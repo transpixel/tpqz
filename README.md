@@ -1,5 +1,5 @@
 
-# TPQZ (libtpqz) "Tip-Que-Zee"
+# TPQZ (libtpqz) "Tip-Q-Zee"
 
 Stand-alone C++ code constructs for developing techy engineering-type software.
 
@@ -42,7 +42,7 @@ Short version: Everything needs a name, should be unique-ish, and here it is.
 
 Longer version: 
 TPQZ is a compositie of the acronym "tpq" from TransPixel-Quantum with
-the "z" added to make it unique and easily pronouncable "Tip-Que-Zee".
+the "z" added to make it unique and easily pronouncable "Tip-Q-Zee".
 
 TransPixel is a (not-yet open source) software code base supporting high
 precision measurement from digital imaging systems. TransPixel's "Quantum"

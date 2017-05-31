@@ -1,11 +1,14 @@
 
-# TPQZ (libtpqz)
+Copyright (c) 2017 Stellacore Corporation. Refer to LICENSE file.
+
+# TPQZ (libtpqz) "Tip-Que-Zee"
 
 Stand-alone C++ code constructs for developing techy engineering-type software.
 
 
 ## Keywords
 C++, Library, Toolkit, Utilities, Geometric Algebra, 3D Transformations
+
 
 ## Questions and Help?
 
@@ -17,59 +20,55 @@ Please be encouraged to:
 
 ## What Is It?
 
-A library of stand-alone C++ code constructs (functions, template,
+TPQZ is a library of stand-alone C++ code constructs (functions, template,
 and classes) perhaps useful(+) for developing techy
 engineering-type software subsystems and applications.
 
 The original code began in support of software systems involved in
-3D geometry, computer vision, photogrammetry and remote sensing operations.
+3D geometry, surveying, computer vision, photogrammetry and
+remote sensing operations.
 
-Developing code for these kinds of applications required a fair number
-of engineering- and math- specific code operations. For example math::atan2
-that avoids the ambiguity of std::atan2() (for which both -pi and +pi can be
-returned). 
+Developing code for those applications required a fair number
+of engineering-specific and math-specific code operations.
+For example math::atan2 that avoids the ambiguity of std::atan2()
+(for which both -pi and +pi can be returned) and other practical-world
+things like that.
 
-(+) at least the code was useful in an actual proprietary project - outside
-of that, caveat consumptor.
+(+) at least the code was useful in some specific actual proprietary
+projects - outside of that, caveat consumptor.
 
 
 ### What's in the Name?
 
-Short version: Needs something, should be unique-ish, and there it is.
+Short version: Everything needs a name, should be unique-ish, and here it is.
 
-Longer quasi-creative version:
-
+Longer version: 
 TPQZ is a compositie of the acronym "tpq" from TransPixel-Quantum with
 the "z" added to make it unique and easily pronouncable "Tip-Que-Zee".
 
 TransPixel is a (not-yet open source) software code base supporting high
-precision measurement from digital imaging systems. The Quantum component
-of this provides a shared generic foundation comprising various C++ utility
-constructs and which has been factored into TPQZ.
+precision measurement from digital imaging systems. TransPixel's "Quantum"
+component provides a shared generic foundation which comprises
+various C++ utility constructs and which has been factored into TPQZ.
 
 
-## What's It Good For?
+## What's TPQZ Good For?
 
-With certainty, it's useful as a code toolbox for it's original
-proprietary purpose. With varying degrees of probability it may
-also be useful for other activities.
+With certainty, it's useful as a code toolbox for its specific original
+proprietary purpose. Outside of that, and with varying degrees of 
+probable success, it may also be useful for other similar
+technical software development activities.
 
-* General capabilities
+ * provides a few capabilities which extend standard C++ (without the
+overhead of a large framework like boost) and a number of capabilities
+which are particularly useful to mathematical operations common in much
+practical engineering work.
+
+* Example capabilities
 	* libdat - useful generic data structures and functions (e.g. grid<>, nullValue<>)
 	* libmath - useful simple math extensions (e.g. interpolation, quadratic equation roots)
 	* libga - geometric algebra support for 3D space (e.g. simple support for Scalars, Vectors, BiVectors and TriVectors and common operations involving them)
-	* libio - (very) minimal - a few functions (e.g. thread safe output)
-	* libsys - (very) minimal - a few functions (e.g. thread pool)
-	* TODO... add descriptions
-
-* A low overhead option for a few useful C++ extensions e.g.
-	* many templates for simplicity
-	* templatized 'null value propagation' (to avoid exceptions)
-
-* High
-
- * provides a few 'extended' capabilities without much overhead (such as from
-boost or other larger libraries)
+	* TODO... add descriptions lib{base,dat,file,ga,geo,img,io.la,math,mem,prob,sig,sys,trans}
 
 ## Getting Started
 
@@ -98,12 +97,12 @@ and/or suggestions to update the documentation.
 
 ### What's Needed?
 
-#### What Environment?
+#### Environment:
 
 The code is intended to be environment agnostic, but is currently (2017.05)
 only exercised on linux/gcc environment.
 
-#### What Dependencies?
+#### Dependencies:
 
 Required
 * C++11 (or later) compiler

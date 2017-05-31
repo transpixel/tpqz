@@ -18,9 +18,13 @@ Please be encouraged to:
 
 ## What Is It?
 
-TPQZ is a library of stand-alone C++ code constructs (functions, template,
+TransPixel-QuantumZ or "TPQZ" is a library of stand-alone C++ code
+constructs (functions, template,
 and classes) perhaps useful(+) for developing techy
 engineering-type software subsystems and applications.
+
+(+) at least the code was useful in some specific actual proprietary
+projects - outside of that, caveat consumptor.
 
 The original code began in support of software systems involved in
 3D geometry, surveying, computer vision, photogrammetry and
@@ -31,9 +35,6 @@ of engineering-specific and math-specific code operations.
 For example math::atan2 that avoids the ambiguity of std::atan2()
 (for which both -pi and +pi can be returned) and other practical-world
 things like that.
-
-(+) at least the code was useful in some specific actual proprietary
-projects - outside of that, caveat consumptor.
 
 
 ### What's in the Name?

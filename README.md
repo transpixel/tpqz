@@ -33,7 +33,7 @@ remote sensing operations.
 Developing code for those applications required a fair number
 of engineering-specific and math-specific code operations.
 For example math::atan2 that avoids the ambiguity of std::atan2()
-(for which both -pi and +pi can be returned) and other practical-world
+for which both -pi and +pi can be returned -and other practical-world
 things like that.
 
 
@@ -56,7 +56,7 @@ various C++ utility constructs and which has been factored into TPQZ.
 With certainty, it's useful as a code toolbox for its specific original
 proprietary purpose. Outside of that, and with varying degrees of 
 probable success, it may also be useful for other similar
-technical software development activities.
+technical software development activities - or perhaps not so much.
 
  * provides a few capabilities which extend standard C++ (without the
 overhead of a large framework like boost) and a number of capabilities
@@ -116,8 +116,8 @@ Optional
 ## Can I Contribute?
 
 Sure!
-TODO - Establish options - for now,
-* contact <:TODO>
+For now,
+* contact [info@transpixel.org](mailto:info@transpixel.org)
 
 
 

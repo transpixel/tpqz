@@ -34,7 +34,7 @@
 
 #include "libsig/match.h"
 
-#include "libbase/Timer.h" // TODO ?
+//#include "libbase/Timer.h" // TODO ?
 #include "libdat/iter.h"
 #include "libdat/layout.h"
 #include "libdat/RowCol.h"
@@ -291,9 +291,9 @@ spotPairAB
 	std::pair<dat::Spot, dat::Spot> spotPair
 		{ dat::nullValue<dat::Spot>(), dat::nullValue<dat::Spot>() };
 
-	base::Timer timer;
+	//T base::Timer timer;
 	// create a metric response grid
-	timer.start("match..scoringGridFor");
+	//T timer.start("match..scoringGridFor");
 	dat::Extents const moveSize{ fcon.targetMoveSize() };
 
 	size_t const maxNullCount{ 0u };
@@ -301,7 +301,7 @@ spotPairAB
 		(scoringGridFor(fullTgtGrid, moveSize, hunkRefGrid, maxNullCount));
 
 	// find peak location
-	timer.start("match..peakfromGrid");
+	//T timer.start("match..peakfromGrid");
 	constexpr double topRadius{ 2. };
 	sig::Peak const peakInB(sig::Peak::fromGrid(evalGridB, topRadius));
 
@@ -309,10 +309,10 @@ spotPairAB
 	if (peakTol < peakInB.prominenceRank())
 	{
 		// refine peak location
-		timer.start("match..peakfitSpot");
+		//T timer.start("match..peakfitSpot");
 		dat::Spot const spotInLookB
 			(sig::Peak::fitSpotFor(evalGridB, peakInB));
-		timer.stop();
+		//T timer.stop();
 
 		// note hotspots w.r.t. full sample
 		spotPair.first = fcon.hotSpotForReference();
@@ -324,7 +324,7 @@ spotPairAB
 
 			io::out() << peakInB.infoString("peakInB") << '\n';
 		//	io::out() << peakInB.infoStringDetail("peakInB") << '\n';
-			io::out() << timer.infoString() << std::endl;
+			//T io::out() << timer.infoString() << std::endl;
 		}
 	}
 

@@ -34,12 +34,25 @@ The dependency grouping of the modules includes:
 * System Utilities
 
 : libmem: threadsafe queue, (memory inspection for linux only)
-: libsys: job control multithreading
+: libsys: job multithreading
 : libfile: interface to boost filesystem
 
-* Math and Geometry
+* Math and Algebra
 
-: lib
+: libmath: useful math constructs
+: libga: geometric algebra for 3D use
+: libprob: simple stats and PDF/CDF operations
+: libtrans: transformation/mapping support
+
+* Geometric Entities and Operations
+
+: libgeo: geometry library (rays, cylinders, etc)
+
+
+* Signal Processing
+
+: libsig
+
 
 NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a
 testLoLevel/ unit test might utilize libHiLevel/ library components.

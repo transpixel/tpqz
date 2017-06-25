@@ -17,9 +17,8 @@ The dependency grouping of the modules includes:
 
 * System Environment Configuration
 
-: Eigen: Linear algebra
-: boost-filesystem: directory/file searching
-: boost-system:
+: Eigen-v3: Eigen C++ library
+: boost-filesystem,system: directory/file searching (Note easily replaced by C++14 or later)
 
 * External
 
@@ -48,10 +47,13 @@ The dependency grouping of the modules includes:
 
 : libgeo: geometry library (rays, cylinders, etc)
 
-
 * Signal Processing
 
-: libsig
+: libsig: primative signal processing operations
+
+* Numerical Operations
+
+: libla: interface libdat structs to Eigen
 
 
 NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a

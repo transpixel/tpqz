@@ -3,6 +3,13 @@
 
 Stand-alone C++ code constructs for developing techy engineering-type software.
 
+## External Licenses
+
+TPQZ is covered by the MIT license.
+
+Integrated 3rd party (external code modules) are consistent with this.
+Specifically
+ * exthalf: MIT License: Copyright (c) 2012-2013 Christian Rau <rauy@users.sourceforge.net>
 
 ## Keywords
 C++, Library, Toolkit, Utilities, Geometric Algebra, 3D Transformations

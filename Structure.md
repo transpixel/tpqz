@@ -48,10 +48,11 @@ The dependency grouping of the modules includes:
 
 : libgeo: geometry library (rays, cylinders, etc)
 
-
 * Signal Processing
 
-: libsig
+: libsig: primative signal processing operations
+
+* XX
 
 
 NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a

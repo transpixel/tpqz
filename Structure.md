@@ -37,12 +37,22 @@ The dependency grouping of the modules includes:
 : libsys: job multithreading
 : libfile: interface to boost filesystem
 
-* Math and Geometry
+* Math and Algebra
 
 : libmath: useful math constructs
 : libga: geometric algebra for 3D use
-: libgeo: geometry library (rays, cylinders, etc)
+: libprob: simple stats and PDF/CDF operations
 : libtrans: transformation/mapping support
+
+* Geometric Entities and Operations
+
+: libgeo: geometry library (rays, cylinders, etc)
+
+
+* Signal Processing
+
+: libsig
+
 
 NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a
 testLoLevel/ unit test might utilize libHiLevel/ library components.

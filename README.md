@@ -91,7 +91,7 @@ practical engineering work.
 
 ## Getting Started
 
-The structure of this repo is described in the [Structure.md] file
+The structure of this repo is described in the [this file](Structure.md).
 
 For an initial quicklook, browse the overview documentation here <:TODO>
 

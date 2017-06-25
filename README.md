@@ -20,6 +20,9 @@ consistent with the TPQZ licensing. Specifically
 * extcli: MIT License: Copyright (c) 2015 - 2016 Florian Rappl
 https://github.com/FlorianRappl/CmdParser
 
+* Eigen-v3: Guennebaud and Beno, Jacob and others
+http://eigen.tuxfamily.org/index.php?title=Main_Page
+
 ## Keywords
 C++, Library, Toolkit, Utilities, Geometric Algebra, 3D Transformations
 
@@ -87,6 +90,8 @@ practical engineering work.
 
 
 ## Getting Started
+
+The structure of this repo is described in the [Structure.md] file
 
 For an initial quicklook, browse the overview documentation here <:TODO>
 

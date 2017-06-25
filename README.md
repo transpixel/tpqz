@@ -3,6 +3,22 @@
 
 Stand-alone C++ code constructs for developing techy engineering-type software.
 
+## External Component Licenses
+
+All original TPQZ is covered by the unrestrictive MIT License
+which provides for allowances for use in commercial products
+and other for-profit activities.
+
+* TPQZ: MIT License: Copyright (c) 2017 Stellacore Corporation.
+
+All integrated 3rd party code (as external directory modules) are
+consistent with the TPQZ license. Specifically
+
+* exthalf: MIT License: Copyright (c) 2012-2013 Christian Rau
+<rauy@users.sourceforge.net>
+
+* extcli: MIT License: Copyright (c) 2015 - 2016 Florian Rappl
+https://github.com/FlorianRappl/CmdParser
 
 ## Keywords
 C++, Library, Toolkit, Utilities, Geometric Algebra, 3D Transformations

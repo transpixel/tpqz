@@ -81,7 +81,7 @@ env.Append(LIBPATH=libpaths)
 
 
 env.Program('ConvertToAscii.cpp')
-env.Program('demoLoadHelix.cpp')
+env.Program('demoLoadBinary.cpp')
 env.Program('FillIndices.cpp')
 env.Program('ThinCloud.cpp')
 env.Program('uFixedPoint.cpp')

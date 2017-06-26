@@ -51,7 +51,7 @@
 
 namespace cloud
 {
-	//! Format used by helix first-stage processing s/w
+	//! Format used by first-stage processing s/w
 	using RecordBin = std::array<float, 7u>;
 
 /*! \brief Functions for input/output of point cloud data.

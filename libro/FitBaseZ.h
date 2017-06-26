@@ -83,12 +83,6 @@ public: // methods
 	isValid
 		() const;
 
-	//! Condition number associated with this ro
-	double
-	condNumFor
-		( ro::PairBaseZ const & roAt
-		) const;
-
 	//! Pair with parameters improved by a single linearized iteration.
 	ro::PairBaseZ
 	improvedNear

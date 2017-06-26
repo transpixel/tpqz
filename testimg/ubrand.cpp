@@ -60,7 +60,7 @@ img_brand_test0
 	return oss.str();
 }
 
-//! Check TODO....
+//! Check write/read operations with generic grid.
 std::string
 img_brand_test1
 	()
@@ -69,10 +69,14 @@ img_brand_test1
 
 	dat::grid<uint8_t> grid(1024u, 1u);
 
-	std::string const expText("Hello");
-	img::brand::writeToColumns(&grid, expText);
+	std::array<uint8_t, img::brand::sMagicSize> const magic
+		{{ 10u, 20u, 30u, 40u, 50u, 60u, 70u, 80u }};
+	img::brand::Config const bConfig(magic);
 
-	std::string const gotText(img::brand::readFromColumns(grid));
+	std::string const expText("Hello");
+	img::brand::writeToColumns(&grid, expText, bConfig);
+
+	std::string const gotText(img::brand::readFromColumns(grid, bConfig));
 
 	if (! (gotText == expText))
 	{

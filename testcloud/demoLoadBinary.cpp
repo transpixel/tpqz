@@ -27,7 +27,7 @@
 //
 
 /*! \file
-\brief  This file contains main application program demoLoadHelix
+\brief  This file contains main application program demoLoadBinary
 */
 
 
@@ -60,7 +60,7 @@ namespace
 	}
 }
 
-//! Demonstrate loading/manipulation of helix point cloud
+//! Demonstrate loading/manipulation of binary point cloud
 int
 main
 	( int const argc
@@ -73,9 +73,9 @@ main
 	// check args
 	app::Usage usage;
 	usage.setSummary
-		( "Load helix (full)point cloud and report statistics"
+		( "Load binary (full)point cloud and report statistics"
 		);
-	usage.addArg("InFile", "Helix processed *.bin format");
+	usage.addArg("InFile", "Binary processed *.bin format");
 	// ...
 	if (usage.argStatus(argc, argv) != app::Usage::Valid)
 	{

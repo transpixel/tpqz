@@ -125,26 +125,6 @@ namespace
 	}
 
 	//! Change in parameters: linear solution for expansion point roAt
-	double
-	normConditionNum
-		( ro::PairBaseZ const & roAt
-		, std::array<ro::FitBaseZ::PtrPairUV, 5u> const & uvPtrs
-		)
-	{
-		double condNum{ dat::nullValue<double>() };
-		if (roAt.isValid() && (5u == uvPtrs.size()))
-		{
-			std::pair<CoefMat, ColVec> const matPair
-				{ normMatRhs(roAt, uvPtrs) };
-
-			// use singular value decomposition in order to assess condNum
-			Eigen::JacobiSVD<CoefMat> const svd(matPair.first);
-			condNum = conditionFor(svd);
-		}
-		return condNum;
-	}
-
-	//! Change in parameters: linear solution for expansion point roAt
 	std::array<double, 5u>
 	deltaParmsFor
 		( ro::PairBaseZ const & roAt
@@ -191,14 +171,6 @@ namespace
 
 		return dParms;
 	}
-}
-
-double
-FitBaseZ :: condNumFor
-	( ro::PairBaseZ const & roAt
-	) const
-{
-	return normConditionNum(roAt, theUVPtrs);
 }
 
 ro::PairBaseZ

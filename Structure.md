@@ -25,16 +25,17 @@ The dependency grouping of the modules includes:
 : exthalf: half precision library
 : extcli: These stand by themselves
 
-* Lowlevel
+* Low-Level 
 
+--- group
+
+: libsys: job multithreading
 : libio: basic IO and data structures
+: libmem: threadsafe queue, (memory inspection for linux only)
+: libfile: interface to boost filesystem
 : libdat: useful data structures used through elsewhere
 
-* System Utilities
-
-: libmem: threadsafe queue, (memory inspection for linux only)
-: libsys: job multithreading
-: libfile: interface to boost filesystem
+--- group
 
 * Math and Algebra
 
@@ -42,18 +43,29 @@ The dependency grouping of the modules includes:
 : libga: geometric algebra for 3D use
 : libprob: simple stats and PDF/CDF operations
 : libtrans: transformation/mapping support
+: libla: linear algebra: interface libdat/ to Eigen
+
+--- group
 
 * Geometric Entities and Operations
 
 : libgeo: geometry library (rays, cylinders, etc)
 
+* Image Processing
+
+: libimg: simple basic image manipulations (uses OpenCV for I/O and format conversion).
+
 * Signal Processing
 
-: libsig: primative signal processing operations
+: libsig: primative signal processing operations.
 
-* Numerical Operations
+--- group
 
-: libla: interface libdat structs to Eigen
+* Photogrammetry / Computer Vision
+
+: libcam: simple camera/image support
+: libmap: cartographic projections
+: libro: relative orientation
 
 
 NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a

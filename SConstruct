@@ -96,7 +96,6 @@ tpSnapshot = GetOption('tpSnapshot')
 tpNoAssert = GetOption('tpNoAssert')
 
 # Scons/Python defaults
-optResin = "-D ACQ_BUILD_NORMAL"
 optNoAssert = ""
 
 # Enable s/w configuration branding
@@ -116,7 +115,6 @@ if tpNoAssert :
 # Aggregate build command options
 OptionCppFlags = \
     [ optSwVersion
-    , optResin
     , optNoAssert
     ]
 

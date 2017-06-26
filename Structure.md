@@ -67,12 +67,14 @@ The dependency grouping of the modules includes:
 : libmap: cartographic projections
 : libro: relative orientation
 
-* Photogrammetry / Computer Vision
+--- group
 
-: libcam: simple camera/image support
-: libmap: cartographic projections
-: libro: relative orientation
+* Prototype Generic Rendering
 
+: libmodel: environment modeling (geometry and radiometry)
+: libsen: general sensing operations
+
+*** Test Modules ***
 
 NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a
 testLoLevel/ unit test might utilize libHiLevel/ library components.

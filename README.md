@@ -5,7 +5,7 @@ Stand-alone C++ code constructs for developing techy engineering-type software.
 
 ## External Component Licenses
 
-All original TPQZ is covered by the unrestrictive MIT License
+All original work in TPQZ is covered by the unrestrictive MIT License
 which provides for use in commercial products and other for-profit
 activities.
 
@@ -103,7 +103,8 @@ practical engineering work.
 
 ## Getting Started
 
-The structure of this repo is described in the [this file](Structure.md).
+The [organizational structure of this repo](Structure.md) is
+described in the top-level file Structure.md
 
 For an initial quicklook, browse the overview documentation here <:TODO>
 
@@ -123,22 +124,30 @@ unit tests. E.g.
 	* if useage/args not clear, then read the corresponding
 	unit test code for concrete example of usage.
 
-The initial internal and generated documentation/comments are rather
-sparse. Therefore please do not hesitate to contact <:TODO> with questions
+The initial internal and generated documentation/comments
+are rather sparse. Therefore please do not hesitate to contact
+[info@transpixel.org](mailto:info@transpixel.org) with questions
 and/or suggestions to update the documentation.
 
 
 ### What's Needed?
+
+There are likely many changes/extensions required or useful for
+TPQZ to be used in a new context.
 
 #### Environment:
 
 The code is intended to be environment agnostic, but is currently (2017.05)
 only exercised on linux/gcc environment.
 
+There are a few items of dormant code that are linux only. Such code
+items are here for convenience only during development activities -
+and are not dependencies of the library.
+
 #### Dependencies:
 
 Required
-* C++11 (or later) compiler
+* C++11 (or later) compiler (C++14 or later to remove use of boost)
 * SCons for build system (which requires python)
 
 Optional

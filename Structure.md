@@ -51,6 +51,7 @@ easily replaced by C++14 or later)
 #### Geometric Entities and Operations
 
 + libgeo: geometry library (rays, cylinders, etc)
++ libcloud: simple point cloud support
 
 #### Image Processing
 

@@ -25,6 +25,11 @@ in the inventory.
 + boost-filesystem,system: used for directory/file searching (Note
 easily replaced by C++14 or later)
 
+### Build System Components
+
++ env: file templates and scripts related to overall build environment.
++ build: scripts to manage builds - e.g. run unit tests, generate docs.
+
 ### External Source Code Imports
 
 + exthalf: half precision (16-bit) library

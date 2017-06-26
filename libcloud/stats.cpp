@@ -28,87 +28,60 @@
 
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Definitions for cloud::stats
 */
 
 
-#include "libapp/ProcessLogger.h"
+#include "libcloud/stats.h"
+
+#include "libdat/MinMax.h"
+#include "libcloud/cast.h"
+#include "libcloud/PointIterator.h"
+
+#include <array>
 
 
-namespace app
+namespace cloud
+{
+namespace stats
 {
 
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
+dat::Volume<double>
+boundingVolumeOf
+	( std::vector<FixedPoint> const & fpnts
 	)
 {
-	if (ptLog)
+	dat::Volume<double> bounds;
+
+	if (! fpnts.empty())
 	{
-		ptLog->mark(msg);
+		// Determine extents of each coordinate component
+		std::array<dat::MinMax<double>, 3u> xyzMinMax;
+		for (PointIterator iter{fpnts} ; iter ; ++iter)
+		{
+			ga::Vector const point(iter.vectorPoint());
+			xyzMinMax[0] = xyzMinMax[0].expandedWith(point[0]);
+			xyzMinMax[1] = xyzMinMax[1].expandedWith(point[1]);
+			xyzMinMax[2] = xyzMinMax[2].expandedWith(point[2]);
+		}
+
+		// return volume
+		if ( dat::isValid(xyzMinMax[0])
+		  && dat::isValid(xyzMinMax[1])
+		  && dat::isValid(xyzMinMax[2])
+		   )
+		{
+			bounds = dat::Volume<double>
+				{ dat::Range<double>(xyzMinMax[0].pair())
+				, dat::Range<double>(xyzMinMax[1].pair())
+				, dat::Range<double>(xyzMinMax[2].pair())
+				};
+		}
 	}
+
+	return bounds;
 }
 
-
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
-}
-
-void
-ProcessLogger :: markMem
-	( std::string const & msg
-	)
-{
-	theMemReporter(msg);
-}
-
-void
-ProcessLogger :: markTime
-	( std::string const & msg
-	)
-{
-	theTimer.start(msg);
-}
-
-void
-ProcessLogger :: mark
-	( std::string const & msg
-	)
-{
-	markMem(msg);
-	markTime(msg);
-}
-
-void
-ProcessLogger :: operator()
-	( std::string const & msg
-	)
-{
-	mark(msg);
-}
-
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
 }
 }
 

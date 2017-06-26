@@ -26,89 +26,52 @@
 //
 //
 
+#ifndef cloud_geo_INCL_
+#define cloud_geo_INCL_
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Declarations for cloud::geo
 */
 
 
-#include "libapp/ProcessLogger.h"
+#include "libga/Rigid.h"
+#include "libgeo/Ray.h"
 
 
-namespace app
+namespace cloud
 {
 
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
-	)
+/*! \brief Functions relating to cloud geometry
+
+\par Example
+\dontinclude testcloud/ugeo.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace geo
 {
-	if (ptLog)
-	{
-		ptLog->mark(msg);
-	}
+	//! Nominal probe motion axis in binary cloud frame
+	::geo::Ray const &
+	axisInBinCloud
+		();
+
+	//! Attitude of cloud .bin file frame w.r.t. reference frame
+	ga::Pose const &
+	poseCloudWrtRef
+		();
+
+	//! Orientation of cloud .bin file frame w.r.t. reference frame
+	ga::Rigid const &
+	xformCloudWrtRef
+		();
+
 }
 
-
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
 }
 
-void
-ProcessLogger :: markMem
-	( std::string const & msg
-	)
-{
-	theMemReporter(msg);
-}
+// Inline definitions
+// #include "libcloud/geo.inl"
 
-void
-ProcessLogger :: markTime
-	( std::string const & msg
-	)
-{
-	theTimer.start(msg);
-}
-
-void
-ProcessLogger :: mark
-	( std::string const & msg
-	)
-{
-	markMem(msg);
-	markTime(msg);
-}
-
-void
-ProcessLogger :: operator()
-	( std::string const & msg
-	)
-{
-	mark(msg);
-}
-
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
-}
-}
+#endif // cloud_geo_INCL_
 

@@ -28,87 +28,47 @@
 
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Inline definitions for cloud::io
 */
 
 
-#include "libapp/ProcessLogger.h"
+#include "libio/sprintf.h"
 
 
-namespace app
+namespace cloud
+{
+namespace io
 {
 
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
+template <typename FwdIter>
+inline
+bool
+saveFixedPointAsAscii
+	( std::ostream & ostrm
+	, FwdIter const & beg
+	, FwdIter const & end
+	, std::string const & fmt
 	)
 {
-	if (ptLog)
+	for (FwdIter iter{beg} ; end != iter ; ++iter)
 	{
-		ptLog->mark(msg);
+		ga::Vector const point(cast::Vector(*iter));
+		ostrm
+			<< ::io::sprintf(fmt, point[0])
+			<< " "
+			<< ::io::sprintf(fmt, point[1])
+			<< " "
+			<< ::io::sprintf(fmt, point[2])
+			<< '\n';
+		if (! ostrm)
+		{
+			break;
+		}
 	}
+	ostrm << std::flush;
+	return (! ostrm.fail());
 }
 
-
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
-}
-
-void
-ProcessLogger :: markMem
-	( std::string const & msg
-	)
-{
-	theMemReporter(msg);
-}
-
-void
-ProcessLogger :: markTime
-	( std::string const & msg
-	)
-{
-	theTimer.start(msg);
-}
-
-void
-ProcessLogger :: mark
-	( std::string const & msg
-	)
-{
-	markMem(msg);
-	markTime(msg);
-}
-
-void
-ProcessLogger :: operator()
-	( std::string const & msg
-	)
-{
-	mark(msg);
-}
-
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
 }
 }
 

@@ -26,77 +26,58 @@
 //
 //
 
-#ifndef app_Progress_INCL_
-#define app_Progress_INCL_
+#ifndef cloud_Panel_INCL_
+#define cloud_Panel_INCL_
 
 /*! \file
-\brief Declarations for app::Progress
+\brief Declarations for cloud::Panel
 */
 
 
-#include "libdat/validity.h"
+#include "libdat/Area.h"
+#include "libdat/Extents.h"
+#include "libga/Rigid.h"
 
 #include <string>
+#include <vector>
 
 
-namespace app
+namespace cloud
 {
 
-/*! \brief Simple progress state class
+/*! \brief A "panel" of regularly distributed points (e.g. grid of points)
 
 \par Example
-\dontinclude testapp/uProgress.cpp
+\dontinclude testcloud/uPanel.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class Progress
+class Panel
 {
 
-	size_t theMaxValue{ dat::nullValue<size_t>() };
-	size_t theAtValue{ dat::nullValue<size_t>() };
+public: // data
+
+	std::vector<ga::Vector> thePoints{};
 
 public: // methods
 
 	//! default null constructor
-	Progress
+	Panel
 		() = default;
 
-	//! Initialization construction
+	//! Construct with specified characteristics
 	explicit
-	Progress
-		( size_t const & maxValue
-		, size_t const & startValue = 0u
+	Panel
+		( dat::Area<double> const & area
+		, dat::Extents const & hwSize = dat::Extents(2u, 2u)
+		, ga::Rigid const & oriPanWrtRef = ga::Rigid::identity()
+			//!< Orientation of panel(XY) plane w.r.t. Reference frame
 		);
-
-	// copy constructor -- compiler provided
-	// assignment operator -- compiler provided
-	// destructor -- compiler provided
 
 	//! Check if instance is valid
 	bool
 	isValid
-		() const;
-
-	//! (Pre) Increment progress - and return modified self
-	Progress const &
-	operator++
-		();
-
-	//! Calls op++() numBump times - and return modified self
-	Progress const &
-	advance
-		( size_t const & numBump
-		);
-
-	//! Amount done as fractional value [0.,1.]
-	double
-	fractionDone
-		() const;
-
-	//! Amount done as (nearest) percent value
-	uint8_t
-	percentDone
 		() const;
 
 	//! Descriptive information about this instance.
@@ -104,13 +85,13 @@ public: // methods
 	infoString
 		( std::string const & title = std::string()
 		) const;
-};
 
-}
+}; // Panel
+
+} // cloud
 
 // Inline definitions
-// #include "libapp/Progress.inl"
+// #include "libcloud/Panel.inl"
 
-#endif // app_Progress_INCL_
-
+#endif // cloud_Panel_INCL_
 

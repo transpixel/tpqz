@@ -26,91 +26,80 @@
 //
 //
 
-#ifndef app_Progress_INCL_
-#define app_Progress_INCL_
+#ifndef cloud_io_INCL_
+#define cloud_io_INCL_
 
 /*! \file
-\brief Declarations for app::Progress
+\brief Declarations for cloud::io
 */
 
 
-#include "libdat/validity.h"
+#include "libcloud/cast.h"
+#include "libcloud/cloud.h"
+#include "libcloud/FixedPoint.h"
+#include "libga/ga.h"
 
+#include <array>
+#include <fstream>
+#include <iterator>
 #include <string>
+#include <vector>
+
+#include "libdat/info.h"
+#include "libio/stream.h"
 
 
-namespace app
+namespace cloud
 {
+	//! Format used by helix first-stage processing s/w
+	using RecordBin = std::array<float, 7u>;
 
-/*! \brief Simple progress state class
+/*! \brief Functions for input/output of point cloud data.
 
 \par Example
-\dontinclude testapp/uProgress.cpp
+\dontinclude testcloud/uio.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
-
-class Progress
+namespace io
 {
-
-	size_t theMaxValue{ dat::nullValue<size_t>() };
-	size_t theAtValue{ dat::nullValue<size_t>() };
-
-public: // methods
-
-	//! default null constructor
-	Progress
-		() = default;
-
-	//! Initialization construction
-	explicit
-	Progress
-		( size_t const & maxValue
-		, size_t const & startValue = 0u
+	//! Load data in direct binary format
+	std::vector<RecordBin>
+	loadAsBinary
+		( std::string const & fpath
 		);
 
-	// copy constructor -- compiler provided
-	// assignment operator -- compiler provided
-	// destructor -- compiler provided
+	//! Load and cast data to compacted representation
+	std::vector<FixedPoint>
+	loadAsFixed
+		( std::string const & fpath
+		);
 
-	//! Check if instance is valid
+	//! Save cloud data in ascii format
+	template <typename FwdIter>
+	inline
 	bool
-	isValid
-		() const;
-
-	//! (Pre) Increment progress - and return modified self
-	Progress const &
-	operator++
-		();
-
-	//! Calls op++() numBump times - and return modified self
-	Progress const &
-	advance
-		( size_t const & numBump
+	saveFixedPointAsAscii
+		( std::ostream & ostrm
+		, FwdIter const & beg //!< *iter: FixedPoint
+		, FwdIter const & end
+		, std::string const & fmt = {"%9.6f"}
 		);
 
-	//! Amount done as fractional value [0.,1.]
-	double
-	fractionDone
-		() const;
+	//! Convenience access to general func
+	bool
+	saveAsAscii
+		( std::ostream & ostrm
+		, std::vector<FixedPoint> const & fpnts
+		, std::string const & fmt = {"%9.6f"}
+		);
 
-	//! Amount done as (nearest) percent value
-	uint8_t
-	percentDone
-		() const;
-
-	//! Descriptive information about this instance.
-	std::string
-	infoString
-		( std::string const & title = std::string()
-		) const;
-};
+}
 
 }
 
 // Inline definitions
-// #include "libapp/Progress.inl"
+#include "libcloud/io.inl"
 
-#endif // app_Progress_INCL_
-
+#endif // cloud_io_INCL_
 

@@ -26,89 +26,34 @@
 //
 //
 
+#ifndef cloud_cloud_INCL_
+#define cloud_cloud_INCL_
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Declarations for cloud::cloud
 */
 
 
-#include "libapp/ProcessLogger.h"
+#include <cstdint>
 
 
-namespace app
+/*! \brief Values and functions pertaining to point cloud data
+
+\par Example
+\dontinclude testcloud/ucloud.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace cloud
 {
-
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
-	)
-{
-	if (ptLog)
-	{
-		ptLog->mark(msg);
-	}
+	//! Data type sufficient for representing point cloud data sizes
+	using NdxType = uint32_t;
 }
 
 
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
-}
+// Inline definitions
+// #include "libcloud/cloud.inl"
 
-void
-ProcessLogger :: markMem
-	( std::string const & msg
-	)
-{
-	theMemReporter(msg);
-}
-
-void
-ProcessLogger :: markTime
-	( std::string const & msg
-	)
-{
-	theTimer.start(msg);
-}
-
-void
-ProcessLogger :: mark
-	( std::string const & msg
-	)
-{
-	markMem(msg);
-	markTime(msg);
-}
-
-void
-ProcessLogger :: operator()
-	( std::string const & msg
-	)
-{
-	mark(msg);
-}
-
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
-}
-}
+#endif // cloud_cloud_INCL_
 

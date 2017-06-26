@@ -26,91 +26,124 @@
 //
 //
 
-#ifndef app_Progress_INCL_
-#define app_Progress_INCL_
+#ifndef cloud_PointIterator_INCL_
+#define cloud_PointIterator_INCL_
 
 /*! \file
-\brief Declarations for app::Progress
+\brief Declarations for cloud::PointIterator
 */
 
 
-#include "libdat/validity.h"
+#include "libcloud/cast.h"
+#include "libcloud/cast.h"
 
-#include <string>
+//#include <string>
 
 
-namespace app
+namespace cloud
 {
 
-/*! \brief Simple progress state class
+/*! \brief Provide iterator over ga::Vector representation of fixed points
 
 \par Example
-\dontinclude testapp/uProgress.cpp
+\dontinclude testcloud/uPointIterator.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class Progress
+class PointIterator
 {
+	using FwdIter = std::vector<FixedPoint>::const_iterator;
 
-	size_t theMaxValue{ dat::nullValue<size_t>() };
-	size_t theAtValue{ dat::nullValue<size_t>() };
+	FwdIter theBeg;
+	FwdIter theIter;
+	FwdIter theEnd;
 
 public: // methods
 
 	//! default null constructor
-	Progress
+	PointIterator
 		() = default;
 
-	//! Initialization construction
+	//! Provide iterator that cast
 	explicit
-	Progress
-		( size_t const & maxValue
-		, size_t const & startValue = 0u
-		);
+	PointIterator
+		( std::vector<FixedPoint> const & fpnts
+		)
+		: theBeg{ fpnts.begin() }
+		, theIter{ theBeg }
+		, theEnd{ fpnts.end() }
+	{
+	}
 
 	// copy constructor -- compiler provided
 	// assignment operator -- compiler provided
 	// destructor -- compiler provided
 
+	//! Like isActive() but w/o validity check
+	inline
+	explicit operator bool
+		() const
+	{
+		return (theEnd != theIter);
+	}
+
+	//! RowCol expression of current iterator value
+	inline
+	ga::Vector
+	vectorPoint
+		() const
+	{
+		return cast::Vector(*theIter);
+	}
+
+	//! Move forward by one element of domain
+	inline
+	PointIterator &
+	operator++
+		()
+	{
+		++theIter;
+		return *this;
+	}
+
+	/*
 	//! Check if instance is valid
 	bool
 	isValid
-		() const;
-
-	//! (Pre) Increment progress - and return modified self
-	Progress const &
-	operator++
-		();
-
-	//! Calls op++() numBump times - and return modified self
-	Progress const &
-	advance
-		( size_t const & numBump
-		);
-
-	//! Amount done as fractional value [0.,1.]
-	double
-	fractionDone
-		() const;
-
-	//! Amount done as (nearest) percent value
-	uint8_t
-	percentDone
-		() const;
+		() const
+	{
+		return (! (theBeg == FwdIter{}));
+	}
 
 	//! Descriptive information about this instance.
 	std::string
 	infoString
 		( std::string const & title = std::string()
-		) const;
+		) const
+	{
+		std::ostringstream oss;
+		if (! title.empty())
+		{
+			oss << title << std::endl;
+		}
+		if (isValid())
+		{
+		}
+		else
+		{
+			oss << " <null>";
+		}
+		return oss.str();
+	}
+	*/
+
 };
 
 }
 
 // Inline definitions
-// #include "libapp/Progress.inl"
+// #include "libcloud/PointIterator.inl"
 
-#endif // app_Progress_INCL_
-
+#endif // cloud_PointIterator_INCL_
 

@@ -28,87 +28,65 @@
 
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Inline Definitions for cloud::cast
 */
 
 
-#include "libapp/ProcessLogger.h"
-
-
-namespace app
+namespace cloud
+{
+namespace cast
 {
 
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
+inline
+int16_t
+countFor
+	( double const & dval
 	)
 {
-	if (ptLog)
-	{
-		ptLog->mark(msg);
-	}
+	return static_cast<int16_t>(std::floor(sCountPerDub * dval));
 }
 
-
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
-}
-
-void
-ProcessLogger :: markMem
-	( std::string const & msg
+inline
+double
+dubFor
+	( int16_t const & count
 	)
 {
-	theMemReporter(msg);
+	return (sDubPerCount * double(count));
 }
 
-void
-ProcessLogger :: markTime
-	( std::string const & msg
+inline
+cloud::FixedPoint
+FixedPoint
+	( float const & fx
+	, float const & fy
+	, float const & fz
 	)
 {
-	theTimer.start(msg);
+	return cloud::FixedPoint
+		{{ countFor(fx), countFor(fy), countFor(fz) }};
 }
 
-void
-ProcessLogger :: mark
-	( std::string const & msg
+inline
+cloud::FixedPoint
+FixedPoint
+	( ga::Vector const & vec
 	)
 {
-	markMem(msg);
-	markTime(msg);
+	return cloud::FixedPoint
+		{{ countFor(vec[0]), countFor(vec[1]), countFor(vec[2]) }};
 }
 
-void
-ProcessLogger :: operator()
-	( std::string const & msg
+inline
+ga::Vector
+Vector
+	( cloud::FixedPoint const & fpnt
 	)
 {
-	mark(msg);
+	return ga::Vector
+		(dubFor(fpnt[0]), dubFor(fpnt[1]), dubFor(fpnt[2]));
 }
 
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
 }
 }
 

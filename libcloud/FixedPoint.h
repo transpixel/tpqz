@@ -26,89 +26,34 @@
 //
 //
 
+#ifndef cloud_FixedPoint_INCL_
+#define cloud_FixedPoint_INCL_
+
+
+#include "libdat/array.h"
+#include "libga/ga.h"
+
+#include <cstddef>
+#include <array>
+
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Declarations for cloud::FixedPoint
 */
 
+#include <string>
 
-#include "libapp/ProcessLogger.h"
-
-
-namespace app
+namespace cloud
 {
+	//! \brief Compressed representation of a 3D point.
+	using FixedPoint = std::array<int16_t, 3u>;
 
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
-	)
-{
-	if (ptLog)
-	{
-		ptLog->mark(msg);
-	}
+	//! Invalid point
+	constexpr FixedPoint sNullPoint{{ dat::nullValue<int16_t>() }};
 }
 
+// Inline definitions
+// #include "libcloud/FixedPoint.inl"
 
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
-}
-
-void
-ProcessLogger :: markMem
-	( std::string const & msg
-	)
-{
-	theMemReporter(msg);
-}
-
-void
-ProcessLogger :: markTime
-	( std::string const & msg
-	)
-{
-	theTimer.start(msg);
-}
-
-void
-ProcessLogger :: mark
-	( std::string const & msg
-	)
-{
-	markMem(msg);
-	markTime(msg);
-}
-
-void
-ProcessLogger :: operator()
-	( std::string const & msg
-	)
-{
-	mark(msg);
-}
-
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
-}
-}
+#endif // cloud_FixedPoint_INCL_
 

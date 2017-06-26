@@ -26,89 +26,45 @@
 //
 //
 
+#ifndef cloud_stats_INCL_
+#define cloud_stats_INCL_
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Declarations for cloud::stats
 */
 
 
-#include "libapp/ProcessLogger.h"
+#include "libdat/Volume.h"
+#include "libcloud/FixedPoint.h"
+
+#include <vector>
 
 
-namespace app
+namespace cloud
 {
 
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
-	)
+/*! \brief Functions that represent statistics for point clouds.
+
+\par Example
+\dontinclude testcloud/ustats.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace stats
 {
-	if (ptLog)
-	{
-		ptLog->mark(msg);
-	}
+	//! Rectangular volume (exactly) containing all points
+	dat::Volume<double>
+	boundingVolumeOf
+		( std::vector<FixedPoint> const & fpnts
+		);
+
 }
 
-
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
 }
 
-void
-ProcessLogger :: markMem
-	( std::string const & msg
-	)
-{
-	theMemReporter(msg);
-}
+// Inline definitions
+#include "libcloud/stats.inl"
 
-void
-ProcessLogger :: markTime
-	( std::string const & msg
-	)
-{
-	theTimer.start(msg);
-}
-
-void
-ProcessLogger :: mark
-	( std::string const & msg
-	)
-{
-	markMem(msg);
-	markTime(msg);
-}
-
-void
-ProcessLogger :: operator()
-	( std::string const & msg
-	)
-{
-	mark(msg);
-}
-
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
-}
-}
+#endif // cloud_stats_INCL_
 

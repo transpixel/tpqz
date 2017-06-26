@@ -28,87 +28,42 @@
 
 
 /*! \file
-\brief Definitions for app::ProcessLogger
+\brief Definitions for cloud::xform
 */
 
 
-#include "libapp/ProcessLogger.h"
+#include "libcloud/xform.h"
+
+#include "libcloud/PointIterator.h"
 
 
-namespace app
+namespace cloud
+{
+namespace xform
 {
 
-// static
-void
-ProcessLogger :: mark
-	( ProcessLogger * const & ptLog
-	, std::string const & msg
+std::vector<cloud::FixedPoint>
+fixedPoints
+	( ga::Rigid const & xIntoWrtFrom
+	, std::vector<cloud::FixedPoint> const & fpntFroms
 	)
 {
-	if (ptLog)
+	std::vector<cloud::FixedPoint> fpntIntos;
+	if (! fpntFroms.empty())
 	{
-		ptLog->mark(msg);
+		// transform points into expression w.r.t. station
+		fpntIntos.reserve(fpntFroms.size());
+		for (cloud::PointIterator iter{fpntFroms} ; iter ; ++iter)
+		{
+			ga::Vector const pntInReel(iter.vectorPoint());
+			ga::Vector const pntInSta(xIntoWrtFrom(pntInReel));
+			fpntIntos.emplace_back(cloud::cast::FixedPoint(pntInSta));
+		}
 	}
+
+	return fpntIntos;
 }
 
-
-// explicit
-ProcessLogger :: ProcessLogger
-	( std::vector<std::string> const memKeys
-	)
-	: theTimer{}
-	, theOssMem{}
-	, theMemReporter(memKeys)
-{
-}
-
-void
-ProcessLogger :: markMem
-	( std::string const & msg
-	)
-{
-	theMemReporter(msg);
-}
-
-void
-ProcessLogger :: markTime
-	( std::string const & msg
-	)
-{
-	theTimer.start(msg);
-}
-
-void
-ProcessLogger :: mark
-	( std::string const & msg
-	)
-{
-	markMem(msg);
-	markTime(msg);
-}
-
-void
-ProcessLogger :: operator()
-	( std::string const & msg
-	)
-{
-	mark(msg);
-}
-
-std::string
-ProcessLogger :: infoStringMem
-	( std::string const & title
-	) const
-{
-	return theMemReporter.infoString(title);
-}
-
-std::string
-ProcessLogger :: infoStringTime
-	( std::string const & title
-	) const
-{
-	return theTimer.infoString(title);
 }
 }
 

@@ -26,60 +26,49 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Inline definitions for cloud::io
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+#include "libio/sprintf.h"
+
+
+namespace cloud
+{
+namespace io
 {
 
-//! \brief functions for s/w version management.
-namespace version
+template <typename FwdIter>
+inline
+bool
+saveFixedPointAsAscii
+	( std::ostream & ostrm
+	, FwdIter const & beg
+	, FwdIter const & end
+	, std::string const & fmt
+	)
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
+	for (FwdIter iter{beg} ; end != iter ; ++iter)
 	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
+		ga::Vector const point(cast::Vector(*iter));
+		ostrm
+			<< ::io::sprintf(fmt, point[0])
+			<< " "
+			<< ::io::sprintf(fmt, point[1])
+			<< " "
+			<< ::io::sprintf(fmt, point[2])
+			<< '\n';
+		if (! ostrm)
 		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
+			break;
 		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
 	}
-
+	ostrm << std::flush;
+	return (! ostrm.fail());
 }
 
 }
-
-// Inline definitions
-// #include "libbuild/version.inl"
-
-#endif // build_version_INCL_
+}
 

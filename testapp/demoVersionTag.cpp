@@ -26,60 +26,53 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
-
 /*! \file
-\brief Declarations for build::version
+\brief  This file contains main application program APPNAME
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
-{
+#include "libapp/Usage.h"
 
-//! \brief functions for s/w version management.
-namespace version
+#include "build/version.h"
+#include "libio/stream.h"
+
+#include <cassert>
+#include <iostream>
+
+
+namespace
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
+}
+
+//! Main program that #####
+int
+main
+	( int const argc
+	, char const * const * const argv
+	)
+{
+	// Don't mix stdio & streams (for performance)
+	//std::ios::sync_with_stdio(false);
+
+	// check args
+	app::Usage usage;
+	usage.setSummary
+		( "Demonstrate use of SCM version tag in code"
+		);
+	// ...
+	if (usage.argStatus(argc, argv) != app::Usage::Valid)
 	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
+		std::string const fname(argv[0]);
+		io::err()
+			<< std::endl << build::version::buildInfo(argv[0]) << std::endl
+			<< usage.infoString(fname) << std::endl;
+		return 1;
 	}
 
+	// display version ID
+//	std::string const vtag(SCM_VERSION_STRING);
+//	io::out() << "vtag:" << " '" << vtag << "'\n";
+io::err() << "WARNING: Restore tag processing\n";
+
+	return 0;
 }
-
-}
-
-// Inline definitions
-// #include "libbuild/version.inl"
-
-#endif // build_version_INCL_
-

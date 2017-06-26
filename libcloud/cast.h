@@ -26,60 +26,78 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
+#ifndef cloud_cast_INCL_
+#define cloud_cast_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Declarations for cloud::cast
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+#include "libcloud/FixedPoint.h"
+#include "libdat/array.h"
+#include "libga/ga.h"
+
+
+namespace cloud
 {
 
-//! \brief functions for s/w version management.
-namespace version
+/*! \brief Functions for casting between cloud entities
+
+\par Example
+\dontinclude testcloud/ucast.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace cast
 {
-	//! Version Brand String (build date)
+	//! encoding provides data range of approx +/- 16. double units
+	constexpr double sCountPerDub{ 2. * 1024. }; // about .000488 per
+	constexpr double sDubPerCount{ 1./sCountPerDub };
+
+	//! Encode double into low 16 bits
 	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
-	{
-		std::ostringstream oss;
+	int16_t
+	countFor
+		( double const & dval
+		);
 
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
+	//! Decode low 16-bits into double
+	inline
+	double
+	dubFor
+		( int16_t const & count
+		);
 
-		return oss.str();
-	}
+	//! Encode vector point into packed representation
+	inline
+	cloud::FixedPoint
+	FixedPoint
+		( float const & fx
+		, float const & fy
+		, float const & fz
+		);
+
+	//! Encode vector point into packed representation
+	inline
+	cloud::FixedPoint
+	FixedPoint
+		( ga::Vector const & vec
+		);
+
+	//! Decode packed representation into full vector
+	inline
+	ga::Vector
+	Vector
+		( cloud::FixedPoint const & fpnt
+		);
 
 }
-
 }
 
 // Inline definitions
-// #include "libbuild/version.inl"
+#include "libcloud/cast.inl"
 
-#endif // build_version_INCL_
+#endif // cloud_cast_INCL_
 

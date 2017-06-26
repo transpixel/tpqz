@@ -26,60 +26,75 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
-
 /*! \file
-\brief Declarations for build::version
+\brief  This file contains unit test for dat::validity
 */
 
-#include <string>
+
+#include "libdat/validity.h"
+#include "libdat/info.h"
+#include "libio/stream.h"
+
+#include <iostream>
 #include <sstream>
+#include <string>
 
-namespace build
+
+namespace
 {
 
-//! \brief functions for s/w version management.
-namespace version
+//! Check for common functions
+std::string
+dat_validity_test0
+	()
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
+	std::ostringstream oss;
+
+	// check function validity
+	std::function<float(int const &)> const fNull(dat::nullFunc<float, int>());
+	float const gotOut(fNull(7));
+	if (dat::isValid(gotOut))
 	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
+		oss << "Failure of null function test" << std::endl;
 	}
 
+	return oss.str();
 }
 
+//! Check TODO....
+std::string
+dat_validity_test1
+	()
+{
+	std::ostringstream oss;
+	/*
+	oss << "Failure: implement this test!" << std::endl;
+	*/
+	return oss.str();
 }
 
-// Inline definitions
-// #include "libbuild/version.inl"
 
-#endif // build_version_INCL_
+}
 
+//! Unit test for dat::validity
+int
+main
+	( int const /*argc*/
+	, char const * const * const /*argv*/
+	)
+{
+	std::ostringstream oss;
+
+	// run tests
+	oss << dat_validity_test0();
+	oss << dat_validity_test1();
+
+	// check/report results
+	std::string const errMessages(oss.str());
+	if (! errMessages.empty())
+	{
+		io::err() << errMessages << std::endl;
+		return 1;
+	}
+	return 0;
+}

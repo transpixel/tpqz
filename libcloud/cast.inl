@@ -26,60 +26,67 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Inline Definitions for cloud::cast
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+namespace cloud
+{
+namespace cast
 {
 
-//! \brief functions for s/w version management.
-namespace version
+inline
+int16_t
+countFor
+	( double const & dval
+	)
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
-	{
-		std::ostringstream oss;
+	return static_cast<int16_t>(std::floor(sCountPerDub * dval));
+}
 
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
+inline
+double
+dubFor
+	( int16_t const & count
+	)
+{
+	return (sDubPerCount * double(count));
+}
 
-		return oss.str();
-	}
+inline
+cloud::FixedPoint
+FixedPoint
+	( float const & fx
+	, float const & fy
+	, float const & fz
+	)
+{
+	return cloud::FixedPoint
+		{{ countFor(fx), countFor(fy), countFor(fz) }};
+}
 
+inline
+cloud::FixedPoint
+FixedPoint
+	( ga::Vector const & vec
+	)
+{
+	return cloud::FixedPoint
+		{{ countFor(vec[0]), countFor(vec[1]), countFor(vec[2]) }};
+}
+
+inline
+ga::Vector
+Vector
+	( cloud::FixedPoint const & fpnt
+	)
+{
+	return ga::Vector
+		(dubFor(fpnt[0]), dubFor(fpnt[1]), dubFor(fpnt[2]));
 }
 
 }
-
-// Inline definitions
-// #include "libbuild/version.inl"
-
-#endif // build_version_INCL_
+}
 

@@ -26,60 +26,72 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
+#ifndef cloud_Panel_INCL_
+#define cloud_Panel_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Declarations for cloud::Panel
 */
 
+
+#include "libdat/Area.h"
+#include "libdat/Extents.h"
+#include "libga/Rigid.h"
+
 #include <string>
-#include <sstream>
+#include <vector>
 
-namespace build
+
+namespace cloud
 {
 
-//! \brief functions for s/w version management.
-namespace version
+/*! \brief A "panel" of regularly distributed points (e.g. grid of points)
+
+\par Example
+\dontinclude testcloud/uPanel.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+class Panel
 {
-	//! Version Brand String (build date)
-	inline
+
+public: // data
+
+	std::vector<ga::Vector> thePoints{};
+
+public: // methods
+
+	//! default null constructor
+	Panel
+		() = default;
+
+	//! Construct with specified characteristics
+	explicit
+	Panel
+		( dat::Area<double> const & area
+		, dat::Extents const & hwSize = dat::Extents(2u, 2u)
+		, ga::Rigid const & oriPanWrtRef = ga::Rigid::identity()
+			//!< Orientation of panel(XY) plane w.r.t. Reference frame
+		);
+
+	//! Check if instance is valid
+	bool
+	isValid
+		() const;
+
+	//! Descriptive information about this instance.
 	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
-	{
-		std::ostringstream oss;
+	infoString
+		( std::string const & title = std::string()
+		) const;
 
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
+}; // Panel
 
-		return oss.str();
-	}
-
-}
-
-}
+} // cloud
 
 // Inline definitions
-// #include "libbuild/version.inl"
+// #include "libcloud/Panel.inl"
 
-#endif // build_version_INCL_
+#endif // cloud_Panel_INCL_
 

@@ -26,60 +26,44 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Definitions for cloud::xform
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+#include "libcloud/xform.h"
+
+#include "libcloud/PointIterator.h"
+
+
+namespace cloud
+{
+namespace xform
 {
 
-//! \brief functions for s/w version management.
-namespace version
+std::vector<cloud::FixedPoint>
+fixedPoints
+	( ga::Rigid const & xIntoWrtFrom
+	, std::vector<cloud::FixedPoint> const & fpntFroms
+	)
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
+	std::vector<cloud::FixedPoint> fpntIntos;
+	if (! fpntFroms.empty())
 	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
+		// transform points into expression w.r.t. station
+		fpntIntos.reserve(fpntFroms.size());
+		for (cloud::PointIterator iter{fpntFroms} ; iter ; ++iter)
 		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
+			ga::Vector const pntInReel(iter.vectorPoint());
+			ga::Vector const pntInSta(xIntoWrtFrom(pntInReel));
+			fpntIntos.emplace_back(cloud::cast::FixedPoint(pntInSta));
 		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
 	}
 
+	return fpntIntos;
 }
 
 }
-
-// Inline definitions
-// #include "libbuild/version.inl"
-
-#endif // build_version_INCL_
+}
 

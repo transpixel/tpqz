@@ -26,60 +26,75 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
-
 /*! \file
-\brief Declarations for build::version
+\brief  This file contains unit test for prob::histo
 */
 
-#include <string>
+
+#include "libprob/histo.h"
+
+#include "libio/stream.h"
+
+#include <array>
+#include <iostream>
 #include <sstream>
+#include <string>
 
-namespace build
+
+namespace
 {
 
-//! \brief functions for s/w version management.
-namespace version
+//! Check basic functions
+std::string
+prob_histo_test1
+	()
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
+	std::ostringstream oss;
+
+	// simple data collections
+	std::vector<uint8_t> const data
+		{{ 8u, 8u, 4u, 6u,  20u, 60u,  79u, 79u, 79u, 3u }};
+	size_t const expMinBin( 3u);
+	size_t const expMaxBin(79u);
+
+	std::array<size_t, 256u> const hist
+		(prob::histo::countsForUint8(data.begin(), data.end()));
+	size_t const gotMinBin(prob::histo::minBinNotZero(hist));
+	size_t const gotMaxBin(prob::histo::maxBinNotZero(hist));
+
+	if (! (gotMinBin == expMinBin))
 	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
+		oss << "Failure of minBin test" << std::endl;
+	}
+	if (! (gotMaxBin == expMaxBin))
+	{
+		oss << "Failure of maxBin test" << std::endl;
 	}
 
+	return oss.str();
 }
 
+
 }
 
-// Inline definitions
-// #include "libbuild/version.inl"
+//! Unit test for prob::histo
+int
+main
+	( int const /*argc*/
+	, char const * const * const /*argv*/
+	)
+{
+	std::ostringstream oss;
 
-#endif // build_version_INCL_
+	// run tests
+	oss << prob_histo_test1();
 
+	// check/report results
+	std::string const errMessages(oss.str());
+	if (! errMessages.empty())
+	{
+		io::err() << errMessages << std::endl;
+		return 1;
+	}
+	return 0;
+}

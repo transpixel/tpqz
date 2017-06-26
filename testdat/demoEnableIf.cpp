@@ -1,5 +1,4 @@
 //
-//
 // MIT License
 //
 // Copyright (c) 2017 Stellacore Corporation.
@@ -24,62 +23,52 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-//
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
+#include "libio/stream.h"
 
-/*! \file
-\brief Declarations for build::version
-*/
+#include <cstddef>
+#include <iostream>
+#include <typeinfo>
+#include <type_traits>
 
-#include <string>
-#include <sstream>
 
-namespace build
+
+template <typename Type>
+using EnableIf = typename std::enable_if<Type::value>::type;
+
+
+template <typename FType, EnableIf<std::is_floating_point<FType>>...>
+inline
+FType
+someFunc
+	( FType const arg
+	)
 {
-
-//! \brief functions for s/w version management.
-namespace version
-{
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
-	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
-	}
-
+	return arg;
 }
 
+template <typename IType, EnableIf<std::is_integral<IType>>...>
+inline
+IType
+someFunc
+	( IType const & arg
+	)
+{
+	return arg;
 }
 
-// Inline definitions
-// #include "libbuild/version.inl"
+int
+main
+	()
+{
 
-#endif // build_version_INCL_
+	io::out() << "ld: " << typeid(someFunc<long double>(27.L)).name() << '\n';
+	io::out() << " d: " << typeid(someFunc<double>(27.)).name() << '\n';
+	io::out() << " f: " << typeid(someFunc<float>(27.f)).name() << '\n';
+	io::out() << " i: " << typeid(someFunc<int>(27)).name() << '\n';
+	io::out() << " s: " << typeid(someFunc<short>(27)).name() << '\n';
+	io::out() << "u8: " << typeid(someFunc<uint8_t>(27u)).name() << '\n';
+
+	return 0;
+}
 

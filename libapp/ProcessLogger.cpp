@@ -26,60 +26,89 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Definitions for app::ProcessLogger
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+#include "libapp/ProcessLogger.h"
+
+
+namespace app
 {
 
-//! \brief functions for s/w version management.
-namespace version
+// static
+void
+ProcessLogger :: mark
+	( ProcessLogger * const & ptLog
+	, std::string const & msg
+	)
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
+	if (ptLog)
 	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
+		ptLog->mark(msg);
 	}
-
 }
 
+
+// explicit
+ProcessLogger :: ProcessLogger
+	( std::vector<std::string> const memKeys
+	)
+	: theTimer{}
+	, theOssMem{}
+	, theMemReporter(memKeys)
+{
 }
 
-// Inline definitions
-// #include "libbuild/version.inl"
+void
+ProcessLogger :: markMem
+	( std::string const & msg
+	)
+{
+	theMemReporter(msg);
+}
 
-#endif // build_version_INCL_
+void
+ProcessLogger :: markTime
+	( std::string const & msg
+	)
+{
+	theTimer.start(msg);
+}
+
+void
+ProcessLogger :: mark
+	( std::string const & msg
+	)
+{
+	markMem(msg);
+	markTime(msg);
+}
+
+void
+ProcessLogger :: operator()
+	( std::string const & msg
+	)
+{
+	mark(msg);
+}
+
+std::string
+ProcessLogger :: infoStringMem
+	( std::string const & title
+	) const
+{
+	return theMemReporter.infoString(title);
+}
+
+std::string
+ProcessLogger :: infoStringTime
+	( std::string const & title
+	) const
+{
+	return theTimer.infoString(title);
+}
+}
 

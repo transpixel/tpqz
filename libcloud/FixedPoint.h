@@ -26,60 +26,34 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
+#ifndef cloud_FixedPoint_INCL_
+#define cloud_FixedPoint_INCL_
+
+
+#include "libdat/array.h"
+#include "libga/ga.h"
+
+#include <cstddef>
+#include <array>
+
 
 /*! \file
-\brief Declarations for build::version
+\brief Declarations for cloud::FixedPoint
 */
 
 #include <string>
-#include <sstream>
 
-namespace build
+namespace cloud
 {
+	//! \brief Compressed representation of a 3D point.
+	using FixedPoint = std::array<int16_t, 3u>;
 
-//! \brief functions for s/w version management.
-namespace version
-{
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
-	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
-	}
-
-}
-
+	//! Invalid point
+	constexpr FixedPoint sNullPoint{{ dat::nullValue<int16_t>() }};
 }
 
 // Inline definitions
-// #include "libbuild/version.inl"
+// #include "libcloud/FixedPoint.inl"
 
-#endif // build_version_INCL_
+#endif // cloud_FixedPoint_INCL_
 

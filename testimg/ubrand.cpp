@@ -27,53 +27,85 @@
 //
 
 /*! \file
-\brief  This file contains main application program APPNAME
+\brief  This file contains unit test for img::brand
 */
 
 
-#include "libapp/Usage.h"
+#include "libimg/brand.h"
 
-#include "build/version.h"
 #include "libio/stream.h"
 
-#include <cassert>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 
 namespace
 {
+
+//! Check for common functions
+std::string
+img_brand_test0
+	()
+{
+	std::ostringstream oss;
+	/*
+	img::brand const aNull;
+	if (aNull.isValid())
+	{
+		oss << "Failure of null value test" << std::endl;
+		oss << "infoString: " << aNull.infoString("aNull") << std::endl;
+	}
+	*/
+	return oss.str();
 }
 
-//! Main program that #####
-int
-main
-	( int const argc
-	, char const * const * const argv
-	)
+//! Check TODO....
+std::string
+img_brand_test1
+	()
 {
-	// Don't mix stdio & streams (for performance)
-	//std::ios::sync_with_stdio(false);
+	std::ostringstream oss;
 
-	// check args
-	app::Usage usage;
-	usage.setSummary
-		( "overview"
-		);
-	usage.addArg("arg1", "description");
-	// ...
-	if (usage.argStatus(argc, argv) != app::Usage::Valid)
+	dat::grid<uint8_t> grid(1024u, 1u);
+
+	std::string const expText("Hello");
+	img::brand::writeToColumns(&grid, expText);
+
+	std::string const gotText(img::brand::readFromColumns(grid));
+
+	if (! (gotText == expText))
 	{
-		std::string const fname(argv[0]);
-		io::err()
-			<< std::endl << build::version::buildInfo(argv[0]) << std::endl
-			<< usage.infoString(fname) << std::endl;
-		return 1;
+		oss << "Failure of readback test" << std::endl;
+		oss << "expText: '" << expText << "'\n";
+		oss << "gotText: '" << gotText << "'\n";
 	}
 
-	// parse input argument
-//	int argnum(0);
-//	std::string const arg1(argv[++argnum]);
+	return oss.str();
+}
 
 
+}
+
+//! Unit test for img::brand
+int
+main
+	( int const /*argc*/
+	, char const * const * const /*argv*/
+	)
+{
+	std::ostringstream oss;
+
+	// run tests
+	oss << img_brand_test0();
+	oss << img_brand_test1();
+
+	// check/report results
+	std::string const errMessages(oss.str());
+	if (! errMessages.empty())
+	{
+		io::err() << errMessages << std::endl;
+		return 1;
+	}
 	return 0;
 }

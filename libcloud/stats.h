@@ -26,60 +26,45 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
+#ifndef cloud_stats_INCL_
+#define cloud_stats_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Declarations for cloud::stats
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+#include "libdat/Volume.h"
+#include "libcloud/FixedPoint.h"
+
+#include <vector>
+
+
+namespace cloud
 {
 
-//! \brief functions for s/w version management.
-namespace version
+/*! \brief Functions that represent statistics for point clouds.
+
+\par Example
+\dontinclude testcloud/ustats.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace stats
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
-	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
-	}
+	//! Rectangular volume (exactly) containing all points
+	dat::Volume<double>
+	boundingVolumeOf
+		( std::vector<FixedPoint> const & fpnts
+		);
 
 }
 
 }
 
 // Inline definitions
-// #include "libbuild/version.inl"
+#include "libcloud/stats.inl"
 
-#endif // build_version_INCL_
+#endif // cloud_stats_INCL_
 

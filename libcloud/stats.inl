@@ -26,60 +26,18 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Inline definitions for cloud::stats
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+namespace cloud
+{
+namespace stats
 {
 
-//! \brief functions for s/w version management.
-namespace version
-{
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
-	{
-		std::ostringstream oss;
 
-		oss << argv0 << std::endl;
-		if (! vid.empty())
-		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
-		}
-
-		return oss.str();
-	}
-
-}
-
-}
-
-// Inline definitions
-// #include "libbuild/version.inl"
-
-#endif // build_version_INCL_
+} // stats
+} // cloud
 

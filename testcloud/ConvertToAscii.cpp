@@ -27,7 +27,7 @@
 //
 
 /*! \file
-\brief  This file contains main application program APPNAME
+\brief  This file contains main application program ConvertToAscii
 */
 
 
@@ -36,7 +36,11 @@
 #include "build/version.h"
 #include "libio/stream.h"
 
+#include "libcloud/io.h"
+#include "libcloud/PointIterator.h"
+
 #include <cassert>
+#include <fstream>
 #include <iostream>
 
 
@@ -44,7 +48,7 @@ namespace
 {
 }
 
-//! Main program that #####
+//! Save point cloud data as ascii format.
 int
 main
 	( int const argc
@@ -57,9 +61,10 @@ main
 	// check args
 	app::Usage usage;
 	usage.setSummary
-		( "overview"
+		( "Load point cloud and save data in ascii text format."
 		);
-	usage.addArg("arg1", "description");
+	usage.addArg("OutFile", "Path to output file <x y z> text format");
+	usage.addArg("InFile", "Path to input cloud [.bin] (7xfloat) format");
 	// ...
 	if (usage.argStatus(argc, argv) != app::Usage::Valid)
 	{
@@ -71,9 +76,30 @@ main
 	}
 
 	// parse input argument
-//	int argnum(0);
-//	std::string const arg1(argv[++argnum]);
+	int argnum(0);
+	std::string const outpath(argv[++argnum]);
+	std::string const inpath(argv[++argnum]);
 
+	// load as fixed point format
+	std::vector<cloud::FixedPoint> const fpnts(cloud::io::loadAsFixed(inpath));
+	if (fpnts.empty())
+	{
+		io::err()
+			<< "ERROR: unable to load points from:" << '\n'
+			<< dat::infoString(inpath, "inpath") << '\n'
+			;
+	}
+
+	// save as ascii
+	std::ofstream ofs(outpath);
+	bool const okaySave{ cloud::io::saveAsAscii(ofs, fpnts, "%9.3f") };
+	if (! okaySave)
+	{
+		io::err()
+			<< "ERROR: unable to save output to:" << '\n'
+			<< dat::infoString(outpath, "outpath") << '\n'
+			;
+	}
 
 	return 0;
 }

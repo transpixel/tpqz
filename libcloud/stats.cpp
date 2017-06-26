@@ -26,60 +26,62 @@
 //
 //
 
-#ifndef build_version_INCL_
-#define build_version_INCL_
 
 /*! \file
-\brief Declarations for build::version
+\brief Definitions for cloud::stats
 */
 
-#include <string>
-#include <sstream>
 
-namespace build
+#include "libcloud/stats.h"
+
+#include "libdat/MinMax.h"
+#include "libcloud/cast.h"
+#include "libcloud/PointIterator.h"
+
+#include <array>
+
+
+namespace cloud
+{
+namespace stats
 {
 
-//! \brief functions for s/w version management.
-namespace version
+dat::Volume<double>
+boundingVolumeOf
+	( std::vector<FixedPoint> const & fpnts
+	)
 {
-	//! Version Brand String (build date)
-	inline
-	std::string
-	buildInfo
-		( std::string const & argv0
-		, std::string const & vid = std::string(SCM_VERSION_ID)
-		, std::string const & bdate = __DATE__
-		, std::string const & btime = __TIME__
-		)
+	dat::Volume<double> bounds;
+
+	if (! fpnts.empty())
 	{
-		std::ostringstream oss;
-
-		oss << argv0 << std::endl;
-		if (! vid.empty())
+		// Determine extents of each coordinate component
+		std::array<dat::MinMax<double>, 3u> xyzMinMax;
+		for (PointIterator iter{fpnts} ; iter ; ++iter)
 		{
-			oss
-				<< "  " <<  "... Version:"
-				<< " " << vid
-				;
-		}
-		else
-		{
-			oss
-				<< "  " <<  "... Build Date/Time:"
-				<< " " << bdate
-				<< " " << btime
-				;
+			ga::Vector const point(iter.vectorPoint());
+			xyzMinMax[0] = xyzMinMax[0].expandedWith(point[0]);
+			xyzMinMax[1] = xyzMinMax[1].expandedWith(point[1]);
+			xyzMinMax[2] = xyzMinMax[2].expandedWith(point[2]);
 		}
 
-		return oss.str();
+		// return volume
+		if ( dat::isValid(xyzMinMax[0])
+		  && dat::isValid(xyzMinMax[1])
+		  && dat::isValid(xyzMinMax[2])
+		   )
+		{
+			bounds = dat::Volume<double>
+				{ dat::Range<double>(xyzMinMax[0].pair())
+				, dat::Range<double>(xyzMinMax[1].pair())
+				, dat::Range<double>(xyzMinMax[2].pair())
+				};
+		}
 	}
 
+	return bounds;
 }
 
 }
-
-// Inline definitions
-// #include "libbuild/version.inl"
-
-#endif // build_version_INCL_
+}
 

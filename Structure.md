@@ -1,81 +1,78 @@
-** Repository Structure **
+# Repository Structure
 
+The overall repo structure is flat with everything contained in
+first level subdirectories. The top level directory contains a few
+miscelanous package-wide tools (e.g. SConscript build directives).
 
-The overall structure is very a "flat" one. The top level directory contains a few miscelanous package-wide tools (e.g. SConscript build directives).
+## Naming Conventions
 
-*** Naming ***
-
-Below the top directory are subdirectories for each package component module which are named as:
+Below the top directory are subdirectories for each package component
+module which are named as:
 
 * extABC: External modules
 * libABC: Modular library code
 * testABC: Unit tests for library code
 
-*** Grouping/Dependencies ***
+## Module Inventory
 
-The dependency grouping of the modules includes:
+The following presents the modules in order of dependency with
+modules in groups later in the list depending on modules earlier
+in the inventory.
 
-* System Environment Configuration
+### System Environment Configuration
 
-: Eigen-v3: Eigen C++ library
-: boost-filesystem,system: directory/file searching (Note easily replaced by C++14 or later)
++ Eigen-v3: Eigen C++ library
++ boost-filesystem,system: used for directory/file searching (Note
+easily replaced by C++14 or later)
 
-* External
+### External
 
-: exthalf: half precision library
-: extcli: These stand by themselves
++ exthalf: half precision library
++ extcli: These stand by themselves
 
-* Low-Level 
+### Low-Level 
 
---- group
++ libsys: job multithreading
++ libio: basic IO and data structures
++ libmem: threadsafe queue, (memory inspection for linux only)
++ libfile: interface to boost filesystem
++ libdat: useful data structures used through elsewhere
 
-: libsys: job multithreading
-: libio: basic IO and data structures
-: libmem: threadsafe queue, (memory inspection for linux only)
-: libfile: interface to boost filesystem
-: libdat: useful data structures used through elsewhere
+### Math and Algebra
 
---- group
++ libmath: useful math constructs
++ libga: geometric algebra for 3D use
++ libprob: simple stats and PDF/CDF operations
++ libtrans: transformation/mapping support
++ libla: linear algebra: interface libdat/ to Eigen
 
-* Math and Algebra
+### Geometric Entities and Operations
 
-: libmath: useful math constructs
-: libga: geometric algebra for 3D use
-: libprob: simple stats and PDF/CDF operations
-: libtrans: transformation/mapping support
-: libla: linear algebra: interface libdat/ to Eigen
++ libgeo: geometry library (rays, cylinders, etc)
 
---- group
+### Image Processing
 
-* Geometric Entities and Operations
++ libimg: simple basic image manipulations (uses OpenCV for I/O
+and format conversion).
 
-: libgeo: geometry library (rays, cylinders, etc)
+### Signal Processing
 
-* Image Processing
++ libsig: primative signal processing operations.
 
-: libimg: simple basic image manipulations (uses OpenCV for I/O and format conversion).
+### Photogrammetry / Computer Vision
 
-* Signal Processing
++ libcam: simple camera/image support
++ libmap: cartographic projections
++ libro: relative orientation
 
-: libsig: primative signal processing operations.
+### Prototype Generic Rendering
 
---- group
++ libmodel: environment modeling (geometry and radiometry)
++ libsen: general sensing operations
 
-* Photogrammetry / Computer Vision
 
-: libcam: simple camera/image support
-: libmap: cartographic projections
-: libro: relative orientation
+## Test Modules
 
---- group
-
-* Prototype Generic Rendering
-
-: libmodel: environment modeling (geometry and radiometry)
-: libsen: general sensing operations
-
-*** Test Modules ***
-
-NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a
+NOTE: the test.../ modules utilize arbitrary mix of libraries. E.g. a
 testLoLevel/ unit test might utilize libHiLevel/ library components.
 

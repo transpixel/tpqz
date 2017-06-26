@@ -14,23 +14,26 @@ activities.
 All integrated 3rd party code (as external directory modules) are
 consistent with the TPQZ licensing. Specifically
 
-* exthalf: MIT License: Copyright (c) 2012-2013 Christian Rau
+* exthalf:
+   MIT License: Copyright (c) 2012-2013 Christian Rau
 <rauy@users.sourceforge.net>
 
-* extcli: MIT License: Copyright (c) 2015 - 2016 Florian Rappl
+* extcli:
+   MIT License: Copyright (c) 2015 - 2016 Florian Rappl
 https://github.com/FlorianRappl/CmdParser
 
-* Eigen-v3: Guennebaud and Beno, Jacob and others
-Website: http://eigen.tuxfamily.org/index.php?title=Main_Page
+* Eigen-v3:
+   Mozilla Public License (MPL2): Guennebaud and Beno, Jacob and others
+  * Website: http://eigen.tuxfamily.org/index.php?title=Main_Page
 
 * OpenCV: BSD License: Many [Copyright Holders](https://github.com/opencv/opencv/blob/master/LICENSE) Including:
-- Copyright (C) 2000-2016, Intel Corporation, all rights reserved.
-- Copyright (C) 2009-2011, Willow Garage Inc., all rights reserved.
-- Copyright (C) 2009-2016, NVIDIA Corporation, all rights reserved.
-- Copyright (C) 2010-2013, Advanced Micro Devices, Inc., all rights reserved.
-- Copyright (C) 2015-2016, OpenCV Foundation, all rights reserved.
-- Copyright (C) 2015-2016, Itseez Inc., all rights reserved.
-Website: http://opencv.org/
+Copyright (C) 2000-2016, Intel Corporation,,
+Copyright (C) 2009-2011, Willow Garage Inc.,,
+Copyright (C) 2009-2016, NVIDIA Corporation,,
+Copyright (C) 2010-2013, Advanced Micro Devices, Inc.,,
+Copyright (C) 2015-2016, OpenCV Foundation,,
+Copyright (C) 2015-2016, Itseez Inc.,,
+  * Website: http://opencv.org/
 
 ## Keywords
 C++, Library, Toolkit, Utilities, Geometric Algebra, 3D Transformations

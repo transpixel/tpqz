@@ -213,7 +213,7 @@ main
 	usage.addArg("OutFile", "path to output file [text format]");
 	usage.addArg("NumPerDim", "Number of voxel cells per dimension");
 	usage.addArg("RadTol", "radial threshold tolerance [m] (e.g. 1m)");
-	usage.addArg("InFile", "path to input cloud <helix *.bin>");
+	usage.addArg("InFile", "path to input cloud <7-float.bin>");
 	// ...
 	if (usage.argStatus(argc, argv) != app::Usage::Valid)
 	{

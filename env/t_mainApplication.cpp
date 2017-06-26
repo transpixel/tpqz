@@ -31,7 +31,7 @@
 */
 
 
-#include "libbase/Usage.h"
+#include "libapp/Usage.h"
 
 #include "build/version.h"
 #include "libio/stream.h"
@@ -55,17 +55,17 @@ main
 	//std::ios::sync_with_stdio(false);
 
 	// check args
-	base::Usage usage;
+	app::Usage usage;
 	usage.setSummary
 		( "overview"
 		);
 	usage.addArg("arg1", "description");
 	// ...
-	if (usage.argStatus(argc, argv) != base::Usage::Valid)
+	if (usage.argStatus(argc, argv) != app::Usage::Valid)
 	{
 		std::string const fname(argv[0]);
 		io::err()
-			<< std::endl << base::version::buildInfo(argv[0]) << std::endl
+			<< std::endl << build::version::buildInfo(argv[0]) << std::endl
 			<< usage.infoString(fname) << std::endl;
 		return 1;
 	}

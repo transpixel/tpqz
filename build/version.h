@@ -26,17 +26,17 @@
 //
 //
 
-#ifndef base_version_INCL_
-#define base_version_INCL_
+#ifndef build_version_INCL_
+#define build_version_INCL_
 
 /*! \file
-\brief Declarations for base::version
+\brief Declarations for build::version
 */
 
 #include <string>
 #include <sstream>
 
-namespace base
+namespace build
 {
 
 //! \brief functions for s/w version management.
@@ -79,7 +79,7 @@ namespace version
 }
 
 // Inline definitions
-// #include "libbase/version.inl"
+// #include "libbuild/version.inl"
 
-#endif // base_version_INCL_
+#endif // build_version_INCL_
 

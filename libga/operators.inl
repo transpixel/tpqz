@@ -38,7 +38,7 @@
 namespace ga
 {
 	//! Functions for internal library use -- not part of public interface
-	namespace base
+	namespace priv
 	{
 		//! Sum of corresponding components
 		inline
@@ -503,8 +503,8 @@ operator*
 	, Vector const & vecB
 	)
 {
-	Scalar const s0(base::inner(vecA.theValues, vecB.theValues));
-	BiVector const bv(base::outer(vecA.theValues, vecB.theValues));
+	Scalar const s0(priv::inner(vecA.theValues, vecB.theValues));
+	BiVector const bv(priv::outer(vecA.theValues, vecB.theValues));
 	return Spinor(s0, bv);
 }
 
@@ -515,8 +515,8 @@ operator*
 	, BiVector const & bv
 	)
 {
-	Vector const vv(base::outer(bv.theValues, vec.theValues));
-	TriVector const tv(base::inner(vec.theValues, bv.theValues));
+	Vector const vv(priv::outer(bv.theValues, vec.theValues));
+	TriVector const tv(priv::inner(vec.theValues, bv.theValues));
 	return ImSpinor(vv, tv);
 }
 
@@ -546,9 +546,9 @@ operator*
 	using dat::operator-;
 	Vector const v1(spin.theS.theValue * vec);
 	Vector const v2
-		(-base::outer(vec.theValues, spin.theB.theValues)); // anti-sym
+		(-priv::outer(vec.theValues, spin.theB.theValues)); // anti-sym
 	TriVector const tv
-		( base::inner(vec.theValues, spin.theB.theValues));
+		( priv::inner(vec.theValues, spin.theB.theValues));
 	return ImSpinor(v1+v2, tv);
 }
 
@@ -559,8 +559,8 @@ operator*
 	, ImSpinor const & ispin
 	)
 {
-	double const s0(base::inner(vec.theValues, ispin.theV.theValues));
-	BiVector const bv1(base::outer(vec.theValues, ispin.theV.theValues));
+	double const s0(priv::inner(vec.theValues, ispin.theV.theValues));
+	BiVector const bv1(priv::outer(vec.theValues, ispin.theV.theValues));
 	double const & tmag = ispin.theT.theValue;
 	using dat::operator*;
 	BiVector const bv2(tmag * vec.theValues);
@@ -579,8 +579,8 @@ operator*
 	, Vector const & vec
 	)
 {
-	Vector const vv(base::outer(vec.theValues, bv.theValues));
-	TriVector const tv(base::inner(vec.theValues, bv.theValues));
+	Vector const vv(priv::outer(vec.theValues, bv.theValues));
+	TriVector const tv(priv::inner(vec.theValues, bv.theValues));
 	return ImSpinor(vv, tv);
 }
 
@@ -591,13 +591,13 @@ operator*
 	, BiVector const & bvB
 	)
 {
-	// Scalar const s0(- base::inner(bvA.theValues, bvB.theValues));
-	// BiVector const bv(- base::outer(bvA.theValues, bvB.theValues));
+	// Scalar const s0(- priv::inner(bvA.theValues, bvB.theValues));
+	// BiVector const bv(- priv::outer(bvA.theValues, bvB.theValues));
 	using dat::operator-;
 	Scalar const s0
-		(-base::inner(bvA.theValues, bvB.theValues)); // symmetric
+		(-priv::inner(bvA.theValues, bvB.theValues)); // symmetric
 	BiVector const bv
-		(base::outer(bvB.theValues, bvA.theValues)); // anti-symmetric
+		(priv::outer(bvB.theValues, bvA.theValues)); // anti-symmetric
 	return Spinor(s0, bv);
 }
 
@@ -622,9 +622,9 @@ operator*
 	BiVector const b1(spin.theS.theValue * biv);
 	using dat::operator-;
 	BiVector const b2
-		(-base::outer(biv.theValues, spin.theB.theValues));
+		(-priv::outer(biv.theValues, spin.theB.theValues));
 	Scalar const s2
-		(-base::inner(biv.theValues, spin.theB.theValues));
+		(-priv::inner(biv.theValues, spin.theB.theValues));
 	return Spinor(s2, b1+b2);
 }
 
@@ -717,9 +717,9 @@ operator*
 	using dat::operator-;
 	Vector const v1(spin.theS.theValue * vec);
 	Vector const v2
-		(-base::outer(spin.theB.theValues, vec.theValues)); // anti-sym
+		(-priv::outer(spin.theB.theValues, vec.theValues)); // anti-sym
 	TriVector const tv
-		(base::inner(vec.theValues, spin.theB.theValues));
+		(priv::inner(vec.theValues, spin.theB.theValues));
 	return ImSpinor(v1+v2, tv);
 }
 
@@ -733,9 +733,9 @@ operator*
 	BiVector const b1(spin.theS.theValue * biv);
 	using dat::operator-;
 	BiVector const b2
-		(-base::outer(spin.theB.theValues, biv.theValues));
+		(-priv::outer(spin.theB.theValues, biv.theValues));
 	Scalar const s2
-		(-base::inner(spin.theB.theValues, biv.theValues));
+		(-priv::inner(spin.theB.theValues, biv.theValues));
 	return Spinor(s2, b1+b2);
 }
 
@@ -799,8 +799,8 @@ operator*
 	, Vector const & vec
 	)
 {
-	double const s0(base::inner(ispin.theV.theValues, vec.theValues));
-	BiVector const bv1(base::outer(ispin.theV.theValues, vec.theValues));
+	double const s0(priv::inner(ispin.theV.theValues, vec.theValues));
+	BiVector const bv1(priv::outer(ispin.theV.theValues, vec.theValues));
 	double const & tmag = ispin.theT.theValue;
 	using dat::operator*;
 	BiVector const bv2(tmag * vec.theValues);

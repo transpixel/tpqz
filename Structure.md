@@ -67,6 +67,12 @@ The dependency grouping of the modules includes:
 : libmap: cartographic projections
 : libro: relative orientation
 
+* Photogrammetry / Computer Vision
+
+: libcam: simple camera/image support
+: libmap: cartographic projections
+: libro: relative orientation
+
 
 NOTE: the test/ modules utilize arbitrary mix of libraries. E.g. a
 testLoLevel/ unit test might utilize libHiLevel/ library components.

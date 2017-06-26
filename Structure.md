@@ -25,47 +25,49 @@ in the inventory.
 + boost-filesystem,system: used for directory/file searching (Note
 easily replaced by C++14 or later)
 
-### External
+### External Source Code Imports
 
-+ exthalf: half precision library
-+ extcli: These stand by themselves
++ exthalf: half precision (16-bit) library
++ extcli: command line interpreter class
 
-### Low-Level 
+### TPQZ Modules
+
+#### Low-Level 
 
 + libsys: job multithreading
 + libio: basic IO and data structures
 + libmem: threadsafe queue, (memory inspection for linux only)
-+ libfile: interface to boost filesystem
-+ libdat: useful data structures used through elsewhere
++ libfile: wrapper for interface to boost filesystem
++ libdat: useful data structures used through TPQZ
 
-### Math and Algebra
+#### Math and Algebra
 
 + libmath: useful math constructs
-+ libga: geometric algebra for 3D use
++ libga: geometric algebra for 3D
 + libprob: simple stats and PDF/CDF operations
 + libtrans: transformation/mapping support
 + libla: linear algebra: interface libdat/ to Eigen
 
-### Geometric Entities and Operations
+#### Geometric Entities and Operations
 
 + libgeo: geometry library (rays, cylinders, etc)
 
-### Image Processing
+#### Image Processing
 
 + libimg: simple basic image manipulations (uses OpenCV for I/O
 and format conversion).
 
-### Signal Processing
+#### Signal Processing
 
 + libsig: primative signal processing operations.
 
-### Photogrammetry / Computer Vision
+#### Photogrammetry / Computer Vision
 
 + libcam: simple camera/image support
 + libmap: cartographic projections
 + libro: relative orientation
 
-### Prototype Generic Rendering
+#### Prototype Generic Rendering
 
 + libmodel: environment modeling (geometry and radiometry)
 + libsen: general sensing operations

@@ -12,6 +12,7 @@ module which are named as:
 * extABC: External modules
 * libABC: Modular library code
 * testABC: Unit tests for library code
+* notes: Technical notes to support some algorithms
 
 ## Module Inventory
 
@@ -24,6 +25,11 @@ in the inventory.
 + Eigen-v3: Eigen C++ library
 + boost-filesystem,system: used for directory/file searching (Note
 easily replaced by C++14 or later)
+
+### Build System Components
+
++ env: file templates and scripts related to overall build environment.
++ build: scripts to manage builds - e.g. run unit tests, generate docs.
 
 ### External Source Code Imports
 

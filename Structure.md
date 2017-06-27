@@ -12,6 +12,7 @@ module which are named as:
 * extABC: External modules
 * libABC: Modular library code
 * testABC: Unit tests for library code
+* notes: Technical notes to support some algorithms
 
 ## Module Inventory
 

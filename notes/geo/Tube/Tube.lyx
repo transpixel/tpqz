@@ -1,0 +1,1945 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Intersection of Ray and Tube
+\end_layout
+
+\begin_layout Author
+Stellacore Corporation
+\begin_inset Newline newline
+\end_inset
+
+Dave Knopp
+\end_layout
+
+\begin_layout Abstract
+This technical note presents an algebraic solution for determining the 3D
+ point of intersection between a half-infinite ray in 3D space and the curved
+ surface of a right circular cylinder herein called a tube.
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Tube.eps
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Illustration_tube&ray"
+
+\end_inset
+
+Illustration of tube and ray parameter relationships.
+ Note that, in general, the ray direction vector, 
+\begin_inset Formula $d$
+\end_inset
+
+, is 
+\emph on
+not
+\emph default
+ contained in the plane of the drawing.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+A tube in 3D space may be characterized by the vector, 
+\begin_inset Formula $p$
+\end_inset
+
+, representing a point on its axis which is closest to the origin, the unitary
+ vector direction of the axis, 
+\begin_inset Formula $a$
+\end_inset
+
+, and its scalar radius, 
+\begin_inset Formula $\rho$
+\end_inset
+
+.
+ Note that this is an over-parameterized representation which requires considera
+tion of constraints.
+ It is a useful representation here since the parameters have an intuitively
+ obvious interpretation.
+\end_layout
+
+\begin_layout Subsection
+A Tubular Manifold
+\end_layout
+
+\begin_layout Standard
+Herein, the curved surface of an infinite cylinder is called a 
+\begin_inset Quotes eld
+\end_inset
+
+tube
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The tube is considered to have infinite extent in both directions along
+ its axis of symmetry.
+ Its surface represents a 2D manifold within 3D space.
+\end_layout
+
+\begin_layout Standard
+A point, 
+\begin_inset Formula $x$
+\end_inset
+
+, lies on the surface of the tube if it lies at a distance 
+\begin_inset Formula $\rho$
+\end_inset
+
+ from the tube axis.
+ For an arbitrary point on the tube, this condition may be expressed algebraical
+ly by the parametric equation,
+\begin_inset Formula 
+\begin{equation}
+x=p+\mu a+\rho b\label{eq:PointOnTube}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is a scalar value representing the distance from 
+\begin_inset Formula $p$
+\end_inset
+
+ to the projection of 
+\begin_inset Formula $x$
+\end_inset
+
+ onto the tubes axis.
+ The vector, 
+\begin_inset Formula $b$
+\end_inset
+
+, is a unit magnitude vector orthogonal to 
+\begin_inset Formula $a$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This may be interpreted as follows.
+ To get to the location, 
+\begin_inset Formula $x$
+\end_inset
+
+, start at point, 
+\begin_inset Formula $p$
+\end_inset
+
+, and proceed a distance, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ in the direction of the axis, 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ From there, proceed in a direction orthogonal to 
+\begin_inset Formula $b$
+\end_inset
+
+ for a distance, 
+\begin_inset Formula $\rho$
+\end_inset
+
+.
+ I.e.
+ is a version of cylindrical coordinates for 
+\begin_inset Formula $x$
+\end_inset
+
+ in which, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the altitude specification, 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is the radial value, and the azimuth value is encoded in the direction
+ of 
+\begin_inset Formula $b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A suitable set of constraint conditions may be expressed by four scalar
+ relationships:
+\begin_inset Formula 
+\begin{eqnarray*}
+a^{2} & = & 1\\
+pa+ap & = & 0=2\left(a\cdot p\right)\\
+b^{2} & = & 1\\
+ab+ba & = & 0=2\left(a\cdot b\right)
+\end{eqnarray*}
+
+\end_inset
+
+The first and third express the unitary nature of direction vectors, 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ The second and forth express the orthogonality relationships that 
+\begin_inset Formula $a\perp p$
+\end_inset
+
+ and 
+\begin_inset Formula $a\perp b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Overall, the 5 degrees of freedom (d.o.f.) contained in the tubular surface
+ are represented by the nine scalar freedoms of vectors 
+\begin_inset Formula $p$
+\end_inset
+
+, 
+\begin_inset Formula $a$
+\end_inset
+
+, and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ This is reduced to 5 d.o.f.
+ by considering the 4 degrees of constraint (d.o.c.) present in the constraint
+ relationships.
+ I.e.
+ the net degrees of freedom are 
+\begin_inset Formula $5=9-4$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Ray in Space
+\end_layout
+
+\begin_layout Standard
+A ray may be expressed in terms of it's vector start point, 
+\begin_inset Formula $s$
+\end_inset
+
+, and a unitary vector direction of propagation, 
+\begin_inset Formula $d$
+\end_inset
+
+.
+ A point, 
+\begin_inset Formula $x$
+\end_inset
+
+, lies on the ray if it satisfies the parametric equation,
+\begin_inset Formula 
+\begin{equation}
+x=s+\lambda d\label{eq:PointOnRay}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is a scalar which represents the distance of the point along the ray.
+ The point, 
+\begin_inset Formula $x$
+\end_inset
+
+ lies in the forward direction along the ray when 
+\begin_inset Formula $\left(0\le\lambda\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The vector parameters are subject to the constraint that the direction,
+ 
+\begin_inset Formula $d$
+\end_inset
+
+, have unit magnitude,
+\begin_inset Formula 
+\[
+d^{2}=1
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 5 d.o.f.
+ of a directed ray in space are represented here by the 6 freedoms present
+ in the two vector parameters, 
+\begin_inset Formula $s$
+\end_inset
+
+ and 
+\begin_inset Formula $d$
+\end_inset
+
+, less the 1 d.o.c.
+ associated with the unit magnitude constraint on 
+\begin_inset Formula $d$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Methodology
+\end_layout
+
+\begin_layout Standard
+Here it is assumed that quantities 
+\begin_inset Formula $p$
+\end_inset
+
+, 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $\rho$
+\end_inset
+
+, 
+\begin_inset Formula $s$
+\end_inset
+
+, 
+\begin_inset Formula $d$
+\end_inset
+
+ are known, and it is desired to determine values for 
+\begin_inset Formula $\lambda$
+\end_inset
+
+, 
+\begin_inset Formula $\mu$
+\end_inset
+
+, and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ From these solution values, the intersection points may be computed by
+ direct evaluation of either the ray equation or the tube equation.
+\end_layout
+
+\begin_layout Subsection
+Intersection Relationship
+\end_layout
+
+\begin_layout Standard
+The point at which a ray intersects the tubular surface (if it does) may
+ be represented by the vector, 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ At the point of intersection, vector 
+\begin_inset Formula $x$
+\end_inset
+
+ must be both on the ray and also on the surface of the tube.
+ I.e.
+ equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PointOnTube"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PointOnRay"
+
+\end_inset
+
+ must simultaneously express the value of, 
+\begin_inset Formula $x$
+\end_inset
+
+, and therefore be equal to each other, such that
+\begin_inset Formula 
+\begin{equation}
+p+\mu a+\rho b=s+\lambda d\label{eq:AbsIntersectEqn}
+\end{equation}
+
+\end_inset
+
+Since it is assumed that 
+\begin_inset Formula $p$
+\end_inset
+
+ and 
+\begin_inset Formula $s$
+\end_inset
+
+ are known a prior, it is convenient to define the relative difference,
+ 
+\begin_inset Formula $r$
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{equation}
+r\equiv s-p\label{eq:Def_r}
+\end{equation}
+
+\end_inset
+
+The intersection condition may therefore be expressed as
+\begin_inset Formula 
+\begin{equation}
+\mu a+\rho b-\lambda d=r\label{eq:RelIntersectEqn}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Impose the Tube Axis Condition
+\end_layout
+
+\begin_layout Standard
+To isolate the longitudinal offset, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ apply the dot product operator with known tube direction, 
+\begin_inset Formula $a$
+\end_inset
+
+, to obtain
+\begin_inset Formula 
+\[
+\mu a\cdot a+\rho a\cdot b-\lambda a\cdot d=a\cdot r
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $a$
+\end_inset
+
+ has unit magnitude, 
+\begin_inset Formula $a^{2}=1$
+\end_inset
+
+, and 
+\begin_inset Formula $a\cdot b=0$
+\end_inset
+
+ from a tube constraint, such that this relationship reduces to
+\begin_inset Formula 
+\[
+\mu-\lambda a\cdot d=a\cdot r
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $a\cdot r=a\cdot\left(s-p\right)=a\cdot s$
+\end_inset
+
+.
+ However, for other relationships below, it is convenient to retain the
+ use of the relative offset vector 
+\begin_inset Formula $r$
+\end_inset
+
+ instead of the absolute locations, 
+\begin_inset Formula $s$
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For notational convenience, introduce scalar parameters defined as
+\begin_inset Formula 
+\begin{eqnarray}
+\alpha_{d} & \equiv & a\cdot d\label{eq:Def_alpha_d}\\
+\alpha_{r} & \equiv & a\cdot r\label{eq:Def_alpha_r}
+\end{eqnarray}
+
+\end_inset
+
+such that
+\begin_inset Formula 
+\[
+\mu-\lambda\alpha_{d}=\alpha_{r}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a simple offset-gain relationship between the scalar parameters,
+ 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda$
+\end_inset
+
+.
+ Rearrange the equation to express 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and an explicit function of 
+\begin_inset Formula $\lambda$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\mu=\alpha_{d}\lambda+\alpha_{r}\label{eq:Func_mu_of_lambda}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Isolate the Transverse Vector, (
+\begin_inset Formula $\rho b$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+Substitute the value of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ from equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Func_mu_of_lambda"
+
+\end_inset
+
+ into the intersection condition
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:RelIntersectEqn"
+
+\end_inset
+
+ to obtain,
+\begin_inset Formula 
+\[
+\left(\alpha_{d}\lambda+\alpha_{r}\right)a+\rho b-\lambda d=r
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rearrange this to isolate the transverse vector, 
+\begin_inset Formula $\rho b$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\rho b=\lambda\left(d-\alpha_{d}a\right)+\left(r-\alpha_{r}a\right)
+\]
+
+\end_inset
+
+and define vectors, 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{eqnarray}
+u & \equiv & d-\alpha_{d}a\label{eq:Def_u_dot}\\
+v & \equiv & r-\alpha_{r}a\label{eq:Def_v_dot}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Relationships-for_u,v"
+
+\end_inset
+
+, demonstrates that 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are both perpendicular to the tube axis, 
+\begin_inset Formula $a$
+\end_inset
+
+, and also may be expressed as
+\begin_inset Formula 
+\begin{eqnarray}
+u & = & a\left(a\wedge d\right)\label{eq:Def_u_wedge}\\
+v & = & a\left(a\wedge r\right)\label{eq:Def_v_wedge}
+\end{eqnarray}
+
+\end_inset
+
+The magnitude, 
+\begin_inset Formula $\left|u\right|$
+\end_inset
+
+ is the sine of the scalar angle between 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $d$
+\end_inset
+
+.
+ The magnitude, 
+\begin_inset Formula $\left|v\right|$
+\end_inset
+
+ is the shortest distance from the ray start point to the tube axis.
+\end_layout
+
+\begin_layout Standard
+Using the ancillary vectors, 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, the transverse vector 
+\begin_inset Formula $\rho b$
+\end_inset
+
+ may be expressed as a function of the scalar range parameter 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ as 
+\begin_inset Formula 
+\begin{equation}
+\rho b=\lambda u+v\label{eq:B_of_lambda_u,v}
+\end{equation}
+
+\end_inset
+
+This vector is orthogonal to the tube axis, 
+\begin_inset Formula $a$
+\end_inset
+
+, since both 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are orthogonal to 
+\begin_inset Formula $a$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Impose the Tube Radius Condition
+\end_layout
+
+\begin_layout Standard
+Begin with equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:B_of_lambda_u,v"
+
+\end_inset
+
+ and compute the squared magnitude by multiplying each side by its own reverse
+ to obtain
+\begin_inset Formula 
+\[
+\rho bb\rho=\left(\lambda u+v\right)\left(u\lambda+v\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Utilize basic algebraic operations along with the constraint condition 
+\begin_inset Formula $b^{2}=1$
+\end_inset
+
+ and definition of the dot product to obtain
+\begin_inset Formula 
+\[
+\rho^{2}=\lambda^{2}u^{2}+\lambda uv+\lambda vu+v^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\rho^{2}=\lambda^{2}u^{2}+2\lambda\left(u\cdot v\right)+v^{2}
+\]
+
+\end_inset
+
+This is a classic scalar quadratic equation in 
+\begin_inset Formula $\lambda$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\lambda^{2}\left(u^{2}\right)+2\lambda\left(u\cdot v\right)+\left(v^{2}-\rho^{2}\right)=0\label{eq:QuadIn_lambda}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Solve for Ray Range Value, 
+\begin_inset Formula $\lambda$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The quadratic formula may be used to solve equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:QuadIn_lambda"
+
+\end_inset
+
+ to determine values for the ray range parameter, 
+\begin_inset Formula $\lambda$
+\end_inset
+
+.
+ This provides the two solution results,
+\begin_inset Formula 
+\[
+\lambda_{\pm}=u^{-2}\left\{ -\left(u\cdot v\right)\pm\sqrt{\left(u\cdot v\right)^{2}-u^{2}\left(v^{2}-\rho^{2}\right)}\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As described in appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Radicand-Identity"
+
+\end_inset
+
+, the radicand may be expressed in an alternative form as
+\begin_inset Formula 
+\[
+\lambda_{\pm}=u^{-2}\left\{ -\left(u\cdot v\right)\pm\sqrt{\rho^{2}u^{2}-\left|u\wedge v\right|^{2}}\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To express this in relative (unitless) terms, factor the tube radius,
+\begin_inset Formula $\rho$
+\end_inset
+
+, from under the radical, via the substitutions,
+\begin_inset Formula 
+\begin{equation}
+w\equiv\frac{v}{\rho}\label{eq:Def_Relative_w}
+\end{equation}
+
+\end_inset
+
+and express vector, 
+\begin_inset Formula $u$
+\end_inset
+
+ in terms of magnitude and direction components via 
+\begin_inset Formula 
+\[
+u=\left|u\right|\hat{u}
+\]
+
+\end_inset
+
+This produces and expression for the range parameter in terms of units of
+ tube radius.
+ I.e.
+ 
+\begin_inset Formula 
+\begin{equation}
+\left(\frac{\lambda}{\rho}\right)_{\pm}=\frac{1}{\left|u\right|}\left\{ -\left(\hat{u}\cdot w\right)\pm\sqrt{\hat{u}^{2}-\left|\hat{u}\wedge w\right|^{2}}\right\} \label{eq:Soln_lambda}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Positive values of 
+\begin_inset Formula $\lambda_{\pm}$
+\end_inset
+
+ correspond to 
+\begin_inset Quotes eld
+\end_inset
+
+forward
+\begin_inset Quotes erd
+\end_inset
+
+ intersection points for which the intersection is 
+\begin_inset Quotes eld
+\end_inset
+
+in front of
+\begin_inset Quotes erd
+\end_inset
+
+ the ray start point - relative to the ray propagation direction, 
+\begin_inset Formula $d$
+\end_inset
+
+.
+ Negative values, 
+\begin_inset Formula $\lambda_{\pm}<0$
+\end_inset
+
+, correspond to solutions 
+\begin_inset Quotes eld
+\end_inset
+
+behind
+\begin_inset Quotes erd
+\end_inset
+
+ the ray (in applications, these can often be eliminated as 
+\begin_inset Quotes eld
+\end_inset
+
+artificial
+\begin_inset Quotes erd
+\end_inset
+
+).
+ The case of degenerate roots, 
+\begin_inset Formula $\lambda_{-}=\lambda_{+}$
+\end_inset
+
+, corresponds with the physical situation in which the ray is tangent to
+ the surface of the cylinder.
+\end_layout
+
+\begin_layout Subsection
+Special Cases
+\end_layout
+
+\begin_layout Standard
+There are several cases in which the solution for range parameter, 
+\begin_inset Formula $\lambda$
+\end_inset
+
+, does not exists.
+\end_layout
+
+\begin_layout Subsubsection
+Ray Aligned with Tube Axis (
+\begin_inset Formula $u=0$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+If the ray direction, 
+\begin_inset Formula $d$
+\end_inset
+
+ is (anti)parallel with the tube axis, 
+\begin_inset Formula $a$
+\end_inset
+
+, then 
+\begin_inset Formula $\left(a\wedge d\right)=0$
+\end_inset
+
+, and, by equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_u_wedge"
+
+\end_inset
+
+, then 
+\begin_inset Formula $u=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $u=0$
+\end_inset
+
+, the quadratic equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:QuadIn_lambda"
+
+\end_inset
+
+ reduces to the exact relationship, 
+\begin_inset Formula 
+\[
+\left(v^{2}-\rho^{2}\right)=0
+\]
+
+\end_inset
+
+This can be satisfied only if 
+\begin_inset Formula $\left|v\right|=\rho$
+\end_inset
+
+.
+ Since, 
+\begin_inset Formula $v=a\wedge r$
+\end_inset
+
+, is the rejection of 
+\begin_inset Formula $r$
+\end_inset
+
+ from 
+\begin_inset Formula $a$
+\end_inset
+
+, this situation occurs only if the ray start point is on the surface of
+ the tube - at a distance, 
+\begin_inset Formula $\rho$
+\end_inset
+
+, from the the axis.
+\end_layout
+
+\begin_layout Standard
+Overall, this solution represents the case, for which the ray start point
+ lies in the surface of the tube 
+\begin_inset Formula $\left|v\right|=\rho$
+\end_inset
+
+, and the ray direction, 
+\begin_inset Formula $d$
+\end_inset
+
+, is parallel to the tube axis.
+\end_layout
+
+\begin_layout Subsubsection
+No Intersection (
+\begin_inset Formula $\rho\left|u\right|<\left|u\wedge v\right|$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+If the ray start point is outside the surface of the tube, and if the ray
+ is not pointed toward (or away from) some part of the tube, then there
+ will be no intersection.
+\end_layout
+
+\begin_layout Standard
+When this occurs, the radicand in equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Soln_lambda"
+
+\end_inset
+
+ is negative such that
+\begin_inset Formula 
+\[
+1-\left|\hat{u}\wedge\frac{v}{\rho}\right|^{2}<0
+\]
+
+\end_inset
+
+or
+\begin_inset Formula 
+\[
+1<\left|\hat{u}\wedge\frac{v}{\rho}\right|^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $\hat{u}$
+\end_inset
+
+ has unit magnitude, this can only be true if 
+\begin_inset Formula $\rho<\left|v\right|$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $\left|v\right|$
+\end_inset
+
+ is the rejection of 
+\begin_inset Formula $r$
+\end_inset
+
+ from the tube axis, this means that the start of the ray must be outside
+ of the tube.
+ Furthermore, the ray direction must be such that it does not point back
+ to the tube.
+ Otherwise the geometric attenuation of the wedge product will counteract
+ the larger value of 
+\begin_inset Formula $\left|v\right|$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Summary
+\end_layout
+
+\begin_layout Standard
+Equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PointOnTube"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PointOnRay"
+
+\end_inset
+
+ provide an analytic vector description of a tubular surface and a half
+ infinite ray, via the two parametric equations,
+\begin_inset Formula 
+\[
+x=p+\mu a+\rho b
+\]
+
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula 
+\[
+x=s+\lambda d
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+The geometric intersection points (if they exist) may be described by the
+ vector, 
+\begin_inset Formula $x$
+\end_inset
+
+, when it satisfies both equations simultaneously.
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+Given known quantities
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\begin_inset Formula $p$
+\end_inset
+
+, 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $\rho$
+\end_inset
+
+, 
+\begin_inset Formula $s$
+\end_inset
+
+, 
+\begin_inset Formula $d$
+\end_inset
+
+, t
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+he intersection solution(s) may be found by evaluating the value of 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ given by the quadratic formula of equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:QuadIn_lambda"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\nu_{\pm}=\frac{1}{\left|u\right|}\left\{ -\left(\hat{u}\cdot w\right)\pm\sqrt{\hat{u}^{2}-\left|\hat{u}\wedge w\right|^{2}}\right\} 
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{eqnarray*}
+\nu & \equiv & \frac{\lambda}{\rho}\\
+\lambda & = & \rho\nu
+\end{eqnarray*}
+
+\end_inset
+
+The ancillary variables are defined via equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_Relative_w"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_u_dot"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_v_dot"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_r"
+
+\end_inset
+
+, viz.
+\begin_inset Formula 
+\[
+w=\frac{v}{\rho}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+u & = & d-\left(a\cdot d\right)a\\
+v & = & r-\left(a\cdot r\right)a
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+r=s-p
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The intersection solution properties may be characterized as
+\end_layout
+
+\begin_layout Itemize
+If 
+\begin_inset Formula $u\ne0$
+\end_inset
+
+, then real-valued solution(s) exist:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+If 
+\begin_inset Formula $\left|u\wedge v\right|<\rho\left|u\right|$
+\end_inset
+
+, or in normalized quantities 
+\begin_inset Formula $\left|\hat{u}\wedge\frac{v}{\rho}\right|<1$
+\end_inset
+
+, then there are two distinct solutions although one or both of which may
+ be 
+\begin_inset Quotes eld
+\end_inset
+
+behind
+\begin_inset Quotes erd
+\end_inset
+
+ the ray.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+forward
+\begin_inset Quotes erd
+\end_inset
+
+ solutions correspond to values of 
+\begin_inset Formula $\lambda_{\pm}$
+\end_inset
+
+ for which 
+\begin_inset Formula $0\le\lambda_{\pm}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+If 
+\begin_inset Formula $\left|u\wedge v\right|=\rho\left|u\right|$
+\end_inset
+
+, or in normalized quantities
+\begin_inset Formula $\left|\hat{u}\wedge\frac{v}{\rho}\right|=1$
+\end_inset
+
+, then the two solutions are degenerate and the ray is tangent to the surface
+ of the tube.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+If 
+\begin_inset Formula $u=0$
+\end_inset
+
+, the solutions are singular or degenerate.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+If 
+\begin_inset Formula $\left|v\right|=\rho$
+\end_inset
+
+, then there are an infinity of solutions along the entire ray which lies
+ in the surface of the tube.
+\end_layout
+
+\begin_layout Itemize
+If 
+\begin_inset Formula $\left|v\right|\ne\rho$
+\end_inset
+
+, the quadratic formula is singular and the ray is displaced from the surface
+ of the tube, but runs parallel to it.
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+The vector location of the solution point(s) may be computed directly from
+ the parametric ray equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PointOnRay"
+
+\end_inset
+
+, and the scalar solution value(s), 
+\begin_inset Formula $\lambda_{\pm}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+x=s+\lambda_{\pm}d
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Once the value(s) of 
+\begin_inset Formula $\lambda_{\pm}$
+\end_inset
+
+ is determined, the value of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ may be computed directly from equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Func_mu_of_lambda"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\mu=\left(a\cdot d\right)\lambda_{\pm}+\left(a\cdot r\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The direction of the transverse vector, 
+\begin_inset Formula $b$
+\end_inset
+
+, may be computed from equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:B_of_lambda_u,v"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\rho b_{\pm}=\lambda_{\pm}u+v
+\]
+
+\end_inset
+
+e.g.
+ as
+\begin_inset Formula 
+\[
+\hat{b}_{\pm}=\frac{\lambda_{\pm}u+v}{\left|\lambda_{\pm}u+v\right|}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\start_of_appendix
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Relationships-for_u,v"
+
+\end_inset
+
+Relationships for 
+\begin_inset Formula $u$
+\end_inset
+
+, and 
+\begin_inset Formula $v$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+These ancillary vectors may be interpreted via a few simple algebraic relationsh
+ips.
+ Substitute the definitions for 
+\begin_inset Formula $\alpha_{d}$
+\end_inset
+
+, and expand the dot product notation to a full geometric product,
+\begin_inset Formula 
+\begin{eqnarray*}
+u & = & \frac{1}{2}\left(2d-2\left(a\cdot d\right)a\right)\\
+ & = & \frac{1}{2}\left(2d-\left(ad+da\right)a\right)\\
+ & = & \frac{1}{2}\left(2d-ada-d\right)\\
+ & = & \frac{1}{2}\left(d-ada\right)\\
+ & = & \frac{1}{2}\left(aad-ada\right)\\
+ & = & \frac{1}{2}a\left(ad-da\right)\\
+ & = & a\left(a\wedge d\right)
+\end{eqnarray*}
+
+\end_inset
+
+The same process can be applied to the definition of 
+\begin_inset Formula $v$
+\end_inset
+
+.
+ Thus,
+\begin_inset Formula 
+\begin{eqnarray*}
+u & = & a\left(a\wedge d\right)\\
+v & = & a\left(a\wedge r\right)
+\end{eqnarray*}
+
+\end_inset
+
+I.e.
+ The vectors 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are respectively the rejections of 
+\begin_inset Formula $d$
+\end_inset
+
+ and 
+\begin_inset Formula $r$
+\end_inset
+
+ from the tube axis, 
+\begin_inset Formula $a$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This rejection relationship can be made explicit by defining bivectors,
+\begin_inset Formula 
+\begin{eqnarray*}
+A_{d} & \equiv & a\wedge d\\
+A_{r} & \equiv & a\wedge r
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here 
+\begin_inset Formula $A_{d}$
+\end_inset
+
+ is directed in the plane containing the ray direction, 
+\begin_inset Formula $d$
+\end_inset
+
+ and the tube axis, 
+\begin_inset Formula $a$
+\end_inset
+
+ and has magnitude equal to the sine of the angle between directions 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $d$
+\end_inset
+
+.
+ The bivector, 
+\begin_inset Formula $A_{r}$
+\end_inset
+
+ is proportional to the plane defined by the relative position of the start
+ of the ray and the axis of the tube.
+ It has magnitude 
+\begin_inset Formula $\left|A_{r}\right|$
+\end_inset
+
+ equal to the distance of the ray start point, 
+\begin_inset Formula $r$
+\end_inset
+
+, from the tube axis.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $a$
+\end_inset
+
+ is coplanar with both bivectors, 
+\begin_inset Formula $A_{d}$
+\end_inset
+
+ and 
+\begin_inset Formula $A_{r}$
+\end_inset
+
+, the vector-bivector product anti-commutates in both cases.
+ Thus, the vectors, 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, may be compactly expressed in product form as
+\begin_inset Formula 
+\begin{eqnarray*}
+u & = & aA_{d}=-A_{d}a\\
+v & = & aA_{r}=-A_{r}a
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Radicand-Identity"
+
+\end_inset
+
+Radicand Identity
+\end_layout
+
+\begin_layout Standard
+Consider the scalar value 
+\begin_inset Formula $\beta^{2}$
+\end_inset
+
+, which is a function of arbitrary vectors, 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, and scalar 
+\begin_inset Formula $\rho$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\beta^{2}=\left(u\cdot v\right)^{2}-u^{2}\left(v^{2}-\rho^{2}\right)
+\]
+
+\end_inset
+
+The expression on the right hand side which includes the scalar inner product,
+ 
+\begin_inset Formula $u\cdot v$
+\end_inset
+
+, may be transformed into an expression in terms of the outer bivector product,
+ 
+\begin_inset Formula $u\wedge v$
+\end_inset
+
+ as follows.
+\end_layout
+
+\begin_layout Standard
+Expand the squared dot product in terms of geometric products and commute/distri
+bute the scalar value 
+\begin_inset Formula $u^{2}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\beta^{2}=\left[\frac{1}{2}\left(uv+vu\right)\right]^{2}-v^{2}u^{2}+\rho^{2}u^{2}
+\]
+
+\end_inset
+
+The perform basic algebraic operations to expand the squared term
+\begin_inset Formula 
+\[
+\beta^{2}=\frac{1}{4}\left[uvuv+uvvu+vuuv+vuvu\right]-v^{2}u^{2}+\rho^{2}u^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\beta^{2}=\frac{1}{4}\left[uvuv+2u^{2}v^{2}+vuvu\right]-v^{2}u^{2}+\rho^{2}u^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\beta^{2}=\frac{1}{4}uvuv+\frac{1}{2}u^{2}v^{2}+\frac{1}{4}vuvu-v^{2}u^{2}+\rho^{2}u^{2}
+\]
+
+\end_inset
+
+Combine the terms with 
+\begin_inset Formula $u^{2}v^{2}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+\beta^{2}=\frac{1}{4}uvuv-\frac{1}{2}u^{2}v^{2}+\frac{1}{4}vuvu+\rho^{2}u^{2}
+\]
+
+\end_inset
+
+This may be factored by reversing the steps above (but here with the minus
+ sign) to obtain
+\begin_inset Formula 
+\[
+\beta^{2}=\frac{1}{4}\left(uv-vu\right)^{2}+\rho^{2}u^{2}
+\]
+
+\end_inset
+
+Employing the definition of the outer product produces the desired result
+\begin_inset Formula 
+\[
+\beta^{2}=\left(u\wedge v\right)^{2}+\rho^{2}u^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since bivectors square to negative scalar values, this is equivalent to
+\begin_inset Formula 
+\[
+\beta^{2}=\rho^{2}u^{2}-\left|u\wedge v\right|^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

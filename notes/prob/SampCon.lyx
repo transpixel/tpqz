@@ -1,0 +1,877 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Sample Consensus Quality Assessment
+\end_layout
+
+\begin_layout Author
+Stellacore Corporation
+\begin_inset Newline newline
+\end_inset
+
+Dave Knopp
+\end_layout
+
+\begin_layout Abstract
+This technical note describes a simple method for ranking the quality of
+ intermediate solutions obtained during random sample consensus operations.
+\end_layout
+
+\begin_layout Section
+Background
+\end_layout
+
+\begin_layout Standard
+In general, the RANSAC algorithm of
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Fischler&Bolles"
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Fischler&Bolles,Wiki"
+
+\end_inset
+
+ uses the 
+\begin_inset Quotes eld
+\end_inset
+
+number of consensus measurements
+\begin_inset Quotes erd
+\end_inset
+
+ as a quality metric by which to assess each iterative solution.
+ This can be problematic in that the counting process requires an a priori
+ estimate of sample measurement quality and the results are somewhat discontinuo
+us due to the hard-cut thresholding operation used to determine which measuremen
+ts are counted.
+\end_layout
+
+\begin_layout Standard
+This note describes an approach of computing a quantitative value that,
+ it is argued, may be interpreted as a continuous pseudo-probability of
+ each solution.
+ Furthermore, the pseudo-probability argument is extended to provide an
+ estimate of the likelihood that each input measurements is 
+\begin_inset Quotes eld
+\end_inset
+
+good
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The approach herein is very much along the lines of the MLESAC
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MLESAC"
+
+\end_inset
+
+ but focuses on a pragmatic formulation that avoids consideration of a prior
+ threshold values, a prior uncertainty estimates, or a prior blunder rate
+ estimates.
+\end_layout
+
+\begin_layout Section
+Methodology
+\end_layout
+
+\begin_layout Standard
+Consider a collection of 
+\begin_inset Formula $N$
+\end_inset
+
+ measurements from which a random subset is used to fit the underlying model.
+ Herein the index, 
+\begin_inset Formula $k$
+\end_inset
+
+, is used to indicate one of the 
+\begin_inset Formula $K$
+\end_inset
+
+ random sampling and model fitting iterations.
+ The index 
+\begin_inset Formula $n$
+\end_inset
+
+ is used to indicate one of the 
+\begin_inset Formula $N$
+\end_inset
+
+ measurements.
+ The index 
+\begin_inset Formula $m$
+\end_inset
+
+ is used to indicate one of the 
+\begin_inset Formula $M$
+\end_inset
+
+ measurements 
+\emph on
+not
+\emph default
+ used in fitting the model for the 
+\begin_inset Formula $k$
+\end_inset
+
+-th iteration.
+ The index 
+\begin_inset Formula $f$
+\end_inset
+
+ is used to indicate one of the 
+\begin_inset Formula $N-M$
+\end_inset
+
+ measurements that are used in a particular model fitting iteration.
+\end_layout
+
+\begin_layout Standard
+Given the fit model for the 
+\begin_inset Formula $k$
+\end_inset
+
+-th iteration, assume that the 
+\begin_inset Formula $m$
+\end_inset
+
+-th measurement can be associated with some scalar value which indicates
+ its deviation from correctness, and denote this residual value as, 
+\begin_inset Formula $\nu_{m}$
+\end_inset
+
+.
+ Assume the residual is specified on an absolute scale for which the zero
+ point represents a 
+\begin_inset Quotes eld
+\end_inset
+
+perfect fit
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For model fitting using a minimum possible sample size, the residuals for
+ all points used to fit the model have zero value (e.g.
+ 
+\begin_inset Formula $\nu_{f}=0$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The underlying (and somewhat implicit) assumption behind the RANSAC process
+ is that smaller residuals, suggest a better consensus.
+ In conventional use, the measurement is assumed to agree with the model
+ if 
+\begin_inset Formula $\left|\nu_{n}\right|<\alpha\sigma_{0}$
+\end_inset
+
+ where 
+\begin_inset Formula $\sigma_{0}$
+\end_inset
+
+ is some a priori estimate of the population uncertainty present in the
+ measurements and 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is some generally arbitrary multiplier (e.g.
+ to specify a one-sigma, two-sigma, etc...
+ level of 
+\begin_inset Quotes eld
+\end_inset
+
+confidence
+\begin_inset Quotes erd
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The first key point of this note, is to generalize this concept somewhat.
+ First assume that the measurements are drawn from some population that
+ has unknown probability distribution.
+ In virtually all practical situations this distribution may be assumed
+ to have a finite variance.
+ If the model fitting process is free of bias (which a good model and process
+ should satisfy), then the residuals will have zero mean.
+ Taken together, this means the values 
+\begin_inset Formula $\nu_{n}$
+\end_inset
+
+ can reasonably be expected to have zero mean and some finite variance.
+\end_layout
+
+\begin_layout Standard
+The maximum likelihood distribution with the zero-mean and finite-variance
+ property is the normal distribution with the form
+\begin_inset Formula 
+\[
+P\left(\nu_{n}\right)=\kappa\exp\left(-\sigma^{-2}\nu_{n}^{2}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ is a normalization constant and 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is the expected variance.
+\end_layout
+
+\begin_layout Standard
+Note: this is 
+\emph on
+NOT
+\emph default
+ suggesting the the measurement errors are normally distributed! Rather
+ this is suggesting that the residuals magnitudes from all the measurements
+ - 
+\emph on
+BOTH
+\emph default
+ inlier measurements and outlier measurements - are from zero-mean and finite-va
+riance populations.
+ Thus, the 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ value here is NOT the same as the conventional 
+\begin_inset Formula $\sigma_{0}$
+\end_inset
+
+ value above.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is a property of the measurement population, it is constant across all
+ measurements such that the (assumed) probability distribution may be expressed
+ as
+\begin_inset Formula 
+\[
+P\left(\nu_{n}\right)=\kappa\left(\exp\left(-\nu_{n}^{2}\right)\right)^{\sigma^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the typical RANSAC problem, one is primarily (often exclusively) interested
+ in only the relative quality between different sample solutions.
+ Since, 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ is a positive value and 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ is necessarily positive
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Because the exponential function 
+\begin_inset Formula $\exp\left(-\sigma^{-2}\nu_{n}^{2}\right)$
+\end_inset
+
+ is everywhere positive, and the probability must be positive, then, 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ must also be a positive value.
+\end_layout
+
+\end_inset
+
+, the value of 
+\begin_inset Formula $P\left(\nu_{n}\right)$
+\end_inset
+
+, varies monotonically with the value of 
+\begin_inset Formula $\exp\left(\nu_{n}^{2}\right)$
+\end_inset
+
+.
+ This suggests introducing a value 
+\begin_inset Formula $\mathcal{P}$
+\end_inset
+
+, herein called a pseudo-probability, and defined as 
+\begin_inset Formula 
+\[
+\mathcal{P}\left(\nu_{n}\right)\equiv e^{-\nu_{n}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The pseudo-probability that the 
+\begin_inset Formula $k$
+\end_inset
+
+-th model fit is a good one, can be associated with the combined pseudo-probabil
+ity of the 
+\begin_inset Formula $M$
+\end_inset
+
+ assessment measurements in a kind of voting strategy.
+ Let 
+\begin_inset Formula $\mathcal{P}_{k}$
+\end_inset
+
+ be the pseudo probability of the 
+\begin_inset Formula $k$
+\end_inset
+
+-th model fit defined as
+\begin_inset Formula 
+\[
+\mathcal{P}_{k}\equiv\sum_{m}\mathcal{P}\left(\nu_{m}\right)=\sum e^{-\nu_{m}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a sufficient expression for the immediate purposes herein.
+ However, if one were to consider comparing different models computed from
+ different data sets altogether, then it may be useful to use a normalized
+ version model fit pseudo-probability,
+\begin_inset Formula 
+\[
+\hat{\mathcal{P}}_{k}=\frac{1}{M}\sum e^{-\nu_{m}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a generalization of the 
+\begin_inset Quotes eld
+\end_inset
+
+counting
+\begin_inset Quotes erd
+\end_inset
+
+ concept used in the classic RANSAC approach.
+ I.e.
+ the conventional approach is to replace the exponential by either a 
+\begin_inset Formula $1$
+\end_inset
+
+ or 
+\begin_inset Formula $0$
+\end_inset
+
+ value depending, respectively, if the 
+\begin_inset Formula $m$
+\end_inset
+
+-th sample is considered to 
+\begin_inset Quotes eld
+\end_inset
+
+agree
+\begin_inset Quotes erd
+\end_inset
+
+ with the model or to not agree with it.
+\end_layout
+
+\begin_layout Standard
+Thus, the first suggested step is to use the continuous function, 
+\begin_inset Formula $\mathcal{P}_{k}\left(\left\{ \nu_{m}\right\} \right)$
+\end_inset
+
+, in place of a conventional thresholded counting operation.
+\end_layout
+
+\begin_layout Standard
+The second part of this technical note address the consideration of deciding
+ which of the 
+\begin_inset Formula $n$
+\end_inset
+
+ measurements should be considered 
+\begin_inset Quotes eld
+\end_inset
+
+good
+\begin_inset Quotes erd
+\end_inset
+
+ (aka inliers) and which should be considered outliers.
+\end_layout
+
+\begin_layout Standard
+Consider the 
+\begin_inset Formula $k$
+\end_inset
+
+-th sample fit in which the fit is 
+\begin_inset Quotes eld
+\end_inset
+
+good
+\begin_inset Quotes erd
+\end_inset
+
+.
+ In this case, the 
+\begin_inset Formula $m$
+\end_inset
+
+-th measurement residual can be expected to have the probability distribution
+ assumed above, and thus also the pseudo-distribution, 
+\begin_inset Formula $\mathcal{P}_{mk}$
+\end_inset
+
+.
+ As the quality of the model degrades, less can be inferred about the quality
+ of any of the measurements.
+ This suggests introducing the sample pseudo-probability
+\begin_inset Formula 
+\[
+\mathcal{P}_{mk}=\mathcal{P}_{m}\mathcal{P}_{k}
+\]
+
+\end_inset
+
+for which
+\begin_inset Formula 
+\[
+\mathcal{P}_{m}\equiv\mathcal{P}\left(\nu_{m}\right)=e^{-\nu_{m}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+For samples that are included in the model fit, the sample residual is zero,
+ hence 
+\begin_inset Formula $\mathcal{P}_{f}=1$
+\end_inset
+
+ and thus,
+\begin_inset Formula 
+\[
+\mathcal{P}_{fk}=\mathcal{P}_{k}
+\]
+
+\end_inset
+
+In general, this is (perhaps much) larger than the 
+\begin_inset Formula $\mathcal{P}_{mk}$
+\end_inset
+
+ values.
+ If all measurements were utilized in the random process, these would tend
+ to cancel out.
+ However, for probably best to skip these.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This value can be interpreted as a kind of 
+\begin_inset Quotes eld
+\end_inset
+
+vote
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+scoring contribution
+\begin_inset Quotes erd
+\end_inset
+
+ (having a continuously distributed value 
+\begin_inset Formula $0\le\mathcal{P}_{mk}\le1$
+\end_inset
+
+).
+ These votes can be accumulated over the 
+\begin_inset Formula $K$
+\end_inset
+
+ sampling processes.
+ Because the measurements used in the fitting process are not included at
+ each iteration, some measurements are excluded from the voting process
+ at each of the 
+\begin_inset Formula $k$
+\end_inset
+
+-th iterations.
+\end_layout
+
+\begin_layout Standard
+For random sample selection different measurements will end up accruing
+ a different number of votes.
+ Therefore the vote totals can be normalized and specified as an 
+\begin_inset Quotes eld
+\end_inset
+
+average vote value
+\begin_inset Quotes erd
+\end_inset
+
+ per sampling iteration.
+ I.e.
+\begin_inset Formula 
+\[
+\mathcal{P}_{m}=\frac{1}{N_{m}}\sum_{k}\mathcal{P}_{mk}\mathcal{P}_{k}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $N_{m}$
+\end_inset
+
+ is the number of times the 
+\begin_inset Formula $m$
+\end_inset
+
+-th measurement is excluded from fitting.
+\end_layout
+
+\begin_layout Standard
+The pseudo-probability that the 
+\begin_inset Formula $m$
+\end_inset
+
+-th measurement is 
+\begin_inset Quotes eld
+\end_inset
+
+good
+\begin_inset Quotes erd
+\end_inset
+
+ may therefore be expressed as
+\begin_inset Formula 
+\[
+\mathcal{P}_{n}=\frac{1}{N_{n}}\sum_{k}\alpha_{nk}\left(e^{-\nu_{n}^{2}}\right)\left(\sum_{m_{k}}e^{-\nu_{m_{k}}^{2}}\right)
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\alpha_{nk}=0$
+\end_inset
+
+ is the 
+\begin_inset Formula $n$
+\end_inset
+
+-th measurement is used in the 
+\begin_inset Formula $k$
+\end_inset
+
+-th sampling and 
+\begin_inset Formula $\alpha_{nk}=1$
+\end_inset
+
+ if 
+\begin_inset Formula $n$
+\end_inset
+
+-th measurement is excluded from the 
+\begin_inset Formula $k$
+\end_inset
+
+-th sampling.
+ Note that 
+\begin_inset Formula 
+\[
+N_{n}=\sum_{k}\alpha_{nk}
+\]
+
+\end_inset
+
+I.e.
+\begin_inset Formula 
+\[
+\mathcal{P}_{n}=\frac{\sum_{k}\alpha_{nk}\left(e^{-\nu_{n}^{2}}\right)\left(\sum_{m_{k}}e^{-\nu_{m_{k}}^{2}}\right)}{\sum_{k}\alpha_{nk}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Summary
+\end_layout
+
+\begin_layout Standard
+For each of the 
+\begin_inset Formula $K$
+\end_inset
+
+ iterations, compute the normalized pseudo-probability of the 
+\begin_inset Formula $k$
+\end_inset
+
+-th model fit via
+\begin_inset Formula 
+\[
+\mathcal{\hat{P}}_{k}=\frac{1}{M}\sum_{m}e^{-\nu_{m}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For each of the 
+\begin_inset Formula $m$
+\end_inset
+
+-th samples not used in this 
+\begin_inset Formula $k$
+\end_inset
+
+-th fit, accumulate the measurement goodness pseudo-probability (while counting
+ the number of these accumulations).
+ E.g.
+ for 
+\begin_inset Formula $m\notin f$
+\end_inset
+
+, utilize the accumulation steps
+\begin_inset Formula 
+\[
+\Sigma_{\mathcal{P}_{mk}}=\Sigma_{\mathcal{P}_{mk}}+e^{-\nu_{m}^{2}}\mathcal{\hat{P}}_{k}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Sigma_{N_{mk}}=\Sigma_{N_{mk}}+1
+\]
+
+\end_inset
+
+and then assign a measurement goodness pseudo-probability to the 
+\begin_inset Formula $n$
+\end_inset
+
+-th measurement as
+\begin_inset Formula 
+\[
+\mathcal{P}_{n}=\frac{\sum_{k}\Sigma_{\mathcal{P}_{nk}}}{\sum_{k}\Sigma_{N_{nk}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An final model fit may be computed using only the 
+\begin_inset Quotes eld
+\end_inset
+
+most (pseduo)-probably good
+\begin_inset Quotes erd
+\end_inset
+
+ measurements.
+\end_layout
+
+\begin_layout Subsection
+Addendum
+\end_layout
+
+\begin_layout Standard
+If the magnitude of uncertainty in the measurement residuals is known, it
+ can be factored into the pseudo-probability values to make the pseudo values
+ more apparently realistic.
+ E.g.
+ for measurement expected uncertainty of 
+\begin_inset Formula $\mu$
+\end_inset
+
+, use formulae,
+\begin_inset Formula 
+\[
+\mathcal{P}_{k}=\sum_{m}e^{-\mu^{2}\nu_{m}^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Sigma_{\mathcal{P}_{mk}}=\Sigma_{\mathcal{P}_{mk}}+e^{-\mu\nu_{m}^{2}}\mathcal{P}_{k}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\start_of_appendix
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Fischler&Bolles"
+
+\end_inset
+
+Martin A.
+ Fischler & Robert C.
+ Bolles (June 1981).
+ "Random Sample Consensus: A Paradigm for Model Fitting with Applications
+ to Image Analysis and Automated Cartography" (PDF).
+ Comm.
+ of the ACM.
+ 24 (6): 381–395.
+ 
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "MLESAC"
+
+\end_inset
+
+P.H.S.
+ Torr and A.
+ Zisserman, MLESAC: A new robust estimator with application to estimating
+ image geometry, Journal of Computer Vision and Image Understanding 78 (2000),
+ no.
+ 1, 138–156.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Wiki"
+
+\end_inset
+
+Wikipedia, https://en.wikipedia.org/wiki/Random_sample_consensus, visited
+ Jun 14 2017.
+\end_layout
+
+\end_body
+\end_document

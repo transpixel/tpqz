@@ -1,0 +1,805 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Removing Bias from SSD Estimate
+\end_layout
+
+\begin_layout Author
+Stellacore Corporation
+\begin_inset Newline newline
+\end_inset
+
+Dave Knopp
+\end_layout
+
+\begin_layout Abstract
+This technical note summarizes the standard sum-squared-difference (SSD)
+ similarity metric as applied to a two collections of samples.
+ It then evaluates how the metric changes when each of the sample collections
+ has values which are offset by a constant bias.
+ A formula is then presented by which the bias can be removed from the result
+ of a naive SSD computation, provided the amount of the bias is known.
+\end_layout
+
+\begin_layout Section
+Background
+\end_layout
+
+\begin_layout Standard
+Consider two collections of samples which have a one-to-one correspondence.
+ Denote the first collection as 
+\begin_inset Formula $\left\{ X_{k}\right\} $
+\end_inset
+
+ and the second collection as, 
+\begin_inset Formula $\left\{ Y_{k}\right\} $
+\end_inset
+
+ where both collections contain, 
+\begin_inset Formula $N$
+\end_inset
+
+, individual samples and 
+\begin_inset Formula $k$
+\end_inset
+
+ is the sample index such that, 
+\begin_inset Formula $k=1,\dots,N$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For unbiased data, the expected value of the sample mean is zero.
+ For the actual samples, this expectation is only approximate, but for a
+ reasonably large number of samples, the approximation is good.
+ Express the unbiased condition as,
+\begin_inset Formula 
+\begin{eqnarray*}
+\sum_{k}X_{k} & \simeq & 0\\
+\sum_{k}Y_{k} & \simeq & 0
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The standard SSD metric, 
+\begin_inset Formula $\psi$
+\end_inset
+
+, may be defined as
+\begin_inset Formula 
+\[
+\psi^{2}\equiv\sum_{k}\left(X_{k}-Y_{k}\right)^{2}
+\]
+
+\end_inset
+
+This may also be expressed as,
+\begin_inset Formula 
+\begin{equation}
+\psi^{2}=\sum_{k}D_{k}^{2}\label{eq:TrueSSD-psi}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+D_{k}\equiv X_{k}-Y_{k}\label{eq:TrueDiff}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The the unbiased condition, implies
+\begin_inset Formula 
+\[
+\sum_{k}D_{k}=\sum_{k}X_{k}-\sum_{k}Y_{k}\simeq0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now consider the case, where the observed samples are affected by a bias
+ amount.
+ Let the observed sample collections, be denoted 
+\begin_inset Formula $\left\{ I_{k}\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ J_{k}\right\} $
+\end_inset
+
+, such that
+\begin_inset Formula 
+\begin{eqnarray}
+I_{k} & = & X_{k}+a\label{eq:BiasSampI}\\
+J_{k} & = & Y_{k}+b\label{eq:BiasSampJ}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The biased SSD metric, 
+\begin_inset Formula $\beta$
+\end_inset
+
+, may be computed directly from the biased samples, via
+\begin_inset Formula 
+\[
+\beta^{2}\equiv\sum_{k}\left(I_{k}-J_{k}\right)^{2}
+\]
+
+\end_inset
+
+which may also be expressed as,
+\begin_inset Formula 
+\begin{equation}
+\beta^{2}=\sum_{k}B_{k}^{2}\label{eq:BiasSSD-beta}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+B_{k}\equiv I_{k}-J_{k}\label{eq:BiasDiffInBias}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The objective of this technical note, is to determine the value of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ given the computed value,
+\begin_inset Formula $\beta$
+\end_inset
+
+, and estimates for 
+\begin_inset Formula $a$
+\end_inset
+
+, and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ I.e.
+ to determine the function relationship,
+\begin_inset Formula 
+\[
+\psi^{2}=\beta^{2}\left(\psi,a,b\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Methodology
+\end_layout
+
+\begin_layout Subsection
+Sample Relationships
+\end_layout
+
+\begin_layout Standard
+First expand equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasDiffInBias"
+
+\end_inset
+
+ by inserting equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasSampI"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasSampJ"
+
+\end_inset
+
+ in terms of the true values to obtain,
+\begin_inset Formula 
+\begin{equation}
+B_{k}=X_{k}+a-Y_{k}-b\label{eq:BiasDiffInTrue}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This can be expressed in terms of equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TrueDiff"
+
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{equation}
+B_{k}=D_{k}+d\label{eq:BiasSampFromTrue}
+\end{equation}
+
+\end_inset
+
+where,
+\begin_inset Formula 
+\begin{equation}
+d\equiv a-b\label{eq:Define_d}
+\end{equation}
+
+\end_inset
+
+This may be inverted to obtain and expression for the true difference in
+ terms of the biased difference, viz.
+\begin_inset Formula 
+\begin{equation}
+D_{k}=B_{k}-d\label{eq:TrueSampFromBias}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+SSD Relationships
+\end_layout
+
+\begin_layout Standard
+The biased SSD, 
+\begin_inset Formula $\beta$
+\end_inset
+
+, may be computed directly from the biased sample pairs via equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasSSD-beta"
+
+\end_inset
+
+.
+ This results in the biased value,
+\begin_inset Formula 
+\[
+\beta^{2}=\sum_{k}\left(D_{k}+d\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Expand this value algebraically to obtain,
+\begin_inset Formula 
+\[
+\beta^{2}=\sum_{k}\left(D_{k}^{2}+2D_{k}d+d^{2}\right)
+\]
+
+\end_inset
+
+Note that, 
+\begin_inset Formula $d$
+\end_inset
+
+, is independent of the summation index, 
+\begin_inset Formula $k$
+\end_inset
+
+, such that distribution of the summation operation, yields
+\begin_inset Formula 
+\begin{equation}
+\beta^{2}=\sum_{k}D_{k}^{2}+2d\sum_{k}D_{k}+d^{2}\sum_{k}1\label{eq:BiasSSDExpand1}
+\end{equation}
+
+\end_inset
+
+The summation of unit values may be replaced by 
+\begin_inset Formula $N=\sum_{k}1$
+\end_inset
+
+, such that
+\begin_inset Formula 
+\begin{equation}
+\beta^{2}=\sum_{k}D_{k}^{2}+2d\sum_{k}D_{k}+d^{2}N\label{eq:BiasSSDExpand2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The first term of equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasSSDExpand1"
+
+\end_inset
+
+ is exactly the definition of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ as expressed by equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TrueSSD-psi"
+
+\end_inset
+
+.
+ Therefore,
+\begin_inset Formula 
+\[
+\beta^{2}=\psi^{2}+2d\sum_{k}D_{k}+d^{2}N
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This may be solved for the desired true SSD value, 
+\begin_inset Formula $\psi$
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{equation}
+\psi^{2}=\beta^{2}-2d\sum_{k}D_{k}-d^{2}N\label{eq:TrueSSDWith_d}
+\end{equation}
+
+\end_inset
+
+The unbiased condition on the summation of the 
+\begin_inset Formula $D_{k}$
+\end_inset
+
+, may be employed to provide an approximation sampling relationship,
+\begin_inset Formula 
+\[
+\psi^{2}\simeq\beta^{2}-d^{2}N
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Bias Relationships
+\end_layout
+
+\begin_layout Standard
+Consider the sample bias values, 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ These may be estimated from the sample data as follows.
+ First consider the summation of the observed difference values as expressed
+ by equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasDiffInTrue"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sum_{k}B_{k}=\sum_{k}D_{k}+\sum_{k}d
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The unbiased conditions may be introduced on the summation over the unbiased
+ differences, 
+\begin_inset Formula $D_{k}$
+\end_inset
+
+, to obtain,
+\begin_inset Formula 
+\[
+\sum_{k}B_{k}\simeq\sum_{k}d
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Once again the difference in biases, 
+\begin_inset Formula $d$
+\end_inset
+
+, is independent of the summation, such that,
+\begin_inset Formula 
+\[
+\sum_{k}B_{k}\simeq d\sum_{k}1=dN
+\]
+
+\end_inset
+
+which may be solved trivially, to obtain the sample estimator for, 
+\begin_inset Formula $d$
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{equation}
+d\simeq\frac{1}{N}\sum_{k}B_{k}\label{eq:d_Estimator}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Unbiased Estimator
+\end_layout
+
+\begin_layout Standard
+To obtain an expression for the sample estimator of the unbiased SSD, substitute
+ relationship
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:d_Estimator"
+
+\end_inset
+
+ into equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TrueSSDWith_d"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\psi^{2}\simeq\beta^{2}-\left(\frac{1}{N}\sum_{k}B_{k}\right)^{2}N
+\]
+
+\end_inset
+
+hence,
+\begin_inset Formula 
+\[
+\psi^{2}\simeq\beta^{2}-\frac{1}{N}\left(\sum_{k}B_{k}\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To simplify the expression, define the biased sum-difference (SD) estimator,
+ 
+\begin_inset Formula $\sigma_{B}$
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{equation}
+\sigma_{B}\equiv\sum_{k}B_{k}\label{eq:BiasSD-sigmaB}
+\end{equation}
+
+\end_inset
+
+such that the unbiased SSD estimator may be expressed as
+\begin_inset Formula 
+\begin{equation}
+\psi^{2}\simeq\beta^{2}-\frac{1}{N}\sigma_{B}^{2}\label{eq:TrueSSD-Estimator}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Alternative SD Estimator
+\end_layout
+
+\begin_layout Standard
+The unbiased sum-difference estimator, 
+\begin_inset Formula $\sigma_{B}$
+\end_inset
+
+, is defined in equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasSD-sigmaB"
+
+\end_inset
+
+ which may be expanded by substitution of definition
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasDiffInBias"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\sigma_{B}\equiv\sum_{k}B_{k}=\sum_{k}\left(I_{k}-J_{k}\right)
+\]
+
+\end_inset
+
+Or equivalently,
+\begin_inset Formula 
+\[
+\sigma_{B}=\sum_{k}I_{k}-\sum_{k}J_{k}
+\]
+
+\end_inset
+
+Note that the two terms on the right are the simple sums of the samples
+ in each of the two input sets.
+\end_layout
+
+\begin_layout Section
+Summary
+\end_layout
+
+\begin_layout Standard
+Recovering the unbiased SSD estimator, 
+\begin_inset Formula $\psi$
+\end_inset
+
+, from biased sample data, 
+\begin_inset Formula $\left\{ I_{k}\right\} $
+\end_inset
+
+, and 
+\begin_inset Formula $\left\{ J_{k}\right\} $
+\end_inset
+
+, may be accomplished via the following steps.
+\end_layout
+
+\begin_layout Enumerate
+Use corresponding sample values to define sample biased difference via equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasDiffInBias"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+B_{k}\equiv I_{k}-J_{k}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Compute the biased SSD estimator per defining equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasSSD-beta"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\beta^{2}=\sum_{k}B_{k}^{2}=\sum_{k}\left(I_{k}-J_{k}\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Compute biased difference estimator as defined by equation_
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:BiasSD-sigmaB"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\sigma_{B}\equiv\sum_{k}B_{k}=\sum_{k}I_{k}-\sum_{k}J_{k}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Compute the unbiased estimator per equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TrueSSD-Estimator"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\psi^{2}\simeq\beta-\frac{1}{N}\sigma_{B}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

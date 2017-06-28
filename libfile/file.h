@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace file
+*/
+
 /*! \brief Declarations and Definitions for libfile.
 
 \par General Concept:

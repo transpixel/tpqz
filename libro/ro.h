@@ -30,7 +30,7 @@
 #define ro_ro_INCL_
 
 /*! \file
-\brief Declarations for ro::ro
+\brief Declarations for namespace ro
 */
 
 

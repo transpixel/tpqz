@@ -30,7 +30,7 @@
 #define cloud_cloud_INCL_
 
 /*! \file
-\brief Declarations for cloud::cloud
+\brief Declarations for namespace cloud
 */
 
 

@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace sig
+*/
+
 /*! \brief Declarations and Definitions for libsig.
 
 \par General Concept:

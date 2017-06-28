@@ -30,7 +30,7 @@
 #define math_math_INCL_
 
 /*! \file
-\brief Declarations for math::math
+\brief Declarations for namespace math
 */
 
 

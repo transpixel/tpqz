@@ -30,7 +30,7 @@
 #define cam_cam_INCL_
 
 /*! \file
-\brief Declarations for cam::cam
+\brief Declarations for namespace cam
 */
 
 #include <string>

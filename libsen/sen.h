@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace sen
+*/
+
 /*! \brief Declarations and Definitions for libsen.
 
 \par General Concept:

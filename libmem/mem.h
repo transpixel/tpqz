@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace mem
+*/
+
 /*! \brief Declarations and Definitions for libmem.
 
 \par General Concept:

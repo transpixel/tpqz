@@ -30,7 +30,7 @@
 #define map_map_INCL_
 
 /*! \file
-\brief Declarations for map::map
+\brief Declarations for namespace map
 */
 
 

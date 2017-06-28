@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace app
+*/
+
 /*! \brief Declarations and Definitions for libapp.
 
 \par General Concept:

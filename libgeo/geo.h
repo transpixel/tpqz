@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace geo
+*/
+
 /*! \brief Declarations and Definitions for libgeo.
 
 \par General Concept:

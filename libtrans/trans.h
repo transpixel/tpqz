@@ -30,7 +30,7 @@
 #define trans_trans_INCL_
 
 /*! \file
-\brief Declarations for trans::trans
+\brief Declarations for namespace trans
 */
 
 

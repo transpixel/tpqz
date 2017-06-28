@@ -40,14 +40,23 @@
 #include <utility>
 
 
-/*! \brief Types and values useful for RO
+/*! \brief Declarations and Definitions for libro.
+
+\par General Concept:
+
+Photogrammetric relative orientation (aka structure form (paired) motion)
+
+\par Special Notes:
+
++ emphasizes physical interpration of RO geometry (e.g. angles and offsets)
++ provides robust solutions to RO determination
 
 \par Example
 \dontinclude testro/uro.cpp
 \skip ExampleStart
 \until ExampleEnd
-*/
 
+*/
 namespace ro
 {
 

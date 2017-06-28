@@ -43,12 +43,22 @@
 #include <utility>
 
 
-/*! \brief Functions supporting interpolation of values.
+/*! \brief Declarations and Definitions for libmath.
+
+\par General Concept:
+
+Extends standar library operations with useful special case capabilities.
+
+\par Special Notes:
+
++ package specific values - e.g. numerical tolerances
++ angle-related operations - e.g. interplation in presence of phase-wrap
 
 \par Example
 \dontinclude testmath/umath.cpp
 \skip ExampleStart
 \until ExampleEnd
+
 */
 namespace math
 {

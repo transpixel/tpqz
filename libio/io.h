@@ -26,41 +26,19 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
-
-/*! \file
-\brief Declarations for cam::cam
-*/
-
-#include <string>
-
-
-/*! \brief Declarations and Definitions for libcam.
+/*! \brief Declarations and Definitions for libio.
 
 \par General Concept:
 
-Basic photogrammetric imaging operations.
+Package-specific conventions for Input/Output involving strings and streams.
 
 \par Special Notes:
 
-+ XRefBase and typedefs provide object/image relationship mangement.
++ Provides thread-save wrapping for output streams.
 
 
 */
-namespace cam
+namespace io
 {
-
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
-
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
-
-} // cam
-
-// Inline definitions
-// #include "libcam/cam.inl"
-
-#endif // cam_cam_INCL_
+}
 

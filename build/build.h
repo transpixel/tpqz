@@ -26,41 +26,19 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
+/*! \brief Declarations and Definitions for build.
 
-/*! \file
-\brief Declarations for cam::cam
-*/
+General Concept:
 
-#include <string>
+Package build support utilities.
 
+Special Notes:
 
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
++ supports application version identifiers (git tags and/or date/time-stamps)
 
 
 */
-namespace cam
+namespace build
 {
-
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
-
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
-
-} // cam
-
-// Inline definitions
-// #include "libcam/cam.inl"
-
-#endif // cam_cam_INCL_
+}
 

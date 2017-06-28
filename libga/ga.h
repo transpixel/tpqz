@@ -35,19 +35,29 @@
 #include "libdat/array.h"
 #include "libga/comparisons.h"
 #include "libga/constructs.h"
-//#include "libga/derivative.h"
 #include "libga/quantities.h"
 #include "libga/operators.h"
 #include "libga/functions.h"
 #include "libmath/math.h"
 
 
-/*! \brief Geometric algebra library.
+/*! \brief Declarations and Definitions for libga.
+
+\par General Concept:
+
+A simple implementation of Geometric Algebra (GA) operations in 3D space.
+
+\par Special Notes:
+
++ Implementation is simple, but relatively efficient in terms of operations.
++ Operations between various grade instances may need to be added as needed.
++ The Pose and Rigid classes support 3D pose/orientation modeling.
 
 \par Example
 \dontinclude testga/uga.cpp
 \skip ExampleStart
 \until ExampleEnd
+
 */
 namespace ga
 {

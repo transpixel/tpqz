@@ -38,12 +38,21 @@
 #include <utility>
 
 
-/*! \brief Basic transformation support functions.
+/*! \brief Declarations and Definitions for libtrans.
+
+\par General Concept:
+
+Support for generic transformation of data while respecting finite data ranges.
+
+\par Special Notes:
+
++ TODO
 
 \par Example
 \dontinclude testtrans/utrans.cpp
 \skip ExampleStart
 \until ExampleEnd
+
 */
 namespace trans
 {

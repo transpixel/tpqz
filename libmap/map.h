@@ -37,7 +37,18 @@
 #include <string>
 
 
-//! \brief Fundamental declarations/definitions for libmap.
+/*! \brief Declarations and Definitions for libmap.
+
+\par General Concept:
+
+Cartographic projection (and unprojection) between 3D data and 2D "map" domain.
+
+\par Special Notes:
+
++ TODO
+
+
+*/
 namespace map
 {
 

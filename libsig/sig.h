@@ -26,41 +26,19 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
-
-/*! \file
-\brief Declarations for cam::cam
-*/
-
-#include <string>
-
-
-/*! \brief Declarations and Definitions for libcam.
+/*! \brief Declarations and Definitions for libsig.
 
 \par General Concept:
 
-Basic photogrammetric imaging operations.
+Signal processing operations useful for photogrammetric image processing.
 
 \par Special Notes:
 
-+ XRefBase and typedefs provide object/image relationship mangement.
++ simple 2D digital filtering.
 
 
 */
-namespace cam
+namespace sig
 {
-
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
-
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
-
-} // cam
-
-// Inline definitions
-// #include "libcam/cam.inl"
-
-#endif // cam_cam_INCL_
+}
 

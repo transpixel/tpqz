@@ -37,14 +37,22 @@
 #include <cstdint>
 
 
-/*! \brief Values and functions pertaining to point cloud data
+/*! \brief Declarations and Definitions for libcloud.
+
+\par General Concept:
+
+Operations related to "3D point clouds"
+
+\par Special Notes:
+
++ TODO
 
 \par Example
 \dontinclude testcloud/ucloud.cpp
 \skip ExampleStart
 \until ExampleEnd
-*/
 
+*/
 namespace cloud
 {
 	//! Data type sufficient for representing point cloud data sizes

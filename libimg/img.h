@@ -47,7 +47,19 @@
 #include <vector>
 
 
-//! Declarations and Definitions for libimg.
+/*! \brief Declarations and Definitions for libimg.
+
+\par General Concept:
+
+Operations for simple digital images - emphasis on quantitative processing.
+
+\par Special Notes:
+
++ Templatized but most support for "float" pixel types.
++ Controlled radiometric operations (e.g. under/overflow checking)
+
+
+*/
 namespace img
 {
 	//! floating point pixel type

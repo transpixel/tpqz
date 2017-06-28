@@ -37,12 +37,23 @@
 #include <array>
 
 
-/*! \brief Functions for probability operations.
+/*! \brief Declarations and Definitions for libprob.
+
+\par General Concept:
+
+Probability and statistics operations useful for basic image processing.
+
+\par Special Notes:
+
++ provides PDF and CDF structs/functions
++ support for histogram based information and operations
+
 
 \par Example
 \dontinclude testprob/uprob.cpp
 \skip ExampleStart
 \until ExampleEnd
+
 */
 namespace prob
 {

@@ -40,9 +40,21 @@
 #include "libdat/validity.h"
 
 
-//namespace dat
-//{
-//}
+/*! \brief Declarations and Definitions for libdat.
+
+\par General Concept:
+
+Common data structures and concepts for overall package.
+
+\par Special Notes:
+
++ Null-instance propagation (e.g. in place of exceptions)
++ Templatized invokation for common other functions (e.g. infoString, isValid)
+
+*/
+namespace dat
+{
+}
 
 // Inline definitions
 // #include "libdat/dat.inl"

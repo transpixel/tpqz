@@ -26,41 +26,19 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
-
-/*! \file
-\brief Declarations for cam::cam
-*/
-
-#include <string>
-
-
-/*! \brief Declarations and Definitions for libcam.
+/*! \brief Declarations and Definitions for libla.
 
 \par General Concept:
 
-Basic photogrammetric imaging operations.
+Package-generic wrapper for linear algebra operations.
 
 \par Special Notes:
 
-+ XRefBase and typedefs provide object/image relationship mangement.
++ Currently uses Eigen.
 
 
 */
-namespace cam
+namespace la
 {
-
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
-
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
-
-} // cam
-
-// Inline definitions
-// #include "libcam/cam.inl"
-
-#endif // cam_cam_INCL_
+}
 

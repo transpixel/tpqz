@@ -26,41 +26,20 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
-
-/*! \file
-\brief Declarations for cam::cam
-*/
-
-#include <string>
-
-
-/*! \brief Declarations and Definitions for libcam.
+/*! \brief Declarations and Definitions for libgeo.
 
 \par General Concept:
 
-Basic photogrammetric imaging operations.
+Simple geometry constructs (in 3D).
 
 \par Special Notes:
 
-+ XRefBase and typedefs provide object/image relationship mangement.
++ Emphasizes physical interpretations (e.g. "in front of" intersections, etc)
++ Limited to items useful for rest of package.
 
 
 */
-namespace cam
+namespace geo
 {
-
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
-
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
-
-} // cam
-
-// Inline definitions
-// #include "libcam/cam.inl"
-
-#endif // cam_cam_INCL_
+}
 

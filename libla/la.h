@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace la
+*/
+
 /*! \brief Declarations and Definitions for libla.
 
 \par General Concept:

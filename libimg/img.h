@@ -30,7 +30,7 @@
 #define img_img_INCL_
 
 /*! \file
-\brief Declarations for img::img
+\brief Declarations for namespace img
 */
 
 

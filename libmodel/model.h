@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace model
+*/
+
 /*! \brief Declarations and Definitions for libmodel.
 
 \par General Concept:

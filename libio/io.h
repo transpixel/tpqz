@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace io
+*/
+
 /*! \brief Declarations and Definitions for libio.
 
 \par General Concept:

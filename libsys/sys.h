@@ -26,6 +26,10 @@
 //
 //
 
+/*! \file
+\brief Declarations for namespace sys
+*/
+
 /*! \brief Declarations and Definitions for libsys.
 
 \par General Concept:

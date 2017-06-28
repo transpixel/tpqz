@@ -30,7 +30,7 @@
 #define dat_dat_INCL_
 
 /*! \file
-\brief Declarations for dat::dat
+\brief Declarations for namespace dat
 */
 
 

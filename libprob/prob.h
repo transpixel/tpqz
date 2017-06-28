@@ -30,7 +30,7 @@
 #define prob_prob_INCL_
 
 /*! \file
-\brief Declarations for prob::prob
+\brief Declarations for namespace prob
 */
 
 

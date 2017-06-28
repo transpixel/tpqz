@@ -1,4 +1,3 @@
-//
 // MIT License
 //
 // Copyright (c) 2017 Stellacore Corporation.
@@ -28,7 +27,7 @@
 #define ga_ga_INCL_
 
 /*! \file
-\brief Declarations for ga::ga
+\brief Declarations for namespace ga
 */
 
 

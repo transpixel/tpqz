@@ -22,6 +22,10 @@ consistent with the TPQZ licensing. Specifically
    MIT License: Copyright (c) 2015 - 2016 Florian Rappl
 https://github.com/FlorianRappl/CmdParser
 
+* boost:
+   Boost License:
+   * Website: http://www.boost.org/
+
 * Eigen-v3:
    Mozilla Public License (MPL2): Guennebaud and Beno, Jacob and others
   * Website: http://eigen.tuxfamily.org/index.php?title=Main_Page

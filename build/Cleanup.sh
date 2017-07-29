@@ -45,7 +45,7 @@
 # Refresh documentation
 
 	(
-	cd ../dochx ;
+	cd ../doctpqz ;
 	rm -rf html/
 	)
 

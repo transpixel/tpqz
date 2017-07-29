@@ -76,5 +76,5 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('uBlock.cpp')
+env.Program('uform.cpp')
 

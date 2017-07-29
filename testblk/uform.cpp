@@ -27,11 +27,11 @@
 //
 
 /*! \file
-\brief  This file contains unit test for blk::Block
+\brief  This file contains unit test for blk::form
 */
 
 
-#include "libblk/Block.h"
+#include "libblk/form.h"
 
 #include "libdat/info.h"
 #include "libdat/validity.h"
@@ -48,16 +48,18 @@ namespace
 
 //! Check for common functions
 std::string
-blk_Block_test0
+blk_form_test0
 	()
 {
 	std::ostringstream oss;
-	blk::Block const aNull;
+	/*
+	blk::form const aNull;
 	if (dat::isValid(aNull))
 	{
 		oss << "Failure of null value test" << std::endl;
 		oss << "infoString: " << dat::infoString(aNull) << std::endl;
 	}
+	*/
 	return oss.str();
 }
 
@@ -123,7 +125,7 @@ blk_Block_test0
 
 //! Check basic operations
 std::string
-blk_Block_test1
+blk_form_test1
 	()
 {
 	std::ostringstream oss;
@@ -137,7 +139,7 @@ blk_Block_test1
 	}
 
 	// assemble into a nominal block structure
-//	blk::Block const block{ blockFrom(rops.begin(), rops.end() };
+	std::vector<ga::Rigid> const eos{ blk::form::bruteForce(rops) };
 
 oss << "Failure: implement this test!" << std::endl;
 	return oss.str();
@@ -146,7 +148,7 @@ oss << "Failure: implement this test!" << std::endl;
 
 }
 
-//! Unit test for blk::Block
+//! Unit test for blk::form
 int
 main
 	( int const /*argc*/
@@ -156,8 +158,8 @@ main
 	std::ostringstream oss;
 
 	// run tests
-	oss << blk_Block_test0();
-	oss << blk_Block_test1();
+	oss << blk_form_test0();
+	oss << blk_form_test1();
 
 	// check/report results
 	std::string const errMessages(oss.str());

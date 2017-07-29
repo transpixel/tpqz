@@ -34,10 +34,12 @@
 */
 
 
+#include "libblk/blk.h"
 #include "libblk/OriPair.h"
 #include "libga/Rigid.h"
 
 #include <string>
+#include <vector>
 
 #include <sstream>
 
@@ -56,15 +58,19 @@ namespace blk
 class Block
 {
 
-public: // data
+//public: // data
 
 	/*
 	struct Node
 	{
-		blk::NodeNdx const theNdx;//{ dat::nullValue<NodeNdx>() };
-		ga::Rigid const theOriWrtRef;//{};
+		blk::NodeNdx const theNdx{ dat::nullValue<NodeNdx>() };
+		ga::Rigid const theOriWrtRef{};
 	};
+
+	std::vector<Node> theNodes;
 	*/
+
+	std::vector<ga::Rigid> theOris;
 
 public: // static methods
 
@@ -84,13 +90,14 @@ public: // methods
 	Block
 		() = default;
 
-	/*
-	//! XXX...
+	//! Construct with space for number of nodes
 	explicit
 	Block
-		(
-		);
-	*/
+		( size_t const & numNodes
+		)
+		: theOris(numNodes) // inits to invalid
+	{
+	}
 
 	//! True if instance is valid
 	bool
@@ -98,6 +105,16 @@ public: // methods
 		() const
 	{
 		return false;
+	}
+
+	//! Orientation for node
+	ga::Rigid const &
+	oriNode
+		( NodeNdx const & ndx
+		) const
+	{
+		assert(ndx < theOris.size());
+		return theOris[ndx];
 	}
 
 	//! Descriptive information about this instance.

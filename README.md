@@ -93,8 +93,8 @@ proprietary purpose. Outside of that, and with varying degrees of
 probable success, it may also be useful for other similar
 technical software development activities - or perhaps not so much.
 
- * provides a few capabilities which extend standard C++ (without the
-overhead of a large framework like boost) and a number of capabilities
+ * provides a few general capabilities which extend standard C++ (without the
+overhead of a larger framework like boost) and a number of capabilities
 which are particularly useful to mathematical operations common in much
 practical engineering work.
 
@@ -153,6 +153,13 @@ and are not dependencies of the library.
 Required
 * C++11 (or later) compiler (C++14 or later to remove use of boost)
 * SCons for build system (which requires python)
+
+Special Requirements
+* boost::filesystem
+	* boost::system
+* boost::graph
+	* boost::serialization
+	* boost::property_map
 
 Optional
 * Doxygen for producing html docs from source code

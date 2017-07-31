@@ -34,11 +34,16 @@
 #include "libapp/Usage.h"
 
 #include "build/version.h"
+#include "libdat/info.h"
 #include "libio/stream.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/connected_components.hpp>
+#include <boost/graph/prim_minimum_spanning_tree.hpp>
+
+#include <boost/graph/visitors.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -57,81 +62,131 @@ main
 	, char const * const * const // argv
 	)
 {
-	/*
-	// property for each vertex
-	struct NodeProp
-	{
-		size_t theComp;
-		std::string theName{ "nullNode" };
-	};
-
-	// property for each edge
-	struct EdgeProp
-	{
-		std::string theName{ "nullEdge" };
-	};
-	*/
-
 	// type of graph structure to use
-	using GraphType = boost::adjacency_list
+	using TypeVNdx = boost::vertex_index_t;
+	using TypeWgt = double;
+	using TypeGraph = boost::adjacency_list
 		< boost::setS // EdgeStore
 		, boost::setS // VertexStore
 		, boost::undirectedS
 		, boost::no_property // NodeProp
-		, boost::property<boost::edge_weight_t, double> // EdgeProp
+		, boost::property<boost::edge_weight_t, TypeWgt> // EdgeProp
 		>;
+	using TypeEDes = TypeGraph::edge_descriptor;
+	using TypeVDes = TypeGraph::vertex_descriptor;
+	using TypeVSize = boost::graph_traits<TypeGraph>::vertices_size_type;
+
+//	io::out() << "TypeVNdx: " << dat::nameOfType(TypeVNdx()) << std::endl;
+//	io::out() << "TypeVSize: " << dat::nameOfType(TypeVSize()) << std::endl;
 
 	// construct graph with specified number of vertices
 	constexpr size_t numVerts{ 5u };
-	GraphType graph(numVerts);
+	TypeGraph graph(numVerts);
 
 	// display initial value vertices
-	for (GraphType::vertex_iterator
+	for (TypeGraph::vertex_iterator
 		itV{vertices(graph).first} ; vertices(graph).second != itV ; ++itV)
 	{
-		GraphType::vertex_descriptor const & subV = *itV;
-		io::out() << subV << std::endl;
-	}
-
-	// create a vNdx[vDesc] map - for reverse lookup
-	using VDescNdxMap = std::map
-		< boost::graph_traits<GraphType>::vertex_descriptor
-		, boost::graph_traits<GraphType>::vertices_size_type
-		>;
-	VDescNdxMap compIds;
-	boost::associative_property_map<VDescNdxMap> compMap(compIds);
-	for (size_t vNdx{0u} ; vNdx < numVerts ; ++vNdx)
-	{
-		compMap[boost::vertex(vNdx, graph)] = vNdx + 100;
+		TypeGraph::vertex_descriptor const & subV = *itV;
+		io::out() << "ctor vDesc: " << subV << std::endl;
 	}
 
 	// get vertex descriptors vDesc[vNdx] ...
-	std::vector<GraphType::vertex_descriptor> vSubs(numVerts);
+	std::vector<TypeGraph::vertex_descriptor> vSubs(numVerts);
 	std::copy
 		( vertices(graph).first, vertices(graph).second
 		, std::inserter(vSubs, vSubs.begin())
 		);
 	// ... and use them to add a few edges
-	boost::add_edge(vSubs[0], vSubs[1], 1.6, graph);
-	boost::add_edge(vSubs[0], vSubs[2], 3.2, graph);
-	boost::add_edge(vSubs[0], vSubs[3], 1.4, graph);
-	boost::add_edge(vSubs[1], vSubs[2], 2.7, graph);
-	boost::add_edge(vSubs[1], vSubs[3], 1.9, graph);
-	boost::add_edge(vSubs[2], vSubs[3], 7.1, graph);
+	boost::add_edge(vSubs[0], vSubs[1], graph);
+	boost::add_edge(vSubs[0], vSubs[2], graph);
+	boost::add_edge(vSubs[0], vSubs[3], graph);
+	boost::add_edge(vSubs[1], vSubs[2], graph);
+	boost::add_edge(vSubs[1], vSubs[3], graph);
+	boost::add_edge(vSubs[2], vSubs[3], graph);
+
+	// create a vNdx[vDesc] map - for reverse lookup ...
+	std::map<TypeVDes, TypeVSize> vSizeForDesData;
+	boost::associative_property_map<std::map<TypeVDes, TypeVSize>>
+		vSizeForDes(vSizeForDesData);
+	// ... and fill it
+	for (size_t vNdx{0u} ; vNdx < numVerts ; ++vNdx)
+	{
+		vSizeForDes[boost::vertex(vNdx, graph)] = vNdx;
+	}
 
 	// determine connected components
 	boost::connected_components
-		(graph, compMap, boost::vertex_index_map(compMap));
+		(graph, vSizeForDes, boost::vertex_index_map(vSizeForDes));
 
 	// report connected components
 	std::for_each
-		( compIds.begin(), compIds.end()
+		( vSizeForDesData.begin(), vSizeForDesData.end()
 		, []
-			(VDescNdxMap::value_type const & compId)
+			(std::pair<TypeVDes, TypeVSize> const & compId)
 			{ io::out() << "..." << compId.second << std::endl; }
 		);
 
 
+	// Compute minimum spanning tree
+
+	// - Input data stuctures
+	std::map<TypeEDes, TypeWgt> wgtMapData;
+	boost::associative_property_map<std::map<TypeEDes, TypeWgt> >
+		wgtMap(wgtMapData);
+	for (TypeGraph::edge_iterator itE{boost::edges(graph).first}
+			; boost::edges(graph).second != itE ; ++itE)
+	{
+		wgtMapData[*itE] = 1.;
+	}
+
+	std::map<TypeVDes, TypeVNdx> vNdxForDesData;
+	boost::associative_property_map<std::map<TypeVDes, TypeVNdx> >
+		vNdxForDes(vNdxForDesData);
+
+	// What is TypeVNdx struct to do with vertex sequences
+	size_t ndx{ 0u };
+	for (TypeGraph::vertex_iterator itV{boost::vertices(graph).first}
+		; boost::vertices(graph).second != itV ; ++itV)
+	{
+		vNdxForDes[vSubs[ndx]] = TypeVNdx(ndx);
+		++ndx;
+	}
+
+	// - Output data structures
+	std::map<TypeVDes, TypeVDes> predMapData;
+	boost::associative_property_map<std::map<TypeVDes, TypeVDes> >
+		predMap(predMapData);
+
+	std::map<TypeVDes, TypeWgt> distMapData;
+	boost::associative_property_map<std::map<TypeVDes, TypeWgt> >
+		distMap(distMapData);
+
+	// compute MST
+	prim_minimum_spanning_tree
+		( graph
+		// IN: vertex_descriptor - s
+		, vSubs[0]
+		// OUT: PredecessorMap - predecessor
+		, predMap
+		// OUT: DistanceMap - distance
+		, distMap
+		// IN: WeightMap - weight
+		, wgtMap
+		// IN: IndexMap - index_map
+		, vNdxForDes
+		// DijkstraVisitor - vis
+		, boost::dijkstra_visitor<boost::null_visitor>()
+		);
+
+	for (auto const & predMapItem : predMapData)
+	{
+		io::out() << "predMapItem: " << predMapItem.second << std::endl;
+	}
+	for (auto const & distMapItem : distMapData)
+	{
+		io::out() << "distMapItem: " << distMapItem.second << std::endl;
+	}
 
 	return 0;
 }

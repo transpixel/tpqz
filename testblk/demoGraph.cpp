@@ -70,7 +70,7 @@ main
 		, boost::setS // VertexStore
 		, boost::undirectedS
 		, boost::no_property // NodeProp
-		, boost::property<boost::edge_weight_t, TypeWgt> // EdgeProp
+		, boost::no_property // EdgeProp -- handled explicitly below
 		>;
 	using TypeEDes = TypeGraph::edge_descriptor;
 	using TypeVDes = TypeGraph::vertex_descriptor;
@@ -80,8 +80,8 @@ main
 //	io::out() << "TypeVSize: " << dat::nameOfType(TypeVSize()) << std::endl;
 
 	// construct graph with specified number of vertices
-	constexpr size_t numVerts{ 5u };
-	TypeGraph graph(numVerts);
+	TypeGraph graph(10u);
+	TypeVSize const numVerts{ boost::num_vertices(graph) };
 
 	// display initial value vertices
 	for (TypeGraph::vertex_iterator
@@ -97,13 +97,19 @@ main
 		( vertices(graph).first, vertices(graph).second
 		, std::inserter(vSubs, vSubs.begin())
 		);
-	// ... and use them to add a few edges
+	// ... and use to add a few edges
+	//
 	boost::add_edge(vSubs[0], vSubs[1], graph);
-	boost::add_edge(vSubs[0], vSubs[2], graph);
-	boost::add_edge(vSubs[0], vSubs[3], graph);
 	boost::add_edge(vSubs[1], vSubs[2], graph);
-	boost::add_edge(vSubs[1], vSubs[3], graph);
 	boost::add_edge(vSubs[2], vSubs[3], graph);
+	//
+	boost::add_edge(vSubs[2], vSubs[4], graph);
+	boost::add_edge(vSubs[4], vSubs[5], graph);
+	boost::add_edge(vSubs[5], vSubs[6], graph);
+	boost::add_edge(vSubs[6], vSubs[7], graph);
+	//
+	boost::add_edge(vSubs[7], vSubs[1], graph);
+	boost::add_edge(vSubs[7], vSubs[4], graph);
 
 	// create a vNdx[vDesc] map - for reverse lookup ...
 	std::map<TypeVDes, TypeVSize> vSizeForDesData;
@@ -134,10 +140,13 @@ main
 	std::map<TypeEDes, TypeWgt> wgtMapData;
 	boost::associative_property_map<std::map<TypeEDes, TypeWgt> >
 		wgtMap(wgtMapData);
+	double wgt{ 1. };
 	for (TypeGraph::edge_iterator itE{boost::edges(graph).first}
 			; boost::edges(graph).second != itE ; ++itE)
 	{
-		wgtMapData[*itE] = 1.;
+		wgtMapData[*itE] = 1.; // wgt;
+		io::out() << "adding wgtMapData: " << wgtMapData[*itE] << std::endl;
+		wgt += .1;
 	}
 
 	std::map<TypeVDes, TypeVNdx> vNdxForDesData;
@@ -154,23 +163,25 @@ main
 	}
 
 	// - Output data structures
-	std::map<TypeVDes, TypeVDes> predMapData;
+	std::map<TypeVDes, TypeVDes> fromIntoData;
 	boost::associative_property_map<std::map<TypeVDes, TypeVDes> >
-		predMap(predMapData);
+		fromInto(fromIntoData);
 
-	std::map<TypeVDes, TypeWgt> distMapData;
+	std::map<TypeVDes, TypeWgt> fromDistData;
 	boost::associative_property_map<std::map<TypeVDes, TypeWgt> >
-		distMap(distMapData);
+		fromDist(fromDistData);
 
 	// compute MST
 	prim_minimum_spanning_tree
 		( graph
 		// IN: vertex_descriptor - s
-		, vSubs[0]
+// TODO - crashes if not vertex associated with first edge added?
+//        ? unless edge weights are all equal?
+		, vSubs[4] 
 		// OUT: PredecessorMap - predecessor
-		, predMap
+		, fromInto
 		// OUT: DistanceMap - distance
-		, distMap
+		, fromDist
 		// IN: WeightMap - weight
 		, wgtMap
 		// IN: IndexMap - index_map
@@ -179,13 +190,30 @@ main
 		, boost::dijkstra_visitor<boost::null_visitor>()
 		);
 
-	for (auto const & predMapItem : predMapData)
+	for (auto const & fromIntoItem : fromIntoData)
 	{
-		io::out() << "predMapItem: " << predMapItem.second << std::endl;
+		TypeVDes const & currVert = fromIntoItem.second;
+		TypeVDes const & nextVert = fromIntoItem.first;
+		TypeVNdx const & currNdx = vNdxForDesData[currVert];
+		TypeVNdx const & nextNdx = vNdxForDesData[nextVert];
+		TypeWgt const distPredCurr{ fromDistData[nextVert] };
+
+		io::out()
+			<< "fromIntoItem: " << fromIntoItem.second
+			<< " ("
+			<< " " << currNdx
+			<< " " << "->"
+			<< " " << nextNdx
+			<< " }"
+			<< " " << distPredCurr
+			<< std::endl;
 	}
-	for (auto const & distMapItem : distMapData)
+	for (auto const & fromDistItem : fromDistData)
 	{
-		io::out() << "distMapItem: " << distMapItem.second << std::endl;
+		io::out()
+			<< "fromDistItem: " << fromDistItem.second
+			<< "  node: " << vNdxForDesData[fromDistItem.first]
+			<< std::endl;
 	}
 
 	return 0;

@@ -46,6 +46,13 @@ namespace dat
 {
 // Functions providing descriptive information about 'ordinary' types
 
+	//! Description (demangled string) for the data type of arg
+	template <typename Type>
+	std::string
+	nameOfType
+		( const Type & arg
+		);
+
 	//! Functions to test if type has specific member functions
 	namespace has
 	{

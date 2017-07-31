@@ -35,6 +35,11 @@
 #include <iomanip>
 #include <sstream>
 
+#include <typeinfo>
+#if defined(__GNUG__)
+	#include <cxxabi.h>
+#endif
+
 
 namespace dat
 {
@@ -57,6 +62,27 @@ namespace priv
 
 //======================================================================
 
+template <typename Type>
+std::string
+nameOfType
+	( const Type & arg
+	)
+{
+	std::string name{ "????" };
+
+#	if defined(__GNUG__)
+		int status{};
+		char * realname
+			{ abi::__cxa_demangle(typeid(arg).name(), 0, 0, &status) };
+		if (realname)
+		{
+			name = realname;
+		}
+		free(realname);
+#	endif
+
+	return name;
+}
 inline
 void
 putTitle

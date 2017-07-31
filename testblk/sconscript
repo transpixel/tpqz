@@ -71,10 +71,15 @@ linklibs = \
 	, 'app'
 	, 'dat'
 	, 'io'
+
+        , 'libboost_graph'
+        , 'libboost_serialization'
+
 	]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('demoGraph.cpp')
 env.Program('uform.cpp')
 

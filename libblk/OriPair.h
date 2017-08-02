@@ -61,6 +61,9 @@ private: // data
 
 	std::pair<NodeNdx, NodeNdx> theNdxIJ
 		{ dat::nullValue<NodeNdx>(), dat::nullValue<NodeNdx>() };
+
+public: // data
+
 	ga::Rigid theOriJwI;
 
 public: // methods

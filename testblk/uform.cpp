@@ -101,6 +101,8 @@ blk_form_test0
 		{
 			ga::Rigid const & oriIwX = eos[ndxI];
 			ga::Rigid const oriXwI{ oriIwX.inverse() };
+			constexpr size_t maxBand{ 1u };
+			size_t numBand{ 0u };
 			for (blk::NodeNdx ndxJ{ndxI+1u} ; ndxJ < numNodes ; ++ndxJ)
 			{
 				ga::Rigid const & oriJwX = eos[ndxJ];
@@ -115,6 +117,11 @@ blk_form_test0
 				{
 					blk::OriPair const rop(ndxJ, ndxI, oriJwI.inverse());
 					rops.emplace_back(rop);
+				}
+
+				if (maxBand < ++numBand)
+				{
+					break;
 				}
 			}
 		}

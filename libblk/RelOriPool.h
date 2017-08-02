@@ -26,41 +26,89 @@
 //
 //
 
-#ifndef blk_blk_INCL_
-#define blk_blk_INCL_
+#ifndef blk_RelOriPool_INCL_
+#define blk_RelOriPool_INCL_
 
 /*! \file
-\brief Declarations for blk::blk
+\brief Declarations for blk::RelOriPool
 */
 
 
+#include "libblk/OriPair.h"
+#include "libblk/blk.h"
 #include "libga/Rigid.h"
 
-#include <cstddef>
-#include <utility>
+#include <map>
+#include <string>
 
-
-/*! \brief Types and values useful for libblk module.
-*/
+// TODO
+#include <vector>
 
 namespace blk
 {
 
-	//! A member of block (associated with its own coordinate frame)
-	using NodeNdx = size_t;
+/*! \brief Collection of RelOri measurements accessable block Node index pair.
 
-	//! Two Nodes (such as associated with a RelOri measurement)
-	using NdxPair = std::pair<NodeNdx, NodeNdx>;
-	//! Terminology associated with graph operations
-	using EdgeKey = NdxPair;
+\par Example
+\dontinclude testblk/uRelOriPool.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-	//! Type of a RelOri observation
-	using EdgeOri = std::pair<EdgeKey, ga::Rigid>;
+class RelOriPool
+{
+
+public: // data
+
+	//! RelOri measurement data
+	std::map<EdgeKey, ga::Rigid> theRelOriMap;
+
+public: // static methods
+
+	//! Invalid RelOri edge
+	static
+	EdgeOri
+	nullEdgeOri
+		();
+
+	//! Construct instance from collection of OriPair
+	static
+	RelOriPool
+	from
+		( std::vector<blk::OriPair> const & rops
+		);
+
+public: // methods
+
+	//! Constructs an empty collection
+	RelOriPool
+		() = default;
+
+	//! Value constructor
+	explicit
+	RelOriPool
+		( std::map<EdgeKey, ga::Rigid> const & relOris
+		);
+
+	//! Directed orientation for node2 w.r.t. node1
+	EdgeOri
+	edgeOriFor
+		( size_t const & ndx1
+		, size_t const & ndx2
+		) const;
+
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // RelOriPool
 
 } // blk
 
 // Inline definitions
-// #include "libblk/blk.inl"
+// #include "libblk/RelOriPool.inl"
 
-#endif // blk_blk_INCL_
+#endif // blk_RelOriPool_INCL_
 

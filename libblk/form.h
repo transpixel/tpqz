@@ -35,6 +35,7 @@
 
 
 #include "libblk/OriPair.h"
+#include "libblk/RelOriPool.h"
 #include "libga/Rigid.h"
 #include "libio/sprintf.h"
 
@@ -67,6 +68,30 @@ namespace blk
 
 namespace form
 {
+	//! Utility functions
+	std::string
+	infoStringShort
+		( std::vector<ga::Rigid> const & oris
+		, std::string const & title = std::string{}
+		)
+	{
+		std::ostringstream oss;
+		if (! title.empty())
+		{
+			oss << title;
+		}
+		for (size_t nn{0u} ; nn < oris.size() ; ++nn)
+		{
+			oss << std::endl;
+			oss
+				<< dat::infoString(nn)
+				<< " " << ":"
+				<< " " << oris[nn].infoStringShort()
+				;
+		}
+		return oss.str();
+	}
+
 	// Define a simple graph structure for topographic connectivity
 	using TopoWgt = double;
 	using TopoGraph = boost::adjacency_list
@@ -110,112 +135,14 @@ namespace form
 		return oss.str();
 	}
 
-	//! Index pair which can assume (.first < .second)
-	using LoHiEdge = std::pair<size_t, size_t>;
-
-	//! Directed RelOri measurement
-	using LoHiOri = std::pair<LoHiEdge, ga::Rigid>;
-
-	//! Invalid RelOri edge
-	LoHiOri
-	nullLoHiOri
-		()
-	{
-		constexpr size_t badNdx{ dat::nullValue<size_t>() };
-		ga::Rigid const badOri{};
-		return LoHiOri{ LoHiEdge{ badNdx, badNdx}, badOri };
-	}
-
-	//! True if this RelOri edge is not null
-	bool
-	isValid
-		( LoHiOri const & lhOri
-		)
-	{
-		return
-			(  dat::isValid(lhOri.first)
-			&& dat::isValid(lhOri.second)
-			);
-	}
-
-	//! Directed orientation for node2 w.r.t. node1
-	LoHiOri
-	lohiOriFor
-		( size_t const & ndx1
-		, size_t const & ndx2
-		, std::map<LoHiEdge, ga::Rigid> const & lohiOris
-		)
-	{
-		LoHiOri lhOri{ nullLoHiOri() };
-
-		LoHiEdge findEdge{ ndx1, ndx2 };
-		ga::Rigid ori2w1;
-
-		if (ndx1 == ndx2) // ori of node w.r.t. self
-		{
-			ori2w1 = ga::Rigid::identity();
-		}
-		else
-		{
-			// lohiOri is required to have ordered index pair as key
-			bool isForward{ true };
-			if (ndx2 < ndx1)
-			{
-				isForward = false;
-				findEdge = { ndx2, ndx1 };
-			}
-
-			// search for (ordered) node pair key within RelOri collection
-			std::map<LoHiEdge, ga::Rigid>::const_iterator const itFind
-				{ lohiOris.find(findEdge) };
-			if (lohiOris.end() != itFind)
-			{
-				ga::Rigid const & oriFound = itFind->second;
-				if (isForward)
-				{
-					ori2w1 = oriFound;
-				}
-				else // requested keys in reversed order
-				{
-					ori2w1 = oriFound.inverse();
-				}
-			}
-		}
-
-		// if orientation is good, set/validate return structure
-		if (dat::isValid(ori2w1))
-		{
-			lhOri.first = findEdge;
-			lhOri.second = ori2w1;
-		}
-
-		return lhOri;
-	}
-
-	//! Gather relative orientations sorted by directed edge indices
-	std::map<LoHiEdge, ga::Rigid>
-	lohiEdgeOrientations
-		( std::vector<blk::OriPair> const & rops
-		)
-	{
-		std::map<LoHiEdge, ga::Rigid> lohiMap;
-		for (blk::OriPair const & rop : rops)
-		{
-			blk::OriPair const ijRop{ rop.principalPair() };
-			LoHiEdge const ijPair{ ijRop.ndxI(), ijRop.ndxJ() };
-			lohiMap[ijPair] = ijRop.theOriJwI;
-		}
-		return lohiMap;
-	}
-
 	//! Graph with all edge connections
 	TopoGraph
 	fullTopoGraph
-		( std::map<LoHiEdge, ga::Rigid> const & relOriMap
+		( std::map<EdgeKey, ga::Rigid> const & relOriMap
 		)
 	{
 		TopoGraph graph;
-		for (std::pair<LoHiEdge, ga::Rigid> const & relOriItem : relOriMap)
+		for (EdgeOri const & relOriItem : relOriMap)
 		{
 			NodeNdx const & ndxI = relOriItem.first.first;
 			NodeNdx const & ndxJ = relOriItem.first.second;
@@ -249,30 +176,6 @@ namespace form
 		return minGraph;
 	}
 
-	//! Report orientations
-	std::string
-	infoStringShort
-		( std::vector<ga::Rigid> const & oris
-		, std::string const & title = std::string{}
-		)
-	{
-		std::ostringstream oss;
-		if (! title.empty())
-		{
-			oss << title;
-		}
-		for (size_t nn{0u} ; nn < oris.size() ; ++nn)
-		{
-			oss << std::endl;
-			oss
-				<< dat::infoString(nn)
-				<< " " << ":"
-				<< " " << oris[nn].infoStringShort()
-				;
-		}
-		return oss.str();
-	}
-
 	//! Set *both* referenced EOs based on ori2w1
 	void
 	initBlockEOs
@@ -303,7 +206,9 @@ namespace form
 	//! Propagate orentations as each spanning RO is descovered/traversed
 	class TreeBuilder : public boost::default_bfs_visitor
 	{
-		std::map<LoHiEdge, ga::Rigid> const & theRelOriMap;
+// TODO - restore - bad compiler warning
+//		RelOriPool const & theRelOriPool;
+RelOriPool const theRelOriPool;
 		bool theIsInit;
 		std::vector<ga::Rigid> * const thePtEOs;
 
@@ -312,11 +217,11 @@ namespace form
 		//! Attach to relOriMap as source for tree build
 		explicit
 		TreeBuilder
-			( std::map<LoHiEdge, ga::Rigid> const & relOriMap
+			( RelOriPool const & roPool
 			, std::vector<ga::Rigid> * const & ptEOs
 			)
 			: boost::default_bfs_visitor{}
-			, theRelOriMap(relOriMap)
+			, theRelOriPool{ roPool }
 			, theIsInit{ false }
 			, thePtEOs{ ptEOs }
 		{ }
@@ -336,8 +241,8 @@ namespace form
 			assert(fromNdx < thePtEOs->size());
 			assert(intoNdx < thePtEOs->size());
 
-			LoHiOri const lhOri{ lohiOriFor(fromNdx, intoNdx, theRelOriMap) };
-			ga::Rigid const & ori2w1 = lhOri.second;
+			EdgeOri const eOri{ theRelOriPool.edgeOriFor(fromNdx, intoNdx) };
+			ga::Rigid const & ori2w1 = eOri.second;
 			assert(ori2w1.isValid());
 
 			// update block by propagating this edge orientation
@@ -358,7 +263,7 @@ namespace form
 	std::vector<ga::Rigid>
 	blockNodeOrientations
 		( TopoGraph const & graph
-		, std::map<LoHiEdge, ga::Rigid> const & relOriMap
+		, RelOriPool const & roPool
 		)
 	{
 		std::vector<ga::Rigid> blockEOs;
@@ -370,7 +275,7 @@ namespace form
 		// functor for block (orientation tree) formation on each node visit
 		size_t const numNodes{ boost::num_vertices(graph) };
 		blockEOs.resize(numNodes);
-		TreeBuilder visitor(relOriMap, &blockEOs);
+		TreeBuilder visitor(roPool, &blockEOs);
 
 		// BGL assistance
 		boost::queue<VDes> buffer;
@@ -399,11 +304,10 @@ namespace form
 		std::vector<ga::Rigid> blockEOs;
 
 		// order relative measurements for easy retrieval
-		std::map<LoHiEdge, ga::Rigid> const relOriMap
-			{ lohiEdgeOrientations(rops) };
+		RelOriPool const roPool(RelOriPool::from(rops));
 
 		// use graph structure to organize relative connections
-		TopoGraph const fullGraph{ fullTopoGraph(relOriMap) };
+		TopoGraph const fullGraph{ fullTopoGraph(roPool.theRelOriMap) };
 		io::out() << infoString(fullGraph, "fullGraph") << std::endl;
 
 		// TODO verify connectivity ? (or return multiple blocks?)
@@ -415,7 +319,7 @@ namespace form
 			io::out() << infoString(spanGraph, "spanGraph") << std::endl;
 
 			// propagate orientations through graph
-			blockEOs = blockNodeOrientations(spanGraph, relOriMap);
+			blockEOs = blockNodeOrientations(spanGraph, roPool);
 		}
 
 		io::out() << infoStringShort(blockEOs, "blockEOs") << std::endl;

@@ -42,6 +42,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 
+#include <algorithm>
 #include <map>
 #include <sstream>
 #include <stack>
@@ -111,6 +112,85 @@ namespace form
 
 	//! Index pair which can assume (.first < .second)
 	using LoHiEdge = std::pair<size_t, size_t>;
+
+	//! Directed RelOri measurement
+	using LoHiOri = std::pair<LoHiEdge, ga::Rigid>;
+
+	//! Invalid RelOri edge
+	LoHiOri
+	nullLoHiOri
+		()
+	{
+		constexpr size_t badNdx{ dat::nullValue<size_t>() };
+		ga::Rigid const badOri{};
+		return LoHiOri{ LoHiEdge{ badNdx, badNdx}, badOri };
+	}
+
+	//! True if this RelOri edge is not null
+	bool
+	isValid
+		( LoHiOri const & lhOri
+		)
+	{
+		return
+			(  dat::isValid(lhOri.first)
+			&& dat::isValid(lhOri.second)
+			);
+	}
+
+	//! Directed orientation for node2 w.r.t. node1
+	LoHiOri
+	lohiOriFor
+		( size_t const & ndx1
+		, size_t const & ndx2
+		, std::map<LoHiEdge, ga::Rigid> const & lohiOris
+		)
+	{
+		LoHiOri lhOri{ nullLoHiOri() };
+
+		LoHiEdge findEdge{ ndx1, ndx2 };
+		ga::Rigid ori2w1;
+
+		if (ndx1 == ndx2) // ori of node w.r.t. self
+		{
+			ori2w1 = ga::Rigid::identity();
+		}
+		else
+		{
+			// lohiOri is required to have ordered index pair as key
+			bool isForward{ true };
+			if (ndx2 < ndx1)
+			{
+				isForward = false;
+				findEdge = { ndx2, ndx1 };
+			}
+
+			// search for (ordered) node pair key within RelOri collection
+			std::map<LoHiEdge, ga::Rigid>::const_iterator const itFind
+				{ lohiOris.find(findEdge) };
+			if (lohiOris.end() != itFind)
+			{
+				ga::Rigid const & oriFound = itFind->second;
+				if (isForward)
+				{
+					ori2w1 = oriFound;
+				}
+				else // requested keys in reversed order
+				{
+					ori2w1 = oriFound.inverse();
+				}
+			}
+		}
+
+		// if orientation is good, set/validate return structure
+		if (dat::isValid(ori2w1))
+		{
+			lhOri.first = findEdge;
+			lhOri.second = ori2w1;
+		}
+
+		return lhOri;
+	}
 
 	//! Gather relative orientations sorted by directed edge indices
 	std::map<LoHiEdge, ga::Rigid>
@@ -256,15 +336,9 @@ namespace form
 			assert(fromNdx < thePtEOs->size());
 			assert(intoNdx < thePtEOs->size());
 
-// TODO -- need to flip indices if need be
-assert(fromNdx < intoNdx);
-
-			// get (properly directed) orientation for this edge
-			LoHiEdge const lohiNdxs{ fromNdx, intoNdx };
-			std::map<LoHiEdge, ga::Rigid>::const_iterator const itFind
-				(theRelOriMap.find(lohiNdxs));
-			assert(theRelOriMap.end() != itFind);
-			ga::Rigid const & ori2w1 = itFind->second;
+			LoHiOri const lhOri{ lohiOriFor(fromNdx, intoNdx, theRelOriMap) };
+			ga::Rigid const & ori2w1 = lhOri.second;
+			assert(ori2w1.isValid());
 
 			// update block by propagating this edge orientation
 			if (! theIsInit)

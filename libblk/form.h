@@ -36,7 +36,6 @@
 
 #include "libblk/OriPair.h"
 #include "libblk/RelOriPool.h"
-#include "libga/Rigid.h"
 #include "libio/sprintf.h"
 
 #include <boost/config.hpp>
@@ -46,7 +45,6 @@
 #include <algorithm>
 #include <map>
 #include <sstream>
-#include <stack>
 #include <string>
 #include <vector>
 
@@ -304,7 +302,7 @@ RelOriPool const theRelOriPool;
 		std::vector<ga::Rigid> blockEOs;
 
 		// order relative measurements for easy retrieval
-		RelOriPool const roPool(RelOriPool::from(rops));
+		RelOriPool const roPool(RelOriPool::from(rops.begin(), rops.end()));
 
 		// use graph structure to organize relative connections
 		TopoGraph const fullGraph{ fullTopoGraph(roPool.theRelOriMap) };

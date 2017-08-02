@@ -50,22 +50,6 @@ RelOriPool :: nullEdgeOri
 	return EdgeOri{ EdgeKey{ badNdx, badNdx}, badOri };
 }
 
-// static
-RelOriPool
-RelOriPool :: from
-	( std::vector<blk::OriPair> const & rops
-	)
-{
-	RelOriPool pool;
-	for (blk::OriPair const & rop : rops)
-	{
-		blk::OriPair const ijRop{ rop.principalPair() };
-		EdgeKey const ijPair{ ijRop.ndxI(), ijRop.ndxJ() };
-		pool.theRelOriMap[ijPair] = ijRop.theOriJwI;
-	}
-	return pool;
-}
-
 // explicit
 RelOriPool :: RelOriPool
 	( std::map<EdgeKey, ga::Rigid> const & relOris

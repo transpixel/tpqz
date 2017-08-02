@@ -1,5 +1,4 @@
 //
-//
 // MIT License
 //
 // Copyright (c) 2017 Stellacore Corporation.
@@ -72,10 +71,12 @@ public: // static methods
 		();
 
 	//! Construct instance from collection of OriPair
+	template <typename FwdIter>
 	static
 	RelOriPool
 	from
-		( std::vector<blk::OriPair> const & rops
+		( FwdIter const & beg //!< *iter is blk::OriPair
+		, FwdIter const & end
 		);
 
 public: // methods
@@ -108,7 +109,7 @@ public: // methods
 } // blk
 
 // Inline definitions
-// #include "libblk/RelOriPool.inl"
+#include "libblk/RelOriPool.inl"
 
 #endif // blk_RelOriPool_INCL_
 

@@ -139,6 +139,14 @@ public: // methods
 		, double const & tolAtt = math::eps
 		) const;
 
+	//! Descriptive information about this instance - on one line
+	std::string
+	infoStringShort
+		( std::string const & title = std::string()
+		, std::string const & fmtLoc = std::string{ "%6.3f" }
+		, std::string const & fmtAng = std::string{ "%9.6f" }
+		) const;
+
 	//! Descriptive information about this instance.
 	std::string
 	infoString

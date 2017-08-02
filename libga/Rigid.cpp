@@ -32,6 +32,9 @@
 
 #include "libga/Rigid.h"
 
+#include "libio/sprintf.h"
+
+#include <iomanip>
 #include <sstream>
 
 
@@ -110,6 +113,40 @@ Rigid :: nearlyEquals
 		same &= pose().nearlyEquals(other.pose(), tolAtt);
 	}
 	return same;
+}
+
+std::string
+Rigid :: infoStringShort
+	( std::string const & title
+	, std::string const & fmtLoc
+	, std::string const & fmtAng
+	) const
+{
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << std::endl;
+	}
+	if (isValid())
+	{
+		Vector const & loc = theTrans;
+		BiVector const biv{ thePose.physicalAngle() };
+		oss
+			<< "  " << "loc"
+			<< " " << ::io::sprintf(fmtLoc, loc[0])
+			<< " " << ::io::sprintf(fmtLoc, loc[1])
+			<< " " << ::io::sprintf(fmtLoc, loc[2])
+			<< "  " << "pAng"
+			<< " " << ::io::sprintf(fmtAng, biv[0])
+			<< " " << ::io::sprintf(fmtAng, biv[1])
+			<< " " << ::io::sprintf(fmtAng, biv[2])
+			;
+	}
+	else
+	{
+		oss << " <null>";
+	}
+	return oss.str();
 }
 
 std::string

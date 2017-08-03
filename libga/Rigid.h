@@ -143,7 +143,7 @@ public: // methods
 	std::string
 	infoStringShort
 		( std::string const & title = std::string()
-		, std::string const & fmtLoc = std::string{ "%6.3f" }
+		, std::string const & fmtLoc = std::string{ "%8.3f" }
 		, std::string const & fmtAng = std::string{ "%9.6f" }
 		) const;
 

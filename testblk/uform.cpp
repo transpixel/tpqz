@@ -147,15 +147,18 @@ exit(8);
 			{
 				ga::Rigid const & oriJwX = eos[ndxJ];
 
+				size_t const keyI{ 10u + ndxI };
+				size_t const keyJ{ 10u + ndxJ };
+
 				ga::Rigid const oriJwI{ oriJwX * oriXwI };
-				if (0u == ((ndxI+ndxJ)%2u))
+				if (0u == ((keyI+keyJ)%2u))
 				{
-					blk::OriPair const rop(ndxI, ndxJ, oriJwI);
+					blk::OriPair const rop(10+keyI, 10+keyJ, oriJwI);
 					rops.emplace_back(rop);
 				}
 				else
 				{
-					blk::OriPair const rop(ndxJ, ndxI, oriJwI.inverse());
+					blk::OriPair const rop(10+keyJ, 10+keyI, oriJwI.inverse());
 					rops.emplace_back(rop);
 				}
 

@@ -40,6 +40,8 @@
 
 #include <algorithm>
 #include <map>
+#include <memory>
+#include <set>
 #include <sstream>
 
 
@@ -50,6 +52,10 @@ namespace form
 
 namespace priv
 {
+	struct Node
+	{
+		NodeNdx theNodeKey{ dat::nullValue<NodeNdx>() };
+	};
 
 	// Define a simple graph structure for topographic connectivity
 	using TopoWgt = double;
@@ -57,7 +63,7 @@ namespace priv
 		< boost::vecS // OutEdgeList
 		, boost::vecS // VertexList
 		, boost::undirectedS // Directed
-		, boost::no_property // VertexProperties
+		, Node // VertexProperties
 		, boost::property<boost::edge_weight_t, TopoWgt> // EdgeProperties
 		// GraphProperties
 		// EdgeList
@@ -101,12 +107,35 @@ namespace priv
 		)
 	{
 		TopoGraph graph;
+
+		// associated VDes with block NodeIds
+		std::set<NodeNdx> uniqNodeKeys;
 		for (EdgeOri const & relOriItem : relOriMap)
 		{
-			NodeNdx const & ndxI = relOriItem.first.first;
-			NodeNdx const & ndxJ = relOriItem.first.second;
+			EdgeKey const & eKey = relOriItem.first;
+			uniqNodeKeys.insert(eKey.first);
+			uniqNodeKeys.insert(eKey.second);
+		}
+
+		// add exactly as many vertices to graph as unique block nodes
+		using VDes = boost::graph_traits<TopoGraph>::vertex_descriptor;
+		std::map<VDes, NodeNdx> vdesForNode;
+		for (NodeNdx const & nodeKey : uniqNodeKeys)
+		{
+			VDes const vdes{ boost::add_vertex(graph) };
+			graph[vdes].theNodeKey = nodeKey;
+			vdesForNode[nodeKey] = vdes;
+		}
+
+		// add graph edges - one for each source relOri
+		for (EdgeOri const & relOriItem : relOriMap)
+		{
+			NodeNdx const ndxI = relOriItem.first.first;
+			NodeNdx const ndxJ = relOriItem.first.second;
+			VDes const vdesI = vdesForNode[ndxI];
+			VDes const vdesJ = vdesForNode[ndxJ];
 			constexpr TopoWgt weight{ 1. };
-			boost::add_edge(ndxI, ndxJ, weight, graph).first;
+			boost::add_edge(vdesI, vdesJ, weight, graph).first;
 		}
 		return graph;
 	}
@@ -117,10 +146,21 @@ namespace priv
 		( TopoGraph const & fullGraph
 		)
 	{
-		TopoGraph minGraph;
+		TopoGraph spanGraph;
+
+		using VDes = boost::graph_traits<TopoGraph>::vertex_descriptor;
+		using VIter = boost::graph_traits<TopoGraph>::vertex_iterator;
+
+		// copy block node info into spanning graph
+		std::pair<VIter, VIter> const itFVBE{ boost::vertices(fullGraph) };
+		for (VIter itFV{itFVBE.first} ; itFVBE.second != itFV ; ++itFV)
+		{
+			VDes const fullVDes{ *itFV };
+			VDes const spanVDes{ boost::add_vertex(spanGraph) };
+			spanGraph[spanVDes] = fullGraph[fullVDes];
+		}
 
 		// compute minimum spanning tree (minimize number of edges involved)
-		using VDes = boost::graph_traits<TopoGraph>::vertex_descriptor;
 		std::map<VDes, VDes> predMapData;
 		boost::associative_property_map<std::map<VDes, VDes> >
 			predMap(predMapData);
@@ -129,10 +169,12 @@ namespace priv
 		// populate new/return graph to represent MST
 		for (auto const & predMapItem : predMapData)
 		{
-			add_edge(predMapItem.first, predMapItem.second, minGraph);
+			VDes const & fromVDes = predMapItem.first;
+			VDes const & intoVDes = predMapItem.second;
+			add_edge(fromVDes, intoVDes, spanGraph);
 		}
 
-		return minGraph;
+		return spanGraph;
 	}
 
 	//! Set *both* referenced EOs based on ori2w1
@@ -165,9 +207,7 @@ namespace priv
 	//! Propagate orentations as each spanning RO is descovered/traversed
 	class TreeBuilder : public boost::default_bfs_visitor
 	{
-		// TODO - restore - bad compiler warning
-	//	RelOriPool const & theRelOriPool;
-		RelOriPool const theRelOriPool;
+		std::shared_ptr<RelOriPool> const thePtPool;
 		bool theIsInit;
 		std::vector<ga::Rigid> * const thePtEOs;
 
@@ -176,11 +216,11 @@ namespace priv
 		//! Attach to relOriMap as source for tree build
 		explicit
 		TreeBuilder
-			( RelOriPool const & roPool
+			( std::shared_ptr<RelOriPool> const & ptRoPool
 			, std::vector<ga::Rigid> * const & ptEOs
 			)
 			: boost::default_bfs_visitor{}
-			, theRelOriPool{ roPool }
+			, thePtPool{ ptRoPool }
 			, theIsInit{ false }
 			, thePtEOs{ ptEOs }
 		{ }
@@ -193,14 +233,16 @@ namespace priv
 			)
 		{
 			// access endpoint vertices for this edge
-			size_t const fromNdx{ boost::source(edesc, graph) };
-			size_t const intoNdx{ boost::target(edesc, graph) };
+			using VDes = boost::graph_traits<TopoGraph>::vertex_descriptor;
+			VDes const fromVDes{ boost::source(edesc, graph) };
+			VDes const intoVDes{ boost::target(edesc, graph) };
+
+			// get block node info from vertices
+			NodeNdx const fromNdx{ graph[fromVDes].theNodeKey };
+			NodeNdx const intoNdx{ graph[intoVDes].theNodeKey };
 
 			assert(thePtEOs);
-			assert(fromNdx < thePtEOs->size());
-			assert(intoNdx < thePtEOs->size());
-
-			EdgeOri const eOri{ theRelOriPool.edgeOriFor(fromNdx, intoNdx) };
+			EdgeOri const eOri{ thePtPool->edgeOriFor(fromNdx, intoNdx) };
 			ga::Rigid const & ori2w1 = eOri.second;
 			assert(ori2w1.isValid());
 
@@ -222,7 +264,7 @@ namespace priv
 	std::vector<ga::Rigid>
 	blockNodeOrientations
 		( TopoGraph const & graph
-		, RelOriPool const & roPool
+		, std::shared_ptr<RelOriPool> const & ptRoPool
 		)
 	{
 		std::vector<ga::Rigid> blockEOs;
@@ -234,7 +276,7 @@ namespace priv
 		// functor for block (orientation tree) formation on each node visit
 		size_t const numNodes{ boost::num_vertices(graph) };
 		blockEOs.resize(numNodes);
-		TreeBuilder visitor(roPool, &blockEOs);
+		TreeBuilder visitor(ptRoPool, &blockEOs);
 
 		// BGL assistance
 		boost::queue<VDes> buffer;
@@ -265,12 +307,15 @@ viaSpan
 	std::vector<ga::Rigid> blockEOs;
 
 	// order relative measurements for easy retrieval
-	RelOriPool const roPool(RelOriPool::from(rops.begin(), rops.end()));
+	std::shared_ptr<RelOriPool> const ptRoPool
+		{ std::make_shared<RelOriPool>
+			(RelOriPool::from(rops.begin(), rops.end()))
+		};
 
 	// use graph structure to organize relative connections
 	priv::TopoGraph const fullGraph
-		{ priv::fullTopoGraph(roPool.theRelOriMap) };
-//	io::out() << priv::infoString(fullGraph, "fullGraph") << std::endl;
+		{ priv::fullTopoGraph(ptRoPool->theRelOriMap) };
+	// io::out() << priv::infoString(fullGraph, "fullGraph") << std::endl;
 
 	// TODO verify connectivity ? (or return multiple blocks?)
 	bool isConnected{ true };
@@ -278,10 +323,10 @@ viaSpan
 	{
 		// use minimum spanning tree to minimize orientation transfers
 		priv::TopoGraph const spanGraph{ priv::minTopoGraph(fullGraph) };
-	//	io::out() << priv::infoString(spanGraph, "spanGraph") << std::endl;
+		// io::out() << priv::infoString(spanGraph, "spanGraph") << std::endl;
 
 		// propagate orientations through graph
-		blockEOs = priv::blockNodeOrientations(spanGraph, roPool);
+		blockEOs = priv::blockNodeOrientations(spanGraph, ptRoPool);
 	}
 
 	return blockEOs;

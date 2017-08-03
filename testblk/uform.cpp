@@ -66,13 +66,22 @@ blk_form_test0
 	return oss.str();
 }
 
+// #define StringKey
+#	if ! defined(StringKey)
+	constexpr size_t keyOffset{ 100u };
+#	endif
+
 	//! Convert index to key
 	blk::NodeKey
 	keyFromNdx
 		( size_t const & ndx
 		)
 	{
+#		if defined(StringKey)
 		std::string const key{ io::sprintf("key_%d", ndx) };
+#		else
+		size_t const key{ keyOffset + ndx };
+#		endif
 		return key;
 	}
 
@@ -82,8 +91,13 @@ blk_form_test0
 		( blk::NodeKey const & key
 		)
 	{
+#		if defined(StringKey)
 		std::string ndxStr(key.begin()+4u, key.end());
 		size_t const ndx{ io::string::from(ndxStr, dat::nullValue<size_t>()) };
+#		else
+		assert(! (key < keyOffset));
+		size_t const ndx{ key - keyOffset };
+#		endif
 		return ndx;
 	}
 

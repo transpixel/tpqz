@@ -49,10 +49,13 @@ namespace blk
 {
 
 	//! A member of block (associated with its own coordinate frame)
-	using NodeKey = std::string;
-	NodeKey const NullKey{};
-//	using NodeKey = size_t;
-//	constexpr NodeKey NullKey{ dat::nullValue<NodeKey>() };
+	using NodeKey = size_t;
+	constexpr NodeKey NullKey{ dat::nullValue<NodeKey>() };
+
+	// -- works okay, but no need to slow with string compares
+	//    if need this, then probably consider general templatizing
+	// using NodeKey = std::string;
+	// NodeKey const NullKey{};
 
 	//! Terminology associated with graph operations
 	using EdgeKey = std::pair<NodeKey, NodeKey>;

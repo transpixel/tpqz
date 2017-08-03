@@ -26,50 +26,42 @@
 //
 //
 
-#ifndef blk_info_INCL_
-#define blk_info_INCL_
 
 /*! \file
-\brief Declarations for blk::info
+\brief Definitions for blk::info
 */
-
-
-#include "libblk/OriPair.h"
-#include "libga/Rigid.h"
-
-#include <string>
-#include <map>
-#include <vector>
 
 
 namespace blk
 {
-	//! Condensed orientation infromation for collection of orientations
-	template <typename TypeKey>
-	std::string
-	infoString
-		( std::map<TypeKey, ga::Rigid> oriMap
-		, std::string const & title = std::string{}
-		);
 
-	//! Condensed orientation infromation for collection of orientations
-	std::string
-	infoString
-		( std::vector<ga::Rigid> const & oris
-		, std::string const & title = std::string{}
-		);
+template <typename TypeKey>
+std::string
+infoString
+	( std::map<TypeKey, ga::Rigid> oriMap
+	, std::string const & title
+	)
+{
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << std::endl;
+	}
+	oss << "NumberNodes: " << oriMap.size();
+	for (typename std::map<TypeKey, ga::Rigid>::const_iterator
+		iter(oriMap.begin()) ; oriMap.end() != iter ; ++iter)
+	{
+		oss << std::endl;
+		oss
+			<< dat::infoString(iter->first)
+			<< " " << ":"
+			<< " " << iter->second.infoStringShort()
+			;
+	}
 
-	//! Condesed summary of all RelOris
-	std::string
-	infoString
-		( std::vector<OriPair> const & rops
-		, std::string const & title = std::string{}
-		);
+	return oss.str();
+}
+
 
 } // blk
-
-// Inline definitions
-#include "libblk/info.inl"
-
-#endif // blk_info_INCL_
 

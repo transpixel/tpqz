@@ -59,9 +59,11 @@ namespace blk
 
 namespace form
 {
+	//! Type used to identify block nodes
+	using NodeKey = NodeNdx; // here match OriPair NodeNdx types
 
 	//! Formation by repeated traversal of orientations
-	std::vector<ga::Rigid>
+	std::map<NodeKey, ga::Rigid>
 	viaSpan
 		( std::vector<blk::OriPair> const & rops
 		);

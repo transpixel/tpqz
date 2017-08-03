@@ -64,6 +64,47 @@ blk_form_test0
 	return oss.str();
 }
 
+	// data type to use for block node identification
+	using NodeNdx = blk::NodeNdx;
+	using NodeKey = blk::NodeNdx;
+
+	//! Convert index to key
+	NodeKey
+	keyFromNdx
+		( blk::NodeNdx const & ndx
+		)
+	{
+		return ndx + 100u;
+	}
+
+	// Restore key from index
+	NodeNdx
+	ndxFromKey
+		( NodeKey const & key
+		)
+	{
+		assert(! (key < 100u));
+		return key - 100u;
+	}
+
+	//! Vector of EO data consistent with test case data structs
+	std::vector<ga::Rigid>
+	vectorFrom
+		( std::map<NodeKey, ga::Rigid> const & oriMap
+		)
+	{
+		std::vector<ga::Rigid> oriVec(oriMap.size(), ga::Rigid{});
+		for (std::pair<NodeKey, ga::Rigid> const & eoItem : oriMap)
+		{
+			NodeKey const & key = eoItem.first;
+			NodeNdx const ndx{ ndxFromKey(key) };
+			assert(ndx < oriVec.size());
+			oriVec[ndx] = eoItem.second;
+		}
+		return oriVec;
+	}
+
+
 	//! Individual node orientations for simulated block
 	std::vector<ga::Rigid>
 	simAbsOris
@@ -134,8 +175,7 @@ exit(8);
 		std::vector<blk::OriPair> rops;
 
 		size_t const numNodes{ eos.size() };
-		assert(1u < numNodes);
-		rops.reserve(numNodes*(numNodes - 1u));
+		rops.reserve(math::sq(numNodes));
 
 		for (blk::NodeNdx ndxI{0u} ; ndxI < numNodes ; ++ndxI)
 		{
@@ -147,18 +187,18 @@ exit(8);
 			{
 				ga::Rigid const & oriJwX = eos[ndxJ];
 
-				size_t const keyI{ 10u + ndxI };
-				size_t const keyJ{ 10u + ndxJ };
+				size_t const keyI{ keyFromNdx(ndxI) };
+				size_t const keyJ{ keyFromNdx(ndxJ) };
 
 				ga::Rigid const oriJwI{ oriJwX * oriXwI };
 				if (0u == ((keyI+keyJ)%2u))
 				{
-					blk::OriPair const rop(10+keyI, 10+keyJ, oriJwI);
+					blk::OriPair const rop(keyI, keyJ, oriJwI);
 					rops.emplace_back(rop);
 				}
 				else
 				{
-					blk::OriPair const rop(10+keyJ, 10+keyI, oriJwI.inverse());
+					blk::OriPair const rop(keyJ, keyI, oriJwI.inverse());
 					rops.emplace_back(rop);
 				}
 
@@ -184,10 +224,11 @@ blk_form_test1
 	std::vector<blk::OriPair> const ropSims{ simRelOris(eosInSim) };
 
 	// assemble into a nominal block structure
-	std::vector<ga::Rigid> const eosInBlk{ blk::form::viaSpan(ropSims) };
+	std::map<NodeKey, ga::Rigid> const eoBlkMap{ blk::form::viaSpan(ropSims) };
+	std::vector<ga::Rigid> const eosInBlk(vectorFrom(eoBlkMap));
 
 	// extract (all) relative orientations from formed block
-	std::vector<blk::OriPair> const ropBlks{ simRelOris(eosInSim) };
+	std::vector<blk::OriPair> const ropBlks{ simRelOris(eosInBlk) };
 
 	// check if block orientations agree with expected simulated ones
 	size_t const numSim(ropSims.size());
@@ -220,6 +261,11 @@ blk_form_test1
 	}
 
 	/*
+	io::out() << blk::infoString(eosInSim, "eosInSim") << std::endl;
+	io::out() << std::endl;
+	io::out() << blk::infoString(eosInBlk, "eosInBlk") << std::endl;
+	io::out() << std::endl;
+
 	io::out() << blk::infoString(ropSims, "ropSims") << std::endl;
 	io::out() << std::endl;
 	io::out() << blk::infoString(ropBlks, "ropBlks") << std::endl;

@@ -43,6 +43,22 @@
 namespace blk
 {
 
+EdgeOri
+principalEdgeOri
+	( EdgeOri const & anyEdgeOri
+	)
+{
+	EdgeOri ijEdgeOri{ anyEdgeOri };
+	EdgeKey const & key = anyEdgeOri.first;
+	if (! (key.first < key.second))
+	{
+		EdgeKey const keyRev{ key.second, key.first };
+		ga::Rigid const & ori = anyEdgeOri.second;
+		ijEdgeOri = { keyRev, ori.inverse() };
+	}
+	return ijEdgeOri;
+}
+
 std::vector<ga::Rigid>
 fitOnto
 	( std::vector<ga::Rigid> const & oriSrcWrtRefs

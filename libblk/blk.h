@@ -60,6 +60,12 @@ namespace blk
 	using EdgeOri = std::pair<EdgeKey, ga::Rigid>;
 
 
+	//! Same relationship but with indices satisfying order I<J
+	EdgeOri
+	principalEdgeOri
+		( EdgeOri const & eOri
+		);
+
 	//! Transform collection of orientations to agreed at ndxFit
 	std::vector<ga::Rigid>
 	fitOnto

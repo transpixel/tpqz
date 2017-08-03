@@ -45,10 +45,10 @@ RelOriPool :: from
 	RelOriPool pool;
 	for (FwdIter iter{beg} ; end != iter ; ++iter)
 	{
-		OriPair const & rop = *iter;
-		blk::OriPair const ijRop{ rop.principalPair() };
-		EdgeKey const ijPair{ ijRop.ndxI(), ijRop.ndxJ() };
-		pool.theRelOriMap[ijPair] = ijRop.theOriJwI;
+		EdgeOri const & edgeOri = *iter;
+		EdgeOri const ijEdgeOri{ principalEdgeOri(edgeOri) };
+		EdgeKey const & key = ijEdgeOri.first;
+		pool.theRelOriMap[key] = ijEdgeOri.second;
 	}
 	return pool;
 }

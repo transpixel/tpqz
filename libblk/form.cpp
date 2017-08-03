@@ -143,7 +143,7 @@ namespace priv
 		return graph;
 	}
 
-	//! Graph with MinSpanningTree within rops
+	//! Graph with MinSpanningTree within edgeOris
 	TopoGraph
 	minTopoGraph
 		( TopoGraph const & fullGraph
@@ -337,7 +337,7 @@ namespace priv
 
 std::map<NodeKey, ga::Rigid>
 viaSpan
-	( std::vector<blk::OriPair> const & rops
+	( std::vector<EdgeOri> const & edgeOris
 	)
 {
 	std::map<NodeKey, ga::Rigid> blkOriMap;
@@ -345,7 +345,7 @@ viaSpan
 	// order relative measurements for easy retrieval
 	std::shared_ptr<RelOriPool> const ptRoPool
 		{ std::make_shared<RelOriPool>
-			(RelOriPool::from(rops.begin(), rops.end()))
+			(RelOriPool::from(edgeOris.begin(), edgeOris.end()))
 		};
 
 	// use graph structure to organize relative connections

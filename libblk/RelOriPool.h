@@ -34,7 +34,6 @@
 */
 
 
-#include "libblk/OriPair.h"
 #include "libblk/blk.h"
 #include "libga/Rigid.h"
 
@@ -71,12 +70,12 @@ public: // static methods
 	nullEdgeOri
 		();
 
-	//! Construct instance from collection of OriPair
+	//! Construct instance from collection of EdgeOri objects
 	template <typename FwdIter>
 	static
 	RelOriPool
 	from
-		( FwdIter const & beg //!< *iter is blk::OriPair
+		( FwdIter const & beg //!< *iter is blk::EdgeOri
 		, FwdIter const & end
 		);
 

@@ -69,7 +69,7 @@ infoString
 
 std::string
 infoString
-	( std::vector<OriPair> const & rops
+	( std::vector<EdgeOri> const & eROs
 	, std::string const & title
 	)
 {
@@ -78,13 +78,13 @@ infoString
 	{
 		oss << title << std::endl;
 	}
-	for (size_t nn{0u} ; nn < rops.size() ; ++nn)
+	for (size_t nn{0u} ; nn < eROs.size() ; ++nn)
 	{
 		if (0u < nn)
 		{
 			oss << std::endl;
 		}
-		oss << rops[nn].theOriJwI.infoStringShort();
+		oss << eROs[nn].second.infoStringShort();
 	}
 	return oss.str();
 }

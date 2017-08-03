@@ -36,7 +36,9 @@
 
 #include "libdat/info.h"
 #include "libdat/validity.h"
+#include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libio/string.h"
 
 #include <iostream>
 #include <sstream>
@@ -74,6 +76,7 @@ blk_form_test0
 		( blk::NodeNdx const & ndx
 		)
 	{
+	//	return io::sprintf("%d", ndx);
 		return ndx + 100u;
 	}
 
@@ -83,6 +86,7 @@ blk_form_test0
 		( NodeKey const & key
 		)
 	{
+	//	return io::string::from(key, dat::nullValue<NodeNdx>());
 		assert(! (key < 100u));
 		return key - 100u;
 	}
@@ -167,12 +171,12 @@ exit(8);
 	}
 
 	//! Pairwise orientations within simulated block
-	std::vector<blk::OriPair>
+	std::vector<blk::EdgeOri>
 	simRelOris
 		( std::vector<ga::Rigid> const & eos
 		)
 	{
-		std::vector<blk::OriPair> rops;
+		std::vector<blk::EdgeOri> rops;
 
 		size_t const numNodes{ eos.size() };
 		rops.reserve(math::sq(numNodes));
@@ -187,18 +191,20 @@ exit(8);
 			{
 				ga::Rigid const & oriJwX = eos[ndxJ];
 
-				size_t const keyI{ keyFromNdx(ndxI) };
-				size_t const keyJ{ keyFromNdx(ndxJ) };
+				NodeKey const keyI{ keyFromNdx(ndxI) };
+				NodeKey const keyJ{ keyFromNdx(ndxJ) };
 
 				ga::Rigid const oriJwI{ oriJwX * oriXwI };
 				if (0u == ((keyI+keyJ)%2u))
 				{
-					blk::OriPair const rop(keyI, keyJ, oriJwI);
+					blk::EdgeOri const rop
+						{ blk::EdgeKey{keyI, keyJ}, oriJwI };
 					rops.emplace_back(rop);
 				}
 				else
 				{
-					blk::OriPair const rop(keyJ, keyI, oriJwI.inverse());
+					blk::EdgeOri const rop
+						{ blk::EdgeKey{keyJ, keyI}, oriJwI.inverse() };
 					rops.emplace_back(rop);
 				}
 
@@ -221,14 +227,14 @@ blk_form_test1
 
 	// simulate a bunch of relative orientations
 	std::vector<ga::Rigid> const eosInSim{ simAbsOris() };
-	std::vector<blk::OriPair> const ropSims{ simRelOris(eosInSim) };
+	std::vector<blk::EdgeOri> const ropSims{ simRelOris(eosInSim) };
 
 	// assemble into a nominal block structure
 	std::map<NodeKey, ga::Rigid> const eoBlkMap{ blk::form::viaSpan(ropSims) };
 	std::vector<ga::Rigid> const eosInBlk(vectorFrom(eoBlkMap));
 
 	// extract (all) relative orientations from formed block
-	std::vector<blk::OriPair> const ropBlks{ simRelOris(eosInBlk) };
+	std::vector<blk::EdgeOri> const ropBlks{ simRelOris(eosInBlk) };
 
 	// check if block orientations agree with expected simulated ones
 	size_t const numSim(ropSims.size());
@@ -241,14 +247,16 @@ blk_form_test1
 	{
 		for (size_t nn{0u} ; nn < numSim ; ++nn)
 		{
-			blk::OriPair const & ropSim = ropSims[nn];
-			blk::OriPair const & ropBlk = ropBlks[nn];
-			// verify test case generating same ROs
-			assert(dat::nearlyEquals(ropBlk.ndxI(), ropSim.ndxI()));
-			assert(dat::nearlyEquals(ropBlk.ndxJ(), ropSim.ndxJ()));
+			blk::EdgeOri const & ropSim = ropSims[nn];
+			blk::EdgeOri const & ropBlk = ropBlks[nn];
 
-			ga::Rigid const & expOri = ropSim.theOriJwI;
-			ga::Rigid const & gotOri = ropBlk.theOriJwI;
+			// verify test case generating same ROs
+			blk::EdgeKey const & keySim = ropSim.first;
+			blk::EdgeKey const & keyBlk = ropBlk.first;
+			assert(dat::nearlyEquals(keySim, keyBlk));
+
+			ga::Rigid const & expOri = ropSim.second;
+			ga::Rigid const & gotOri = ropBlk.second;
 			if (! gotOri.nearlyEquals(expOri))
 			{
 				oss << "Failure of recovered RO test" << std::endl;

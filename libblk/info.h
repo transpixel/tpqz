@@ -34,7 +34,7 @@
 */
 
 
-#include "libblk/OriPair.h"
+#include "libblk/blk.h"
 #include "libga/Rigid.h"
 
 #include <string>
@@ -62,7 +62,7 @@ namespace blk
 	//! Condesed summary of all RelOris
 	std::string
 	infoString
-		( std::vector<OriPair> const & rops
+		( std::vector<EdgeOri> const & eROs
 		, std::string const & title = std::string{}
 		);
 

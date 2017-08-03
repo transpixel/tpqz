@@ -59,9 +59,6 @@ namespace blk
 
 namespace form
 {
-	//! Type used to identify block nodes
-	using NodeKey = NodeNdx; // TODO - make template parameter?
-
 	//! Formation by repeated traversal of orientations
 	std::map<NodeKey, ga::Rigid>
 	viaSpan

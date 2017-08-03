@@ -56,7 +56,7 @@ namespace priv
 {
 	struct Node
 	{
-		NodeNdx theNodeKey{ dat::nullValue<NodeNdx>() };
+		NodeKey theNodeKey{ dat::nullValue<NodeKey>() };
 	};
 
 	// Define a simple graph structure for topographic connectivity

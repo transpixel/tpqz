@@ -49,12 +49,10 @@ namespace blk
 {
 
 	//! A member of block (associated with its own coordinate frame)
-	using NodeNdx = size_t;
+	using NodeKey = size_t;
 
-	//! Two Nodes (such as associated with a RelOri measurement)
-	using NdxPair = std::pair<NodeNdx, NodeNdx>;
 	//! Terminology associated with graph operations
-	using EdgeKey = NdxPair;
+	using EdgeKey = std::pair<NodeKey, NodeKey>;
 
 	//! Type of a RelOri observation
 	using EdgeOri = std::pair<EdgeKey, ga::Rigid>;

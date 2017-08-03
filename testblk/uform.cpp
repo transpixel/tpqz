@@ -66,14 +66,10 @@ blk_form_test0
 	return oss.str();
 }
 
-	// data type to use for block node identification
-	using NodeNdx = blk::NodeNdx;
-	using NodeKey = blk::NodeNdx;
-
 	//! Convert index to key
-	NodeKey
+	blk::NodeKey
 	keyFromNdx
-		( blk::NodeNdx const & ndx
+		( size_t const & ndx
 		)
 	{
 	//	return io::sprintf("%d", ndx);
@@ -81,12 +77,12 @@ blk_form_test0
 	}
 
 	// Restore key from index
-	NodeNdx
+	size_t
 	ndxFromKey
-		( NodeKey const & key
+		( blk::NodeKey const & key
 		)
 	{
-	//	return io::string::from(key, dat::nullValue<NodeNdx>());
+	//	return io::string::from(key, dat::nullValue<size_t>());
 		assert(! (key < 100u));
 		return key - 100u;
 	}
@@ -94,14 +90,14 @@ blk_form_test0
 	//! Vector of EO data consistent with test case data structs
 	std::vector<ga::Rigid>
 	vectorFrom
-		( std::map<NodeKey, ga::Rigid> const & oriMap
+		( std::map<blk::NodeKey, ga::Rigid> const & oriMap
 		)
 	{
 		std::vector<ga::Rigid> oriVec(oriMap.size(), ga::Rigid{});
-		for (std::pair<NodeKey, ga::Rigid> const & eoItem : oriMap)
+		for (std::pair<blk::NodeKey, ga::Rigid> const & eoItem : oriMap)
 		{
-			NodeKey const & key = eoItem.first;
-			NodeNdx const ndx{ ndxFromKey(key) };
+			blk::NodeKey const & key = eoItem.first;
+			size_t const ndx{ ndxFromKey(key) };
 			assert(ndx < oriVec.size());
 			oriVec[ndx] = eoItem.second;
 		}
@@ -181,18 +177,18 @@ exit(8);
 		size_t const numNodes{ eos.size() };
 		rops.reserve(math::sq(numNodes));
 
-		for (blk::NodeNdx ndxI{0u} ; ndxI < numNodes ; ++ndxI)
+		for (size_t ndxI{0u} ; ndxI < numNodes ; ++ndxI)
 		{
 			ga::Rigid const & oriIwX = eos[ndxI];
 			ga::Rigid const oriXwI{ oriIwX.inverse() };
 			constexpr size_t maxBand{ 1u };
 			size_t numBand{ 0u };
-			for (blk::NodeNdx ndxJ{ndxI+1u} ; ndxJ < numNodes ; ++ndxJ)
+			for (size_t ndxJ{ndxI+1u} ; ndxJ < numNodes ; ++ndxJ)
 			{
 				ga::Rigid const & oriJwX = eos[ndxJ];
 
-				NodeKey const keyI{ keyFromNdx(ndxI) };
-				NodeKey const keyJ{ keyFromNdx(ndxJ) };
+				blk::NodeKey const keyI{ keyFromNdx(ndxI) };
+				blk::NodeKey const keyJ{ keyFromNdx(ndxJ) };
 
 				ga::Rigid const oriJwI{ oriJwX * oriXwI };
 				if (0u == ((keyI+keyJ)%2u))
@@ -230,7 +226,8 @@ blk_form_test1
 	std::vector<blk::EdgeOri> const ropSims{ simRelOris(eosInSim) };
 
 	// assemble into a nominal block structure
-	std::map<NodeKey, ga::Rigid> const eoBlkMap{ blk::form::viaSpan(ropSims) };
+	std::map<blk::NodeKey, ga::Rigid> const eoBlkMap
+		{ blk::form::viaSpan(ropSims) };
 	std::vector<ga::Rigid> const eosInBlk(vectorFrom(eoBlkMap));
 
 	// extract (all) relative orientations from formed block

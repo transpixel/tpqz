@@ -26,52 +26,48 @@
 //
 //
 
-#ifndef blk_form_INCL_
-#define blk_form_INCL_
 
 /*! \file
-\brief Declarations for blk::form
+\brief Definitions for blk::blk
 */
 
 
 #include "libblk/blk.h"
-#include "libblk/RelOriPool.h"
-#include "libga/Rigid.h"
 
-#include <string>
-#include <vector>
+#include <sstream>
 
-namespace
-{
-}
 
+/*! \brief Types and values useful for libblk module.
+*/
 
 namespace blk
 {
 
-/*! \brief Block formation algorithms.
-
-\par Example
-\dontinclude testblk/uform.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
-
-namespace form
+std::vector<ga::Rigid>
+fitOnto
+	( std::vector<ga::Rigid> const & oriSrcWrtRefs
+	, size_t const & ndxToFit
+	, ga::Rigid const & keyTgtWrtRef
+	)
 {
+	std::vector<ga::Rigid> oriTgtWrtRefs;
+	assert(ndxToFit < oriSrcWrtRefs.size());
+	oriTgtWrtRefs.reserve(oriSrcWrtRefs.size());
 
-	//! Formation by repeated traversal of orientations
-	std::vector<ga::Rigid>
-	viaSpan
-		( std::vector<blk::OriPair> const & rops
-		);
+	// compute relationship of target frame w.r.t. source frame
+	ga::Rigid const & keySrcWrtRef = oriSrcWrtRefs[ndxToFit];
+	ga::Rigid const keyRefWrtSrc{ keySrcWrtRef.inverse() };
+	ga::Rigid const oriTgtWrtSrc{ keyTgtWrtRef * keyRefWrtSrc };
 
-} // form
+	// transform all orientations from expression w.r.t. source to target
+	for (ga::Rigid const & oriSrcWrtRef : oriSrcWrtRefs)
+	{
+		ga::Rigid const oriTgtWrtRef{ oriTgtWrtSrc * oriSrcWrtRef };
+		oriTgtWrtRefs.emplace_back(oriTgtWrtRef);
+	}
+
+	return oriTgtWrtRefs;
+}
 
 } // blk
-
-// Inline definitions
-// #include "libblk/form.inl"
-
-#endif // blk_form_INCL_
 

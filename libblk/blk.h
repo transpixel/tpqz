@@ -37,7 +37,9 @@
 #include "libga/Rigid.h"
 
 #include <cstddef>
+#include <string>
 #include <utility>
+#include <vector>
 
 
 /*! \brief Types and values useful for libblk module.
@@ -56,6 +58,15 @@ namespace blk
 
 	//! Type of a RelOri observation
 	using EdgeOri = std::pair<EdgeKey, ga::Rigid>;
+
+
+	//! Transform collection of orientations to agreed at ndxFit
+	std::vector<ga::Rigid>
+	fitOnto
+		( std::vector<ga::Rigid> const & // oriSrcWrtRefs
+		, size_t const & // keyNdxToFit
+		, ga::Rigid const & // oriKeyWrtRef
+		);
 
 } // blk
 

@@ -26,52 +26,42 @@
 //
 //
 
-#ifndef blk_form_INCL_
-#define blk_form_INCL_
+#ifndef blk_info_INCL_
+#define blk_info_INCL_
 
 /*! \file
-\brief Declarations for blk::form
+\brief Declarations for blk::info
 */
 
 
-#include "libblk/blk.h"
-#include "libblk/RelOriPool.h"
+#include "libblk/OriPair.h"
 #include "libga/Rigid.h"
 
 #include <string>
 #include <vector>
 
-namespace
-{
-}
-
 
 namespace blk
 {
 
-/*! \brief Block formation algorithms.
-
-\par Example
-\dontinclude testblk/uform.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
-
-namespace form
-{
-
-	//! Formation by repeated traversal of orientations
-	std::vector<ga::Rigid>
-	viaSpan
-		( std::vector<blk::OriPair> const & rops
+	//! Condensed orientation infromation for collection of orientations
+	std::string
+	infoString
+		( std::vector<ga::Rigid> const & oris
+		, std::string const & title = std::string{}
 		);
 
-} // form
+	//! Condesed summary of all RelOris
+	std::string
+	infoString
+		( std::vector<OriPair> const & rops
+		, std::string const & title = std::string{}
+		);
 
 } // blk
 
 // Inline definitions
-// #include "libblk/form.inl"
+// #include "libblk/info.inl"
 
-#endif // blk_form_INCL_
+#endif // blk_info_INCL_
 

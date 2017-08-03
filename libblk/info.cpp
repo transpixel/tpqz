@@ -26,52 +26,69 @@
 //
 //
 
-#ifndef blk_form_INCL_
-#define blk_form_INCL_
 
 /*! \file
-\brief Declarations for blk::form
+\brief Definitions for blk::info
 */
 
 
-#include "libblk/blk.h"
-#include "libblk/RelOriPool.h"
-#include "libga/Rigid.h"
+#include "libblk/info.h"
 
-#include <string>
-#include <vector>
-
-namespace
-{
-}
+#include <sstream>
 
 
 namespace blk
 {
 
-/*! \brief Block formation algorithms.
-
-\par Example
-\dontinclude testblk/uform.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
-
-namespace form
+std::string
+infoString
+	( std::vector<ga::Rigid> const & oris
+	, std::string const & title
+	)
 {
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << std::endl;
+	}
+	for (size_t nn{0u} ; nn < oris.size() ; ++nn)
+	{
+		if (0u < nn)
+		{
+			oss << std::endl;
+		}
+		oss
+			<< dat::infoString(nn)
+			<< " " << ":"
+			<< " " << oris[nn].infoStringShort()
+			;
+	}
 
-	//! Formation by repeated traversal of orientations
-	std::vector<ga::Rigid>
-	viaSpan
-		( std::vector<blk::OriPair> const & rops
-		);
+	return oss.str();
+}
 
-} // form
+std::string
+infoString
+	( std::vector<OriPair> const & rops
+	, std::string const & title
+	)
+{
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << std::endl;
+	}
+	for (size_t nn{0u} ; nn < rops.size() ; ++nn)
+	{
+		if (0u < nn)
+		{
+			oss << std::endl;
+		}
+		oss << rops[nn].theOriJwI.infoStringShort();
+	}
+	return oss.str();
+}
+
 
 } // blk
-
-// Inline definitions
-// #include "libblk/form.inl"
-
-#endif // blk_form_INCL_
 

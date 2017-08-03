@@ -81,5 +81,6 @@ env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
 env.Program('demoGraph.cpp')
+env.Program('ublk.cpp')
 env.Program('uform.cpp')
 

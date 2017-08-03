@@ -32,6 +32,7 @@
 
 
 #include "libblk/form.h"
+#include "libblk/info.h"
 
 #include "libdat/info.h"
 #include "libdat/validity.h"
@@ -72,13 +73,53 @@ blk_form_test0
 		oris.reserve(10u);
 
 		using namespace ga;
-		oris.emplace_back(Rigid(vZero, Pose::identity()));
-		oris.emplace_back(Rigid( -e1, Pose(BiVector(0., 5., 3.))));
-		oris.emplace_back(Rigid(  e1, Pose(BiVector(1., 4., 6.))));
-		oris.emplace_back(Rigid( -e2, Pose(BiVector(2., 3., 9.))));
-		oris.emplace_back(Rigid(  e2, Pose(BiVector(3., 2., 2.))));
-		oris.emplace_back(Rigid( -e3, Pose(BiVector(4., 1., 5.))));
-		oris.emplace_back(Rigid(  e3, Pose(BiVector(5., 0., 8.))));
+
+if (false)
+{
+		ga::Vector const off( 10., 0., 0. );
+		constexpr double qtr{ math::qtrTurn };
+
+oris.emplace_back(Rigid(off +e1   , Pose(BiVector(0., 0., qtr))));
+oris.emplace_back(Rigid(off +e1+e2, Pose(BiVector(0., 0., 2.*qtr))));
+oris.emplace_back(Rigid(off    +e2, Pose(BiVector(0., 0., 3.*qtr))));
+oris.emplace_back(Rigid(off       , Pose(BiVector(0., 0., .0))));
+
+	std::vector<ga::Rigid> const eosIn1(oris);;
+	std::vector<ga::Rigid> eosIn2;
+	std::vector<ga::Rigid> eosIn3;
+
+	{
+	io::out() << "== Transform: A" << std::endl;
+	size_t const ndxFit{ 0u };
+	ga::Rigid const & oriFitWrtChk = ga::Rigid::identity();
+	eosIn2 = blk::fitOnto(eosIn1, ndxFit, oriFitWrtChk);
+	}
+
+	{
+	io::out() << "== Transform: B" << std::endl;
+	size_t const ndxFit{ 2u };
+	ga::Rigid const & oriFitWrtChk = eosIn1[ndxFit];
+	eosIn3 = blk::fitOnto(eosIn2, ndxFit, oriFitWrtChk);
+	}
+
+	io::out() << "== Results" << std::endl;
+	io::out() << blk::infoString(eosIn1, "eosIn1") << std::endl;
+	io::out() << std::endl;
+	io::out() << blk::infoString(eosIn2, "eosIn2") << std::endl;
+	io::out() << std::endl;
+	io::out() << blk::infoString(eosIn3, "eosIn3") << std::endl;
+	io::out() << std::endl;
+
+exit(8);
+}
+
+		ga::Vector const off( 10., 20., 20. );
+		oris.emplace_back(Rigid(off-e1, Pose(BiVector(0., 5., 3.))));
+		oris.emplace_back(Rigid(off+e1, Pose(BiVector(1., 4., 6.))));
+		oris.emplace_back(Rigid(off-e2, Pose(BiVector(2., 3., 9.))));
+		oris.emplace_back(Rigid(off+e2, Pose(BiVector(3., 2., 2.))));
+		oris.emplace_back(Rigid(off-e3, Pose(BiVector(4., 1., 5.))));
+		oris.emplace_back(Rigid(off+e3, Pose(BiVector(5., 0., 8.))));
 
 		// a simple cube
 		return oris;
@@ -87,11 +128,10 @@ blk_form_test0
 	//! Pairwise orientations within simulated block
 	std::vector<blk::OriPair>
 	simRelOris
-		()
+		( std::vector<ga::Rigid> const & eos
+		)
 	{
 		std::vector<blk::OriPair> rops;
-
-		std::vector<ga::Rigid> const eos{ simAbsOris() };
 
 		size_t const numNodes{ eos.size() };
 		assert(1u < numNodes);
@@ -129,7 +169,6 @@ blk_form_test0
 		return rops;
 	}
 
-
 //! Check basic operations
 std::string
 blk_form_test1
@@ -138,17 +177,52 @@ blk_form_test1
 	std::ostringstream oss;
 
 	// simulate a bunch of relative orientations
-	std::vector<blk::OriPair> const rops{ simRelOris() };
-
-	for (blk::OriPair const & rop : rops)
-	{
-		io::out() << dat::infoString(rop.principalPair(), "rop") << std::endl;
-	}
+	std::vector<ga::Rigid> const eosInSim{ simAbsOris() };
+	std::vector<blk::OriPair> const ropSims{ simRelOris(eosInSim) };
 
 	// assemble into a nominal block structure
-	std::vector<ga::Rigid> const eos{ blk::form::bruteForce(rops) };
+	std::vector<ga::Rigid> const eosInBlk{ blk::form::viaSpan(ropSims) };
 
-oss << "Failure: implement this test!" << std::endl;
+	// extract (all) relative orientations from formed block
+	std::vector<blk::OriPair> const ropBlks{ simRelOris(eosInSim) };
+
+	// check if block orientations agree with expected simulated ones
+	size_t const numSim(ropSims.size());
+	size_t const numBlk(ropBlks.size());
+	if (! (numSim == numBlk))
+	{
+		oss << "Failure of block return size" << std::endl;
+	}
+	else
+	{
+		for (size_t nn{0u} ; nn < numSim ; ++nn)
+		{
+			blk::OriPair const & ropSim = ropSims[nn];
+			blk::OriPair const & ropBlk = ropBlks[nn];
+			// verify test case generating same ROs
+			assert(dat::nearlyEquals(ropBlk.ndxI(), ropSim.ndxI()));
+			assert(dat::nearlyEquals(ropBlk.ndxJ(), ropSim.ndxJ()));
+
+			ga::Rigid const & expOri = ropSim.theOriJwI;
+			ga::Rigid const & gotOri = ropBlk.theOriJwI;
+			if (! gotOri.nearlyEquals(expOri))
+			{
+				oss << "Failure of recovered RO test" << std::endl;
+				oss << dat::infoString(expOri, "expOri") << std::endl;
+				oss << dat::infoString(gotOri, "gotOri") << std::endl;
+				break;
+			}
+
+		}
+	}
+
+	/*
+	io::out() << blk::infoString(ropSims, "ropSims") << std::endl;
+	io::out() << std::endl;
+	io::out() << blk::infoString(ropBlks, "ropBlks") << std::endl;
+	io::out() << std::endl;
+	*/
+
 	return oss.str();
 }
 

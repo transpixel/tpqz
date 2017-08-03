@@ -72,8 +72,8 @@ blk_form_test0
 		( size_t const & ndx
 		)
 	{
-	//	return io::sprintf("%d", ndx);
-		return ndx + 100u;
+		std::string const key{ io::sprintf("key_%d", ndx) };
+		return key;
 	}
 
 	// Restore key from index
@@ -82,9 +82,9 @@ blk_form_test0
 		( blk::NodeKey const & key
 		)
 	{
-	//	return io::string::from(key, dat::nullValue<size_t>());
-		assert(! (key < 100u));
-		return key - 100u;
+		std::string ndxStr(key.begin()+4u, key.end());
+		size_t const ndx{ io::string::from(ndxStr, dat::nullValue<size_t>()) };
+		return ndx;
 	}
 
 	//! Vector of EO data consistent with test case data structs
@@ -115,44 +115,44 @@ blk_form_test0
 
 		using namespace ga;
 
-if (false)
-{
-		ga::Vector const off( 10., 0., 0. );
-		constexpr double qtr{ math::qtrTurn };
+		if (false)
+		{
+				ga::Vector const off( 10., 0., 0. );
+				constexpr double qtr{ math::qtrTurn };
 
-oris.emplace_back(Rigid(off +e1   , Pose(BiVector(0., 0., qtr))));
-oris.emplace_back(Rigid(off +e1+e2, Pose(BiVector(0., 0., 2.*qtr))));
-oris.emplace_back(Rigid(off    +e2, Pose(BiVector(0., 0., 3.*qtr))));
-oris.emplace_back(Rigid(off       , Pose(BiVector(0., 0., .0))));
+		oris.emplace_back(Rigid(off +e1   , Pose(BiVector(0., 0., qtr))));
+		oris.emplace_back(Rigid(off +e1+e2, Pose(BiVector(0., 0., 2.*qtr))));
+		oris.emplace_back(Rigid(off    +e2, Pose(BiVector(0., 0., 3.*qtr))));
+		oris.emplace_back(Rigid(off       , Pose(BiVector(0., 0., .0))));
 
-	std::vector<ga::Rigid> const eosIn1(oris);;
-	std::vector<ga::Rigid> eosIn2;
-	std::vector<ga::Rigid> eosIn3;
+			std::vector<ga::Rigid> const eosIn1(oris);;
+			std::vector<ga::Rigid> eosIn2;
+			std::vector<ga::Rigid> eosIn3;
 
-	{
-	io::out() << "== Transform: A" << std::endl;
-	size_t const ndxFit{ 0u };
-	ga::Rigid const & oriFitWrtChk = ga::Rigid::identity();
-	eosIn2 = blk::fitOnto(eosIn1, ndxFit, oriFitWrtChk);
-	}
+			{
+			io::out() << "== Transform: A" << std::endl;
+			size_t const ndxFit{ 0u };
+			ga::Rigid const & oriFitWrtChk = ga::Rigid::identity();
+			eosIn2 = blk::fitOnto(eosIn1, ndxFit, oriFitWrtChk);
+			}
 
-	{
-	io::out() << "== Transform: B" << std::endl;
-	size_t const ndxFit{ 2u };
-	ga::Rigid const & oriFitWrtChk = eosIn1[ndxFit];
-	eosIn3 = blk::fitOnto(eosIn2, ndxFit, oriFitWrtChk);
-	}
+			{
+			io::out() << "== Transform: B" << std::endl;
+			size_t const ndxFit{ 2u };
+			ga::Rigid const & oriFitWrtChk = eosIn1[ndxFit];
+			eosIn3 = blk::fitOnto(eosIn2, ndxFit, oriFitWrtChk);
+			}
 
-	io::out() << "== Results" << std::endl;
-	io::out() << blk::infoString(eosIn1, "eosIn1") << std::endl;
-	io::out() << std::endl;
-	io::out() << blk::infoString(eosIn2, "eosIn2") << std::endl;
-	io::out() << std::endl;
-	io::out() << blk::infoString(eosIn3, "eosIn3") << std::endl;
-	io::out() << std::endl;
+			io::out() << "== Results" << std::endl;
+			io::out() << blk::infoString(eosIn1, "eosIn1") << std::endl;
+			io::out() << std::endl;
+			io::out() << blk::infoString(eosIn2, "eosIn2") << std::endl;
+			io::out() << std::endl;
+			io::out() << blk::infoString(eosIn3, "eosIn3") << std::endl;
+			io::out() << std::endl;
 
-exit(8);
-}
+		exit(8);
+		}
 
 		ga::Vector const off( 10., 20., 20. );
 		oris.emplace_back(Rigid(off-e1, Pose(BiVector(0., 5., 3.))));
@@ -177,6 +177,7 @@ exit(8);
 		size_t const numNodes{ eos.size() };
 		rops.reserve(math::sq(numNodes));
 
+		size_t roCount{ 0u };
 		for (size_t ndxI{0u} ; ndxI < numNodes ; ++ndxI)
 		{
 			ga::Rigid const & oriIwX = eos[ndxI];
@@ -191,7 +192,7 @@ exit(8);
 				blk::NodeKey const keyJ{ keyFromNdx(ndxJ) };
 
 				ga::Rigid const oriJwI{ oriJwX * oriXwI };
-				if (0u == ((keyI+keyJ)%2u))
+				if (0u == ((roCount++)%2u))
 				{
 					blk::EdgeOri const rop
 						{ blk::EdgeKey{keyI, keyJ}, oriJwI };
@@ -250,7 +251,7 @@ blk_form_test1
 			// verify test case generating same ROs
 			blk::EdgeKey const & keySim = ropSim.first;
 			blk::EdgeKey const & keyBlk = ropBlk.first;
-			assert(dat::nearlyEquals(keySim, keyBlk));
+			assert(keySim == keyBlk);
 
 			ga::Rigid const & expOri = ropSim.second;
 			ga::Rigid const & gotOri = ropBlk.second;
@@ -265,17 +266,19 @@ blk_form_test1
 		}
 	}
 
-	/*
-	io::out() << blk::infoString(eosInSim, "eosInSim") << std::endl;
-	io::out() << std::endl;
-	io::out() << blk::infoString(eosInBlk, "eosInBlk") << std::endl;
-	io::out() << std::endl;
+	constexpr bool showValues{ false };
+	if (showValues)
+	{
+		io::out() << blk::infoString(eosInSim, "eosInSim") << std::endl;
+		io::out() << std::endl;
+		io::out() << blk::infoString(eosInBlk, "eosInBlk") << std::endl;
+		io::out() << std::endl;
 
-	io::out() << blk::infoString(ropSims, "ropSims") << std::endl;
-	io::out() << std::endl;
-	io::out() << blk::infoString(ropBlks, "ropBlks") << std::endl;
-	io::out() << std::endl;
-	*/
+		io::out() << blk::infoString(ropSims, "ropSims") << std::endl;
+		io::out() << std::endl;
+		io::out() << blk::infoString(ropBlks, "ropBlks") << std::endl;
+		io::out() << std::endl;
+	}
 
 	return oss.str();
 }

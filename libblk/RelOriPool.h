@@ -94,8 +94,8 @@ public: // methods
 	//! Directed orientation for node2 w.r.t. node1
 	EdgeOri
 	edgeOriFor
-		( size_t const & ndx1
-		, size_t const & ndx2
+		( NodeKey const & ndx1
+		, NodeKey const & ndx2
 		) const;
 
 	//! Descriptive information about this instance.

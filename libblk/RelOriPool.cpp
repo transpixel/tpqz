@@ -45,9 +45,8 @@ EdgeOri
 RelOriPool :: nullEdgeOri
 	()
 {
-	constexpr size_t badNdx{ dat::nullValue<size_t>() };
 	ga::Rigid const badOri{};
-	return EdgeOri{ EdgeKey{ badNdx, badNdx}, badOri };
+	return EdgeOri{ EdgeKey{ NullKey, NullKey}, badOri };
 }
 
 // explicit
@@ -60,16 +59,16 @@ RelOriPool :: RelOriPool
 
 EdgeOri
 RelOriPool :: edgeOriFor
-	( size_t const & ndx1
-	, size_t const & ndx2
+	( NodeKey const & key1
+	, NodeKey const & key2
 	) const
 {
 	EdgeOri lhOri{ nullEdgeOri() };
 
-	EdgeKey findEdge{ ndx1, ndx2 };
+	EdgeKey findEdge{ key1, key2 };
 	ga::Rigid ori2w1;
 
-	if (ndx1 == ndx2) // ori of node w.r.t. self
+	if (key1 == key2) // ori of node w.r.t. self
 	{
 		ori2w1 = ga::Rigid::identity();
 	}
@@ -77,10 +76,10 @@ RelOriPool :: edgeOriFor
 	{
 		// theRelOriMap is required to have ordered index pair as key
 		bool isForward{ true };
-		if (ndx2 < ndx1)
+		if (key2 < key1)
 		{
 			isForward = false;
-			findEdge = { ndx2, ndx1 };
+			findEdge = { key2, key1 };
 		}
 
 		// search for (ordered) node pair key within RelOri collection

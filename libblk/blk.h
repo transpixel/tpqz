@@ -49,7 +49,10 @@ namespace blk
 {
 
 	//! A member of block (associated with its own coordinate frame)
-	using NodeKey = size_t;
+	using NodeKey = std::string;
+	NodeKey const NullKey{};
+//	using NodeKey = size_t;
+//	constexpr NodeKey NullKey{ dat::nullValue<NodeKey>() };
 
 	//! Terminology associated with graph operations
 	using EdgeKey = std::pair<NodeKey, NodeKey>;

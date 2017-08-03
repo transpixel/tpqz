@@ -56,7 +56,7 @@ namespace priv
 {
 	struct Node
 	{
-		NodeKey theNodeKey{ dat::nullValue<NodeKey>() };
+		NodeKey theNodeKey{ NullKey };
 	};
 
 	// Define a simple graph structure for topographic connectivity
@@ -121,12 +121,12 @@ namespace priv
 
 		// add exactly as many vertices to graph as unique block nodes
 		using VDes = boost::graph_traits<TopoGraph>::vertex_descriptor;
-		std::map<VDes, NodeKey> vdesForNode;
+		std::map<blk::NodeKey, VDes> vDesForKey;
 		for (NodeKey const & nodeKey : uniqNodeKeys)
 		{
 			VDes const vdes{ boost::add_vertex(graph) };
 			graph[vdes].theNodeKey = nodeKey;
-			vdesForNode[nodeKey] = vdes;
+			vDesForKey[nodeKey] = vdes;
 		}
 
 		// add graph edges - one for each source relOri
@@ -135,11 +135,12 @@ namespace priv
 			EdgeKey const & eKey = relOriItem.first;
 			NodeKey const & keyI = eKey.first;
 			NodeKey const & keyJ = eKey.second;
-			VDes const vdesI = vdesForNode[keyI];
-			VDes const vdesJ = vdesForNode[keyJ];
+			VDes const vdesI = vDesForKey[keyI];
+			VDes const vdesJ = vDesForKey[keyJ];
 			constexpr TopoWgt weight{ 1. };
 			boost::add_edge(vdesI, vdesJ, weight, graph).first;
 		}
+
 		return graph;
 	}
 
@@ -184,8 +185,8 @@ namespace priv
 	void
 	initBlockEOs
 		( std::map<NodeKey, ga::Rigid> * const ptEOs
-		, size_t const & key1
-		, size_t const & key2
+		, NodeKey const & key1
+		, NodeKey const & key2
 		, ga::Rigid const & ori2w1
 		)
 	{
@@ -197,8 +198,8 @@ namespace priv
 	void
 	updateBlockEOs
 		( std::map<NodeKey, ga::Rigid> * const ptEOs
-		, size_t const & key1
-		, size_t const & key2
+		, NodeKey const & key1
+		, NodeKey const & key2
 		, ga::Rigid const & ori2w1
 		)
 	{

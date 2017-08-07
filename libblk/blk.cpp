@@ -61,28 +61,26 @@ principalEdgeOri
 
 std::vector<ga::Rigid>
 fitOnto
-	( std::vector<ga::Rigid> const & oriSrcWrtRefs
-	, size_t const & ndxToFit
-	, ga::Rigid const & keyTgtWrtRef
+	( std::vector<ga::Rigid> const & oriHaveWrtRefs
+	, ga::Rigid const & oriWantWrtAny
+	, ga::Rigid const & oriHaveWrtAny
 	)
 {
-	std::vector<ga::Rigid> oriTgtWrtRefs;
-	assert(ndxToFit < oriSrcWrtRefs.size());
-	oriTgtWrtRefs.reserve(oriSrcWrtRefs.size());
+	std::vector<ga::Rigid> oriWantWrtRefs;
+	oriWantWrtRefs.reserve(oriHaveWrtRefs.size());
 
 	// compute relationship of target frame w.r.t. source frame
-	ga::Rigid const & keySrcWrtRef = oriSrcWrtRefs[ndxToFit];
-	ga::Rigid const keyRefWrtSrc{ keySrcWrtRef.inverse() };
-	ga::Rigid const oriTgtWrtSrc{ keyTgtWrtRef * keyRefWrtSrc };
+	ga::Rigid const oriAnyWrtHave{ oriHaveWrtAny.inverse() };
+	ga::Rigid const oriWantWrtHave{ oriWantWrtAny * oriAnyWrtHave };
 
 	// transform all orientations from expression w.r.t. source to target
-	for (ga::Rigid const & oriSrcWrtRef : oriSrcWrtRefs)
+	for (ga::Rigid const & oriInHave : oriHaveWrtRefs)
 	{
-		ga::Rigid const oriTgtWrtRef{ oriTgtWrtSrc * oriSrcWrtRef };
-		oriTgtWrtRefs.emplace_back(oriTgtWrtRef);
+		ga::Rigid const oriInWant{ oriWantWrtHave * oriInHave };
+		oriWantWrtRefs.emplace_back(oriInWant);
 	}
 
-	return oriTgtWrtRefs;
+	return oriWantWrtRefs;
 }
 
 } // blk

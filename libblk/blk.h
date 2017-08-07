@@ -70,12 +70,12 @@ namespace blk
 		( EdgeOri const & eOri
 		);
 
-	//! Transform collection of orientations to agreed at ndxFit
+	//! Transform collection of orientations consistent with two orientations
 	std::vector<ga::Rigid>
 	fitOnto
-		( std::vector<ga::Rigid> const & // oriSrcWrtRefs
-		, size_t const & // keyNdxToFit
-		, ga::Rigid const & // oriKeyWrtRef
+		( std::vector<ga::Rigid> const & oriHaveWrtRefs
+		, ga::Rigid const & oriWantWrtAny
+		, ga::Rigid const & oriHaveWrtAny
 		);
 
 } // blk

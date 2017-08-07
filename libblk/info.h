@@ -48,7 +48,7 @@ namespace blk
 	template <typename TypeKey>
 	std::string
 	infoString
-		( std::map<TypeKey, ga::Rigid> oriMap
+		( std::map<TypeKey, ga::Rigid> const & oriMap
 		, std::string const & title = std::string{}
 		);
 

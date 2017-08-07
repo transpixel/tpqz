@@ -74,6 +74,13 @@ namespace sim
 		, double const & edgeSpan = 2.
 		);
 
+	//! Band-limited combinations of pairwise relative orientations
+	std::vector<blk::EdgeOri>
+	bandedROs
+		( std::map<NodeKey, ga::Rigid> const & eos
+		, size_t const & maxBandWidth = { 2u }
+		);
+
 	//! All combinations of pairwise relative orientations
 	std::vector<blk::EdgeOri>
 	allROs

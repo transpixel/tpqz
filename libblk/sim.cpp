@@ -127,6 +127,61 @@ cubeEOs
 }
 
 std::vector<blk::EdgeOri>
+bandedROs
+	( std::map<NodeKey, ga::Rigid> const & eos
+	, size_t const & maxBandWidth
+	)
+{
+	std::vector<blk::EdgeOri> rops;
+
+	// consider all combinations of pairs
+	// - each node used at least once
+	// - each node paired with maxBandWidth of (lexicographical) neighbors
+	size_t const numNodes{ eos.size() };
+	rops.reserve(numNodes * maxBandWidth);
+
+	size_t roCount{ 0u };
+	// get first node
+	for (std::map<NodeKey, ga::Rigid>::const_iterator
+		itI{eos.begin()} ; eos.end() != itI ; ++itI)
+	{
+		blk::NodeKey const & keyI = itI->first;
+		ga::Rigid const & oriIwX = itI->second;
+
+		// get second node (until bandwidth exceeded)
+		ga::Rigid const oriXwI{ oriIwX.inverse() };
+		size_t bandSize{ 0u };
+		std::map<NodeKey, ga::Rigid>::const_iterator itJ{ itI };
+		for (++itJ ; (eos.end() != itJ) && (bandSize++ < maxBandWidth) ; ++itJ)
+		{
+			blk::NodeKey const & keyJ = itJ->first;
+			ga::Rigid const & oriJwX = itJ->second;
+
+			// compute relative orientation
+			ga::Rigid const oriJwI{ oriJwX * oriXwI };
+
+			// alternate edge direction to mix things up a bit
+			if (0u == ((roCount++)%2u))
+			{
+				// "forward" edge (I<J)
+				blk::EdgeOri const rop
+					{ blk::EdgeKey{keyI, keyJ}, oriJwI };
+				rops.emplace_back(rop);
+			}
+			else
+			{
+				// "reverse" edge (J<I)
+				blk::EdgeOri const rop
+					{ blk::EdgeKey{keyJ, keyI}, oriJwI.inverse() };
+				rops.emplace_back(rop);
+			}
+		}
+	}
+
+	return rops;
+}
+
+std::vector<blk::EdgeOri>
 allROs
 	( std::map<NodeKey, ga::Rigid> const & eos
 	)
@@ -134,45 +189,31 @@ allROs
 	std::vector<blk::EdgeOri> rops;
 
 	size_t const numNodes{ eos.size() };
-	rops.reserve(math::sq(numNodes));
-
-	size_t roCount{ 0u };
-	for (size_t ndxI{0u} ; ndxI < numNodes ; ++ndxI)
+	if (1u < numNodes)
 	{
-		blk::NodeKey const keyI{ keyFromNdx(ndxI) };
-		std::map<NodeKey, ga::Rigid>::const_iterator const itI
-			{ eos.find(keyI) };
-		assert(eos.end() != itI);
-		ga::Rigid const & oriIwX = itI->second;
+		// consider all combinations of pairs
+		rops.reserve((numNodes * (numNodes - 1u)) / 2u);
 
-		ga::Rigid const oriXwI{ oriIwX.inverse() };
-		constexpr size_t maxBand{ 1u };
-		size_t numBand{ 0u };
-		for (size_t ndxJ{ndxI+1u} ; ndxJ < numNodes ; ++ndxJ)
+		// get first node
+		for (std::map<NodeKey, ga::Rigid>::const_iterator
+			itI{eos.begin()} ; eos.end() != itI ; ++itI)
 		{
-			blk::NodeKey const keyJ{ keyFromNdx(ndxJ) };
-			std::map<NodeKey, ga::Rigid>::const_iterator const itJ
-				{ eos.find(keyJ) };
-			assert(eos.end() != itJ);
-			ga::Rigid const & oriJwX = itJ->second;
+			blk::NodeKey const & keyI = itI->first;
+			ga::Rigid const & oriIwX = itI->second;
 
-			ga::Rigid const oriJwI{ oriJwX * oriXwI };
-			if (0u == ((roCount++)%2u))
+			// get second node (until bandwidth exceeded)
+			ga::Rigid const oriXwI{ oriIwX.inverse() };
+			std::map<NodeKey, ga::Rigid>::const_iterator itJ{ itI };
+			for (++itJ ; eos.end() != itJ ; ++itJ)
 			{
-				blk::EdgeOri const rop
-					{ blk::EdgeKey{keyI, keyJ}, oriJwI };
-				rops.emplace_back(rop);
-			}
-			else
-			{
-				blk::EdgeOri const rop
-					{ blk::EdgeKey{keyJ, keyI}, oriJwI.inverse() };
-				rops.emplace_back(rop);
-			}
+				blk::NodeKey const & keyJ = itJ->first;
+				ga::Rigid const & oriJwX = itJ->second;
 
-			if (maxBand < ++numBand)
-			{
-				break;
+				// compute relative orientation
+				ga::Rigid const oriJwI{ oriJwX * oriXwI };
+				// "forward" edge (I<J)
+				blk::EdgeOri const rop{ blk::EdgeKey{keyI, keyJ}, oriJwI };
+				rops.emplace_back(rop);
 			}
 		}
 	}

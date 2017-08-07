@@ -41,6 +41,7 @@
 #include "libio/stream.h"
 #include "libio/string.h"
 
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -77,18 +78,21 @@ blk_form_test1
 
 	// simulate a bunch of relative orientations
 	std::map<blk::NodeKey, ga::Rigid> const eoSimMap{ blk::sim::cubeEOs() };
-	std::vector<blk::EdgeOri> const ropSims{ blk::sim::allROs(eoSimMap) };
+	std::vector<blk::EdgeOri> const meaEdges{ blk::sim::bandedROs(eoSimMap) };
+	assert(! eoSimMap.empty());
+	assert(! meaEdges.empty());
 
 	// exercise formation to assemble into a nominal block structure
 	std::map<blk::NodeKey, ga::Rigid> const eoBlkMap
-		{ blk::form::viaSpan(ropSims) };
+		{ blk::form::viaSpan(meaEdges) };
 
-	// extract (all) relative orientations from formed block
-	std::vector<blk::EdgeOri> const ropBlks{ blk::sim::allROs(eoBlkMap) };
+	// extract (all) relative orientations for comparison
+	std::vector<blk::EdgeOri> const expEdges{ blk::sim::allROs(eoSimMap) };
+	std::vector<blk::EdgeOri> const gotEdges{ blk::sim::allROs(eoBlkMap) };
 
 	// check if block orientations agree with expected simulated ones
-	size_t const numSim(ropSims.size());
-	size_t const numBlk(ropBlks.size());
+	size_t const numSim(expEdges.size());
+	size_t const numBlk(gotEdges.size());
 	if (! (numSim == numBlk))
 	{
 		oss << "Failure of block return size" << std::endl;
@@ -97,16 +101,16 @@ blk_form_test1
 	{
 		for (size_t nn{0u} ; nn < numSim ; ++nn)
 		{
-			blk::EdgeOri const & ropSim = ropSims[nn];
-			blk::EdgeOri const & ropBlk = ropBlks[nn];
+			blk::EdgeOri const & expEdge = expEdges[nn];
+			blk::EdgeOri const & gotEdge = gotEdges[nn];
 
 			// verify test case generating same ROs
-			blk::EdgeKey const & keySim = ropSim.first;
-			blk::EdgeKey const & keyBlk = ropBlk.first;
+			blk::EdgeKey const & keySim = expEdge.first;
+			blk::EdgeKey const & keyBlk = gotEdge.first;
 			assert(keySim == keyBlk);
 
-			ga::Rigid const & expOri = ropSim.second;
-			ga::Rigid const & gotOri = ropBlk.second;
+			ga::Rigid const & expOri = expEdge.second;
+			ga::Rigid const & gotOri = gotEdge.second;
 			if (! gotOri.nearlyEquals(expOri))
 			{
 				oss << "Failure of recovered RO test" << std::endl;
@@ -118,6 +122,13 @@ blk_form_test1
 		}
 	}
 
+	//! Compare individual orientations in absolute frame
+	std::map<blk::NodeKey, ga::Rigid> const & expEOs = eoSimMap;
+	ga::Rigid const & oriInExp = expEOs.begin()->second;
+	ga::Rigid const & oriInGot = eoBlkMap.begin()->second;
+	std::map<blk::NodeKey, ga::Rigid> const gotEOs
+		{ blk::transformed(eoBlkMap, oriInExp, oriInGot) };
+
 	constexpr bool showValues{ false };
 	if (showValues)
 	{
@@ -126,9 +137,16 @@ blk_form_test1
 		io::out() << blk::infoString(eoBlkMap, "eoBlkMap") << std::endl;
 		io::out() << std::endl;
 
-		io::out() << blk::infoString(ropSims, "ropSims") << std::endl;
+		io::out() << blk::infoString(meaEdges, "meaEdges") << std::endl;
 		io::out() << std::endl;
-		io::out() << blk::infoString(ropBlks, "ropBlks") << std::endl;
+		io::out() << blk::infoString(expEdges, "expEdges") << std::endl;
+		io::out() << std::endl;
+		io::out() << blk::infoString(gotEdges, "gotEdges") << std::endl;
+		io::out() << std::endl;
+
+		io::out() << blk::infoString(expEOs, "expEOs") << std::endl;
+		io::out() << std::endl;
+		io::out() << blk::infoString(gotEOs, "gotEOs") << std::endl;
 		io::out() << std::endl;
 	}
 

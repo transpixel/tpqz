@@ -67,6 +67,17 @@ namespace sim
 		( blk::NodeKey const & key
 		);
 
+	//! ga::Rigid from 6 component values
+	ga::Rigid
+	oriComps
+		( double const & loc1
+		, double const & loc2
+		, double const & loc3
+		, double const & ang1
+		, double const & ang2
+		, double const & ang3
+		);
+
 	//! Orientations at the vertices of a cube
 	std::map<NodeKey, ga::Rigid>
 	cubeEOs

@@ -77,6 +77,22 @@ ndxFromKey
 	return ndx;
 }
 
+ga::Rigid
+oriComps
+	( double const & loc1
+	, double const & loc2
+	, double const & loc3
+	, double const & ang1
+	, double const & ang2
+	, double const & ang3
+	)
+{
+	return ga::Rigid
+		( ga::Vector(loc1, loc2, loc3)
+		, ga::Pose(ga::BiVector(ang1, ang2, ang3))
+		);
+}
+
 namespace
 {
 	ga::Pose

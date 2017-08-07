@@ -75,34 +75,55 @@ namespace
 	}
 
 	//! Functor for conversion of Oris w.r.t. frame 1 into oris w.r.t. frame 2
-	struct Ori2w1
+	struct ToTgtFrame
 	{
-		ga::Rigid theOri2w1;
+		// orientation to apply
+		ga::Rigid theSrcWrtTgt;
 
 		explicit
-		Ori2w1
-			( ga::Rigid const & ori2wX
-			, ga::Rigid const & ori1wX
+		ToTgtFrame
+			( ga::Rigid const & oriTgtWrtAny
+			, ga::Rigid const & oriSrcWrtAny
 			)
-			: theOri2w1{ rigid2w1(ori2wX, ori1wX) }
+		//	: theSrcWrtTgt{ oriSrcWrtAny * (oriTgtWrtAny.inverse()) }
+			: theSrcWrtTgt{ rigid2w1(oriTgtWrtAny, oriSrcWrtAny) }
 		{ }
 
-		//! Returns ori2wX
+		//! Returns oriSrcWrtAny
 		ga::Rigid
 		operator()
-			( ga::Rigid const & ori1wX
+			( ga::Rigid const & nodeWrtSrc
 			) const
 		{
-			return { theOri2w1 * ori1wX };
+			return { nodeWrtSrc * theSrcWrtTgt };
 		}
 
-		//! Returns ori2wX
+		//! Returns oriSrcWrtAny
 		std::pair<NodeKey, ga::Rigid>
 		operator()
-			( std::pair<NodeKey, ga::Rigid> const & edge1wX
+			( std::pair<NodeKey, ga::Rigid> const & pairWrtSrc
 			) const
 		{
-			return { edge1wX.first, (*this)(edge1wX.second) };
+			return { pairWrtSrc.first, (*this)(pairWrtSrc.second) };
+		}
+
+		//! Descriptive information about this instance
+		std::string
+		infoString
+			( std::string const & title = std::string{}
+			) const
+		{
+			std::ostringstream oss;
+			if (! title.empty())
+			{
+				oss << title << std::endl;
+			}
+			ga::Rigid const oriTgtWrtSrc{ theSrcWrtTgt.inverse() };
+			oss << theSrcWrtTgt.infoStringShort("theSrcWrtTgt");
+			oss << std::endl;
+			oss << oriTgtWrtSrc.infoStringShort("oriTgtWrtSrc");
+
+			return oss.str();
 		}
 	};
 
@@ -110,46 +131,47 @@ namespace
 
 std::vector<ga::Rigid>
 transformed
-	( std::vector<ga::Rigid> const & oriFromWrtRefs
-	, ga::Rigid const & oriIntoWrtAny
-	, ga::Rigid const & oriFromWrtAny
+	( std::vector<ga::Rigid> const & oriNodeWrtSrcs
+	, ga::Rigid const & oriTgtWrtAny
+	, ga::Rigid const & oriSrcWrtAny
 	)
 {
-	std::vector<ga::Rigid> oriIntoWrtRefs;
-	oriIntoWrtRefs.reserve(oriFromWrtRefs.size());
+	std::vector<ga::Rigid> oriNodeWrtTgts;
+	oriNodeWrtTgts.reserve(oriNodeWrtSrcs.size());
 
 	// compute relationship of target frame w.r.t. source frame
-	Ori2w1 const xIntoWrtFrom(oriIntoWrtAny, oriFromWrtAny);
+	ToTgtFrame const xTgtFromSrc(oriTgtWrtAny, oriSrcWrtAny);
 
 	// transform all orientations from expression w.r.t. source to target
-	for (ga::Rigid const & oriFromWrtRef : oriFromWrtRefs)
+	for (ga::Rigid const & oriNodeWrtSrc : oriNodeWrtSrcs)
 	{
-		oriIntoWrtRefs.emplace_back(xIntoWrtFrom(oriFromWrtRef));
+		ga::Rigid const oriNodeWrtTgt{ xTgtFromSrc(oriNodeWrtSrc) };
+		oriNodeWrtTgts.emplace_back(oriNodeWrtTgt);
 	}
 
-	return oriIntoWrtRefs;
+	return oriNodeWrtTgts;
 }
 
 std::map<NodeKey, ga::Rigid>
 transformed
-	( std::map<NodeKey, ga::Rigid> const & oriFromWrtRefs
-	, ga::Rigid const & oriIntoWrtAny
-	, ga::Rigid const & oriFromWrtAny
+	( std::map<NodeKey, ga::Rigid> const & pairNodeWrtSrcs
+	, ga::Rigid const & oriTgtWrtAny
+	, ga::Rigid const & oriSrcWrtAny
 	)
 {
-	std::map<NodeKey, ga::Rigid> oriIntoWrtRefs;
+	std::map<NodeKey, ga::Rigid> pairNodeWrtTgts;
 
 	// compute relationship of target frame w.r.t. source frame
-	Ori2w1 const xIntoWrtFrom(oriIntoWrtAny, oriFromWrtAny);
+	ToTgtFrame const xTgtFromSrc(oriTgtWrtAny, oriSrcWrtAny);
 
 	// transform all orientations from expression w.r.t. source to target
-	for (std::pair<NodeKey, ga::Rigid> const & oriFromWrtRef : oriFromWrtRefs)
+	for (std::pair<NodeKey, ga::Rigid> const & pairNodeWrtSrc : pairNodeWrtSrcs)
 	{
-		oriIntoWrtRefs.insert
-			(oriIntoWrtRefs.end(), xIntoWrtFrom(oriFromWrtRef));
+		pairNodeWrtTgts.insert
+			(pairNodeWrtTgts.end(), xTgtFromSrc(pairNodeWrtSrc));
 	}
 
-	return oriIntoWrtRefs;
+	return pairNodeWrtTgts;
 }
 
 } // blk

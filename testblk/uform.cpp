@@ -68,6 +68,44 @@ blk_form_test0
 	return oss.str();
 }
 
+	void
+	checkEoMaps
+		( std::ostream & oss
+		, std::map<blk::NodeKey, ga::Rigid> const & expEoMap
+		, std::map<blk::NodeKey, ga::Rigid> const & gotEoMap
+		, std::string const & tname
+		)
+	{
+		if (! (expEoMap.size() == gotEoMap.size()))
+		{
+			oss << "Failure of size for test = " << tname << std::endl;
+		}
+		else
+		{
+			for (std::map<blk::NodeKey, ga::Rigid>::const_iterator
+				itExp{expEoMap.begin()} ; expEoMap.end() != itExp ; ++itExp)
+			{
+				std::map<blk::NodeKey, ga::Rigid>::const_iterator
+					const itGot{ gotEoMap.find(itExp->first) };
+				if (gotEoMap.end() == itGot)
+				{
+					oss << "Failure to find got entry for exp: test = "
+						<< tname << std::endl;
+				}
+				else
+				{
+					ga::Rigid const & expEo = itExp->second;
+					ga::Rigid const & gotEo = itGot->second;
+					if (! gotEo.nearlyEquals(expEo))
+					{
+						oss << "Failure of EO value test = " << tname << '\n';
+						oss << expEo.infoStringShort("exp") << std::endl;
+						oss << gotEo.infoStringShort("got") << std::endl;
+					}
+				}
+			}
+		}
+	}
 
 //! Check basic operations
 std::string
@@ -129,6 +167,8 @@ blk_form_test1
 	std::map<blk::NodeKey, ga::Rigid> const gotEOs
 		{ blk::transformed(eoBlkMap, oriInExp, oriInGot) };
 
+	checkEoMaps(oss, expEOs, gotEOs, "test1");
+
 	constexpr bool showValues{ false };
 	if (showValues)
 	{
@@ -153,6 +193,94 @@ blk_form_test1
 	return oss.str();
 }
 
+	//! Simple orientation
+	inline
+	ga::Rigid
+	simOri
+		( double const & loc1
+		, double const & loc2
+		, double const & loc3
+		, double const & ang1
+		, double const & ang2
+		, double const & ang3
+		)
+	{
+		return ga::Rigid
+			( ga::Vector(loc1, loc2, loc3)
+			, ga::Pose(ga::BiVector(ang1, ang2, ang3))
+			);
+	}
+
+	//! Simple orientation
+	inline
+	ga::Rigid
+	simOri
+		( double const & relOffset
+		, double const & relAngle
+		)
+	{
+		return simOri(1000., 100., 10.+relOffset , 0., 0., relAngle);
+	}
+
+//! Check absolute frame restoration
+std::string
+blk_form_test2
+	()
+{
+	std::ostringstream oss;
+
+	// simulate a bunch of relative orientations
+	constexpr double qtr{ math::qtrPi };
+	std::map<blk::NodeKey, ga::Rigid> expEoMap
+		{ { 91u, simOri(1.,  .0) }
+		, { 92u, simOri(2., 1.*qtr) }
+		, { 93u, simOri(3., 2.*qtr) }
+		, { 94u, simOri(3.,  18.) }
+		, { 95u, simOri(4., -19.) }
+		, { 96u, simOri(17., 19., 23. , .4, .5, .3) }
+		, { 97u, simOri(29., 31., 37. , -.5, .3, .7) }
+		};
+
+	std::vector<blk::EdgeOri> const meaEdges{ blk::sim::allROs(expEoMap) };
+	assert(! expEoMap.empty());
+	assert(! meaEdges.empty());
+
+	// exercise formation to assemble into a nominal block structure
+	std::map<blk::NodeKey, ga::Rigid> const blkEoMap
+		{ blk::form::viaSpan(meaEdges) };
+	std::vector<blk::EdgeOri> const blkEdges{ blk::sim::allROs(blkEoMap) };
+
+	// reorient now-formed block to match initial simulation
+	std::map<blk::NodeKey, ga::Rigid> const gotEoMap
+		{ blk::transformed
+			(blkEoMap, expEoMap.begin()->second, blkEoMap.begin()->second)
+		};
+	std::vector<blk::EdgeOri> const gotEdges{ blk::sim::allROs(gotEoMap) };
+
+	// check that final EO's match sim EO's
+	checkEoMaps(oss, expEoMap, gotEoMap, "test2");
+
+	constexpr bool showValues{ false };
+	if (showValues)
+	{
+		io::out() << std::endl;
+		io::out() << blk::infoString(expEoMap, "expEoMap") << std::endl;
+	//	io::out() << blk::infoString(meaEdges, "meaEdges") << std::endl;
+
+		io::out() << std::endl;
+		io::out() << blk::infoString(blkEoMap, "blkEoMap") << std::endl;
+	//	io::out() << blk::infoString(blkEdges, "blkEdges") << std::endl;
+
+		io::out() << std::endl;
+		io::out() << blk::infoString(gotEoMap, "gotEoMap") << std::endl;
+	//	io::out() << blk::infoString(gotEdges, "gotEdges") << std::endl;
+
+		io::out() << std::endl;
+	}
+
+	return oss.str();
+}
+
 
 }
 
@@ -168,6 +296,7 @@ main
 	// run tests
 	oss << blk_form_test0();
 	oss << blk_form_test1();
+	oss << blk_form_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

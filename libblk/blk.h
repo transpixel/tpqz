@@ -74,17 +74,17 @@ namespace blk
 	//! Transform collection of orientations consistent with two orientations
 	std::vector<ga::Rigid>
 	transformed
-		( std::vector<ga::Rigid> const & oriFromWrtRefs
-		, ga::Rigid const & oriIntoWrtAny
-		, ga::Rigid const & oriFromWrtAny
+		( std::vector<ga::Rigid> const & oriNodeWrtSrcs
+		, ga::Rigid const & oriTgtWrtAny
+		, ga::Rigid const & oriSrcWrtAny
 		);
 
 	//! Transform collection of orientations consistent with two orientations
 	std::map<NodeKey, ga::Rigid>
 	transformed
-		( std::map<NodeKey, ga::Rigid> const & oriFromWrtRefs
-		, ga::Rigid const & oriIntoWrtAny
-		, ga::Rigid const & oriFromWrtAny
+		( std::map<NodeKey, ga::Rigid> const & oriNodeWrtSrcs
+		, ga::Rigid const & oriTgtWrtAny
+		, ga::Rigid const & oriSrcWrtAny
 		);
 
 } // blk

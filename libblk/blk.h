@@ -37,6 +37,7 @@
 #include "libga/Rigid.h"
 
 #include <cstddef>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -73,9 +74,17 @@ namespace blk
 	//! Transform collection of orientations consistent with two orientations
 	std::vector<ga::Rigid>
 	fitOnto
-		( std::vector<ga::Rigid> const & oriHaveWrtRefs
-		, ga::Rigid const & oriWantWrtAny
-		, ga::Rigid const & oriHaveWrtAny
+		( std::vector<ga::Rigid> const & oriFromWrtRefs
+		, ga::Rigid const & oriIntoWrtAny
+		, ga::Rigid const & oriFromWrtAny
+		);
+
+	//! Transform collection of orientations consistent with two orientations
+	std::map<NodeKey, ga::Rigid>
+	fitOnto
+		( std::map<NodeKey, ga::Rigid> const & oriFromWrtRefs
+		, ga::Rigid const & oriIntoWrtAny
+		, ga::Rigid const & oriFromWrtAny
 		);
 
 } // blk

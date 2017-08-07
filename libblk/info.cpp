@@ -84,7 +84,13 @@ infoString
 		{
 			oss << std::endl;
 		}
-		oss << eROs[nn].second.infoStringShort();
+		EdgeOri const & edge = eROs[nn];
+		EdgeKey const & key = edge.first;
+		ga::Rigid const & ro = edge.second;
+		oss
+			<< " " << dat::infoString(key.first)
+			<< " " << dat::infoString(key.second)
+			<< ro.infoStringShort();
 	}
 	return oss.str();
 }

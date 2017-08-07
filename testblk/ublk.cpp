@@ -91,7 +91,7 @@ blk_blk_test1
 		size_t const ndxFit{ 2u };
 		ga::Rigid const & oriIn1 = eosIn1[ndxFit];
 		ga::Rigid const & oriIn2 = ga::Rigid::identity();
-		eosIn2 = blk::fitOnto(eosIn1, oriIn2, oriIn1);
+		eosIn2 = blk::transformed(eosIn1, oriIn2, oriIn1);
 	}
 
 	// transform back to source frame
@@ -99,7 +99,7 @@ blk_blk_test1
 		size_t const ndxFit{ 1u };
 		ga::Rigid const & oriIn2 = eosIn2[ndxFit];
 		ga::Rigid const & oriIn3 = eosIn1[ndxFit];
-		eosIn3 = blk::fitOnto(eosIn2, oriIn3, oriIn2);
+		eosIn3 = blk::transformed(eosIn2, oriIn3, oriIn2);
 	}
 
 	// check that round-trip transformed EO's match source

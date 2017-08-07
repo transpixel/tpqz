@@ -34,7 +34,7 @@
 
 #include "libblk/blk.h"
 
-#include <iterator>
+#include <algorithm>
 #include <sstream>
 
 
@@ -109,7 +109,7 @@ namespace
 }
 
 std::vector<ga::Rigid>
-fitOnto
+transformed
 	( std::vector<ga::Rigid> const & oriFromWrtRefs
 	, ga::Rigid const & oriIntoWrtAny
 	, ga::Rigid const & oriFromWrtAny
@@ -131,7 +131,7 @@ fitOnto
 }
 
 std::map<NodeKey, ga::Rigid>
-fitOnto
+transformed
 	( std::map<NodeKey, ga::Rigid> const & oriFromWrtRefs
 	, ga::Rigid const & oriIntoWrtAny
 	, ga::Rigid const & oriFromWrtAny

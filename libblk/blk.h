@@ -73,7 +73,7 @@ namespace blk
 
 	//! Transform collection of orientations consistent with two orientations
 	std::vector<ga::Rigid>
-	fitOnto
+	transformed
 		( std::vector<ga::Rigid> const & oriFromWrtRefs
 		, ga::Rigid const & oriIntoWrtAny
 		, ga::Rigid const & oriFromWrtAny
@@ -81,7 +81,7 @@ namespace blk
 
 	//! Transform collection of orientations consistent with two orientations
 	std::map<NodeKey, ga::Rigid>
-	fitOnto
+	transformed
 		( std::map<NodeKey, ga::Rigid> const & oriFromWrtRefs
 		, ga::Rigid const & oriIntoWrtAny
 		, ga::Rigid const & oriFromWrtAny

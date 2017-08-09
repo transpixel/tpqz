@@ -101,6 +101,7 @@ blk_form_test0
 						oss << "Failure of EO value test = " << tname << '\n';
 						oss << expEo.infoStringShort("exp") << std::endl;
 						oss << gotEo.infoStringShort("got") << std::endl;
+						break;
 					}
 				}
 			}
@@ -197,29 +198,12 @@ blk_form_test1
 	inline
 	ga::Rigid
 	simOri
-		( double const & loc1
-		, double const & loc2
-		, double const & loc3
-		, double const & ang1
-		, double const & ang2
-		, double const & ang3
-		)
-	{
-		return ga::Rigid
-			( ga::Vector(loc1, loc2, loc3)
-			, ga::Pose(ga::BiVector(ang1, ang2, ang3))
-			);
-	}
-
-	//! Simple orientation
-	inline
-	ga::Rigid
-	simOri
 		( double const & relOffset
 		, double const & relAngle
 		)
 	{
-		return simOri(1000., 100., 10.+relOffset , 0., 0., relAngle);
+		return blk::sim::oriComps
+			(1000., 100., 10.+relOffset , 0., 0., relAngle);
 	}
 
 //! Check absolute frame restoration
@@ -237,8 +221,8 @@ blk_form_test2
 		, { 93u, simOri(3., 2.*qtr) }
 		, { 94u, simOri(3.,  18.) }
 		, { 95u, simOri(4., -19.) }
-		, { 96u, simOri(17., 19., 23. , .4, .5, .3) }
-		, { 97u, simOri(29., 31., 37. , -.5, .3, .7) }
+		, { 96u, blk::sim::oriComps(17., 19., 23. , .4, .5, .3) }
+		, { 97u, blk::sim::oriComps(29., 31., 37. , -.5, .3, .7) }
 		};
 
 	std::vector<blk::EdgeOri> const meaEdges{ blk::sim::allROs(expEoMap) };

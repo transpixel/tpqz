@@ -33,6 +33,7 @@
 
 #include "libblk/blk.h"
 #include "libblk/info.h"
+#include "libblk/sim.h"
 
 #include "libdat/info.h"
 #include "libdat/validity.h"
@@ -63,6 +64,7 @@ blk_blk_test0
 	return oss.str();
 }
 
+
 //! Check basic operations
 std::string
 blk_blk_test1
@@ -70,41 +72,39 @@ blk_blk_test1
 {
 	std::ostringstream oss;
 
-	std::vector<ga::Rigid> eosIn1;
-	eosIn1.reserve(10u);
+	std::vector<ga::Rigid> xWrtSrcs;
+	xWrtSrcs.reserve(10u);
 
 	using namespace ga;
 
-	ga::Vector const off( 10., 0., 0. );
 	constexpr double qtr{ math::qtrTurn };
-
-	eosIn1.emplace_back(Rigid(off +e1   , Pose(BiVector(0., 0., qtr))));
-	eosIn1.emplace_back(Rigid(off +e1+e2, Pose(BiVector(0., 0., 2.*qtr))));
-	eosIn1.emplace_back(Rigid(off    +e2, Pose(BiVector(0., 0., 3.*qtr))));
-	eosIn1.emplace_back(Rigid(off       , Pose(BiVector(0., 0., .0))));
-
-	std::vector<ga::Rigid> eosIn2;
-	std::vector<ga::Rigid> eosIn3;
+	/*
+	xWrtSrcs.emplace_back(blk::sim::oriComps(1., 0., 0. , 0., 0., 1.*qtr));
+	xWrtSrcs.emplace_back(blk::sim::oriComps(2., 0., 0. , 0., 0., 2.*qtr));
+	xWrtSrcs.emplace_back(blk::sim::oriComps(3., 0., 0. , 0., 0., 3.*qtr));
+	xWrtSrcs.emplace_back(blk::sim::oriComps(4., 0., 0. , 0., 0., 4.*qtr));
+	*/
+	xWrtSrcs.emplace_back(blk::sim::oriComps(1., 8., 13. , 1., 2., 1.*qtr));
+	xWrtSrcs.emplace_back(blk::sim::oriComps(2., 6., 17. , 3., 3., 2.*qtr));
+	xWrtSrcs.emplace_back(blk::sim::oriComps(3., 4., 19. , 5., 4., 3.*qtr));
+	xWrtSrcs.emplace_back(blk::sim::oriComps(4., 2., 23. , 7., 5., 4.*qtr));
 
 	// transform all orientations into arbitrary frame
-	{
-		size_t const ndxFit{ 2u };
-		ga::Rigid const & oriIn1 = eosIn1[ndxFit];
-		ga::Rigid const & oriIn2 = ga::Rigid::identity();
-		eosIn2 = blk::transformed(eosIn1, oriIn2, oriIn1);
-	}
+	size_t const ndxA{ 2u };
+	ga::Rigid const & oriSrcWrtA = xWrtSrcs[ndxA];
+	ga::Rigid const oriTgtWrtA{ ga::Rigid::identity() };
+	std::vector<ga::Rigid> const xWrtTmps
+		{ blk::transformed(xWrtSrcs, oriTgtWrtA, oriSrcWrtA) };
 
-	// transform back to source frame
-	{
-		size_t const ndxFit{ 1u };
-		ga::Rigid const & oriIn2 = eosIn2[ndxFit];
-		ga::Rigid const & oriIn3 = eosIn1[ndxFit];
-		eosIn3 = blk::transformed(eosIn2, oriIn3, oriIn2);
-	}
+	size_t const ndxB{ 0u };
+	ga::Rigid const & oriSrcWrtB = xWrtTmps[ndxB];
+	ga::Rigid const & oriTgtWrtB = xWrtSrcs[ndxB];
+	std::vector<ga::Rigid> const xWrtTgt
+		{ blk::transformed(xWrtTmps, oriTgtWrtB, oriSrcWrtB) };
 
 	// check that round-trip transformed EO's match source
-	std::vector<ga::Rigid> const & expEOs = eosIn1;
-	std::vector<ga::Rigid> const & gotEOs = eosIn3;
+	std::vector<ga::Rigid> const & expEOs = xWrtSrcs;
+	std::vector<ga::Rigid> const & gotEOs = xWrtTgt;
 	if (! (expEOs.size() == gotEOs.size()))
 	{
 		oss << "Failure of size test" << std::endl;
@@ -125,15 +125,17 @@ blk_blk_test1
 		}
 	}
 
-	/*
-	io::out() << "== Results" << std::endl;
-	io::out() << blk::infoString(eosIn1, "eosIn1") << std::endl;
-	io::out() << std::endl;
-	io::out() << blk::infoString(eosIn2, "eosIn2") << std::endl;
-	io::out() << std::endl;
-	io::out() << blk::infoString(eosIn3, "eosIn3") << std::endl;
-	io::out() << std::endl;
-	*/
+	constexpr bool showValues{ false };
+	if (showValues)
+	{
+		io::out() << "== Results" << std::endl;
+		io::out() << blk::infoString(xWrtSrcs, "xWrtSrcs") << std::endl;
+		io::out() << std::endl;
+		io::out() << blk::infoString(xWrtTmps, "xWrtTmps") << std::endl;
+		io::out() << std::endl;
+		io::out() << blk::infoString(xWrtTgt, "xWrtTgt") << std::endl;
+		io::out() << std::endl;
+	}
 
 	return oss.str();
 }

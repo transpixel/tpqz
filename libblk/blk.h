@@ -75,16 +75,16 @@ namespace blk
 	std::vector<ga::Rigid>
 	transformed
 		( std::vector<ga::Rigid> const & oriNodeWrtSrcs
-		, ga::Rigid const & oriTgtWrtAny
-		, ga::Rigid const & oriSrcWrtAny
+		, ga::Rigid const & oriAnyWrtTgt
+		, ga::Rigid const & oriAnyWrtSrc
 		);
 
 	//! Transform collection of orientations consistent with two orientations
 	std::map<NodeKey, ga::Rigid>
 	transformed
 		( std::map<NodeKey, ga::Rigid> const & oriNodeWrtSrcs
-		, ga::Rigid const & oriTgtWrtAny
-		, ga::Rigid const & oriSrcWrtAny
+		, ga::Rigid const & oriAnyWrtTgt
+		, ga::Rigid const & oriAnyWrtSrc
 		);
 
 } // blk

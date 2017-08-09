@@ -31,9 +31,6 @@
 */
 
 
-#include "libapp/Usage.h"
-
-#include "build/version.h"
 #include "libdat/info.h"
 #include "libio/stream.h"
 

@@ -26,50 +26,85 @@
 //
 //
 
-#ifndef blk_info_INCL_
-#define blk_info_INCL_
+#ifndef blk_sim_INCL_
+#define blk_sim_INCL_
 
 /*! \file
-\brief Declarations for blk::info
+\brief Declarations for blk::sim
 */
 
 
 #include "libblk/blk.h"
 #include "libga/Rigid.h"
 
-#include <string>
 #include <map>
 #include <vector>
+#include <string>
 
 
 namespace blk
 {
-	//! Condensed orientation infromation for collection of orientations
-	template <typename TypeKey>
-	std::string
-	infoString
-		( std::map<TypeKey, ga::Rigid> const & oriMap
-		, std::string const & title = std::string{}
+
+/*! \brief Functions that simulation block configurations
+
+\par Example
+\dontinclude testblk/uform.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace sim
+{
+	//! Convert index to key - distinct from index values for testing
+	blk::NodeKey
+	keyFromNdx
+		( size_t const & ndx
 		);
 
-	//! Condensed orientation infromation for collection of orientations
-	std::string
-	infoString
-		( std::vector<ga::Rigid> const & oris
-		, std::string const & title = std::string{}
+	//! Restore key from index
+	size_t
+	ndxFromKey
+		( blk::NodeKey const & key
 		);
 
-	//! Condesed summary of all RelOris
-	std::string
-	infoString
-		( std::vector<EdgeOri> const & eROs
-		, std::string const & title = std::string{}
+	//! ga::Rigid from 6 component values
+	ga::Rigid
+	oriComps
+		( double const & loc1
+		, double const & loc2
+		, double const & loc3
+		, double const & ang1
+		, double const & ang2
+		, double const & ang3
 		);
+
+	//! Orientations at the vertices of a cube
+	std::map<NodeKey, ga::Rigid>
+	cubeEOs
+		( ga::Vector const & center = ga::vZero
+		, double const & edgeSpan = 2.
+		);
+
+	//! Band-limited combinations of pairwise relative orientations
+	std::vector<blk::EdgeOri>
+	bandedROs
+		( std::map<NodeKey, ga::Rigid> const & eos
+		, size_t const & maxBandWidth = { 2u }
+		);
+
+	//! All combinations of pairwise relative orientations
+	std::vector<blk::EdgeOri>
+	allROs
+		( std::map<NodeKey, ga::Rigid> const & eos
+		);
+
+
+} // sim
 
 } // blk
 
 // Inline definitions
-#include "libblk/info.inl"
+// #include "libblk/sim.inl"
 
-#endif // blk_info_INCL_
+#endif // blk_sim_INCL_
 

@@ -125,7 +125,7 @@ Rigid :: infoStringShort
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << title << std::endl;
+		oss << title << "  ";
 	}
 	if (isValid())
 	{

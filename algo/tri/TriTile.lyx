@@ -74,8 +74,11 @@ Dave Knopp
 
 \begin_layout Abstract
 Triangle meshes are frequently utilized to represent arbitrary surface shapes.
- This technical note presents a mathematic description of a regular tiling
- of isosceles triangles, herein called a tritille
+ Although reasonably fast, general configuration triangle networks can still
+ involve time consuming search operations.
+ This technical note presents a mathematic description of a special case
+ triangle network comprising a regular planar tiling of isosceles triangles,
+ herein called a iso-tritille
 \begin_inset Foot
 status collapsed
 
@@ -96,24 +99,32 @@ key "wikiTiling"
 
 \end_inset
 
- which is treated a special case of an triangular network.
+.
  Although not as general as an arbitrary network, the tritille is also a
- useful structure for representing arbitrary two-dimensional manifolds such
- as arbitrary surface shapes in three-dimensional space.
- Because of the regularity underling regularity within the iso-tritille,
- point location and interpolation algorithms can be implemented with great
- efficiency (constant order complexity?).
+ useful structure for approximating arbitrary two-dimensional functions.
+ This includes representation of various surfaces embedded within three-dimensio
+nal space when the surface can be expressed as a function defined over a
+ two-dimensional domain.
+ Because of the underling regularity within the iso-tritille, point location
+ and vertex value interpolation algorithms can be implemented with great
+ efficiency (constant order complexity).
  This technical node describes a mathematical representation of the tritille
  geometry and the presents a simple algorithm for determining which triangle
  contains an arbitrary point.
  The point location algorithm is extended to interpolation of triangle faces
  at points regularly spaced (along a line in the reference domain).
- This presentation is focused on practical implementation over theoretical
+ This presentation emphasizes practical implementation aspects over theoretical
  rigor or completeness.
+ Examples are presented including use of an iso-tritille tessellation defined
+ in spherical coordinates and another defined in cylindrical coordinates.
 \end_layout
 
 \begin_layout Section
 Introduction
+\end_layout
+
+\begin_layout Standard
+TODO....
 \end_layout
 
 \begin_layout Subsection
@@ -122,12 +133,12 @@ Concepts and Terminology
 
 \begin_layout Itemize
 Application Domain: A 2D orthonormal coordinate frame which is the application-s
-pecific domain in which the iso-trille is defined.
+pecific domain in which the tritrille is defined.
 \end_layout
 
 \begin_layout Itemize
 Tile Domain: A two-degree of freedom data storage structure associated with
- the enumeration of iso-tritille tile entities.
+ the enumeration of tile entities.
 \end_layout
 
 \begin_layout Subsection
@@ -217,7 +228,7 @@ Tessellation geometry.
 \end_inset
 
  such that 
-\begin_inset Formula $u\propto\delta_{a}a+\delta_{b}b$
+\begin_inset Formula $u\propto\delta_{a}a-\delta_{b}b$
 \end_inset
 
 .
@@ -369,10 +380,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Graphics
 	filename TriTileLocation.svg
 	width 100col%
@@ -471,7 +478,7 @@ Major Axis,
 : Unitary direction vector defined as
 \begin_inset Formula 
 \[
-u=\frac{\delta_{a}a+\delta_{b}b}{\left|\delta_{a}a+\delta_{b}b\right|}
+u=\frac{\delta_{a}a-\delta_{b}b}{\left|\delta_{a}a-\delta_{b}b\right|}
 \]
 
 \end_inset
@@ -487,7 +494,7 @@ Minor Axis,
 : Unitary direction vector defined as
 \begin_inset Formula 
 \[
-v=\frac{\delta_{a}a-\delta_{b}b}{\left|\delta_{a}a-\delta_{b}b\right|}
+v=\frac{\delta_{a}a+\delta_{b}b}{\left|\delta_{a}a+\delta_{b}b\right|}
 \]
 
 \end_inset
@@ -496,12 +503,12 @@ v=\frac{\delta_{a}a-\delta_{b}b}{\left|\delta_{a}a-\delta_{b}b\right|}
 \end_layout
 
 \begin_layout Itemize
-Tile location, 
+Location, 
 \begin_inset Formula $y$
 \end_inset
 
-: Vector associated with arbitrary location expressed with respect to the
- NON-orthogonal tiling axes.
+, expressed in tile space: Vector associated with arbitrary location expressed
+ with respect to the NON-orthogonal tiling axes.
  I.e.
 \begin_inset Formula 
 \begin{equation}
@@ -574,48 +581,89 @@ Latice Spacing,
 
 \end_layout
 
-\begin_layout Subsection
-Ancillary Grid Domain
-\end_layout
+\begin_layout Itemize
+Rhobic Cell: Tile edges aligned with the 
+\begin_inset Formula $u$
+\end_inset
 
-\begin_layout Standard
-Linear transform deformation of the tile domain.
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ edge directions form a rhombic lattice.
+ Each rhombic cell is defined by four nodes, 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+, 
+\begin_inset Formula $\left\{ i+1,j\right\} $
+\end_inset
+
+, 
+\begin_inset Formula $\left\{ i+1,j+1\right\} $
+\end_inset
+
+, and 
+\begin_inset Formula $\left\{ i,j+1\right\} $
+\end_inset
+
+ and can be associated with an unique individual node of the lattice (the
+ 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+th node).
+ The final tritille topology is obtained by partitioning each rhombic cell
+ in half with an edge directed parallel to the primary axis.
 \end_layout
 
 \begin_layout Itemize
-First basis, 
-\begin_inset Formula $e_{i}$
+Triangle Cell/Face: An isosceles triangle is the fundamental element of
+ the tiling.
+ The equal length sides of each triangle are aligned with the 
+\begin_inset Formula $u$
 \end_inset
 
-: unitary direction vector associated with tile index, 
-\begin_inset Formula $i$
+ and 
+\begin_inset Formula $v$
 \end_inset
 
-.
-\end_layout
-
-\begin_layout Itemize
-Second basis, 
-\begin_inset Formula $e_{j}$
+ directions.
+ The triangle edge aligned with the primary axis may be any (non-zero) length.
+ For the iso-tritille, all faces may be classified into one of two categories.
+ One class of faces is on the 
+\begin_inset Quotes eld
 \end_inset
 
-: unitary direction vector associated with tile index, 
-\begin_inset Formula $j$
+negative
+\begin_inset Quotes erd
 \end_inset
 
-, and orthogonal by construction to 
-\begin_inset Formula $e_{i}$
+ side of the axis of symmetry (toward the 
+\begin_inset Formula $-b$
 \end_inset
 
-.
-\end_layout
-
-\begin_layout Itemize
-Grid plane basis, 
-\begin_inset Formula $E_{ij}\equiv e_{i}e_{j}$
+ and 
+\begin_inset Formula $u$
 \end_inset
 
- unitary bivector representing unit area element.
+ directions), the other is on the 
+\begin_inset Quotes eld
+\end_inset
+
+positive
+\begin_inset Quotes erd
+\end_inset
+
+ side (toward the 
+\begin_inset Formula $+b$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ directions).
 \end_layout
 
 \begin_layout Section

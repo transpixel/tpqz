@@ -44,6 +44,8 @@
 #include <sstream>
 
 
+// TODO - factor into .inl,.cpp files
+
 namespace tri
 {
 	using Vec2D = std::array<double, 2u>;
@@ -255,6 +257,14 @@ namespace tile
 		{ 
 		}
 
+		//! True if instance is valid
+		bool
+		isValid
+			() const
+		{
+			return dat::isValid(theDelta);
+		}
+
 		//! Return triangle tile based on tessellation coordinates
 		tile::Triangle
 		triangleFor
@@ -346,7 +356,10 @@ public: // methods
 	isValid
 		() const
 	{
-		return false;
+		return
+			{  dat::isValid(theGeo)
+			&& dat::isValid(theFinder)
+			};
 	}
 
 	//! Perform interpolation at xrel

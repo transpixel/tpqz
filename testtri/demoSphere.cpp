@@ -114,6 +114,8 @@ namespace
 			if (dat::isValid(err))
 			{
 				size_t const bin{ theErrPart.binIndexFor(err) };
+io::out() << "err: " << err << std::endl;
+io::out() << "bin: " << bin << std::endl;
 				assert(bin < theErrCounts.size());
 				theErrCounts[bin] += 1.;
 				theErrSum += 1.;
@@ -208,8 +210,23 @@ main
 		, Assessor("cfg5")
 	};
 
-	using PropGrid = dat::grid<PropType>;
-	PropGrid const radGrid;
+//	using PropGrid = dat::grid<PropType>;
+//	PropGrid const radGrid;
+	struct PropFunc
+	{
+		using value_type = PropType;
+
+		PropType
+		operator()
+			( size_t const & // ndxI
+			, size_t const & // ndxJ
+			) const
+		{
+			return {};
+		}
+	};
+
+	PropFunc const radGrid;
 
 	// for each case
 	for (Assessor & qual : quals)
@@ -217,18 +234,19 @@ main
 		double const da{ 1. };
 		double const db{ 1. };
 		PairZA const adir{ 1., 0. };
-		tri::IsoTille<PropGrid> const tin(da, db, adir, &radGrid);
+		tri::IsoTille const tin(da, db, adir);
 
 		// compute histogram of interpolation errors
 		for (ga::Vector const & dir : dirs)
 		{
 			using namespace geo::sphere;
 			PairZA const zaLoc{ zenithOf(dir), azimuthOf(dir) };
-			PropType const gotRad{ tin(zaLoc) };
+			PropType const gotRad{ tin(zaLoc, radGrid) };
 			if (dat::isValid(gotRad))
 			{
 				constexpr PropType expRad{ 1. };
 				PropType const err{ gotRad - expRad };
+assert(0. < err);
 				qual.addSample(err);
 			}
 		}

@@ -140,19 +140,54 @@ namespace tile
 		{
 			return dat::dot(theBarV, xrel);
 		}
-	};
 
-	//! Tessellation indices and weight associated with the (i,j)-th node
-	struct Vertex
-	{
-		size_t theI{ dat::nullValue<size_t>() };
-		size_t theJ{ dat::nullValue<size_t>() };
-		double theW{ dat::nullValue<double>() };
+		//! True if instance is valid
+		bool
+		isValid
+			() const
+		{
+			return
+				{  dat::isValid(theBarU)
+				&& dat::isValid(theBarV)
+				};
+		}
+
+		//! Descriptive information about this instance.
+		std::string
+		infoString
+			( std::string const & title = std::string()
+			) const
+		{
+			std::ostringstream oss;
+			if (! title.empty())
+			{
+				oss << title << std::endl;
+			}
+			if (isValid())
+			{
+				oss << dat::infoString(theBarU, "theBarU");
+				oss << std::endl;
+				oss << dat::infoString(theBarV, "theBarV");
+			}
+			else
+			{
+				oss << " <null>";
+			}
+			return oss.str();
+		}
 	};
 
 	//! A triple of (weighted) nodes within the tessellation
 	struct Triangle
 	{
+		//! Tessellation indices and weight associated with the (i,j)-th node
+		struct Vertex
+		{
+			size_t theI{ dat::nullValue<size_t>() };
+			size_t theJ{ dat::nullValue<size_t>() };
+			double theW{ dat::nullValue<double>() };
+		};
+
 		std::array<Vertex, 3u> theVerts{{}};
 
 		/*! Interpolate value from a collection of properties
@@ -161,14 +196,14 @@ namespace tile
 		 *   op: double * PropType
 		 *   op: PropType + PropType
 		 *
-		 * PropGrid: Must support access via
-		 *   PropType = PropGrid(size_t, size_t)
+		 * PropSampFunc: Property sampling function. Must support
+		 *   PropType = PropSampFunc(size_t, size_t)
 		*/
-		template <typename PropGrid>
+		template <typename PropSampFunc>
 		inline
-		typename PropGrid::value_type
+		typename PropSampFunc::value_type
 		valueFrom
-			( PropGrid const & propGrid
+			( PropSampFunc const & propGrid
 			) const
 		{
 			size_t const & i1 = theVerts[0].theI;
@@ -182,13 +217,6 @@ namespace tile
 			double const & w1 = theVerts[0].theW;
 			double const & w2 = theVerts[1].theW;
 			double const & w3 = theVerts[2].theW;
-
-			assert(i1 < propGrid.high());
-			assert(i2 < propGrid.high());
-			assert(i3 < propGrid.high());
-			assert(j1 < propGrid.wide());
-			assert(j2 < propGrid.wide());
-			assert(j3 < propGrid.wide());
 
 			return
 				{ w1 * propGrid(i1, j1)
@@ -218,6 +246,7 @@ namespace tile
 			return {static_cast<size_t>(base), frac };
 		}
 
+		//! Construct for tesselation with iso-triangle edge size delta
 		explicit
 		Finder
 			( double const & delta
@@ -226,6 +255,7 @@ namespace tile
 		{ 
 		}
 
+		//! Return triangle tile based on tessellation coordinates
 		tile::Triangle
 		triangleFor
 			( double const & mu
@@ -288,12 +318,10 @@ namespace tile
 \skip ExampleStart
 \until ExampleEnd
 */
-template <typename PropGrid>
 class IsoTille
 {
 	tile::TileGeo theGeo;
 	tile::Finder theFinder;
-	PropGrid const * const thePropGrid;
 
 public: // methods
 
@@ -307,11 +335,9 @@ public: // methods
 		( double const & da
 		, double const & db
 		, Vec2D const & adir
-		, PropGrid const * const & propGrid
 		)
 		: theGeo(da, db, adir)
 		, theFinder(std::hypot(da, db))
-		, thePropGrid{ propGrid }
 	{
 	}
 
@@ -324,9 +350,11 @@ public: // methods
 	}
 
 	//! Perform interpolation at xrel
-	typename PropGrid::value_type
+	template <typename SampFunc>
+	typename SampFunc::value_type
 	operator()
 		( Vec2D const & xrel //!< location relative to tile origin
+		, SampFunc const & propSampFunc
 		) const
 	{
 		double const mu{ theGeo.mu(xrel) };
@@ -334,14 +362,13 @@ public: // methods
 
 		tile::Triangle const tri{ theFinder.triangleFor(mu, nu) };
 
-		return tri.valueFrom<PropGrid>(*thePropGrid);
+		return tri.valueFrom<SampFunc>(propSampFunc);
 	}
 
 	//! Descriptive information about this instance.
 	std::string
 	infoString
 		( std::string const & title = std::string()
-//		, std::string const & fmt = std::string("%12.6f")
 		) const
 	{
 		std::ostringstream oss;
@@ -351,6 +378,9 @@ public: // methods
 		}
 		if (isValid())
 		{
+			oss << dat::infoString(theGeo, "theGeo");
+			oss << std::endl;
+			oss << dat::infoString(theFinder.theDelta, "delta");
 		}
 		else
 		{

@@ -302,6 +302,10 @@ where the two scalar quantities,
  are the coordinates of the point location.
 \end_layout
 
+\begin_layout Subsection
+Tessellation
+\end_layout
+
 \begin_layout Standard
 A unique iso-tritille may be defined uniquely over an application-specific
  region of interest, 

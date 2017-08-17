@@ -89,20 +89,19 @@ namespace
 	struct Assessor
 	{
 		std::string const theName;
-		size_t const theSize;
+		math::Partition const theErrPart;
 		std::vector<size_t> theErrCounts;
 		size_t theErrSum;
-		math::Partition const theErrPart;
 
 		//! Construct named quality tracker
 		Assessor
 			( std::string const & name
+			, math::Partition const & errPart
 			)
 			: theName(name)
-			, theSize{ 256u }
-			, theErrCounts(theSize, 0u)
+			, theErrPart{ errPart }
+			, theErrCounts(theErrPart.size() + 1u, 0u)
 			, theErrSum{ 0u }
-			, theErrPart(0., 1./(double(theSize)), theSize)
 		{ }
 
 		//! Incorporate observation error into quality assessment
@@ -114,11 +113,15 @@ namespace
 			if (dat::isValid(err))
 			{
 				size_t const bin{ theErrPart.binIndexFor(err) };
-io::out() << "err: " << err << std::endl;
-io::out() << "bin: " << bin << std::endl;
-				assert(bin < theErrCounts.size());
-				theErrCounts[bin] += 1.;
-				theErrSum += 1.;
+				if (dat::isValid(bin))
+				{
+					theErrCounts[bin] += 1.;
+					theErrSum += 1.;
+				}
+				else
+				{
+					io::err() << "out of range bin: " << bin << std::endl;
+				}
 			}
 		}
 
@@ -129,14 +132,24 @@ io::out() << "bin: " << bin << std::endl;
 			) const
 		{
 			double prob{ dat::nullValue<double>() };
-			assert(0. <= errValue);
-			assert(errValue <= 1.);
-			double const subIndex{ errValue * double(theErrPart.size()) };
-			double const count
-				{ math::interp::linear<double>(subIndex, theErrCounts) };
-			if (dat::isValid(count))
+			assert(theErrPart.range().contains(errValue));
+			if (dat::isValid(errValue))
 			{
-				prob = count / theErrSum;
+				double const subIndex{ theErrPart.interpIndexFor(errValue) };
+				double const count
+					{ math::interp::linear<double>(subIndex, theErrCounts) };
+
+				if (dat::isValid(count))
+				{
+					prob = count / theErrSum;
+				}
+				else
+				{
+					io::err() << "badCount:evalue,subIndex:"
+						<< " " << errValue
+						<< " " << subIndex
+						<< std::endl;
+				}
 			}
 			return prob;
 		}
@@ -146,6 +159,7 @@ io::out() << "bin: " << bin << std::endl;
 	void
 	saveForGnuplot
 		( std::vector<Assessor> const & quals
+		, math::Partition const & errPart
 		)
 	{
 		std::string datname("errSphere.dat");
@@ -174,7 +188,10 @@ io::out() << "bin: " << bin << std::endl;
 		ofsplt << '\n';
 
 		// .dat file
-		for (double err{0.} ; err <= 1. ; err += 1./256.)
+		double const emin{ errPart.min() };
+		double const emax{ errPart.max() };
+		double const delta{ 1./double(errPart.size()) };
+		for (double err{emin} ; err < emax ; err += delta)
 		{
 			ofsdat << dat::infoString(err);
 			for (Assessor const & qual : quals)
@@ -201,32 +218,46 @@ main
 	std::vector<ga::Vector> const dirs{ randomDirs(32u) };
 
 	// various test cases
+	math::Partition const errPart(dat::Range<double>(-2., 2.), 256u);
 	std::vector<Assessor> quals
 	{
-		  Assessor("cfg1")
-		, Assessor("cfg2")
-		, Assessor("cfg3")
-		, Assessor("cfg4")
-		, Assessor("cfg5")
+		  Assessor("cfg1", errPart)
+/*
+		, Assessor("cfg2", errPart)
+		, Assessor("cfg3", errPart)
+		, Assessor("cfg4", errPart)
+		, Assessor("cfg5", errPart)
+*/
 	};
 
-//	using PropGrid = dat::grid<PropType>;
-//	PropGrid const radGrid;
+	//! Property sampling functor (for unit sphere)
 	struct PropFunc
 	{
+		//! Define value type (radius of sphere)
 		using value_type = PropType;
 
+		//! Evaluate (radius) property - constant over sphere
 		PropType
 		operator()
-			( size_t const & // ndxI
-			, size_t const & // ndxJ
+			( size_t const & ndxI
+			, size_t const & ndxJ
 			) const
 		{
-			return {};
+io::out()
+	<< "ndxI,J:"
+	<< " " << dat::infoString(ndxI)
+	<< " " << dat::infoString(ndxJ)
+	<< std::endl;
+//
+// TODO - Investigate index computation/lookup in Triangle et.al.
+//
+io::out() << "TODO: --- fix libtri/IsoTile" << std::endl;
+exit(8);
+
+			return { 1. };
 		}
 	};
-
-	PropFunc const radGrid;
+	PropFunc const unitSphere;
 
 	// for each case
 	for (Assessor & qual : quals)
@@ -236,25 +267,37 @@ main
 		PairZA const adir{ 1., 0. };
 		tri::IsoTille const tin(da, db, adir);
 
+		io::out() << dat::infoString(tin, "tin") << std::endl;
+
 		// compute histogram of interpolation errors
 		for (ga::Vector const & dir : dirs)
 		{
 			using namespace geo::sphere;
 			PairZA const zaLoc{ zenithOf(dir), azimuthOf(dir) };
-			PropType const gotRad{ tin(zaLoc, radGrid) };
+			PropType const gotRad{ tin(zaLoc, unitSphere) };
+
 			if (dat::isValid(gotRad))
 			{
 				constexpr PropType expRad{ 1. };
-				PropType const err{ gotRad - expRad };
-assert(0. < err);
-				qual.addSample(err);
+				PropType const difRad{ gotRad - expRad };
+
+io::out()
+	<< "rad:exp,got,dif:"
+	<< " " << dat::infoString(expRad)
+	<< " " << dat::infoString(gotRad)
+	<< " " << dat::infoString(difRad)
+	<< std::endl;
+/*
+*/
+
+				qual.addSample(difRad);
 			}
 		}
 
 	}
 
 	// write data to file for display
-	saveForGnuplot(quals);
+	saveForGnuplot(quals, errPart);
 
 	return 0;
 }

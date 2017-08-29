@@ -72,6 +72,17 @@ dat_Region_test0
 		oss << "Failure of nullVolume test" << std::endl;
 	}
 
+	// construct from pairs
+	using Type = long;
+	std::pair<Type, Type> const rangePair{ 7L, 17L };
+	dat::Region<2u, size_t> const d1pairs{ rangePair };
+	dat::Area<size_t> const d2pairs{ rangePair, rangePair };
+	dat::Volume<size_t> const d3pairs{ rangePair, rangePair, rangePair };
+	if (! (d1pairs.isValid() && d2pairs.isValid() && d3pairs.isValid()))
+	{
+		oss << "Failure of valid pair construction test" << std::endl;
+	}
+
 	// basic equality test
 	dat::Region<3, size_t> const region3
 		{ dat::Range<size_t>{ 4u, 9u }

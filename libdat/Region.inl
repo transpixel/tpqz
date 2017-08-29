@@ -34,6 +34,7 @@
 
 #include "libdat/info.h"
 
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 
@@ -42,15 +43,47 @@ namespace dat
 {
 //======================================================================
 
+namespace priv
+{
+	//! Cast pairs to dat::Range instances
+	template <size_t Dim, typename Type>
+	inline
+	std::array<dat::Range<Type>, Dim>
+	rangesFrom
+		( std::initializer_list<std::pair<Type, Type> > const & rangePairs
+		)
+	{
+		std::array<dat::Range<Type>, Dim> ranges;
+		std::transform
+			( rangePairs.begin(), rangePairs.end()
+			, ranges.begin()
+			, [] (std::pair<Type, Type> const & pair)
+				{ return dat::Range<Type>(pair); }
+			);
+		return ranges;
+	}
+}
+
 template <size_t Dim, typename Type>
 inline
 // explicit
 Region<Dim, Type> :: Region
 	( std::initializer_list<Range<Type> > const & ranges
 	)
-	: theRanges(ranges.begin(), ranges.end())
+	: theRanges{{}}
 {
-	assert(Dim == theRanges.size());
+	assert(Dim == ranges.size());
+	std::copy(ranges.begin(), ranges.end(), theRanges.begin());
+}
+
+template <size_t Dim, typename Type>
+inline
+// explicit
+Region<Dim, Type> :: Region
+	( std::initializer_list<std::pair<Type, Type> > const & rangePairs
+	)
+	: theRanges(priv::rangesFrom<Dim, Type>(rangePairs))
+{
 }
 
 // copy constructor -- compiler provided
@@ -63,7 +96,12 @@ bool
 Region<Dim, Type> :: isValid
 	() const
 {
-	return (! theRanges.empty());
+	bool okay{ false };
+	if (0u < Dim)
+	{
+		return theRanges[0].isValid();
+	}
+	return okay;
 }
 
 template <size_t Dim, typename Type>
@@ -171,12 +209,11 @@ Region<Dim, Type> :: intersectWith
 	Region<Dim, Type> common;
 	if (isValid() && other.isValid())
 	{
-		common.theRanges.reserve(Dim);
 		for (size_t ndx(0u) ; ndx < Dim ; ++ndx)
 		{
 			Range<Type> const & rangeThis = theRanges[ndx];
 			Range<Type> const & rangeThat = other.theRanges[ndx];
-			common.theRanges.emplace_back(rangeThis.intersectWith(rangeThat));
+			common.theRanges[ndx] = rangeThis.intersectWith(rangeThat);
 		}
 	}
 	return common;

@@ -54,7 +54,7 @@ namespace dat
 template <size_t Dim, typename Type>
 class Region
 {
-	std::vector<dat::Range<Type> > theRanges{};
+	std::array<dat::Range<Type>, Dim> theRanges{{}};
 
 public: // methods
 
@@ -66,6 +66,13 @@ public: // methods
 	explicit
 	Region
 	  	( std::initializer_list<Range<Type> > const & ranges
+		);
+
+	//! Value constructor
+	inline
+	explicit
+	Region
+		( std::initializer_list<std::pair<Type, Type> > const & rangePairs
 		);
 
 	// copy constructor -- compiler provided

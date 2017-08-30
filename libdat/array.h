@@ -107,11 +107,14 @@ namespace dat
 		);
 
 	//! Direction of vec (or null)
-	template <typename Type, size_t Dim>
+	template
+		< typename FType, size_t Dim
+		, EnableIf< std::is_floating_point<FType> >...
+		>
 	inline
-	std::array<Type, Dim>
+	std::array<FType, Dim>
 	unit
-		( std::array<Type, Dim> const & vec
+		( std::array<FType, Dim> const & vec
 		);
 
 	//! Array addition

@@ -113,6 +113,16 @@ dat_Range_test1
 	bool const expInMax(false);
 	bool const expInHi(false);
 
+
+	if (! dat::nearlyEquals(range[0], expMin))
+	{
+		oss << "Failure of op[0] test" << std::endl;
+	}
+	if (! dat::nearlyEquals(range[1], expMax))
+	{
+		oss << "Failure of op[1] test" << std::endl;
+	}
+
 	if (! dat::nearlyEquals(range.min(), expMin))
 	{
 		oss << "Failure of min test" << std::endl;

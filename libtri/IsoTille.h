@@ -52,23 +52,6 @@ namespace tri
 {
 	using Vec2D = std::array<double, 2u>;
 
-	//! Unit magnitude vector (or null)
-	inline
-	Vec2D
-	unit
-		( Vec2D const & vec
-		)
-	{
-		Vec2D dir{{ dat::nullValue<double>(), dat::nullValue<double>() }};
-		using dat::operator*;
-		double const mag{ dat::magnitude(vec) };
-		if (std::numeric_limits<double>::min() < mag)
-		{
-			dir = (1. / mag) * vec;
-		}
-		return dir;
-	}
-
 //! Individual tiles within tritille tessellation
 namespace tile
 {
@@ -98,14 +81,14 @@ namespace tile
 			using dat::operator-;
 			using dat::operator+;
 
-			Vec2D const adir(unit(avec));
+			Vec2D const adir(dat::unit(avec));
 
 			Vec2D const bdir{{ -adir[1], adir[0] }};
 			Vec2D const uvec(da * adir - db * bdir);
-			Vec2D const udir(unit(uvec));
+			Vec2D const udir(dat::unit(uvec));
 
 			Vec2D const vvec(da * adir + db * bdir);
-			Vec2D const vdir(unit(vvec));
+			Vec2D const vdir(dat::unit(vvec));
 
 			double const gamma{ dat::dot(udir, vdir) };
 

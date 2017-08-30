@@ -106,6 +106,14 @@ namespace dat
 		( std::array<Type, Dim> const & vals
 		);
 
+	//! Direction of vec (or null)
+	template <typename Type, size_t Dim>
+	inline
+	std::array<Type, Dim>
+	unit
+		( std::array<Type, Dim> const & vec
+		);
+
 	//! Array addition
 	template <typename Type, size_t Dim>
 	inline

@@ -133,6 +133,16 @@ magnitude
 template <typename Type, size_t Dim>
 inline
 std::array<Type, Dim>
+unit
+	( std::array<Type, Dim> const & vec
+	)
+{
+	return vec;
+}
+
+template <typename Type, size_t Dim>
+inline
+std::array<Type, Dim>
 operator+
 	( std::array<Type, Dim> const & argA
 	, std::array<Type, Dim> const & argB

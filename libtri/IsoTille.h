@@ -34,7 +34,9 @@
 */
 
 
+#include "libdat/Area.h"
 #include "libdat/array.h"
+#include "libdat/MinMax.h"
 #include "libdat/validity.h"
 #include "libga/ga.h"
 #include "libmath/angle.h"
@@ -143,6 +145,16 @@ namespace tile
 			return dat::dot(theBarV, xrel);
 		}
 
+		//! The mu() and nu() values combined in a pair
+		inline
+		std::pair<double, double>
+		pairMuNu
+			( Vec2D const & xrel
+			) const
+		{
+			return { mu(xrel), nu(xrel) };
+		}
+
 		//! True if instance is valid
 		bool
 		isValid
@@ -228,29 +240,56 @@ namespace tile
 		}
 	};
 
+	//! Fractional index
+	struct FracNdx
+	{
+		long theInt{ dat::nullValue<long>() };
+		double theFrac{ dat::nullValue<double>() };
+
+		//! Construct a null instance
+		FracNdx
+			() = default;
+
+		//! Construct by splitting value into integer and remainders
+		explicit
+		FracNdx
+			( double const & value
+			)
+			// force rounding downward (e.g. unlike std::div)
+			: theInt{ static_cast<long>(std::floor(value)) }
+			, theFrac{ value - (double)theInt }
+		{ }
+
+		//! True if this instance is not null
+		bool
+		isValid
+			() const
+		{
+			return dat::isValid(theFrac);
+		}
+	};
+
 	//! Transformation into tile coordinates
-	struct Finder
+	struct TileFinder
 	{
 		double theDelta;
 
 		//! Integer and fractional remainder associated with (value/delta)
 		static
 		inline
-		std::pair<size_t, double>
+		FracNdx
 		ndxFrac
 			( double const & value
 			, double const & delta
 			)
 		{
-			// force rounding downward (e.g. unlike std::div)
-			double const base{ std::floor(value / delta) };
-			double const frac{ value - base };
-			return {static_cast<size_t>(base), frac };
+			assert(std::numeric_limits<double>::min() < delta);
+			return FracNdx(value / delta);
 		}
 
 		//! Construct for tesselation with iso-triangle edge size delta
 		explicit
-		Finder
+		TileFinder
 			( double const & delta
 			)
 			: theDelta{ delta }
@@ -274,13 +313,13 @@ namespace tile
 		{
 			tile::Triangle tri;
 
-			std::pair<size_t, double> const muNdxFrac{ ndxFrac(mu, theDelta) };
-			std::pair<size_t, double> const nuNdxFrac{ ndxFrac(nu, theDelta) };
+			FracNdx const muNdxFrac{ ndxFrac(mu, theDelta) };
+			FracNdx const nuNdxFrac{ ndxFrac(nu, theDelta) };
 
-			size_t const & ndxI = muNdxFrac.first;
-			size_t const & ndxJ = nuNdxFrac.first;
-			double const & muFrac = muNdxFrac.second;
-			double const & nuFrac = nuNdxFrac.second;
+			size_t const & ndxI = muNdxFrac.theInt;
+			size_t const & ndxJ = nuNdxFrac.theInt;
+			double const & muFrac = muNdxFrac.theFrac;
+			double const & nuFrac = nuNdxFrac.theFrac;
 
 			if (muFrac < nuFrac)
 			{
@@ -330,8 +369,8 @@ namespace tile
 */
 class IsoTille
 {
-	tile::TileGeo theGeo;
-	tile::Finder theFinder;
+	tile::TileGeo theTileGeo;
+	tile::TileFinder theTileFinder;
 
 public: // methods
 
@@ -346,8 +385,8 @@ public: // methods
 		, double const & db
 		, Vec2D const & adir
 		)
-		: theGeo(da, db, adir)
-		, theFinder(std::hypot(da, db))
+		: theTileGeo(da, db, adir)
+		, theTileFinder(std::hypot(da, db))
 	{
 	}
 
@@ -357,10 +396,56 @@ public: // methods
 		() const
 	{
 		return
-			{  dat::isValid(theGeo)
-			&& dat::isValid(theFinder)
+			{  dat::isValid(theTileGeo)
+			&& dat::isValid(theTileFinder)
 			};
 	}
+
+	//! Limits (half open) on mu and nu values given domain area limits
+	dat::Area<double>
+	areaMuNu
+		( dat::Area<double> const & areaXY
+		) const
+	{
+		dat::Area<double> mnArea;
+		if (areaXY.isValid())
+		{
+			dat::MinMax<double> muMinMax;
+			dat::MinMax<double> nuMinMax;
+			std::array<double, 2u> const mins(areaXY.minimums());
+			std::array<double, 2u> const maxs(areaXY.maximums());
+			std::array<Vec2D, 4u> const xyCorners
+				{ Vec2D{{ mins[0], mins[1] }}
+				, Vec2D{{ mins[0], maxs[1] }}
+				, Vec2D{{ maxs[0], mins[1] }}
+				, Vec2D{{ maxs[0], maxs[1] }}
+				};
+io::out() << dat::infoString(xyCorners[0], "xyCorners[0]") << std::endl;
+io::out() << dat::infoString(xyCorners[1], "xyCorners[1]") << std::endl;
+io::out() << dat::infoString(xyCorners[2], "xyCorners[2]") << std::endl;
+io::out() << dat::infoString(xyCorners[3], "xyCorners[3]") << std::endl;
+			for (Vec2D const & xyCorner : xyCorners)
+			{
+				// expand the mu,nu dimensions (independently)
+				double const mu{ theTileGeo.mu(xyCorner) };
+				double const nu{ theTileGeo.nu(xyCorner) };
+				muMinMax = muMinMax.expandedWith(mu);
+				nuMinMax = nuMinMax.expandedWith(nu);
+io::out()
+	<< "xy:"
+	<< " " << dat::infoString(xyCorner[0])
+	<< " " << dat::infoString(xyCorner[1])
+	<< "   "
+	<< "mn:"
+	<< " " << dat::infoString(mu)
+	<< " " << dat::infoString(nu)
+	<< std::endl;
+			}
+			mnArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
+		}
+		return mnArea;
+	}
+
 
 	//! Perform interpolation at xrel
 	template <typename SampFunc>
@@ -370,10 +455,19 @@ public: // methods
 		, SampFunc const & propSampFunc
 		) const
 	{
-		double const mu{ theGeo.mu(xrel) };
-		double const nu{ theGeo.nu(xrel) };
+		double const mu{ theTileGeo.mu(xrel) };
+		double const nu{ theTileGeo.nu(xrel) };
 
-		tile::Triangle const tri{ theFinder.triangleFor(mu, nu) };
+		tile::Triangle const tri{ theTileFinder.triangleFor(mu, nu) };
+
+io::out()
+	<< "..."
+	<< " " << "xrel"
+	<< " " << dat::infoString(xrel)
+	<< " " << "mu,nu"
+	<< " " << dat::infoString(mu)
+	<< " " << dat::infoString(nu)
+	<< std::endl;
 
 		return tri.valueFrom<SampFunc>(propSampFunc);
 	}
@@ -391,9 +485,9 @@ public: // methods
 		}
 		if (isValid())
 		{
-			oss << dat::infoString(theGeo, "theGeo");
+			oss << dat::infoString(theTileGeo, "theTileGeo");
 			oss << std::endl;
-			oss << dat::infoString(theFinder.theDelta, "delta");
+			oss << dat::infoString(theTileFinder.theDelta, "delta");
 		}
 		else
 		{

@@ -74,8 +74,8 @@ Dave Knopp
 
 \begin_layout Abstract
 Triangle meshes are frequently utilized to represent arbitrary surface shapes.
- Although reasonably fast, general configuration triangle networks can still
- involve time consuming search operations.
+ Although they are reasonably fast, triangle networks in general configuration
+ can still involve time consuming search operations.
  This technical note presents a mathematic description of a special case
  triangle network comprising a regular planar tiling of isosceles triangles,
  herein called a iso-tritille
@@ -100,15 +100,16 @@ key "wikiTiling"
 \end_inset
 
 .
- Although not as general as an arbitrary network, the tritille is also a
- useful structure for approximating arbitrary two-dimensional functions.
+ Although not as general as an arbitrary network, a regularly structured
+ tritille can be a useful structure for approximating arbitrary two-dimensional
+ functions.
  This includes representation of various surfaces embedded within three-dimensio
 nal space when the surface can be expressed as a function defined over a
  two-dimensional domain.
  Because of the underling regularity within the iso-tritille, point location
  and vertex value interpolation algorithms can be implemented with great
  efficiency (constant order complexity).
- This technical node describes a mathematical representation of the tritille
+ This technical node describes a mathematical representation of the iso-tritille
  geometry and the presents a simple algorithm for determining which triangle
  contains an arbitrary point.
  The point location algorithm is extended to interpolation of triangle faces
@@ -150,10 +151,6 @@ Application Domain
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \begin_inset Graphics
@@ -299,7 +296,7 @@ where the two scalar quantities,
 \begin_inset Formula $\xi_{2}$
 \end_inset
 
- are the coordinates of the point location.
+ are the coordinates of a point location.
 \end_layout
 
 \begin_layout Subsection
@@ -473,8 +470,8 @@ reference "fig:Location-in-application"
 \end_inset
 
 .
- Several ancillary quantities may be defined in terms of the defining characteri
-stics.
+ Several ancillary quantities may be represented in terms of the defining
+ characteristics.
 \end_layout
 
 \begin_layout Itemize
@@ -778,7 +775,7 @@ The node indices,
 
  directions respectively.
  Therefore, an obvious and simple solution is to store the properties in
- a simple grid structure which is addressable using (
+ a simple raster grid structure which is addressable using (
 \family roman
 \series medium
 \shape up
@@ -846,8 +843,8 @@ The tiling of triangles can be accomplished by introducing a diagonal slash
 \end_layout
 
 \begin_layout Standard
-The initial rhombic tessellation may be started placing by a node at a predeterm
-ined location, 
+The initial rhombic tessellation may be started by placing by a node at
+ a predetermined location, 
 \begin_inset Formula $x_{0}$
 \end_inset
 
@@ -856,8 +853,16 @@ ined location,
 \end_inset
 
 .
- The next node in the tile major direction may be associated with index
- pair 
+ In practice, it is often convenient to select the origin node, 
+\begin_inset Formula $x_{0}$
+\end_inset
+
+, such that all subsequently relevant tile index values are positive.
+\end_layout
+
+\begin_layout Standard
+The next node in the tile major direction may be associated with index pair
+ 
 \begin_inset Formula $\left\{ i,j\right\} =\left\{ 1,0\right\} $
 \end_inset
 
@@ -975,12 +980,12 @@ Each node is therefore associated with a rhombic cell that is partitioned
 \end_inset
 
  and associate them with ordered vertices.
- I.e.
- for the 
+ Associate each 
 \begin_inset Formula $\left\{ i,j\right\} $
 \end_inset
 
-th node identify the two associated triangles with vertices as,
+th node with two specific (positive) triangles defined in terms of (ordered)
+ nodes forming the vertices as:
 \begin_inset Formula 
 \begin{eqnarray*}
 \mathbb{T}_{uij} & : & \left\{ \left\{ i,j\right\} ,\left\{ i+1,j\right\} ,\left\{ i+1,j+1\right\} \right\} \\
@@ -1025,6 +1030,10 @@ reference "eq:DefTileLoc"
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 Forming the inner product of this equation with each of 
 \begin_inset Formula $u$
 \end_inset
@@ -1043,6 +1052,9 @@ Forming the inner product of this equation with each of
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
 \begin_inset Note Comment
 status collapsed
 
@@ -1252,7 +1264,15 @@ Note that the transformation vectors,
 
 , are constants determined entirely by the tessellation geometry and are
  therefore fixed constants for a given tritille configuration.
- With a bit of basic algebra
+ After expanding the dot product in terms of the definitions of 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, and a small amount of basic algebra
 \begin_inset Note Comment
 status collapsed
 
@@ -1476,7 +1496,7 @@ If
 \end_inset
 
 When 
-\begin_inset Formula $\delta_{a}=0$
+\begin_inset Formula $\delta_{a}=\delta_{b}$
 \end_inset
 
 , then 
@@ -1491,7 +1511,24 @@ When
 \begin_inset Formula $v$
 \end_inset
 
-.
+, and the iso-tritille corresponds with a diagonally slashed square tessellation.
+ If either 
+\begin_inset Formula $\delta_{a}=0$
+\end_inset
+
+, or 
+\begin_inset Formula $\delta_{b}=0$
+\end_inset
+
+, then 
+\begin_inset Formula $\gamma^{2}=1$
+\end_inset
+
+ and both 
+\begin_inset Formula $\overline{u}=\overline{v}=0$
+\end_inset
+
+, such that the tritille collapses into singularity.
 \end_layout
 
 \begin_layout Standard
@@ -1590,7 +1627,7 @@ reference "eq:xferInverse"
 \end_layout
 
 \begin_layout Standard
-Since the transformation is linear, conservative tile coordinate bounding
+Since the transformation is linear, pessimistic tile coordinate bounding
  values, 
 \begin_inset Formula $\mu_{\left\{ \text{min,max}\right\} }$
 \end_inset
@@ -1599,19 +1636,19 @@ Since the transformation is linear, conservative tile coordinate bounding
 \begin_inset Formula $\nu_{\left\{ \text{min,max}\right\} }$
 \end_inset
 
-, may be established by transforming each of the application domain extents,
- 
+, may be established by transforming each of the application domain extent
+ limits, 
 \begin_inset Formula $\xi_{\left\{ 1,2\right\} \left\{ \text{min,max}\right\} }$
 \end_inset
 
  and selecting the largest and smallest results.
  A tighter bound may be computed by evaluating each tritille node on the
- convex hull of nodes which are contained in the domain, 
+ convex hull of the nodes contained in the domain, 
 \begin_inset Formula $\mathcal{D}$
 \end_inset
 
 , (e.g.
- for which 
+ collection of nodes for which 
 \begin_inset Formula $V\left(x\right)=1$
 \end_inset
 
@@ -1672,7 +1709,8 @@ Let
 \begin_inset Formula $j$
 \end_inset
 
- be the unique integers that satisfy
+ be the unique integers that satisfy the iso-tritille's spacing-normalized
+ relationship
 \begin_inset Formula 
 \begin{eqnarray*}
 \delta^{-1}\mu & = & i+\mu_{f}\\
@@ -1681,7 +1719,7 @@ Let
 
 \end_inset
 
-I.e.
+For which:
 \begin_inset Formula 
 \begin{eqnarray}
 i & = & \left\lfloor \frac{\mu}{\delta}\right\rfloor =\left\lfloor \frac{x\cdot\overline{u}}{\delta}\right\rfloor \label{eq:Def_i}\\
@@ -1722,11 +1760,12 @@ The fractional values,
 \end_inset
 
 , are the relative positions within that rhombic cell.
- Membership of the location, 
+ Membership within the appropriate one of the two partitioning triangles,
+ of the location 
 \begin_inset Formula $y$
 \end_inset
 
-, within the appropriate one of two triangles may be determined as
+, may be determined via
 \begin_inset Formula 
 \begin{equation}
 y\in\begin{cases}
@@ -1748,13 +1787,7 @@ Due to the regularity of the tritille structure, this triangle location
 \end_layout
 
 \begin_layout Standard
-For bookkeeping purposes, each triangle partition can be associated with
- the corresponding 
-\begin_inset Formula $\left\{ i,j\right\} $
-\end_inset
-
-th, tritille node that they share.
- The triangle selection process may be summarized as:
+The triangle selection process may be summarized as:
 \end_layout
 
 \begin_layout Enumerate
@@ -1870,8 +1903,8 @@ Face Interpolation
 
 \begin_layout Standard
 A common and significant use of triangulated networks is to interpolate
- arbitrary properties across a specified domain when sample property values
- are known only at tritille node locations.
+ arbitrary properties when sample property values are known only at tritille
+ node locations.
  For the iso-tritille, the network regularity can be exploited to perform
  interpolation using a small number of computations.
  The following describes the case of simple linear interpolation of properties
@@ -1886,7 +1919,7 @@ key "wikiBary"
 
 \end_inset
 
-) of a point interior to tritille triangular cells.
+) for point locations interior to a tritille triangle.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2060,7 +2093,12 @@ reference "fig:Barycenter"
 .
  Two of the barycenter values can be obtained from the figure by inspection
  and the third can be computed from the requirement that (normalized) barycentri
-c coordinates sum to unity.
+c coordinates sum to unity (i.e.
+ 
+\begin_inset Formula $\sum_{k}\omega_{k}=1$
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsubsection
@@ -2208,7 +2246,7 @@ Given discrete property values at the three vertices,
 \begin_inset Formula $P\left(r_{n}\right)$
 \end_inset
 
-, the interpolated property value at location 
+, the linearly interpolated property value at location 
 \begin_inset Formula $q$
 \end_inset
 
@@ -2347,6 +2385,10 @@ P\left(q\right) & = & P_{00}+\mu_{f}K_{1100}-\nu_{f}K_{1110}
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
 This may also be expressed in terms of property differences (associated
  with the 
 \begin_inset Formula $i,j$
@@ -2366,6 +2408,11 @@ for
 K_{1100} & = & P\left(i+1,j+1\right)-P\left(i,j\right)\\
 K_{1110} & = & P\left(i+1,j+1\right)-P\left(i+1,j\right)
 \end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -2467,6 +2514,10 @@ P\left(q\right) & = & P_{00}+\mu_{f}K_{1101}+\nu_{f}K_{0100}
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
 This may also be expressed in terms of property differences as
 \begin_inset Formula 
 \begin{eqnarray*}
@@ -2487,13 +2538,18 @@ K_{0100} & = & P\left(i,j+1\right)-P\left(i,j\right)
 
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsubsection
 Missing Nodes
 \end_layout
 
 \begin_layout Standard
 In a practical setting, it is necessary to handle the situation in which
- one or more of the node properties is not be defined.
+ one or more of the node properties is not defined.
  Certainly this is the situation near the edge of the domain of interest,
  
 \begin_inset Formula $\mathcal{D}$

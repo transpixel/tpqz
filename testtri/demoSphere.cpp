@@ -85,16 +85,16 @@ namespace
 		return dirs;
 	}
 
-	//! Example 
-	struct Assessor
+	//! Record error values quantized into bins
+	struct SampleTracker
 	{
 		std::string const theName;
 		math::Partition const theErrPart;
 		std::vector<size_t> theErrCounts;
 		size_t theErrSum;
 
-		//! Construct named quality tracker
-		Assessor
+		//! Construct named tracker
+		SampleTracker
 			( std::string const & name
 			, math::Partition const & errPart
 			)
@@ -104,9 +104,9 @@ namespace
 			, theErrSum{ 0u }
 		{ }
 
-		//! Incorporate observation error into quality assessment
+		//! Incorporate observation error into error collection
 		void
-		addSample
+		recordError
 			( double const & err
 			)
 		{
@@ -125,10 +125,10 @@ namespace
 			}
 		}
 
-		//! Probability of requested error
+		//! Probability of error of (near to) specified value
 		double
-		probabilityAt
-			( double const & errValue //!< [0,1]
+		probabilityOf
+			( double const & errValue
 			) const
 		{
 			double prob{ dat::nullValue<double>() };
@@ -158,7 +158,7 @@ namespace
 	// write gnuplot data
 	void
 	saveForGnuplot
-		( std::vector<Assessor> const & quals
+		( std::vector<SampleTracker> const & errPots
 		, math::Partition const & errPart
 		)
 	{
@@ -170,7 +170,7 @@ namespace
 		// .plt file
 		ofsplt << "plot";
 		size_t col{2u};
-		for (Assessor const & qual : quals)
+		for (SampleTracker const & errPot : errPots)
 		{
 			if (2u == col)
 			{
@@ -182,7 +182,7 @@ namespace
 			}
 			ofsplt
 				<< "'" << datname << "' u 1:" << col << " w l"
-				<< " ti '" << qual.theName << "'";
+				<< " ti '" << errPot.theName << "'";
 			++col;
 		}
 		ofsplt << '\n';
@@ -194,9 +194,9 @@ namespace
 		for (double err{emin} ; err < emax ; err += delta)
 		{
 			ofsdat << dat::infoString(err);
-			for (Assessor const & qual : quals)
+			for (SampleTracker const & errPot : errPots)
 			{
-				ofsdat << " " << dat::infoString(qual.probabilityAt(err));
+				ofsdat << " " << dat::infoString(errPot.probabilityOf(err));
 			}
 			ofsdat << '\n';
 		}
@@ -214,24 +214,8 @@ main
 	using PropType = double;
 	using PairZA = tri::Vec2D;
 
-	// get (pseudo)random sampling directions
-	std::vector<ga::Vector> const dirs{ randomDirs(32u) };
-
-	// various test cases
-	math::Partition const errPart(dat::Range<double>(-2., 2.), 256u);
-	std::vector<Assessor> quals
-	{
-		  Assessor("cfg1", errPart)
-/*
-		, Assessor("cfg2", errPart)
-		, Assessor("cfg3", errPart)
-		, Assessor("cfg4", errPart)
-		, Assessor("cfg5", errPart)
-*/
-	};
-
 	//! Property sampling functor (for unit sphere)
-	struct PropFunc
+	struct PropertyStore
 	{
 		//! Define value type (radius of sphere)
 		using value_type = PropType;
@@ -239,33 +223,53 @@ main
 		//! Evaluate (radius) property - constant over sphere
 		PropType
 		operator()
-			( size_t const & ndxI
-			, size_t const & ndxJ
+			( size_t const & // ndxI
+			, size_t const & // ndxJ
 			) const
 		{
-io::out()
-	<< "ndxI,J:"
-	<< " " << dat::infoString(ndxI)
-	<< " " << dat::infoString(ndxJ)
-	<< std::endl;
-//
-// TODO - Investigate index computation/lookup in Triangle et.al.
-//
-io::out() << "TODO: --- fix libtri/IsoTile" << std::endl;
-exit(8);
-
+			// For this test example, generate properties "on the fly"
+			// without concern for an actual storage structure for node data
 			return { 1. };
 		}
 	};
-	PropFunc const unitSphere;
+
+	// get (pseudo)random sampling directions
+	std::vector<ga::Vector> const dirs{ randomDirs(32u) };
+
+	// various test cases
+	math::Partition const errPart(dat::Range<double>(-2., 2.), 256u);
+	std::vector<SampleTracker> errPots
+	{
+		  SampleTracker("cfg1", errPart)
+	//	, SampleTracker("cfg2", errPart)
+	//	, SampleTracker("cfg3", errPart)
+	//	, SampleTracker("cfg4", errPart)
+	//	, SampleTracker("cfg5", errPart)
+	};
+
+	PropertyStore const radiusPropertyStore;
 
 	// for each case
-	for (Assessor & qual : quals)
+	for (SampleTracker & errPot : errPots)
 	{
-		double const da{ 1. };
-		double const db{ 1. };
-		PairZA const adir{ 1., 0. };
+		// define iso-tritille
+		double const da{ 1. }; // azimuth tritille spacing
+		double const db{ 1. }; // zenith tritille spacing
+		PairZA const adir{ 1., 0. }; // primary tesselation axis
 		tri::IsoTille const tin(da, db, adir);
+
+		// check boundaries
+		dat::Range<double> const zenithRange{ 0., math::pi };
+		dat::Range<double> const azimuthRange{ 0., math::twoPi };
+		dat::Area<double> const zaArea{ zenithRange, azimuthRange };
+		dat::Area<double> const mnArea{ tin.areaMuNu(zaArea) };
+
+/*
+io::out() << std::endl;
+io::out() << dat::infoString(zaArea, "zaArea") << std::endl;
+io::out() << dat::infoString(mnArea, "mnArea") << std::endl;
+io::out() << std::endl;
+*/
 
 		io::out() << dat::infoString(tin, "tin") << std::endl;
 
@@ -274,30 +278,33 @@ exit(8);
 		{
 			using namespace geo::sphere;
 			PairZA const zaLoc{ zenithOf(dir), azimuthOf(dir) };
-			PropType const gotRad{ tin(zaLoc, unitSphere) };
+			PropType const gotRad{ tin(zaLoc, radiusPropertyStore) };
 
 			if (dat::isValid(gotRad))
 			{
 				constexpr PropType expRad{ 1. };
 				PropType const difRad{ gotRad - expRad };
 
+/*
+io::out() << std::endl;
 io::out()
-	<< "rad:exp,got,dif:"
+	<< "za:"
+	<< " " << dat::infoString(zaLoc)
+	<< "   " << "rad:exp,got,dif:"
 	<< " " << dat::infoString(expRad)
 	<< " " << dat::infoString(gotRad)
 	<< " " << dat::infoString(difRad)
 	<< std::endl;
-/*
 */
 
-				qual.addSample(difRad);
+				errPot.recordError(difRad);
 			}
 		}
 
 	}
 
 	// write data to file for display
-	saveForGnuplot(quals, errPart);
+	saveForGnuplot(errPots, errPart);
 
 	return 0;
 }

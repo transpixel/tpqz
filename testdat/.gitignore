@@ -18,6 +18,8 @@ ulayout
 uMinMax
 uNdxBegEnd
 uops
+uquantum
+uQuantumFrac
 urandom
 uRange
 uRegion

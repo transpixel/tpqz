@@ -35,6 +35,7 @@
 
 
 #include "libdat/Range.h"
+#include "libdat/template.h"
 
 #include <array>
 #include <string>
@@ -116,6 +117,27 @@ public: // methods
 	center
 		() const;
 
+	//! **Length: Corners (combinatorials of (min,max) over all dimensions
+	template <typename Vertex>
+	inline
+	typename std::enable_if<(1uL == Dim), std::array<Vertex, 2u> >::type
+	extrema
+		() const;
+
+	//! **Area: Corners (combinatorials of (min,max) over all dimensions
+	template <typename Vertex>
+	inline
+	typename std::enable_if<(2uL == Dim), std::array<Vertex, 4u> >::type
+	extrema
+		() const;
+
+	//! **Volume: Corners (combinatorials of (min,max) over all dimensions
+	template <typename Vertex>
+	inline
+	typename std::enable_if<(3uL == Dim), std::array<Vertex, 8u> >::type
+	extrema
+		() const;
+
 	//! True if each range component contains corresponding component of value
 	inline
 	bool
@@ -150,15 +172,17 @@ public: // methods
 template <typename Type>
 using Length = Region<1u, Type>;
 
+/*
 //! Classic 2D region
 template <typename Type>
 using Area = Region<2u, Type>;
+*/
 
 //! Classic 3D region
 template <typename Type>
 using Volume = Region<3u, Type>;
 
-}
+} // dat
 
 
 // Inline definitions

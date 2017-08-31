@@ -34,12 +34,15 @@
 */
 
 
+#include "libtri/tri.h"
+
 #include "libdat/Area.h"
 #include "libdat/array.h"
 #include "libdat/MinMax.h"
 #include "libdat/validity.h"
 #include "libga/ga.h"
 #include "libmath/angle.h"
+#include "libtri/IsoGeo.h"
 
 #include <array>
 #include <string>
@@ -50,129 +53,10 @@
 
 namespace tri
 {
-	using Vec2D = std::array<double, 2u>;
 
 //! Individual tiles within tritille tessellation
 namespace tile
 {
-
-	//! Representation of tritille geometry;
-	struct TileGeo
-	{
-		// e.g. rows of transition matrix
-		Vec2D theBarU{{ dat::nullValue<double>(), dat::nullValue<double>() }};
-		Vec2D theBarV{{ dat::nullValue<double>(), dat::nullValue<double>() }};
-
-		//! Construct with null values
-		TileGeo
-			() = default;
-
-		//! Construct tessellation via defining parameters
-		explicit
-		TileGeo
-			( double const & da
-			, double const & db
-			, Vec2D const & avec //!< non-zero vector
-		//	, Vec2D uv0 // -- herein assumed to be {0.,0.}
-			)
-			: TileGeo()
-		{
-			using dat::operator*;
-			using dat::operator-;
-			using dat::operator+;
-
-			Vec2D const adir(dat::unit(avec));
-
-			Vec2D const bdir{{ -adir[1], adir[0] }};
-			Vec2D const uvec(da * adir - db * bdir);
-			Vec2D const udir(dat::unit(uvec));
-
-			Vec2D const vvec(da * adir + db * bdir);
-			Vec2D const vdir(dat::unit(vvec));
-
-			double const gamma{ dat::dot(udir, vdir) };
-
-			double const tmp{ 1. - math::sq(gamma) };
-			if (std::numeric_limits<double>::min() < tmp)
-			{
-				double const inv{ 1./tmp };
-				double const & alpha = inv;
-				double const beta{ -inv * gamma };
-				Vec2D const ubar(alpha*vdir + beta*udir);
-				Vec2D const vbar(alpha*udir + beta*vdir);
-
-				theBarU[0] = ubar[0];
-				theBarU[1] = ubar[1];
-				theBarV[0] = vbar[0];
-				theBarV[1] = vbar[1];
-			}
-		}
-
-		//! Projection of xrel onto udir axis
-		inline
-		double
-		mu
-			( Vec2D const & xrel //!< location relative to tile origin
-			) const
-		{
-			return dat::dot(theBarU, xrel);
-		}
-
-		//! Projection of xrel onto vdir axis
-		inline
-		double
-		nu
-			( Vec2D const & xrel //!< location relative to tile origin
-			) const
-		{
-			return dat::dot(theBarV, xrel);
-		}
-
-		//! The mu() and nu() values combined in a pair
-		inline
-		std::pair<double, double>
-		pairMuNu
-			( Vec2D const & xrel
-			) const
-		{
-			return { mu(xrel), nu(xrel) };
-		}
-
-		//! True if instance is valid
-		bool
-		isValid
-			() const
-		{
-			return
-				{  dat::isValid(theBarU)
-				&& dat::isValid(theBarV)
-				};
-		}
-
-		//! Descriptive information about this instance.
-		std::string
-		infoString
-			( std::string const & title = std::string()
-			) const
-		{
-			std::ostringstream oss;
-			if (! title.empty())
-			{
-				oss << title << std::endl;
-			}
-			if (isValid())
-			{
-				oss << dat::infoString(theBarU, "theBarU");
-				oss << std::endl;
-				oss << dat::infoString(theBarV, "theBarV");
-			}
-			else
-			{
-				oss << " <null>";
-			}
-			return oss.str();
-		}
-	};
 
 	//! A triple of (weighted) nodes within the tessellation
 	struct Triangle
@@ -189,12 +73,12 @@ namespace tile
 
 		/*! Interpolate value from a collection of properties
 		 *
+		 * PropSampFunc: Property sampling function. Must support
+		 *   PropType = PropSampFunc(size_t, size_t)
+		 *
 		 * PropType: Must support
 		 *   op: double * PropType
 		 *   op: PropType + PropType
-		 *
-		 * PropSampFunc: Property sampling function. Must support
-		 *   PropType = PropSampFunc(size_t, size_t)
 		*/
 		template <typename PropSampFunc>
 		inline
@@ -252,94 +136,6 @@ namespace tile
 		}
 	};
 
-	//! Transformation into tile coordinates
-	struct TileFinder
-	{
-		double theDelta;
-
-		//! Integer and fractional remainder associated with (value/delta)
-		static
-		inline
-		FracNdx
-		ndxFrac
-			( double const & value
-			, double const & delta
-			)
-		{
-			assert(std::numeric_limits<double>::min() < delta);
-			return FracNdx(value / delta);
-		}
-
-		//! Construct for tesselation with iso-triangle edge size delta
-		explicit
-		TileFinder
-			( double const & delta
-			)
-			: theDelta{ delta }
-		{ 
-		}
-
-		//! True if instance is valid
-		bool
-		isValid
-			() const
-		{
-			return dat::isValid(theDelta);
-		}
-
-		//! Return triangle tile based on tessellation coordinates
-		tile::Triangle
-		triangleFor
-			( double const & mu
-			, double const & nu
-			) const
-		{
-			tile::Triangle tri;
-
-			FracNdx const muNdxFrac{ ndxFrac(mu, theDelta) };
-			FracNdx const nuNdxFrac{ ndxFrac(nu, theDelta) };
-
-			size_t const & ndxI = muNdxFrac.theInt;
-			size_t const & ndxJ = nuNdxFrac.theInt;
-			double const & muFrac = muNdxFrac.theFrac;
-			double const & nuFrac = nuNdxFrac.theFrac;
-
-			if (muFrac < nuFrac)
-			{
-				// use triangle Tv
-				tri.theVerts[0].theI = ndxI;
-				tri.theVerts[0].theJ = ndxJ;
-				tri.theVerts[0].theW = 1. - nuFrac;
-
-				tri.theVerts[1].theI = ndxI + 1u;
-				tri.theVerts[1].theJ = ndxJ + 1u;
-				tri.theVerts[1].theW = muFrac;
-
-				tri.theVerts[2].theI = ndxI;
-				tri.theVerts[2].theJ = ndxJ + 1u;
-				tri.theVerts[2].theW = nuFrac - muFrac;
-			}
-			else
-			{
-				// use triangle Tu
-				tri.theVerts[0].theI = ndxI;
-				tri.theVerts[0].theJ = ndxJ;
-				tri.theVerts[0].theW = 1. - muFrac;
-
-				tri.theVerts[1].theI = ndxI + 1u;
-				tri.theVerts[1].theJ = ndxJ;
-				tri.theVerts[1].theW = muFrac - nuFrac;
-
-				tri.theVerts[2].theI = ndxI + 1u;
-				tri.theVerts[2].theJ = ndxJ + 1u;
-				tri.theVerts[2].theW = nuFrac;
-			}
-
-			return tri;
-		}
-
-	};
-
 } // tile
 
 
@@ -352,8 +148,61 @@ namespace tile
 */
 class IsoTille
 {
-	tile::TileGeo theTileGeo;
-	tile::TileFinder theTileFinder;
+	tri::IsoGeo theTileGeo;
+
+public: // static methods
+
+	//! Return triangle tile based on tessellation coordinates
+	static
+	tile::Triangle
+	triangleFor
+		( dat::Spot const & xrel
+		, IsoGeo const & tileGeo
+		)
+	{
+		tile::Triangle tri;
+
+		dat::QuantumFrac const muNdxFrac{ tileGeo.muNdxFrac(xrel) };
+		dat::QuantumFrac const nuNdxFrac{ tileGeo.nuNdxFrac(xrel) };
+
+		size_t const & ndxI = muNdxFrac.floor();
+		size_t const & ndxJ = nuNdxFrac.floor();
+		double const & muFrac = muNdxFrac.fraction();
+		double const & nuFrac = nuNdxFrac.fraction();
+
+		if (muFrac < nuFrac)
+		{
+			// use triangle Tv
+			tri.theVerts[0].theI = ndxI;
+			tri.theVerts[0].theJ = ndxJ;
+			tri.theVerts[0].theW = 1. - nuFrac;
+
+			tri.theVerts[1].theI = ndxI + 1u;
+			tri.theVerts[1].theJ = ndxJ + 1u;
+			tri.theVerts[1].theW = muFrac;
+
+			tri.theVerts[2].theI = ndxI;
+			tri.theVerts[2].theJ = ndxJ + 1u;
+			tri.theVerts[2].theW = nuFrac - muFrac;
+		}
+		else
+		{
+			// use triangle Tu
+			tri.theVerts[0].theI = ndxI;
+			tri.theVerts[0].theJ = ndxJ;
+			tri.theVerts[0].theW = 1. - muFrac;
+
+			tri.theVerts[1].theI = ndxI + 1u;
+			tri.theVerts[1].theJ = ndxJ;
+			tri.theVerts[1].theW = muFrac - nuFrac;
+
+			tri.theVerts[2].theI = ndxI + 1u;
+			tri.theVerts[2].theJ = ndxJ + 1u;
+			tri.theVerts[2].theW = nuFrac;
+		}
+
+		return tri;
+	}
 
 public: // methods
 
@@ -364,12 +213,9 @@ public: // methods
 	//! Construct tessellation of specified geometry
 	explicit
 	IsoTille
-		( double const & da
-		, double const & db
-		, Vec2D const & adir
+		( tri::IsoGeo const & geometry
 		)
-		: theTileGeo(da, db, adir)
-		, theTileFinder(std::hypot(da, db))
+		: theTileGeo{ geometry }
 	{
 	}
 
@@ -380,7 +226,6 @@ public: // methods
 	{
 		return
 			{  dat::isValid(theTileGeo)
-			&& dat::isValid(theTileFinder)
 			};
 	}
 
@@ -395,18 +240,7 @@ public: // methods
 		{
 			dat::MinMax<double> muMinMax;
 			dat::MinMax<double> nuMinMax;
-			std::array<double, 2u> const mins(areaXY.minimums());
-			std::array<double, 2u> const maxs(areaXY.maximums());
-			std::array<Vec2D, 4u> const xyCorners
-				{ Vec2D{{ mins[0], mins[1] }}
-				, Vec2D{{ mins[0], maxs[1] }}
-				, Vec2D{{ maxs[0], mins[1] }}
-				, Vec2D{{ maxs[0], maxs[1] }}
-				};
-io::out() << dat::infoString(xyCorners[0], "xyCorners[0]") << std::endl;
-io::out() << dat::infoString(xyCorners[1], "xyCorners[1]") << std::endl;
-io::out() << dat::infoString(xyCorners[2], "xyCorners[2]") << std::endl;
-io::out() << dat::infoString(xyCorners[3], "xyCorners[3]") << std::endl;
+			std::array<Vec2D, 4u> const xyCorners(areaXY.extrema<Vec2D>());
 			for (Vec2D const & xyCorner : xyCorners)
 			{
 				// expand the mu,nu dimensions (independently)
@@ -414,21 +248,11 @@ io::out() << dat::infoString(xyCorners[3], "xyCorners[3]") << std::endl;
 				double const nu{ theTileGeo.nu(xyCorner) };
 				muMinMax = muMinMax.expandedWith(mu);
 				nuMinMax = nuMinMax.expandedWith(nu);
-io::out()
-	<< "xy:"
-	<< " " << dat::infoString(xyCorner[0])
-	<< " " << dat::infoString(xyCorner[1])
-	<< "   "
-	<< "mn:"
-	<< " " << dat::infoString(mu)
-	<< " " << dat::infoString(nu)
-	<< std::endl;
 			}
 			mnArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
 		}
 		return mnArea;
 	}
-
 
 	//! Perform interpolation at xrel
 	template <typename SampFunc>
@@ -438,20 +262,9 @@ io::out()
 		, SampFunc const & propSampFunc
 		) const
 	{
-		double const mu{ theTileGeo.mu(xrel) };
-		double const nu{ theTileGeo.nu(xrel) };
-
-		tile::Triangle const tri{ theTileFinder.triangleFor(mu, nu) };
-
-io::out()
-	<< "..."
-	<< " " << "xrel"
-	<< " " << dat::infoString(xrel)
-	<< " " << "mu,nu"
-	<< " " << dat::infoString(mu)
-	<< " " << dat::infoString(nu)
-	<< std::endl;
-
+		// get triangle covering this area...
+		tile::Triangle const tri{ triangleFor(xrel, theTileGeo) };
+		// ... and return interpolated value
 		return tri.valueFrom<SampFunc>(propSampFunc);
 	}
 
@@ -469,8 +282,6 @@ io::out()
 		if (isValid())
 		{
 			oss << dat::infoString(theTileGeo, "theTileGeo");
-			oss << std::endl;
-			oss << dat::infoString(theTileFinder.theDelta, "delta");
 		}
 		else
 		{

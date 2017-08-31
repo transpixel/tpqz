@@ -256,7 +256,8 @@ main
 		double const da{ 1. }; // azimuth tritille spacing
 		double const db{ 1. }; // zenith tritille spacing
 		PairZA const adir{ 1., 0. }; // primary tesselation axis
-		tri::IsoTille const tin(da, db, adir);
+		tri::IsoGeo const geo(da, db, adir);
+		tri::IsoTille const tin(geo);
 
 		// check boundaries
 		dat::Range<double> const zenithRange{ 0., math::pi };

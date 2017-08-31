@@ -77,6 +77,16 @@ public: // methods
 	//	, Vec2D uv0 // -- herein assumed to be {0.,0.}
 		);
 
+	//! True if instance is valid
+	bool
+	isValid
+		() const;
+
+	//! Tessellation lattice spacing (same in both direction for iso-tritille)
+	double
+	delta
+		() const;
+
 	//! Projection of xrel onto udir axis
 	inline
 	double
@@ -117,11 +127,6 @@ public: // methods
 	areaMuNu
 		( dat::Area<double> const & areaXY
 		) const;
-
-	//! True if instance is valid
-	bool
-	isValid
-		() const;
 
 	//! Descriptive information about this instance.
 	std::string

@@ -79,6 +79,23 @@ IsoGeo :: IsoGeo
 	}
 }
 
+bool
+IsoGeo :: isValid
+	() const
+{
+	return
+		{  dat::isValid(theBarU)
+		&& dat::isValid(theBarV)
+		};
+}
+
+double
+IsoGeo :: delta
+	() const
+{
+	return std::hypot(theSplitterMu.theDelta, theSplitterNu.theDelta);
+}
+
 dat::Area<double>
 IsoGeo :: areaMuNu
 	( dat::Area<double> const & areaXY
@@ -100,16 +117,6 @@ IsoGeo :: areaMuNu
 		mnArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
 	}
 	return mnArea;
-}
-
-bool
-IsoGeo :: isValid
-	() const
-{
-	return
-		{  dat::isValid(theBarU)
-		&& dat::isValid(theBarV)
-		};
 }
 
 std::string

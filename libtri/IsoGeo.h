@@ -37,8 +37,8 @@
 #include "libdat/Area.h"
 #include "libdat/MinMax.h"
 #include "libdat/QuantumFrac.h"
+#include "libdat/Spot.h"
 #include "libmath/math.h"
-#include "libtri/tri.h"
 
 #include <string>
 
@@ -58,7 +58,7 @@ namespace tri
 
 class IsoGeo
 {
-public: // data
+	using Vec2D = std::array<double, 2u>;
 
 	// e.g. rows of transition matrix
 	dat::quantum::Splitter<long, double> theSplitterMu;
@@ -114,7 +114,7 @@ public: // methods
 	inline
 	double
 	mu
-		( Vec2D const & xrel //!< location relative to tile origin
+		( dat::Spot const & xrel //!< location relative to tile origin
 		) const
 	{
 		return dat::dot(theBarU, xrel);
@@ -124,7 +124,7 @@ public: // methods
 	inline
 	double
 	nu
-		( Vec2D const & xrel //!< location relative to tile origin
+		( dat::Spot const & xrel //!< location relative to tile origin
 		) const
 	{
 		return dat::dot(theBarV, xrel);
@@ -132,9 +132,9 @@ public: // methods
 
 	//! Projection of xrel onto (udir,vdir) axis
 	inline
-	Vec2D
+	dat::Spot
 	locMuNu
-		( Vec2D const & xrel //!< location relative to tile origin
+		( dat::Spot const & xrel //!< location relative to tile origin
 		) const
 	{
 		return {{ mu(xrel), nu(xrel) }};
@@ -143,7 +143,7 @@ public: // methods
 	//! Index and residual fraction along "u" direction
 	dat::QuantumFrac
 	muNdxFrac
-		( Vec2D const & xrel //!< location relative to tile origin
+		( dat::Spot const & xrel //!< location relative to tile origin
 		) const
 	{
 		return dat::QuantumFrac(mu(xrel), theSplitterMu);
@@ -152,7 +152,7 @@ public: // methods
 	//! Index and residual fraction along "v" direction
 	dat::QuantumFrac
 	nuNdxFrac
-		( Vec2D const & xrel //!< location relative to tile origin
+		( dat::Spot const & xrel //!< location relative to tile origin
 		) const
 	{
 		return dat::QuantumFrac(nu(xrel), theSplitterNu);
@@ -169,15 +169,9 @@ public: // methods
 		{
 			dat::MinMax<double> muMinMax;
 			dat::MinMax<double> nuMinMax;
-			std::array<double, 2u> const mins(areaXY.minimums());
-			std::array<double, 2u> const maxs(areaXY.maximums());
-			std::array<Vec2D, 4u> const xyCorners
-				{ Vec2D{{ mins[0], mins[1] }}
-				, Vec2D{{ mins[0], maxs[1] }}
-				, Vec2D{{ maxs[0], mins[1] }}
-				, Vec2D{{ maxs[0], maxs[1] }}
-				};
-			for (Vec2D const & xyCorner : xyCorners)
+			std::array<dat::Spot, 4u> const xyCorners
+				(areaXY.extrema<dat::Spot>());
+			for (dat::Spot const & xyCorner : xyCorners)
 			{
 				// expand the mu,nu dimensions (independently)
 				muMinMax = muMinMax.expandedWith(mu(xyCorner));

@@ -59,4 +59,5 @@ env.Append(LIBPATH=libpaths)
 
 #env.Program('demoCylinder.cpp')
 env.Program('demoSphere.cpp')
+env.Program('demoSquare.cpp')
 

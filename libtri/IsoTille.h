@@ -37,27 +37,16 @@
 #include "libtri/tri.h"
 
 #include "libdat/Area.h"
-#include "libdat/array.h"
-#include "libdat/MinMax.h"
+#include "libdat/Spot.h"
 #include "libdat/validity.h"
-#include "libga/ga.h"
-#include "libmath/angle.h"
 #include "libtri/IsoGeo.h"
 
 #include <array>
 #include <string>
-#include <sstream>
 
-
-// TODO - factor into .inl,.cpp files
 
 namespace tri
 {
-
-//! Individual tiles within tritille tessellation
-namespace tile
-{
-
 	//! A triple of (weighted) nodes within the tessellation
 	struct Triangle
 	{
@@ -107,37 +96,6 @@ namespace tile
 		}
 	};
 
-	//! Fractional index
-	struct FracNdx
-	{
-		long theInt{ dat::nullValue<long>() };
-		double theFrac{ dat::nullValue<double>() };
-
-		//! Construct a null instance
-		FracNdx
-			() = default;
-
-		//! Construct by splitting value into integer and remainders
-		explicit
-		FracNdx
-			( double const & value
-			)
-			// force rounding downward (e.g. unlike std::div)
-			: theInt{ static_cast<long>(std::floor(value)) }
-			, theFrac{ value - (double)theInt }
-		{ }
-
-		//! True if this instance is not null
-		bool
-		isValid
-			() const
-		{
-			return dat::isValid(theFrac);
-		}
-	};
-
-} // tile
-
 
 /*! \brief Iso-tritille interpolation entity.
 
@@ -154,55 +112,12 @@ public: // static methods
 
 	//! Return triangle tile based on tessellation coordinates
 	static
-	tile::Triangle
+	inline
+	Triangle
 	triangleFor
 		( dat::Spot const & xrel
 		, IsoGeo const & tileGeo
-		)
-	{
-		tile::Triangle tri;
-
-		dat::QuantumFrac const muNdxFrac{ tileGeo.muNdxFrac(xrel) };
-		dat::QuantumFrac const nuNdxFrac{ tileGeo.nuNdxFrac(xrel) };
-
-		size_t const & ndxI = muNdxFrac.floor();
-		size_t const & ndxJ = nuNdxFrac.floor();
-		double const & muFrac = muNdxFrac.fraction();
-		double const & nuFrac = nuNdxFrac.fraction();
-
-		if (muFrac < nuFrac)
-		{
-			// use triangle Tv
-			tri.theVerts[0].theI = ndxI;
-			tri.theVerts[0].theJ = ndxJ;
-			tri.theVerts[0].theW = 1. - nuFrac;
-
-			tri.theVerts[1].theI = ndxI + 1u;
-			tri.theVerts[1].theJ = ndxJ + 1u;
-			tri.theVerts[1].theW = muFrac;
-
-			tri.theVerts[2].theI = ndxI;
-			tri.theVerts[2].theJ = ndxJ + 1u;
-			tri.theVerts[2].theW = nuFrac - muFrac;
-		}
-		else
-		{
-			// use triangle Tu
-			tri.theVerts[0].theI = ndxI;
-			tri.theVerts[0].theJ = ndxJ;
-			tri.theVerts[0].theW = 1. - muFrac;
-
-			tri.theVerts[1].theI = ndxI + 1u;
-			tri.theVerts[1].theJ = ndxJ;
-			tri.theVerts[1].theW = muFrac - nuFrac;
-
-			tri.theVerts[2].theI = ndxI + 1u;
-			tri.theVerts[2].theJ = ndxJ + 1u;
-			tri.theVerts[2].theW = nuFrac;
-		}
-
-		return tri;
-	}
+		);
 
 public: // methods
 
@@ -214,88 +129,40 @@ public: // methods
 	explicit
 	IsoTille
 		( tri::IsoGeo const & geometry
-		)
-		: theTileGeo{ geometry }
-	{
-	}
+		);
 
 	//! True if instance is valid
 	bool
 	isValid
-		() const
-	{
-		return
-			{  dat::isValid(theTileGeo)
-			};
-	}
+		() const;
 
 	//! Limits (half open) on mu and nu values given domain area limits
 	dat::Area<double>
 	areaMuNu
 		( dat::Area<double> const & areaXY
-		) const
-	{
-		dat::Area<double> mnArea;
-		if (areaXY.isValid())
-		{
-			dat::MinMax<double> muMinMax;
-			dat::MinMax<double> nuMinMax;
-			std::array<Vec2D, 4u> const xyCorners(areaXY.extrema<Vec2D>());
-			for (Vec2D const & xyCorner : xyCorners)
-			{
-				// expand the mu,nu dimensions (independently)
-				double const mu{ theTileGeo.mu(xyCorner) };
-				double const nu{ theTileGeo.nu(xyCorner) };
-				muMinMax = muMinMax.expandedWith(mu);
-				nuMinMax = nuMinMax.expandedWith(nu);
-			}
-			mnArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
-		}
-		return mnArea;
-	}
+		) const;
 
 	//! Perform interpolation at xrel
 	template <typename SampFunc>
+	inline
 	typename SampFunc::value_type
 	operator()
 		( Vec2D const & xrel //!< location relative to tile origin
 		, SampFunc const & propSampFunc
-		) const
-	{
-		// get triangle covering this area...
-		tile::Triangle const tri{ triangleFor(xrel, theTileGeo) };
-		// ... and return interpolated value
-		return tri.valueFrom<SampFunc>(propSampFunc);
-	}
+		) const;
 
 	//! Descriptive information about this instance.
 	std::string
 	infoString
 		( std::string const & title = std::string()
-		) const
-	{
-		std::ostringstream oss;
-		if (! title.empty())
-		{
-			oss << title << std::endl;
-		}
-		if (isValid())
-		{
-			oss << dat::infoString(theTileGeo, "theTileGeo");
-		}
-		else
-		{
-			oss << " <null>";
-		}
-		return oss.str();
-	}
+		) const;
 
 }; // IsoTille
 
 } // tri
 
 // Inline definitions
-// #include "libtri/IsoTille.inl"
+#include "libtri/IsoTille.inl"
 
 #endif // tri_IsoTille_INCL_
 

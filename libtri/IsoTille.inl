@@ -38,13 +38,13 @@ namespace tri
 
 // static
 inline
-Triangle
+FaceVerts
 IsoTille :: triangleFor
 	( dat::Spot const & xrel
 	, IsoGeo const & tileGeo
 	)
 {
-	Triangle tri;
+	FaceVerts triangle;
 
 	dat::QuantumFrac const muNdxFrac{ tileGeo.muNdxFrac(xrel) };
 	dat::QuantumFrac const nuNdxFrac{ tileGeo.nuNdxFrac(xrel) };
@@ -57,35 +57,35 @@ IsoTille :: triangleFor
 	if (muFrac < nuFrac)
 	{
 		// use triangle Tv
-		tri.theVerts[0].theI = ndxI;
-		tri.theVerts[0].theJ = ndxJ;
-		tri.theVerts[0].theW = 1. - nuFrac;
+		triangle.theVerts[0].theI = ndxI;
+		triangle.theVerts[0].theJ = ndxJ;
+		triangle.theVerts[0].theW = 1. - nuFrac;
 
-		tri.theVerts[1].theI = ndxI + 1u;
-		tri.theVerts[1].theJ = ndxJ + 1u;
-		tri.theVerts[1].theW = muFrac;
+		triangle.theVerts[1].theI = ndxI + 1u;
+		triangle.theVerts[1].theJ = ndxJ + 1u;
+		triangle.theVerts[1].theW = muFrac;
 
-		tri.theVerts[2].theI = ndxI;
-		tri.theVerts[2].theJ = ndxJ + 1u;
-		tri.theVerts[2].theW = nuFrac - muFrac;
+		triangle.theVerts[2].theI = ndxI;
+		triangle.theVerts[2].theJ = ndxJ + 1u;
+		triangle.theVerts[2].theW = nuFrac - muFrac;
 	}
 	else
 	{
 		// use triangle Tu
-		tri.theVerts[0].theI = ndxI;
-		tri.theVerts[0].theJ = ndxJ;
-		tri.theVerts[0].theW = 1. - muFrac;
+		triangle.theVerts[0].theI = ndxI;
+		triangle.theVerts[0].theJ = ndxJ;
+		triangle.theVerts[0].theW = 1. - muFrac;
 
-		tri.theVerts[1].theI = ndxI + 1u;
-		tri.theVerts[1].theJ = ndxJ;
-		tri.theVerts[1].theW = muFrac - nuFrac;
+		triangle.theVerts[1].theI = ndxI + 1u;
+		triangle.theVerts[1].theJ = ndxJ;
+		triangle.theVerts[1].theW = muFrac - nuFrac;
 
-		tri.theVerts[2].theI = ndxI + 1u;
-		tri.theVerts[2].theJ = ndxJ + 1u;
-		tri.theVerts[2].theW = nuFrac;
+		triangle.theVerts[2].theI = ndxI + 1u;
+		triangle.theVerts[2].theJ = ndxJ + 1u;
+		triangle.theVerts[2].theW = nuFrac;
 	}
 
-	return tri;
+	return triangle;
 }
 
 template <typename SampFunc>
@@ -97,9 +97,9 @@ IsoTille :: operator()
 	) const
 {
 	// get triangle covering this area...
-	Triangle const tri{ triangleFor(xrel, theTileGeo) };
+	FaceVerts const triangle{ triangleFor(xrel, theTileGeo) };
 	// ... and return interpolated value
-	return tri.valueFrom<SampFunc>(propSampFunc);
+	return triangle.valueFrom<SampFunc>(propSampFunc);
 }
 
 } // tri

@@ -40,62 +40,13 @@
 #include "libdat/Spot.h"
 #include "libdat/validity.h"
 #include "libtri/IsoGeo.h"
+#include "libtri/FaceVerts.h"
 
-#include <array>
 #include <string>
 
 
 namespace tri
 {
-	//! A triple of (weighted) nodes within the tessellation
-	struct Triangle
-	{
-		//! Tessellation indices and weight associated with the (i,j)-th node
-		struct Vertex
-		{
-			size_t theI{ dat::nullValue<size_t>() };
-			size_t theJ{ dat::nullValue<size_t>() };
-			double theW{ dat::nullValue<double>() };
-		};
-
-		std::array<Vertex, 3u> theVerts{{}};
-
-		/*! Interpolate value from a collection of properties
-		 *
-		 * PropSampFunc: Property sampling function. Must support
-		 *   PropType = PropSampFunc(size_t, size_t)
-		 *
-		 * PropType: Must support
-		 *   op: double * PropType
-		 *   op: PropType + PropType
-		*/
-		template <typename PropSampFunc>
-		inline
-		typename PropSampFunc::value_type
-		valueFrom
-			( PropSampFunc const & propGrid
-			) const
-		{
-			size_t const & i1 = theVerts[0].theI;
-			size_t const & i2 = theVerts[1].theI;
-			size_t const & i3 = theVerts[2].theI;
-
-			size_t const & j1 = theVerts[0].theJ;
-			size_t const & j2 = theVerts[1].theJ;
-			size_t const & j3 = theVerts[2].theJ;
-
-			double const & w1 = theVerts[0].theW;
-			double const & w2 = theVerts[1].theW;
-			double const & w3 = theVerts[2].theW;
-
-			return
-				{ w1 * propGrid(i1, j1)
-				+ w2 * propGrid(i2, j2)
-				+ w3 * propGrid(i3, j3)
-				};
-		}
-	};
-
 
 /*! \brief Iso-tritille interpolation entity.
 
@@ -113,7 +64,7 @@ public: // static methods
 	//! Return triangle tile based on tessellation coordinates
 	static
 	inline
-	Triangle
+	FaceVerts
 	triangleFor
 		( dat::Spot const & xrel
 		, IsoGeo const & tileGeo

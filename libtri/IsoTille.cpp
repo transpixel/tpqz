@@ -59,30 +59,6 @@ IsoTille :: isValid
 		};
 }
 
-dat::Area<double>
-IsoTille :: areaMuNu
-	( dat::Area<double> const & areaXY
-	) const
-{
-	dat::Area<double> mnArea;
-	if (areaXY.isValid())
-	{
-		dat::MinMax<double> muMinMax;
-		dat::MinMax<double> nuMinMax;
-		std::array<Vec2D, 4u> const xyCorners(areaXY.extrema<Vec2D>());
-		for (Vec2D const & xyCorner : xyCorners)
-		{
-			// expand the mu,nu dimensions (independently)
-			double const mu{ theTileGeo.mu(xyCorner) };
-			double const nu{ theTileGeo.nu(xyCorner) };
-			muMinMax = muMinMax.expandedWith(mu);
-			nuMinMax = nuMinMax.expandedWith(nu);
-		}
-		mnArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
-	}
-	return mnArea;
-}
-
 std::string
 IsoTille :: infoString
 	( std::string const & title

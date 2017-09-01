@@ -36,7 +36,6 @@
 
 #include "libtri/tri.h"
 
-#include "libdat/Area.h"
 #include "libdat/Spot.h"
 #include "libdat/validity.h"
 #include "libtri/IsoGeo.h"
@@ -86,12 +85,6 @@ public: // methods
 	bool
 	isValid
 		() const;
-
-	//! Limits (half open) on mu and nu values given domain area limits
-	dat::Area<double>
-	areaMuNu
-		( dat::Area<double> const & areaXY
-		) const;
 
 	//! Perform interpolation at xrel
 	template <typename SampFunc>

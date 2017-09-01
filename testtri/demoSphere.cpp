@@ -263,7 +263,7 @@ main
 		dat::Range<double> const zenithRange{ 0., math::pi };
 		dat::Range<double> const azimuthRange{ 0., math::twoPi };
 		dat::Area<double> const zaArea{ zenithRange, azimuthRange };
-		dat::Area<double> const mnArea{ tin.areaMuNu(zaArea) };
+		dat::Area<double> const mnArea{ geo.mnArea(zaArea) };
 
 /*
 io::out() << std::endl;

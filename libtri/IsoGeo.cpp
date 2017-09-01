@@ -35,6 +35,7 @@
 #include "libtri/IsoGeo.h"
 
 #include "libdat/MinMax.h"
+#include "libga/ga.h"
 #include "libmath/math.h"
 
 #include <sstream>
@@ -78,6 +79,7 @@ IsoGeo :: IsoGeo
 		// set members
 		theSplitterMu = { da };
 		theSplitterNu = { db };
+		theDirA = adir;
 		theDirU = udir;
 		theDirV = vdir;
 		theBarU = ubar;
@@ -138,6 +140,44 @@ IsoGeo :: infoString
 	}
 	if (isValid())
 	{
+		ga::Vector const aVec(theDirA[0], theDirA[1], 0.);
+		ga::Vector const uVec(theDirU[0], theDirU[1], 0.);
+		ga::Vector const vVec(theDirV[0], theDirV[1], 0.);
+		ga::BiVector const angUwA
+			{ ga::spin::physicalAngleFrom(ga::spin::between(aVec, uVec)) };
+		ga::BiVector const angVwA
+			{ ga::spin::physicalAngleFrom(ga::spin::between(aVec, vVec)) };
+
+		double const uRad{ angUwA[2] };
+		double const vRad{ angVwA[2] };
+		double const uDeg{ uRad * 180. / math::pi };
+		double const vDeg{ vRad * 180. / math::pi };
+
+		oss << std::endl;
+		oss << dat::infoString(theSplitterMu.theDelta, "muDelta");
+		oss << std::endl;
+		oss << dat::infoString(theSplitterNu.theDelta, "nuDelta");
+
+		oss << std::endl;
+		oss
+			<< dat::infoString(theDirA, "theDirA")
+			;
+		oss << std::endl;
+		oss
+			<< dat::infoString(theDirU, "theDirU")
+			<< "  angleFromA:"
+			<< " " << dat::infoString(uRad) << " [rad]"
+			<< " " << dat::infoString(uDeg) << " [deg]"
+			;
+		oss << std::endl;
+		oss
+			<< dat::infoString(theDirV, "theDirV")
+			<< "  angleFromA:" 
+			<< " " << dat::infoString(vRad) << " [rad]"
+			<< " " << dat::infoString(vDeg) << " [deg]"
+			;
+
+		oss << std::endl;
 		oss << dat::infoString(theBarU, "theBarU");
 		oss << std::endl;
 		oss << dat::infoString(theBarV, "theBarV");

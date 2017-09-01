@@ -60,6 +60,7 @@ class IsoGeo
 	// e.g. rows of transition matrix
 	dat::quantum::Splitter<long, double> theSplitterMu;
 	dat::quantum::Splitter<long, double> theSplitterNu;
+	Vec2D theDirA{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theDirU{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theDirV{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theBarU{{ dat::nullValue<double>(), dat::nullValue<double>() }};

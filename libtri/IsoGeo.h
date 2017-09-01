@@ -89,6 +89,8 @@ public: // methods
 	delta
 		() const;
 
+private:
+
 	//! Projection of xyRel onto udir axis
 	inline
 	double
@@ -103,17 +105,19 @@ public: // methods
 		( dat::Spot const & xyRel //!< location relative to tile origin
 		) const;
 
-	//! Projection of xyRel onto (udir,vdir) axis
+public:
+
+	//! Projection of xyRel onto (udir,vdir) axis - relative to origin
 	inline
 	dat::Spot
-	locMuNu
+	mnLoc
 		( dat::Spot const & xyRel //!< location relative to tile origin
 		) const;
 
 	//! Reconstruction of (orthogonal) xyRel from (non-ortho) tile coordinates
 	inline
 	dat::Spot
-	locXY
+	xyRelative
 		( dat::Spot const & mnRel
 		) const;
 

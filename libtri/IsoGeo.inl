@@ -55,7 +55,7 @@ IsoGeo :: nu
 
 inline
 dat::Spot
-IsoGeo :: locMuNu
+IsoGeo :: mnLoc
 	( dat::Spot const & xrel //!< location relative to tile origin
 	) const
 {
@@ -64,7 +64,7 @@ IsoGeo :: locMuNu
 
 inline
 dat::Spot
-IsoGeo :: locXY
+IsoGeo :: xyRelative
 	( dat::Spot const & mnRel
 	) const
 {

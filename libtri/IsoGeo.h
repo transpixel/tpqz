@@ -37,7 +37,7 @@
 #include "libdat/Area.h"
 #include "libdat/QuantumFrac.h"
 #include "libdat/Spot.h"
-#include "libtri/tri.h"
+#include "libtri/Domain.h"
 
 #include <string>
 

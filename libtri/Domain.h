@@ -26,35 +26,87 @@
 //
 //
 
-#ifndef tri_tri_INCL_
-#define tri_tri_INCL_
+#ifndef tri_Domain_INCL_
+#define tri_Domain_INCL_
 
 /*! \file
-\brief Declarations for namespace tri
+\brief Declarations for tri::Domain
 */
 
 
 #include "libdat/Area.h"
-#include "libdat/array.h"
+
+#include <string>
 
 
-/*! \brief Triangulation related types and values
+namespace tri
+{
+
+/*! \brief Representation of region over which tritille nodes should be valid.
 
 \par Example
-\dontinclude testtri/utri.cpp
+\dontinclude testtri/uDomain.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-namespace tri
+class Domain
 {
-	//! Representation for tessellation domain locations.
-	using Vec2D = std::array<double, 2u>;
+
+protected: // data
+
+	dat::Area<double> theAreaBounds{};
+
+public: // methods
+
+	//! default null constructor
+	Domain
+		() = default;
+
+	//! Defined via rectangular area
+	explicit
+	Domain
+		( dat::Area<double> const & area
+		);
+
+	//! Noop dtor
+	virtual
+	~Domain
+		() = default;
+
+	//! Bounding area of valid domain region
+	dat::Area<double>
+	areaBounds
+		() const;
+
+public: // virtual methods
+
+	//! True if instance is valid
+	virtual
+	bool
+	isValid
+		() const;
+
+	//! True if xyLoc is within valid region of domain
+	virtual
+	bool
+	contains
+		( dat::Spot const & xyLoc
+		) const;
+
+	//! Descriptive information about this instance.
+	virtual
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // Domain
 
 } // tri
 
 // Inline definitions
-// #include "libtri/tri.inl"
+// #include "libtri/Domain.inl"
 
-#endif // tri_tri_INCL_
+#endif // tri_Domain_INCL_
 

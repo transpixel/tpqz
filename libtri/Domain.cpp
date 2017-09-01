@@ -26,35 +26,73 @@
 //
 //
 
-#ifndef tri_tri_INCL_
-#define tri_tri_INCL_
 
 /*! \file
-\brief Declarations for namespace tri
+\brief Definitions for tri::Domain
 */
 
 
-#include "libdat/Area.h"
-#include "libdat/array.h"
+#include "libtri/Domain.h"
 
-
-/*! \brief Triangulation related types and values
-
-\par Example
-\dontinclude testtri/utri.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
 
 namespace tri
 {
-	//! Representation for tessellation domain locations.
-	using Vec2D = std::array<double, 2u>;
+
+// explicit
+Domain :: Domain
+	( dat::Area<double> const & area
+	)
+	: theAreaBounds(area)
+{
+}
+
+dat::Area<double>
+Domain :: areaBounds
+	() const
+{
+	return theAreaBounds;
+}
+
+// virtual
+bool
+Domain :: isValid
+	() const
+{
+	return theAreaBounds.isValid();
+}
+
+// virtual
+bool
+Domain :: contains
+	( dat::Spot const & xyLoc
+	) const
+{
+	return theAreaBounds.contains(xyLoc);
+}
+
+// virtual
+std::string
+Domain :: infoString
+	( std::string const & title
+	) const
+{
+	return theAreaBounds.infoString(title);
+	/*
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << std::endl;
+	}
+	if (isValid())
+	{
+	}
+	else
+	{
+		oss << " <null>";
+	}
+	return oss.str();
+	*/
+}
 
 } // tri
-
-// Inline definitions
-// #include "libtri/tri.inl"
-
-#endif // tri_tri_INCL_
 

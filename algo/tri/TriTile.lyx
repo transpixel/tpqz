@@ -1056,9 +1056,143 @@ Forming the inner product of this equation with each of
 
 \begin_layout Standard
 \begin_inset Note Comment
-status collapsed
+status open
 
 \begin_layout Plain Layout
+Via matrices
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+\left[\begin{array}{cc}
+1 & \gamma\\
+\gamma & 1
+\end{array}\right]\left[\begin{array}{c}
+\mu\\
+\nu
+\end{array}\right]=\left[\begin{array}{c}
+u\cdot x\\
+v\cdot x
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+\mu\\
+\nu
+\end{array}\right]=\frac{1}{1-\gamma^{2}}\left[\begin{array}{cc}
+1 & -\gamma\\
+-\gamma & 1
+\end{array}\right]\left[\begin{array}{c}
+u\cdot x\\
+v\cdot x
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \frac{u\cdot x-\gamma v\cdot x}{1-\gamma^{2}}\\
+\nu & = & \frac{-\gamma u\cdot x+v\cdot x}{1-\gamma^{2}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \frac{1}{1-\gamma^{2}}\left(u\cdot x-\gamma v\cdot x\right)\\
+\nu & = & -\frac{1}{1-\gamma^{2}}\left(\gamma u\cdot x-v\cdot x\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \frac{1}{1-\gamma^{2}}\left(u\cdot x-\gamma v\cdot x\right)\\
+\nu & = & \frac{1}{1-\gamma^{2}}\left(v\cdot x-\gamma u\cdot x\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \frac{1}{1-\gamma^{2}}\left(u\cdot x-\gamma v\cdot x\right)\\
+\nu & = & \frac{1}{1-\gamma^{2}}\left(-\gamma u\cdot x+v\cdot x\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\alpha=\frac{1}{1-\gamma^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \alpha\left(u\cdot x-\gamma v\cdot x\right)\\
+\nu & = & \alpha\left(-\gamma u\cdot x+v\cdot x\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \alpha u\cdot x-\alpha\gamma v\cdot x\\
+\nu & = & -\alpha\gamma u\cdot x+\alpha v\cdot x
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\beta=-\alpha\gamma
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \alpha u\cdot x+\beta v\cdot x\\
+\nu & = & \beta u\cdot x+\alpha v\cdot x
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu & = & \left(\alpha u+\beta v\right)\cdot x\\
+\nu & = & \left(\beta u+\alpha v\right)\cdot x
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Algebraic solve for 
+\begin_inset Formula $\mu$
+\end_inset
+
+
 \begin_inset Formula 
 \begin{eqnarray*}
 \mu+\nu\gamma & = & x\cdot v\\
@@ -1134,7 +1268,7 @@ status collapsed
 
 \begin_inset Formula 
 \[
-\mu=x\cdot\left(\alpha v+\beta u\right)
+\mu=x\cdot\left(\alpha u+\beta v\right)
 \]
 
 \end_inset
@@ -1142,7 +1276,7 @@ status collapsed
 
 \begin_inset Formula 
 \[
-\alpha\equiv\frac{1}{1-\gamma^{2}}
+\beta\equiv\frac{1}{1-\gamma^{2}}
 \]
 
 \end_inset
@@ -1150,7 +1284,7 @@ status collapsed
 
 \begin_inset Formula 
 \[
-\beta=-\frac{\gamma}{1-\gamma^{2}}
+\alpha=-\gamma\beta
 \]
 
 \end_inset
@@ -1158,7 +1292,41 @@ status collapsed
 
 \begin_inset Formula 
 \[
-\mu=x\cdot v-\gamma\nu
+\mu=\left(\alpha u+\beta v\right)\cdot x
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Algebraic solve for 
+\begin_inset Formula $\nu$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu+\nu\gamma & = & x\cdot v\\
+\mu\gamma+\nu & = & x\cdot u
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+-\mu\gamma-\nu\gamma\gamma & = & -\gamma x\cdot v\\
+\mu\gamma+\nu & = & x\cdot u
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(1-\gamma^{2}\right)\nu=x\cdot\left(u-\gamma v\right)
 \]
 
 \end_inset
@@ -1166,39 +1334,7 @@ status collapsed
 
 \begin_inset Formula 
 \[
-\left(\mu\right)\gamma+\nu=x\cdot u
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\left(x\cdot v-\gamma\nu\right)\gamma+\nu=x\cdot u
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\gamma x\cdot v-\gamma^{2}\nu+\nu=x\cdot u
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\nu-\gamma^{2}\nu=x\cdot u-\gamma x\cdot v
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\nu=\frac{x\cdot u-\gamma x\cdot v}{1-\gamma^{2}}
+\nu=\left(1-\gamma^{2}\right)^{-1}x\cdot\left(u-\gamma v\right)
 \]
 
 \end_inset
@@ -1222,7 +1358,7 @@ status collapsed
 
 \begin_inset Formula 
 \[
-\nu=x\cdot\left(\alpha u+\beta v\right)
+\nu=\left(\beta u+\alpha v\right)\cdot x
 \]
 
 \end_inset
@@ -1245,10 +1381,10 @@ With some simple algebra, the values which satisfy this system may be expressed
 where
 \begin_inset Formula 
 \begin{eqnarray*}
-\overline{u} & \equiv & \alpha v+\beta u\\
-\overline{v} & \equiv & \alpha u+\beta v\\
-\alpha & \equiv & \left(1-\gamma^{2}\right)^{-1}\\
-\beta & \equiv & -\left(1-\gamma^{2}\right)^{-1}\gamma\\
+\overline{u} & \equiv & \alpha u+\beta v\\
+\overline{v} & \equiv & \beta u+\alpha v\\
+\beta & \equiv & \left(1-\gamma^{2}\right)^{-1}\\
+\alpha & \equiv & -\gamma\left(1-\gamma^{2}\right)^{-1}\\
 \gamma & \equiv & u\cdot v
 \end{eqnarray*}
 

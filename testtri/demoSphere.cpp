@@ -212,7 +212,7 @@ main
 	()
 {
 	using PropType = double;
-	using PairZA = tri::Vec2D;
+	using PairZA = dat::Spot;
 
 	//! Property sampling functor (for unit sphere)
 	struct PropertyStore

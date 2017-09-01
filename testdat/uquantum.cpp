@@ -60,6 +60,28 @@ dat_quantum_test0
 		oss << "infoString: " << dat::infoString(aNull) << std::endl;
 	}
 	*/
+
+	// check general convention
+	dat::quantum::Splitter<long, double> const split{ .25 };
+	std::pair<long, double> const expPos{ 3L*4L + 3L, 0. };
+	std::pair<long, double> const gotPos{ split(3.75) };
+	if (! dat::nearlyEquals(gotPos, expPos))
+	{
+		oss << "Failure of fractional delta positive value test" << std::endl;
+		oss << dat::infoString(expPos, "expPos") << std::endl;
+		oss << dat::infoString(gotPos, "gotPos") << std::endl;
+	}
+
+	std::pair<long, double> const expNeg{ -4L*4L + 1L, 0. };
+	std::pair<long, double> const gotNeg{ split(-3.75) };
+	if (! dat::nearlyEquals(gotNeg, expNeg))
+	{
+		oss << "Failure of fractional delta negative value test" << std::endl;
+		oss << dat::infoString(expNeg, "expNeg") << std::endl;
+		oss << dat::infoString(gotNeg, "gotNeg") << std::endl;
+	}
+
+
 	return oss.str();
 }
 

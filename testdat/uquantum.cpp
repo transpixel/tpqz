@@ -61,24 +61,51 @@ dat_quantum_test0
 	}
 	*/
 
+	constexpr double delta{ .25 };
+	dat::quantum::Splitter<long, double> const split{ delta };
+
 	// check general convention
-	dat::quantum::Splitter<long, double> const split{ .25 };
-	std::pair<long, double> const expPos{ 3L*4L + 3L, 0. };
-	std::pair<long, double> const gotPos{ split(3.75) };
-	if (! dat::nearlyEquals(gotPos, expPos))
 	{
-		oss << "Failure of fractional delta positive value test" << std::endl;
-		oss << dat::infoString(expPos, "expPos") << std::endl;
-		oss << dat::infoString(gotPos, "gotPos") << std::endl;
+		/*
+		*/
+		std::pair<long, double> const expPos{ 3L*4L + 3L, 0. };
+		std::pair<long, double> const gotPos{ split(3.75) };
+		if (! dat::nearlyEquals(gotPos, expPos))
+		{
+			oss << "Failure of whole delta positive value test" << '\n';
+			oss << dat::infoString(expPos, "expPos") << std::endl;
+			oss << dat::infoString(gotPos, "gotPos") << std::endl;
+		}
+
+		std::pair<long, double> const expNeg{ -4L*4L + 1L, 0. };
+		std::pair<long, double> const gotNeg{ split(-3.75) };
+		if (! dat::nearlyEquals(gotNeg, expNeg))
+		{
+			oss << "Failure of whole delta negative value test" << '\n';
+			oss << dat::infoString(expNeg, "expNeg") << std::endl;
+			oss << dat::infoString(gotNeg, "gotNeg") << std::endl;
+		}
 	}
 
-	std::pair<long, double> const expNeg{ -4L*4L + 1L, 0. };
-	std::pair<long, double> const gotNeg{ split(-3.75) };
-	if (! dat::nearlyEquals(gotNeg, expNeg))
+	// check fraction interpretations
 	{
-		oss << "Failure of fractional delta negative value test" << std::endl;
-		oss << dat::infoString(expNeg, "expNeg") << std::endl;
-		oss << dat::infoString(gotNeg, "gotNeg") << std::endl;
+		std::pair<long, double> const expPos{ 3L, .25 };
+		std::pair<long, double> const gotPos{ split(( (3.+.25))*delta) };
+		if (! dat::nearlyEquals(gotPos, expPos))
+		{
+			oss << "Failure of fractional delta positive value test" << '\n';
+			oss << dat::infoString(expPos, "expPos") << std::endl;
+			oss << dat::infoString(gotPos, "gotPos") << std::endl;
+		}
+
+		std::pair<long, double> const expNeg{ -4L, .75 };
+		std::pair<long, double> const gotNeg{ split((-(3.+.25))*delta) };
+		if (! dat::nearlyEquals(gotNeg, expNeg))
+		{
+			oss << "Failure of fractional delta negative value test" << '\n';
+			oss << dat::infoString(expNeg, "expNeg") << std::endl;
+			oss << dat::infoString(gotNeg, "gotNeg") << std::endl;
+		}
 	}
 
 
@@ -95,14 +122,15 @@ dat_quantum_test0
 		)
 	{
 		using FracType = DataType;
-		dat::quantum::Splitter<BaseType, FracType> const quantizer{ 7 };
+		constexpr DataType delta{ 7 };
+		dat::quantum::Splitter<BaseType, FracType> const quantizer{ delta };
 		using FloorResid = std::pair<BaseType, FracType>;
 		std::vector<std::pair<DataType, FloorResid> > const valExpPairs
-			{ {  9, {  1, 2 } }
-			, {  3, {  0, 3 } }
-			, {  0, {  0, 0 } }
-			, { -3, { -1, 4 } }
-			, { -9, { -2, 5 } }
+			{ {  9, {  1, DataType(2)/delta } }
+			, {  3, {  0, DataType(3)/delta } }
+			, {  0, {  0, DataType(0)/delta } }
+			, { -3, { -1, DataType(4)/delta } }
+			, { -9, { -2, DataType(5)/delta } }
 			};
 
 		for (std::pair<DataType, FloorResid> const & valExpPair : valExpPairs)
@@ -127,10 +155,9 @@ dat_quantum_test1
 {
 	std::ostringstream oss;
 
-	runTest<int, int>(oss, "int,int");
 	runTest<int, float>(oss, "int,float");
-	runTest<double, int>(oss, "double,int");
 	runTest<double, float>(oss, "double,float");
+	runTest<long, double>(oss, "long,double");
 
 	return oss.str();
 }

@@ -53,8 +53,15 @@ namespace dat
 
 namespace quantum
 {
-	//! Functor to split values into floor and fraction parts
-	template <typename BaseType, typename FracType>
+	/*! Functor to split values into floor and fraction parts.
+	 *
+	 * NOTE: FracType must support fractional parts of a quanta.
+	 *       E.g. a floating point type for integral BaseType.
+	 *
+	 */
+	template
+		< typename BaseType, typename FracType
+		>
 	struct Splitter
 	{
 		FracType theDelta; // { dat::nullValue<FracType>() };
@@ -65,6 +72,15 @@ namespace quantum
 		operator()
 			( FracType const & value
 			) const;
+
+		inline
+		FracType
+		value
+			( std::pair<BaseType, FracType> const & qfParts
+			) const
+		{
+			return (static_cast<FracType>(qfParts.first) + qfParts.second);
+		}
 	};
 
 

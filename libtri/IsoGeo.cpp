@@ -103,7 +103,7 @@ IsoGeo :: delta
 }
 
 dat::Area<double>
-IsoGeo :: areaMuNu
+IsoGeo :: mnArea
 	( dat::Area<double> const & areaXY
 	) const
 {

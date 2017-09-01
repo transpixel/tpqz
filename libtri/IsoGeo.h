@@ -137,7 +137,7 @@ public:
 
 	//! Limits (half open) on mu and nu values given domain area limits
 	dat::Area<double>
-	areaMuNu
+	mnArea
 		( dat::Area<double> const & areaXY
 		) const;
 

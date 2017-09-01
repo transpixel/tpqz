@@ -57,7 +57,7 @@ class NodeIterator
 {
 
 	IsoGeo theGeo{};
-	dat::Area<double> theDomainTest{}; // TODO replace with functor?
+	Domain theDomain;
 
 	std::pair<long, long> theMinMaxMu
 		{ dat::nullValue<long>(), dat::nullValue<long>() };
@@ -78,8 +78,7 @@ public: // methods
 	explicit
 	NodeIterator
 		( IsoGeo const & trigeo
-		, dat::Area<double> const & xyDomain // TODO replace with functor?
-	//	, dat::Area<double> const & mnRange
+		, Domain const & xyDomain
 		)
 		: NodeIterator()
 	{
@@ -95,7 +94,7 @@ public: // methods
 			assert (nuMin <= nuMax);
 
 			theGeo = trigeo;
-			theDomainTest = xyDomain;
+			theDomain = xyDomain;
 			theMinMaxMu = { muMin, muMax };
 			theMinMaxNu = { nuMin, nuMax };
 			theAtMuNu = { theMinMaxMu.first, theMinMaxNu.first };
@@ -181,7 +180,7 @@ private:
 	{
 		dat::Spot const mnSpot
 			{{ double(theAtMuNu.first), double(theAtMuNu.second) }};
-		return theDomainTest.contains(theGeo.xyRelative(mnSpot));
+		return theDomain.contains(theGeo.xyRelative(mnSpot));
 	}
 
 	//! Increment theAtMuNu to next node (whether valid or not)

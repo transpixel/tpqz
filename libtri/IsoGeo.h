@@ -37,6 +37,7 @@
 #include "libdat/Area.h"
 #include "libdat/QuantumFrac.h"
 #include "libdat/Spot.h"
+#include "libtri/tri.h"
 
 #include <string>
 
@@ -138,7 +139,7 @@ public:
 	//! Limits (half open) on mu and nu values given domain area limits
 	dat::Area<double>
 	mnArea
-		( dat::Area<double> const & areaXY
+		( Domain const & xyDomain
 		) const;
 
 	//! Descriptive information about this instance.

@@ -74,7 +74,8 @@ tri_NodeIterator_test1
 
 	dat::Range<double> xRange{ -10., 10. };
 	dat::Range<double> yRange{ -20., 20. };
-	dat::Area<double> xyDomain{ xRange, yRange };
+	dat::Area<double> xyBounds{ xRange, yRange };
+	tri::Domain const xyDomain{ xyBounds };
 
 	constexpr std::array<double, 2u> aDir{{ 0., 1. }};
 	tri::IsoGeo const trigeo( 5., 7., aDir);

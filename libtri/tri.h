@@ -34,6 +34,7 @@
 */
 
 
+#include "libdat/Area.h"
 #include "libdat/array.h"
 
 
@@ -49,6 +50,30 @@ namespace tri
 {
 	//! Representation for tessellation domain locations.
 	using Vec2D = std::array<double, 2u>;
+
+	//! Entity defining valid domain over which tritille is defined
+//	using Domain = dat::Area<double>;
+	struct Domain
+	{
+		dat::Area<double> theArea;
+
+		//! Bounding area of valid domain region
+		dat::Area<double>
+		areaBounds
+			() const
+		{
+			return theArea;
+		}
+
+		//! True if xyLoc is within valid region of domain
+		bool
+		contains
+			( dat::Spot const & xyLoc
+			) const
+		{
+			return theArea.contains(xyLoc);
+		}
+	};
 
 } // tri
 

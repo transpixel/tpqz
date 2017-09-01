@@ -104,10 +104,11 @@ IsoGeo :: delta
 
 dat::Area<double>
 IsoGeo :: mnArea
-	( dat::Area<double> const & areaXY
+	( Domain const & xyDomain
 	) const
 {
 	dat::Area<double> mnArea;
+	dat::Area<double> const areaXY{ xyDomain.areaBounds() };
 	if (areaXY.isValid())
 	{
 		dat::MinMax<double> muMinMax;

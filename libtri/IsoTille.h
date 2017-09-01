@@ -34,12 +34,11 @@
 */
 
 
-#include "libtri/tri.h"
-
 #include "libdat/Spot.h"
 #include "libdat/validity.h"
-#include "libtri/IsoGeo.h"
 #include "libtri/FaceVerts.h"
+#include "libtri/IsoGeo.h"
+#include "libtri/tri.h"
 
 #include <string>
 

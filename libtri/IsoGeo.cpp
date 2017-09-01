@@ -49,33 +49,39 @@ IsoGeo :: IsoGeo
 	, double const & db //!< secondary spacing (rhombus width)
 	, Vec2D const & avec //!< non-zero vector for primary alignment
 	)
-	: theSplitterMu{ da }
-	, theSplitterNu{ db }
+	: IsoGeo()
 {
 	using dat::operator*;
 	using dat::operator-;
 	using dat::operator+;
 
+	// definte orthogonal tiling axes
 	Vec2D const adir(dat::unit(avec));
 	Vec2D const bdir{{ -adir[1], adir[0] }};
 
+	// define (non-orthogonal) tessellation directions
 	Vec2D const udir(dat::unit(da * adir - db * bdir));
 	Vec2D const vdir(dat::unit(da * adir + db * bdir));
 
+	// check for singularity
 	double const gamma{ dat::dot(udir, vdir) };
 	double const tmp{ 1. - math::sq(gamma) };
 	if (std::numeric_limits<double>::min() < tmp)
 	{
+		// compute cache values
 		double const inv{ 1./tmp };
 		double const & beta = inv;
 		double const alpha{ -inv * gamma };
 		Vec2D const ubar(alpha*udir +  beta*vdir);
 		Vec2D const vbar( beta*udir + alpha*vdir);
 
-		theBarU[0] = ubar[0];
-		theBarU[1] = ubar[1];
-		theBarV[0] = vbar[0];
-		theBarV[1] = vbar[1];
+		// set members
+		theSplitterMu = { da };
+		theSplitterNu = { db };
+		theDirU = udir;
+		theDirV = vdir;
+		theBarU = ubar;
+		theBarV = vbar;
 	}
 }
 

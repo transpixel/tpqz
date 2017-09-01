@@ -59,6 +59,8 @@ class IsoGeo
 	// e.g. rows of transition matrix
 	dat::quantum::Splitter<long, double> theSplitterMu;
 	dat::quantum::Splitter<long, double> theSplitterNu;
+	Vec2D theDirU{{ dat::nullValue<double>(), dat::nullValue<double>() }};
+	Vec2D theDirV{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theBarU{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theBarV{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 
@@ -87,39 +89,46 @@ public: // methods
 	delta
 		() const;
 
-	//! Projection of xrel onto udir axis
+	//! Projection of xyRel onto udir axis
 	inline
 	double
 	mu
-		( dat::Spot const & xrel //!< location relative to tile origin
+		( dat::Spot const & xyRel //!< location relative to tile origin
 		) const;
 
-	//! Projection of xrel onto vdir axis
+	//! Projection of xyRel onto vdir axis
 	inline
 	double
 	nu
-		( dat::Spot const & xrel //!< location relative to tile origin
+		( dat::Spot const & xyRel //!< location relative to tile origin
 		) const;
 
-	//! Projection of xrel onto (udir,vdir) axis
+	//! Projection of xyRel onto (udir,vdir) axis
 	inline
 	dat::Spot
 	locMuNu
-		( dat::Spot const & xrel //!< location relative to tile origin
+		( dat::Spot const & xyRel //!< location relative to tile origin
+		) const;
+
+	//! Reconstruction of (orthogonal) xyRel from (non-ortho) tile coordinates
+	inline
+	dat::Spot
+	locXY
+		( dat::Spot const & mnRel
 		) const;
 
 	//! Index and residual fraction along "u" direction
 	inline
 	dat::QuantumFrac
 	muNdxFrac
-		( dat::Spot const & xrel //!< location relative to tile origin
+		( dat::Spot const & xyRel //!< location relative to tile origin
 		) const;
 
 	//! Index and residual fraction along "v" direction
 	inline
 	dat::QuantumFrac
 	nuNdxFrac
-		( dat::Spot const & xrel //!< location relative to tile origin
+		( dat::Spot const & xyRel //!< location relative to tile origin
 		) const;
 
 	//! Limits (half open) on mu and nu values given domain area limits

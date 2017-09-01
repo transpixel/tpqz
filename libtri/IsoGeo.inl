@@ -63,6 +63,17 @@ IsoGeo :: locMuNu
 }
 
 inline
+dat::Spot
+IsoGeo :: locXY
+	( dat::Spot const & mnRel
+	) const
+{
+	using dat::operator*;
+	using dat::operator+;
+	return (mnRel[0]*theDirU + mnRel[1]*theDirV);
+}
+
+inline
 dat::QuantumFrac
 IsoGeo :: muNdxFrac
 	( dat::Spot const & xrel //!< location relative to tile origin

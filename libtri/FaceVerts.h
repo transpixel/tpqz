@@ -65,11 +65,12 @@ struct FaceVerts
 	/*! Interpolate value from a collection of properties
 	 *
 	 * PropSampFunc: Property sampling function. Must support
-	 *   PropType = PropSampFunc(size_t, size_t)
+	 *   PropType = PropSampFunc(size_t, size_t) const
+	 *   using value_type = PropType
 	 *
-	 * PropType: Must support
-	 *   op: double * PropType
-	 *   op: PropType + PropType
+	 * Need operations for:
+	 *   op+(PropType const &, PropType const &)
+	 *   op*(double, PropType const &)
 	*/
 	template <typename PropSampFunc>
 	inline
@@ -90,11 +91,11 @@ struct FaceVerts
 		double const & w2 = theVerts[1].theW;
 		double const & w3 = theVerts[2].theW;
 
-		return
-			{ w1 * propGrid(i1, j1)
+		return typename PropSampFunc::value_type
+			( w1 * propGrid(i1, j1)
 			+ w2 * propGrid(i2, j2)
 			+ w3 * propGrid(i3, j3)
-			};
+			);
 	}
 
 }; // FaceVerts

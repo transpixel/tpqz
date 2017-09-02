@@ -34,9 +34,11 @@
 */
 
 
-#include "libdat/template.h"
+#include "libdat/info.h"
+#include "libdat/validity.h"
 
 #include <cmath>
+#include <sstream>
 #include <utility>
 
 
@@ -64,15 +66,36 @@ namespace quantum
 		>
 	struct Splitter
 	{
-		FracType theDelta; // { dat::nullValue<FracType>() };
+		FracType theDelta{ dat::nullValue<FracType>() };
+		FracType theInvDelta{ dat::nullValue<FracType>() };
 
-		//! Split value into module and fraction parts
+		//! Construct a null instance
+		inline
+		explicit
+		Splitter
+			() = default;
+
+		//! Value ctor.
+		inline
+		explicit
+		Splitter
+			( FracType const & delta
+			);
+
+		//! True if instance is valid
+		inline
+		bool
+		isValid
+			() const;
+
+		//! Split value into floor and fraction parts
 		inline
 		std::pair<BaseType, FracType>
 		operator()
 			( FracType const & value
 			) const;
 
+		//! Reconstitute value from quantum parts
 		inline
 		FracType
 		value
@@ -83,6 +106,13 @@ namespace quantum
 				{ static_cast<FracType>(qfParts.first) + qfParts.second };
 			return (valueInQuanta * theDelta);
 		}
+
+		//! Descriptive information about this instance.
+		inline
+		std::string
+		infoString
+			( std::string const & title = {}
+			) const;
 	};
 
 

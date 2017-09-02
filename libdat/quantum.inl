@@ -32,14 +32,35 @@
 */
 
 
-#include <cassert>
-
-
 namespace dat
 {
 
 namespace quantum
 {
+
+template
+	< typename BaseType, typename FracType
+	>
+inline
+// explicit
+Splitter<BaseType, FracType> :: Splitter
+	( FracType const & delta
+	)
+	: theDelta{ delta }
+	, theInvDelta{ FracType{ 1 } / theDelta }
+{
+}
+
+template
+	< typename BaseType, typename FracType
+	>
+inline
+bool
+Splitter<BaseType, FracType> :: isValid
+	() const
+{
+	return dat::isValid(theDelta);
+}
 
 template
 	< typename BaseType, typename FracType
@@ -55,9 +76,7 @@ Splitter<BaseType, FracType> :: operator()
 	FracType & residInQuanta = qfValue.second;
 
 	// normalize input w.r.t. quanta size
-	constexpr FracType fOne{ 1 };
-	FracType const invDelta{ (fOne/theDelta) };
-	FracType const valueInQuanta{ invDelta * valueInReal };
+	FracType const valueInQuanta{ theInvDelta * valueInReal };
 
 	// determine floor
 	FracType const floorInQuanta{ std::floor(valueInQuanta) };
@@ -67,6 +86,35 @@ Splitter<BaseType, FracType> :: operator()
 	residInQuanta = valueInQuanta - floorInQuanta;
 
 	return qfValue;
+}
+
+template
+	< typename BaseType, typename FracType
+	>
+inline
+std::string
+Splitter<BaseType, FracType> :: infoString
+	( std::string const & title
+	) const
+{
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << " ";
+	}
+	if (isValid())
+	{
+		oss
+			<< "delta,inv:"
+			<< " " << dat::infoString(theDelta)
+			<< " " << dat::infoString(theInvDelta)
+			;
+	}
+	else
+	{
+		oss << " <null>";
+	}
+	return oss.str();
 }
 
 } // quantum

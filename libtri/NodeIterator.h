@@ -85,27 +85,32 @@ public: // methods
 		dat::Area<double> const mnRange{ trigeo.tileAreaForRefArea(xyDomain) };
 		if (mnRange.isValid())
 		{
+			// get bounding (mu,nu) limits of tile space
 			dat::Spot const tileSpotBeg{{ mnRange[0].min(), mnRange[1].min() }};
 			dat::Spot const tileSpotEnd{{ mnRange[0].max(), mnRange[1].max() }};
 
+			// transform to index+resid form
 			IsoGeo::QuantPair const fracPairBeg
 				(trigeo.fracPairForTileSpot(tileSpotBeg));
 			IsoGeo::QuantPair const fracPairEnd
 				(trigeo.fracPairForTileSpot(tileSpotEnd));
 
+			// identify node indices with STL style iterators
 			long const & iBeg = fracPairBeg.first.theFloor;
 			long const iEnd{ fracPairEnd.first.theFloor + 1 };
 			long const & jBeg = fracPairBeg.second.theFloor;
 			long const jEnd{ fracPairEnd.second.theFloor + 1 };
-
 			assert (iBeg < iEnd);
 			assert (jBeg < jEnd);
 
+			// set member vars
 			theGeo = trigeo;
 			theDomain = xyDomain;
 			theBegEndI = { iBeg, iEnd };
 			theBegEndJ = { jBeg, jEnd };
 			theAtIJ = { theBegEndI.first, theBegEndJ.first };
+
+			// ensure first node is over valid domain location (or end)
 			theIsActive = true; // assume unless contradicted
 			if (! atNodeIsValid())
 			{

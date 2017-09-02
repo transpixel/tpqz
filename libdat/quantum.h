@@ -79,7 +79,9 @@ namespace quantum
 			( std::pair<BaseType, FracType> const & qfParts
 			) const
 		{
-			return (static_cast<FracType>(qfParts.first) + qfParts.second);
+			FracType const valueInQuanta
+				{ static_cast<FracType>(qfParts.first) + qfParts.second };
+			return (valueInQuanta * theDelta);
 		}
 	};
 

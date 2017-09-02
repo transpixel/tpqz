@@ -32,9 +32,6 @@
 */
 
 
-#include "libio/stream.h"
-#include "libdat/info.h"
-
 #include <cassert>
 
 
@@ -90,10 +87,11 @@ Splitter<BaseType, FracType> :: operator()
 		FracType fracResid{ magResid / theDelta };
 
 		constexpr FracType fOne{ 1 };
-		if (fOne == fracResid)
+		if (fOne <= fracResid)
 		{
 			++numDeltas;
 			fracResid = fracResid - fOne;
+			assert(fracResid < fOne);
 		}
 
 		bfResult = { numDeltas, fracResid };

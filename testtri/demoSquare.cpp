@@ -33,6 +33,7 @@
 
 #include "libtri/IsoTille.h"
 
+#include "libapp/Timer.h"
 #include "libdat/cast.h"
 #include "libdat/ExtentsIterator.h"
 #include "libdat/grid.h"
@@ -89,7 +90,7 @@ namespace example
 			, long const & keyJ
 			) const
 		{
-			DataType samp;
+			DataType samp(dat::nullValue<double>(), dat::nullValue<double>());
 			KeyType const key{ keyI, keyJ };
 			std::map<KeyType, DataType>::const_iterator
 				const itFind{ theSamps.find(key) };
@@ -130,9 +131,9 @@ namespace example
 		( dat::Spot const & xyLoc
 		)
 	{
+		// return { xyLoc[0], xyLoc[1] }; // linear
 		DataType const tmp{ xyLoc[0], xyLoc[1] };
 		return math::sq(tmp);
-		// return { xyLoc[0], xyLoc[1] }; // linear
 	}
 
 	//! Generate samples over domain - (from planar surface)
@@ -296,36 +297,48 @@ main
 	, char const * const * const // argv
 	)
 {
-	// define iso-tritille geometry
-	constexpr double deltaHigh{ 1./80. };
-	constexpr double deltaWide{ 1./110. };
-
-	constexpr size_t gridHigh{ 4u * 1024u };
-	constexpr size_t gridWide{ 4u * 1024u };
-
-	// define tessellation geometry
-	constexpr std::array<double, 2u> aDir{{ .125, 1. }};
-	tri::IsoGeo const trigeo(deltaHigh, deltaWide, aDir);
-
 	// define area domain (simple square)
 	dat::Range<double> xRange{ -1., 1. };
 	dat::Range<double> yRange{ -1., 1. };
 	dat::Area<double> xyArea{ xRange, yRange };
 	tri::Domain const xyDomain{ xyArea };
 
+	// define iso-tritille geometry
+	constexpr double deltaHigh{ 1./128. };
+	constexpr double deltaWide{ 1./128. };
+
+	constexpr size_t gridHigh{ 4u * 1024u };
+	constexpr size_t gridWide{ 4u * 1024u };
+
+	app::Timer timer;
+
+	// define tessellation geometry
+	constexpr std::array<double, 2u> aDir{{ .125, 1. }};
+	tri::IsoGeo const trigeo(deltaHigh, deltaWide, aDir);
+
 	// construct tritille
 	tri::IsoTille const trinet(trigeo, xyDomain);
 
+io::out() << dat::infoString(trinet, "trinet") << std::endl;
+io::out() << std::endl;
+
 	// generate samples at each tritille node
+	timer.start("pool.genSamples");
 	example::SamplePool const samples(example::poolOfSamples(trinet));
+	timer.stop();
 
 	// interpolate surface value at raster grid locations
 	size_t numNull{ 0u };
-	size_t numInDom{ 0u };
+	size_t numGridInDom{ 0u };
 	size_t numDiff{ 0u };
 	double sumSqDiff{ 0. };
+	timer.start("trinet.nodes");
+	size_t const numNodeInDom{ trinet.sizeValidNodes() };
+	timer.stop();
+
 
 	// check tritille interpolation at raster locations
+	timer.start("raster.interp");
 	dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
 	dat::Extents gridSize{ gridHigh, gridWide };
 	math::MapSizeArea const map(gridSize, rngArea);
@@ -339,7 +352,7 @@ main
 
 		if (xyDomain.contains(xySpot))
 		{
-			++numInDom;
+			++numGridInDom;
 		}
 
 		// expected value (from test case surface model)
@@ -360,22 +373,25 @@ main
 			++numNull;
 		}
 	}
+	timer.stop();
 
 	assert(0u < numDiff);
 	double const diffPerNode{ std::sqrt(sumSqDiff / double(numDiff)) };
 	constexpr double tolPerNode{ math::eps };
-//	if (! (diffPerNode < tolPerNode))
-	{
-		io::out() << "Failure of interpolation test" << std::endl;
-		io::out() << dat::infoString(numNull, "numNull") << std::endl;
-		io::out() << dat::infoString(numInDom, "numInDom") << std::endl;
-		io::out() << dat::infoString(numDiff, "numDiff") << std::endl;
-		io::out()
-			<< dat::infoString(sumSqDiff, "sumSqDiff") << '\n'
-			<< "diffPerNode: " << io::sprintf("%12.5e", diffPerNode) << '\n'
-			<< " tolPerNode: " << io::sprintf("%12.5e", tolPerNode) << '\n'
-			<< '\n';
-	}
+
+	io::out() << "Failure of interpolation test" << std::endl;
+	io::out() << dat::infoString(numNull, "numNull") << std::endl;
+	io::out() << dat::infoString(numDiff, "numDiff") << std::endl;
+	io::out()
+		<< dat::infoString(sumSqDiff, "sumSqDiff") << '\n'
+		<< "diffPerNode: " << io::sprintf("%12.5e", diffPerNode) << '\n'
+		<< " tolPerNode: " << io::sprintf("%12.5e", tolPerNode) << '\n'
+		<< '\n';
+
+	// report information
+	io::out() << dat::infoString(numNodeInDom, "numNodeInDom") << std::endl;
+	io::out() << dat::infoString(numGridInDom, "numGridInDom") << std::endl;
+	io::out() << dat::infoString(timer, "timer") << std::endl;
 
 	constexpr bool saveGrid{ false };
 	if (saveGrid)

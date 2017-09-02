@@ -43,6 +43,11 @@ libpaths = \
 	, '../libmath/'
 
 	, '../libio/'
+
+	, '../libapp/'
+#	, '../libmem/'
+#	, '../libdat/'
+#	, '../libsys/'
 	]
 
 linklibs = \
@@ -52,6 +57,11 @@ linklibs = \
 	, 'math'
 
 	, 'io'
+
+	, 'app'
+#	, 'mem'
+#	, 'dat'
+#	, 'sys'
 	]
 
 env.Append(LIBS=linklibs)

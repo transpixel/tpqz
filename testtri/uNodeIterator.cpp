@@ -82,43 +82,44 @@ tri_NodeIterator_test1
 	constexpr double db{ 7. };
 	tri::IsoGeo const trigeo( da, db, aDir);
 
-	// determine acceptable iterator
+	// determine acceptable nodes
 	std::set<std::pair<long, long> > expMuNus;
 	{
-		dat::Area<double> const mnRange{ trigeo.mnAreaForXY(xyDomain) };
+		dat::Area<double> const mnRange{ trigeo.tileAreaForRefArea(xyDomain) };
 		long const muBeg{ (long)std::floor(mnRange[0].min() / da) };
 		long const muEnd{ (long)std::ceil(mnRange[0].max() / da) };
 		long const nuBeg{ (long)std::floor(mnRange[1].min() / db) };
 		long const nuEnd{ (long)std::ceil(mnRange[1].max() / db) };
-		for (long ndxNu{nuBeg} ; ndxNu <= nuEnd ; ++ndxNu)
+		for (long ndxJ{nuBeg} ; ndxJ <= nuEnd ; ++ndxJ)
 		{
-			for (long ndxMu{muBeg} ; ndxMu <= muEnd ; ++ndxMu)
+			for (long ndxI{muBeg} ; ndxI <= muEnd ; ++ndxI)
 			{
-				dat::Spot const mnLoc
-					(trigeo.mnLocForNode({ ndxMu, ndxNu }));
-				dat::Spot const xyLoc(trigeo.xyLocForMuNu(mnLoc));
+				tri::IsoGeo::QuantPair const fracPair
+					(trigeo.fracPairForIndices(ndxI, ndxJ));
+				dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
 				if (xyDomain.contains(xyLoc))
 				{
-					expMuNus.insert(std::make_pair(ndxMu, ndxNu));
+					expMuNus.insert(std::make_pair(ndxI, ndxJ));
 				}
 			}
 		}
 	}
 	assert(! expMuNus.empty());
 
+	// get nodes from iterator
 	std::set<std::pair<long, long> > gotMuNus;
 	for (tri::NodeIterator iter(trigeo, xyDomain) ; iter ; ++iter)
 	{
-		gotMuNus.insert(*iter);
+		gotMuNus.insert(iter.indexPair());
 	}
 
 	/*
-	std::ofstream ofsExp("nodeIter_exp.dat");
+	std::ofstream ofsExp("test_exp.dat");
 	for (std::pair<long, long> const & expMuNu : expMuNus)
 	{
 		ofsExp << dat::infoString(expMuNu, "expMuNu") << std::endl;
 	}
-	std::ofstream ofsGot("nodeIter_got.dat");
+	std::ofstream ofsGot("test_got.dat");
 	for (std::pair<long, long> const & gotMuNu : gotMuNus)
 	{
 		ofsGot << dat::infoString(gotMuNu, "gotMuNu") << std::endl;

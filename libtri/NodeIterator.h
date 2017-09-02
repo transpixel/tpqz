@@ -59,12 +59,12 @@ class NodeIterator
 	IsoGeo theGeo{};
 	Domain theDomain;
 
-	std::pair<long, long> theMinMaxMu
+	std::pair<long, long> theBegEndI
 		{ dat::nullValue<long>(), dat::nullValue<long>() };
-	std::pair<long, long> theMinMaxNu
+	std::pair<long, long> theBegEndJ
 		{ dat::nullValue<long>(), dat::nullValue<long>() };
 
-	std::pair<long, long> theAtMuNu
+	std::pair<long, long> theAtIJ
 		{ dat::nullValue<long>(), dat::nullValue<long>() };
 	bool theIsActive{ false };
 
@@ -82,21 +82,30 @@ public: // methods
 		)
 		: NodeIterator()
 	{
-		dat::Area<double> const mnRange{ trigeo.mnAreaForXY(xyDomain) };
+		dat::Area<double> const mnRange{ trigeo.tileAreaForRefArea(xyDomain) };
 		if (mnRange.isValid())
 		{
-			long const muMin{ trigeo.indexForMu(mnRange[0].min()) };
-			long const muMax{ trigeo.indexForMu(mnRange[0].max()) };
-			long const nuMin{ trigeo.indexForNu(mnRange[1].min()) };
-			long const nuMax{ trigeo.indexForNu(mnRange[1].max()) };
-			assert (muMin <= muMax);
-			assert (nuMin <= nuMax);
+			dat::Spot const tileSpotBeg{{ mnRange[0].min(), mnRange[1].min() }};
+			dat::Spot const tileSpotEnd{{ mnRange[0].max(), mnRange[1].max() }};
+
+			IsoGeo::QuantPair const fracPairBeg
+				(trigeo.fracPairForTileSpot(tileSpotBeg));
+			IsoGeo::QuantPair const fracPairEnd
+				(trigeo.fracPairForTileSpot(tileSpotEnd));
+
+			long const & iBeg = fracPairBeg.first.theFloor;
+			long const iEnd{ fracPairEnd.first.theFloor + 1 };
+			long const & jBeg = fracPairBeg.second.theFloor;
+			long const jEnd{ fracPairEnd.second.theFloor + 1 };
+
+			assert (iBeg < iEnd);
+			assert (jBeg < jEnd);
 
 			theGeo = trigeo;
 			theDomain = xyDomain;
-			theMinMaxMu = { muMin, muMax };
-			theMinMaxNu = { nuMin, nuMax };
-			theAtMuNu = { theMinMaxMu.first, theMinMaxNu.first };
+			theBegEndI = { iBeg, iEnd };
+			theBegEndJ = { jBeg, jEnd };
+			theAtIJ = { theBegEndI.first, theBegEndJ.first };
 			theIsActive = true; // assume unless contradicted
 			if (! atNodeIsValid())
 			{
@@ -116,11 +125,19 @@ public: // methods
 
 	//! Index pair associated with current (valid) iterator
 	inline
-	std::pair<long, long>
-	operator*
+	IsoGeo::QuantPair
+	fracPair
 		() const
 	{
-		return theAtMuNu;
+		return fracPairAt();
+	}
+
+	inline
+	std::pair<long, long>
+	indexPair
+		() const
+	{
+		return { theAtIJ.first, theAtIJ.second };
 	}
 
 	//! Advance to next valid node (node in the domain)
@@ -148,19 +165,19 @@ public: // methods
 		// oss << theGeo.infoString("theGeo");
 		// oss << std::endl;
 
-		oss << "muMinMax: " << dat::infoString(theMinMaxMu);
+		oss << "theBegEndI: " << dat::infoString(theBegEndI);
 
 		oss << std::endl;
-		oss << "nuMinMax: " << dat::infoString(theMinMaxNu);
+		oss << "theBegEndJ: " << dat::infoString(theBegEndJ);
 
 		oss << std::endl;
-		if (dat::isValid(theAtMuNu))
+		if (dat::isValid(theAtIJ))
 		{
-			oss << "atMuNu: " << dat::infoString(theAtMuNu);
+			oss << "theAtIJ: " << dat::infoString(theAtIJ);
 		}
 		else
 		{
-			oss << "theAtMuNu: " << "<null>";
+			oss << "theAtIJ: " << "<null>";
 		}
 
 		oss << std::endl;
@@ -171,36 +188,43 @@ public: // methods
 
 private:
 
+	//! QuantPair for current position
+	inline
+	IsoGeo::QuantPair
+	fracPairAt
+		() const
+	{
+		return theGeo.fracPairForIndices(theAtIJ.first, theAtIJ.second);
+	}
+
 	//! True if xyLoc is within domain area
 	inline
 	bool
 	atNodeIsValid
 		() const
 	{
-		double const mu{ theGeo.muFromIndex(theAtMuNu.first) };
-		double const nu{ theGeo.nuFromIndex(theAtMuNu.second) };
-		dat::Spot const mnLoc{{ mu, nu }};
-		return theDomain.contains(theGeo.xyLocForMuNu(mnLoc));
+		dat::Spot const xyLoc(theGeo.refSpotForFracPair(fracPairAt()));
+		return theDomain.contains(xyLoc);
 	}
 
-	//! Increment theAtMuNu to next node (whether valid or not)
+	//! Increment theAtIJ to next node (whether valid or not)
 	inline
 	void
 	advanceToNextAny
 		()
 	{
-		long & ndxAtMu = theAtMuNu.first;
-		long & ndxAtNu = theAtMuNu.second;
-		++ndxAtNu;
-		if (theMinMaxNu.second < ndxAtNu)
+		long & ndxAtI = theAtIJ.first;
+		long & ndxAtJ = theAtIJ.second;
+		++ndxAtJ;
+		if (theBegEndJ.second < ndxAtJ)
 		{
-			ndxAtNu = theMinMaxNu.first;
-			++ndxAtMu;
-			if (theMinMaxMu.second < ndxAtMu)
+			ndxAtJ = theBegEndJ.first;
+			++ndxAtI;
+			if (theBegEndI.second < ndxAtI)
 			{
 				theIsActive = false;
-				ndxAtMu = dat::nullValue<long>();
-				ndxAtNu = dat::nullValue<long>();
+				ndxAtI = dat::nullValue<long>();
+				ndxAtJ = dat::nullValue<long>();
 			}
 		}
 	}

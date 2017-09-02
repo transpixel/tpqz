@@ -195,8 +195,10 @@ namespace sample
 		sample::SamplePool pool;
 		for (tri::NodeIterator iter(trigeo, domain) ; iter ; ++iter)
 		{
-			SamplePool::KeyType const key(*iter);
-			dat::Spot const xyLoc(trigeo.xyLocForNode(key));
+			SamplePool::KeyType const key(iter.indexPair());
+			tri::IsoGeo::QuantPair const fracPair
+				(trigeo.fracPairForIndices(key.first, key.second));
+			dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
 			pool.addSample(valueOnPlaneFor(xyLoc), key);
 		}
 		return pool;
@@ -237,14 +239,16 @@ io::out() << std::endl;
 	std::ofstream ofs("testExpGot.dat");
 	for (tri::NodeIterator iter(trigeo, xyDomain) ; iter ; ++iter)
 	{
-		std::pair<long, long> const mnNdxs{ *iter };
-		dat::Spot const xyLoc(trigeo.xyLocForNode(mnNdxs));
+		std::pair<long, long> const mnNdxs{ iter.indexPair() };
+		tri::IsoGeo::QuantPair const fracPair
+			(trigeo.fracPairForIndices(mnNdxs.first, mnNdxs.second));
+		dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
 		sample::DataType const expSamp{ sample::valueOnPlaneFor(xyLoc) };
 
 		if (xyDomain.contains(xyLoc))
 		{
 			sample::DataType const gotSamp{ trinet(xyLoc, samples) };
-			dat::Spot const mnLoc(trigeo.mnLocForNode(mnNdxs));
+			dat::Spot const mnLoc(trigeo.tileSpotForFracPair(fracPair));
 			io::out()
 				<< " " << dat::infoString(mnLoc, "r.mnLoc")
 				<< " " << dat::infoString(xyLoc, "r.xyLoc")
@@ -262,7 +266,7 @@ io::out() << std::endl;
 	}
 
 	// interpolate tritille samples at raster grid locations
-	dat::Area<double> const rngArea{ trigeo.mnAreaForXY(xyDomain) };
+	dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
 	dat::grid<sample::DataType> surfSamps(17u, 19u);
 	math::MapSizeArea const map(surfSamps.hwSize(), rngArea);
 	for (dat::ExtentsIterator iter{surfSamps.hwSize()} ; iter ; ++iter)

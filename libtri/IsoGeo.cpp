@@ -97,19 +97,12 @@ IsoGeo :: isValid
 		};
 }
 
-double
-IsoGeo :: delta
-	() const
-{
-	return std::hypot(theSplitterMu.theDelta, theSplitterNu.theDelta);
-}
-
 dat::Area<double>
-IsoGeo :: mnAreaForXY
+IsoGeo :: tileAreaForRefArea
 	( Domain const & xyDomain
 	) const
 {
-	dat::Area<double> mnArea;
+	dat::Area<double> tileArea;
 	dat::Area<double> const areaXY{ xyDomain.areaBounds() };
 	if (areaXY.isValid())
 	{
@@ -119,13 +112,21 @@ IsoGeo :: mnAreaForXY
 			(areaXY.extrema<dat::Spot>());
 		for (dat::Spot const & xyCorner : xyCorners)
 		{
+			dat::Spot const mnSpot(tileSpotForRefSpot(xyCorner));
 			// expand the mu,nu dimensions (independently)
-			muMinMax = muMinMax.expandedWith(muForXY(xyCorner));
-			nuMinMax = nuMinMax.expandedWith(nuForXY(xyCorner));
+			muMinMax = muMinMax.expandedWith(mnSpot[0]);
+			nuMinMax = nuMinMax.expandedWith(mnSpot[1]);
 		}
-		mnArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
+		tileArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
 	}
-	return mnArea;
+	return tileArea;
+}
+
+double
+IsoGeo :: delta
+	() const
+{
+	return std::hypot(theSplitterMu.theDelta, theSplitterNu.theDelta);
 }
 
 std::string

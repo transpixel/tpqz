@@ -47,7 +47,7 @@ IsoTille :: triangleFor
 	FaceVerts triangle;
 
 	std::pair<dat::QuantumFrac, dat::QuantumFrac>
-		const mnNodeFracPair{ tileGeo.cellPairForXY(xyLoc) };
+		const mnNodeFracPair{ tileGeo.fracPairForRefSpot(xyLoc) };
 	dat::QuantumFrac const & muNodeFrac = mnNodeFracPair.first;
 	dat::QuantumFrac const & nuNodeFrac = mnNodeFracPair.second;
 

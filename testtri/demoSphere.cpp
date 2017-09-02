@@ -264,7 +264,7 @@ main
 		dat::Range<double> const azimuthRange{ 0., math::twoPi };
 		dat::Area<double> const zaArea{ zenithRange, azimuthRange };
 		tri::Domain const zaDomain{ zaArea };
-		dat::Area<double> const mnArea{ trigeo.mnAreaForXY(zaDomain) };
+		dat::Area<double> const mnArea{ trigeo.tileAreaForRefArea(zaDomain) };
 
 /*
 io::out() << std::endl;

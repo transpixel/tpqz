@@ -47,6 +47,16 @@ namespace tri
 
 /*! \brief Geometry associated with an iso-tritille.
 
+Terminology is based on three reference frames:
+\arg Ref: The original domain in which tritille is defined.
+\arg Tile: The (skew) frame associated with "a", "u" and "v" edge directions.
+\arg Node: The quantized frame for node indices and fractional locations.
+
+Note the reference frame is orthogonal, while the Tile and Node frames are
+(in general) not. Locations in the Ref and Tile frames are associated with
+2D floating point values via dat::Spot. Locations in the node frame are
+specified with dat::Quantum values.
+
 \par Example
 \dontinclude testtri/uIsoGeo.cpp
 \skip ExampleStart
@@ -67,6 +77,8 @@ class IsoGeo
 	Vec2D theBarV{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 
 public: // methods
+
+	using QuantPair = std::pair<dat::QuantumFrac, dat::QuantumFrac>;
 
 	//! Construct with null values
 	IsoGeo
@@ -91,98 +103,76 @@ public: // methods
 	delta
 		() const;
 
-private:
+	//
+	// Tile locations
+	//
 
-	//! Projection of xyLoc onto udir axis
-	inline
-	double
-	muForXY
-		( dat::Spot const & xyLoc //!< location relative to tile origin
-		) const;
-
-	//! Projection of xyLoc onto vdir axis
-	inline
-	double
-	nuForXY
-		( dat::Spot const & xyLoc //!< location relative to tile origin
-		) const;
-
-public:
-
-	//! Projection of xyLoc onto (udir,vdir) axis - relative to origin
+	//! Projection of refSpot onto (udir,vdir) axis - relative to origin
 	inline
 	dat::Spot
-	mnLocForXY
-		( dat::Spot const & xyLoc //!< location relative to tile origin
-		) const;
-
-	//! Limits (half open) on mu and nu values given domain area limits
-	dat::Area<double>
-	mnAreaForXY
-		( Domain const & xyDomain
-		) const;
-
-	//! Node index and fraction into cell along ("u","v") directions
-	inline
-	std::pair<dat::QuantumFrac, dat::QuantumFrac>
-	cellPairForXY
-		( dat::Spot const & xyLoc
-		) const;
-
-	//! Node index associated with mu value
-	inline
-	long
-	indexForMu
-		( double const & mu
-		) const;
-
-	//! Node index associated with nu value
-	inline
-	long
-	indexForNu
-		( double const & nu
-		) const;
-
-	//! Value of mu from node index in "u" direction
-	inline
-	double
-	muFromIndex
-		( long const & muNdx
-		) const;
-
-	//! Value of nu from node index in "v" direction
-	inline
-	double
-	nuFromIndex
-		( long const & nuNdx
+	tileSpotForRefSpot
+		( dat::Spot const & refSpot //!< location relative to tile origin
 		) const;
 
 	//! Range value of (mu,nu) for node with indices
 	inline
 	dat::Spot
-	mnLocForNode
-		( std::pair<long, long> const & ndxPairMuNu
+	tileSpotForFracPair
+		( QuantPair const & fracPair
+		) const;
+
+	//
+	// Node locations
+	//
+
+	//! Node index and fraction into cell along ("u","v") directions
+	inline
+	QuantPair
+	fracPairForRefSpot
+		( dat::Spot const & refSpot
 		) const;
 
 	//! Node index and fraction into cell along ("u","v") directions
 	inline
-	std::pair<dat::QuantumFrac, dat::QuantumFrac>
-	cellPairForMuNu
-		( dat::Spot const & mnLoc
+	QuantPair
+	fracPairForTileSpot
+		( dat::Spot const & tileSpot
 		) const;
 
-	//! Reconstruction of (orthogonal) xyLoc from (non-ortho) tile coordinates
+	//! Node index and fraction at exact node location
+	inline
+	QuantPair
+	fracPairForIndices
+		( long const & ndxI
+		, long const & ndxJ
+		) const;
+
+	//
+	// Ref locations
+	//
+
+	//! Reconstruction of (orthogonal) refSpot from (non-ortho) tile coords
 	inline
 	dat::Spot
-	xyLocForMuNu
-		( dat::Spot const & mnRel
+	refSpotForTileSpot
+		( dat::Spot const & tileSpot
 		) const;
 
 	//! Domain value of (x,y) for node with indices
 	inline
 	dat::Spot
-	xyLocForNode
-		( std::pair<long, long> const & ndxPairMuNu
+	refSpotForFracPair
+		( QuantPair const & fracPair
+		) const;
+
+	//
+	// General
+	//
+
+	//! Limits (half open) on mu and nu values given domain area limits
+	dat::Area<double>
+	tileAreaForRefArea
+		( Domain const & xyDomain
 		) const;
 
 	//! Descriptive information about this instance.

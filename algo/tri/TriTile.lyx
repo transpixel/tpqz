@@ -1098,44 +1098,17 @@ v\cdot x
 
 
 \begin_inset Formula 
-\begin{eqnarray*}
-\mu & = & \frac{u\cdot x-\gamma v\cdot x}{1-\gamma^{2}}\\
-\nu & = & \frac{-\gamma u\cdot x+v\cdot x}{1-\gamma^{2}}
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu & = & \frac{1}{1-\gamma^{2}}\left(u\cdot x-\gamma v\cdot x\right)\\
-\nu & = & -\frac{1}{1-\gamma^{2}}\left(\gamma u\cdot x-v\cdot x\right)
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu & = & \frac{1}{1-\gamma^{2}}\left(u\cdot x-\gamma v\cdot x\right)\\
-\nu & = & \frac{1}{1-\gamma^{2}}\left(v\cdot x-\gamma u\cdot x\right)
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu & = & \frac{1}{1-\gamma^{2}}\left(u\cdot x-\gamma v\cdot x\right)\\
-\nu & = & \frac{1}{1-\gamma^{2}}\left(-\gamma u\cdot x+v\cdot x\right)
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
 \[
-\alpha=\frac{1}{1-\gamma^{2}}
+\left[\begin{array}{c}
+\mu\\
+\nu
+\end{array}\right]=\left[\begin{array}{cc}
+\alpha & \alpha\\
+\beta & \alpha
+\end{array}\right]\left[\begin{array}{c}
+u\cdot x\\
+v\cdot x
+\end{array}\right]
 \]
 
 \end_inset
@@ -1143,223 +1116,9 @@ v\cdot x
 
 \begin_inset Formula 
 \begin{eqnarray*}
-\mu & = & \alpha\left(u\cdot x-\gamma v\cdot x\right)\\
-\nu & = & \alpha\left(-\gamma u\cdot x+v\cdot x\right)
+\alpha & = & \frac{1}{1-\gamma^{2}}\\
+\beta & = & \frac{-\gamma}{1-\gamma^{2}}
 \end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu & = & \alpha u\cdot x-\alpha\gamma v\cdot x\\
-\nu & = & -\alpha\gamma u\cdot x+\alpha v\cdot x
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\beta=-\alpha\gamma
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu & = & \alpha u\cdot x+\beta v\cdot x\\
-\nu & = & \beta u\cdot x+\alpha v\cdot x
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu & = & \left(\alpha u+\beta v\right)\cdot x\\
-\nu & = & \left(\beta u+\alpha v\right)\cdot x
-\end{eqnarray*}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-Algebraic solve for 
-\begin_inset Formula $\mu$
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu+\nu\gamma & = & x\cdot v\\
-\mu\gamma+\nu & = & x\cdot u
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\nu=x\cdot u-\gamma\mu
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu+\gamma\left(x\cdot u-\gamma\mu\right)=x\cdot v
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu+\gamma x\cdot u-\gamma\gamma\mu=x\cdot v
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu-\gamma\gamma\mu=x\cdot v-\gamma x\cdot u
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu=\frac{x\cdot v-\gamma x\cdot u}{1-\gamma^{2}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu=\frac{x\cdot\left(v-\gamma u\right)}{1-\gamma^{2}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu=x\cdot\frac{v-\gamma u}{1-\gamma^{2}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu=x\cdot\left(\frac{1}{1-\gamma^{2}}v-\frac{\gamma}{1-\gamma^{2}}u\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu=x\cdot\left(\alpha u+\beta v\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\beta\equiv\frac{1}{1-\gamma^{2}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\alpha=-\gamma\beta
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mu=\left(\alpha u+\beta v\right)\cdot x
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-Algebraic solve for 
-\begin_inset Formula $\nu$
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
-\mu+\nu\gamma & = & x\cdot v\\
-\mu\gamma+\nu & = & x\cdot u
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{eqnarray*}
--\mu\gamma-\nu\gamma\gamma & = & -\gamma x\cdot v\\
-\mu\gamma+\nu & = & x\cdot u
-\end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\left(1-\gamma^{2}\right)\nu=x\cdot\left(u-\gamma v\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\nu=\left(1-\gamma^{2}\right)^{-1}x\cdot\left(u-\gamma v\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\nu=\frac{x\cdot\left(u-\gamma v\right)}{1-\gamma^{2}}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\nu=x\cdot\left(\frac{u}{1-\gamma^{2}}-\frac{\gamma v}{1-\gamma^{2}}\right)
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\nu=\left(\beta u+\alpha v\right)\cdot x
-\]
 
 \end_inset
 
@@ -1383,8 +1142,8 @@ where
 \begin{eqnarray*}
 \overline{u} & \equiv & \alpha u+\beta v\\
 \overline{v} & \equiv & \beta u+\alpha v\\
-\beta & \equiv & \left(1-\gamma^{2}\right)^{-1}\\
-\alpha & \equiv & -\gamma\left(1-\gamma^{2}\right)^{-1}\\
+\alpha & \equiv & \left(1-\gamma^{2}\right)^{-1}\\
+\beta & \equiv & -\gamma\left(1-\gamma^{2}\right)^{-1}\\
 \gamma & \equiv & u\cdot v
 \end{eqnarray*}
 

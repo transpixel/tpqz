@@ -39,7 +39,6 @@
 #include "libtri/IsoGeo.h"
 
 #include <string>
-#include <sstream>
 
 
 namespace tri
@@ -79,117 +78,37 @@ public: // methods
 	NodeIterator
 		( IsoGeo const & trigeo
 		, Domain const & xyDomain
-		)
-		: NodeIterator()
-	{
-		dat::Area<double> const mnRange{ trigeo.tileAreaForRefArea(xyDomain) };
-		if (mnRange.isValid())
-		{
-			// get bounding (mu,nu) limits of tile space
-			dat::Spot const tileSpotBeg{{ mnRange[0].min(), mnRange[1].min() }};
-			dat::Spot const tileSpotEnd{{ mnRange[0].max(), mnRange[1].max() }};
-
-			// transform to index+resid form
-			IsoGeo::QuantPair const fracPairBeg
-				(trigeo.fracPairForTileSpot(tileSpotBeg));
-			IsoGeo::QuantPair const fracPairEnd
-				(trigeo.fracPairForTileSpot(tileSpotEnd));
-
-			// identify node indices with STL style iterators
-			long const & iBeg = fracPairBeg.first.theFloor;
-			long const iEnd{ fracPairEnd.first.theFloor + 1 };
-			long const & jBeg = fracPairBeg.second.theFloor;
-			long const jEnd{ fracPairEnd.second.theFloor + 1 };
-			assert (iBeg < iEnd);
-			assert (jBeg < jEnd);
-
-			// set member vars
-			theGeo = trigeo;
-			theDomain = xyDomain;
-			theBegEndI = { iBeg, iEnd };
-			theBegEndJ = { jBeg, jEnd };
-			theAtIJ = { theBegEndI.first, theBegEndJ.first };
-
-			// ensure first node is over valid domain location (or end)
-			theIsActive = true; // assume unless contradicted
-			if (! atNodeIsValid())
-			{
-				advanceToNextValid();
-			}
-		}
-	}
+		);
 
 	//! True if iterator is currently active (not at end)
 	inline
 	explicit
 	operator bool
-		() const
-	{
-		return theIsActive;
-	}
+		() const;
 
-	//! Index pair associated with current (valid) iterator
+	//! Node location (index+resid) associated with current (valid) iterator
 	inline
 	IsoGeo::QuantPair
 	fracPair
-		() const
-	{
-		return fracPairAt();
-	}
+		() const;
 
+	//! Index pair associated with current (valid) iterator
 	inline
 	std::pair<long, long>
 	indexPair
-		() const
-	{
-		return { theAtIJ.first, theAtIJ.second };
-	}
+		() const;
 
 	//! Advance to next valid node (node in the domain)
 	inline
 	NodeIterator &
 	operator++
-		()
-	{
-		advanceToNextValid();
-		return *this;
-	}
+		();
 
 	//! Descriptive information about this instance.
 	std::string
 	infoString
 		( std::string const & title = std::string()
-		) const
-	{
-		std::ostringstream oss;
-		if (! title.empty())
-		{
-			oss << title << std::endl;
-		}
-
-		// oss << theGeo.infoString("theGeo");
-		// oss << std::endl;
-
-		oss << "theBegEndI: " << dat::infoString(theBegEndI);
-
-		oss << std::endl;
-		oss << "theBegEndJ: " << dat::infoString(theBegEndJ);
-
-		oss << std::endl;
-		if (dat::isValid(theAtIJ))
-		{
-			oss << "theAtIJ: " << dat::infoString(theAtIJ);
-		}
-		else
-		{
-			oss << "theAtIJ: " << "<null>";
-		}
-
-		oss << std::endl;
-		oss << "active: " << dat::infoString(theIsActive);
-
-		return oss.str();
-	}
+		) const;
 
 private:
 
@@ -197,62 +116,32 @@ private:
 	inline
 	IsoGeo::QuantPair
 	fracPairAt
-		() const
-	{
-		return theGeo.fracPairForIndices(theAtIJ.first, theAtIJ.second);
-	}
+		() const;
 
 	//! True if xyLoc is within domain area
 	inline
 	bool
 	atNodeIsValid
-		() const
-	{
-		dat::Spot const xyLoc(theGeo.refSpotForFracPair(fracPairAt()));
-		return theDomain.contains(xyLoc);
-	}
+		() const;
 
 	//! Increment theAtIJ to next node (whether valid or not)
 	inline
 	void
 	advanceToNextAny
-		()
-	{
-		long & ndxAtI = theAtIJ.first;
-		long & ndxAtJ = theAtIJ.second;
-		++ndxAtJ;
-		if (theBegEndJ.second < ndxAtJ)
-		{
-			ndxAtJ = theBegEndJ.first;
-			++ndxAtI;
-			if (theBegEndI.second < ndxAtI)
-			{
-				theIsActive = false;
-				ndxAtI = dat::nullValue<long>();
-				ndxAtJ = dat::nullValue<long>();
-			}
-		}
-	}
+		();
 
 	//! Increment iterator until pointing to next valid instance (or end)
 	inline
 	void
 	advanceToNextValid
-		()
-	{
-		do
-		{
-			advanceToNextAny();
-		}
-		while (theIsActive && (! atNodeIsValid()));
-	}
+		();
 
 }; // NodeIterator
 
 } // tri
 
 // Inline definitions
-// #include "libtri/NodeIterator.inl"
+#include "libtri/NodeIterator.inl"
 
 #endif // tri_NodeIterator_INCL_
 

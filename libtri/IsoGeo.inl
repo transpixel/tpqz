@@ -91,8 +91,8 @@ IsoGeo :: fracPairForIndices
 	) const
 {
 	return
-		{ dat::QuantumFrac(double(ndxI), theSplitterMu)
-		, dat::QuantumFrac(double(ndxJ), theSplitterNu)
+		{ dat::QuantumFrac(double(ndxI), 0., theSplitterMu)
+		, dat::QuantumFrac(double(ndxJ), 0., theSplitterNu)
 		};
 }
 

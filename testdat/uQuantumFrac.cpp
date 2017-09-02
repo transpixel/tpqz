@@ -69,23 +69,24 @@ dat_QuantumFrac_test1
 {
 	std::ostringstream oss;
 
-	dat::quantum::Splitter<long, double> const delta{ 5. };
+	constexpr double delta{ 5. };
+	dat::quantum::Splitter<long, double> const splitter{ 5. };
 	std::vector<std::pair<double, dat::QuantumFrac> > const valExpPairs
-		{ {  5.00, dat::QuantumFrac( 1L,  .00, delta) }
-		, {  6.00, dat::QuantumFrac( 1L, 1.00, delta) }
-		, {  6.25, dat::QuantumFrac( 1L, 1.25, delta) }
-		, { 10.00, dat::QuantumFrac( 2L,  .00, delta) }
-		, {   .00, dat::QuantumFrac( 0L, 0.00, delta) }
-		, { -5.00, dat::QuantumFrac(-1L,  .00, delta) }
-		, { -6.25, dat::QuantumFrac(-2L, 3.75, delta) }
-		, {-10.00, dat::QuantumFrac(-2L,  .00, delta) }
+		{ {  5.00, dat::QuantumFrac( 1L,  .00/delta, splitter) }
+		, {  6.00, dat::QuantumFrac( 1L, 1.00/delta, splitter) }
+		, {  6.25, dat::QuantumFrac( 1L, 1.25/delta, splitter) }
+		, { 10.00, dat::QuantumFrac( 2L,  .00/delta, splitter) }
+		, {   .00, dat::QuantumFrac( 0L, 0.00/delta, splitter) }
+		, { -5.00, dat::QuantumFrac(-1L,  .00/delta, splitter) }
+		, { -6.25, dat::QuantumFrac(-2L, 3.75/delta, splitter) }
+		, {-10.00, dat::QuantumFrac(-2L,  .00/delta, splitter) }
 		};
 
 	for (std::pair<double, dat::QuantumFrac> const & valExpPair : valExpPairs)
 	{
 		double const & value = valExpPair.first;
 		dat::QuantumFrac const & expQF = valExpPair.second;
-		dat::QuantumFrac const gotQF(value, delta);
+		dat::QuantumFrac const gotQF(value, splitter);
 		if (! gotQF.nearlyEquals(expQF))
 		{
 			oss << "Failure of quantization test" << std::endl;

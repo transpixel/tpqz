@@ -40,6 +40,7 @@
 #include "libdat/grid.h"
 #include "libdat/validity.h"
 #include "libmath/MapSizeArea.h"
+#include "libmath/math.h"
 
 #include "libio/stream.h"
 
@@ -74,6 +75,20 @@ namespace sample
 			: theABC{{ aa, bb, cc }}
 		{ }
 
+		bool
+		isValid
+			() const
+		{
+			return dat::isValid(theABC);
+		}
+
+		double
+		testValue
+			() const
+		{
+			return (theABC[0] + theABC[1] + theABC[2]);
+		}
+
 		std::string
 		infoString
 			( std::string const & title = {}
@@ -86,7 +101,7 @@ namespace sample
 			}
 			oss
 				<< "abc:"
-				<< " " << dat::infoString(theABC[0] + theABC[1] + theABC[2])
+				<< " " << dat::infoString(testValue())
 				/*
 				<< " " << dat::infoString(theABC[0])
 				<< " " << dat::infoString(theABC[1])
@@ -157,33 +172,42 @@ namespace sample
 			return samp;
 		}
 
+		std::string
+		infoString
+			( std::string const & title = {}
+			) const
+		{
+			std::ostringstream oss;
+			if (! title.empty())
+			{
+				oss << title << std::endl;
+			}
+			oss << dat::infoString(theSamps.size(), "numSamp") << '\n';
+			for (std::pair<KeyType, DataType> const & samp: theSamps)
+			{
+				oss
+					<< "key,value:"
+					<< " " << dat::infoString(samp.first)
+					<< " " << dat::infoString(samp.second)
+					<< std::endl;
+			}
+			return oss.str();
+		}
+
 	};
 
 	// Planar "surface"
 	DataType
-	valueOnPlaneFor
+	valueOnPlaneAtXY
 		( dat::Spot const & xyLoc
 		)
 	{
+		// return DataType(0., xyLoc[0], xyLoc[1]);
 		constexpr double bias{ 7000. };
 		double const xRamp{  10.*xyLoc[0] };
 		double const yRamp{ 100.*xyLoc[1] };
 		return DataType(bias, xRamp, yRamp);
 	}
-
-	/*
-	// Planar "surface"
-	DataType
-	valueOnPlaneFor
-		( std::pair<long, long> const & keyIJ
-		)
-	{
-		constexpr double bias{ 7000. };
-		double const xRamp{  10.*double(keyIJ.first) };
-		double const yRamp{ 100.*double(keyIJ.second) };
-		return DataType(bias, xRamp, yRamp);
-	}
-	*/
 
 	//! Generate samples over domain - (from planar surface)
 	SamplePool
@@ -199,9 +223,127 @@ namespace sample
 			tri::IsoGeo::QuantPair const fracPair
 				(trigeo.fracPairForIndices(key.first, key.second));
 			dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
-			pool.addSample(valueOnPlaneFor(xyLoc), key);
+			pool.addSample(valueOnPlaneAtXY(xyLoc), key);
 		}
 		return pool;
+	}
+
+}
+
+void
+saveNodeStates
+	( tri::IsoGeo const & trigeo
+	, tri::Domain const & xyDomain
+	, std::string const & fname = {"/dev/stdout"}
+	)
+{
+	std::ofstream ofs(fname);
+	for (tri::NodeIterator iter(trigeo, xyDomain) ; iter ; ++iter)
+	{
+		std::pair<long, long> const ndxPair{ iter.indexPair() };
+		dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
+
+		bool const isIn(xyDomain.contains(xyLoc));
+
+		ofs
+			<< " " << dat::infoString(xyLoc, "xyLoc")
+			<< " " << dat::infoString("isIn") << " " << isIn
+			<< std::endl;
+	}
+}
+
+dat::Spot
+refSpotFor
+	( tri::IsoGeo const & trigeo
+	, std::pair<long, long> const & ndxPair
+	)
+{
+	tri::IsoGeo::QuantPair const fracPair
+		{ trigeo.fracPairForIndices(ndxPair.first, ndxPair.second) };
+	return trigeo.refSpotForFracPair(fracPair);
+}
+
+
+void
+saveNodeInterp
+	( tri::IsoTille const & trinet
+	, tri::NodeIterator const & itBeg
+	, tri::Domain const & xyDomain
+	, sample::SamplePool const & samples
+	)
+{
+	tri::IsoGeo const & trigeo = trinet.theTileGeo;
+	std::ofstream ofsHas("testNodeHas.dat");
+	std::ofstream ofsBad("testNodeBad.dat");
+	std::ofstream ofsTri("testNodeTri.dat");
+	long prevI{ -10000L };
+	for (tri::NodeIterator iter{itBeg} ; iter ; ++iter)
+	{
+		std::pair<long, long> const ndxPair{ iter.indexPair() };
+		dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
+
+		sample::DataType const tinValue{ trinet(xyLoc, samples) };
+		bool const hasValue{ tinValue.isValid() };
+
+		std::ostringstream oss;
+		long const & currI = ndxPair.first;
+		if (currI != prevI)
+		{
+			oss << "\n\n";
+			prevI = currI;
+		}
+		oss
+			<< " " << dat::infoString(xyLoc, "xyLoc")
+			<< " " << "hasValue" << " " << hasValue
+			<< " " << dat::infoString(ndxPair, "ndxPair")
+			<< std::endl;
+
+		if (hasValue)
+		{
+			ofsHas << oss.str() << std::endl;
+		}
+		else
+		{
+			ofsBad << oss.str() << std::endl;
+		}
+
+		using NdxPair = std::pair<long, long>;
+		NdxPair const & ndx00 = ndxPair;
+		NdxPair const ndx10{ ndx00.first + 1L, ndx00.second + 0L };
+		NdxPair const ndx11{ ndx00.first + 1L, ndx00.second + 1L };
+		NdxPair const ndx01{ ndx00.first + 0L, ndx00.second + 1L };
+
+		dat::Spot const xy00(refSpotFor(trigeo, ndx00));
+		dat::Spot const xy10(refSpotFor(trigeo, ndx10));
+		dat::Spot const xy11(refSpotFor(trigeo, ndx11));
+
+		dat::Spot const xy01(refSpotFor(trigeo, ndx01));
+
+		if ( xyDomain.contains(xy00)
+		  && xyDomain.contains(xy11)
+		   )
+		{
+			ofsTri << "\n\n";
+
+			if (xyDomain.contains(xy10))
+			{
+				ofsTri
+					<< dat::infoString(xy00) << " 0.000" << '\n'
+					<< dat::infoString(xy10) << " 0.000" << '\n'
+					<< dat::infoString(xy11) << " 0.000" << '\n'
+					<< dat::infoString(xy00) << " 0.000" << '\n'
+					;
+			}
+			if (xyDomain.contains(xy01))
+			{
+				ofsTri
+					<< dat::infoString(xy00) << " 0.000" << '\n'
+					<< dat::infoString(xy11) << " 0.000" << '\n'
+					<< dat::infoString(xy01) << " 0.000" << '\n'
+					<< dat::infoString(xy00) << " 0.000" << '\n'
+					;
+			}
+		}
 	}
 }
 
@@ -215,17 +357,17 @@ main
 	)
 {
 	// define iso-tritille geometry
-	constexpr double deltaHigh{ 1./10. };
-	constexpr double deltaWide{ 1./20. };
-	constexpr std::array<double, 2u> aDir{{ 0., 1. }};
+	constexpr double deltaHigh{ 1./8. };
+	constexpr double deltaWide{ 1./11. };
+
+	constexpr size_t gridHigh{ 4u * 1024u };
+	constexpr size_t gridWide{ 4u * 1024u };
+
+	constexpr std::array<double, 2u> aDir{{ .125, 1. }};
 	tri::IsoGeo const trigeo(deltaHigh, deltaWide, aDir);
 
 	// construct tritille
 	tri::IsoTille const trinet(trigeo);
-
-io::out() << std::endl;
-io::out() << dat::infoString(trinet, "trinet") << std::endl;
-io::out() << std::endl;
 
 	dat::Range<double> xRange{ -1., 1. };
 	dat::Range<double> yRange{ -1., 1. };
@@ -235,56 +377,95 @@ io::out() << std::endl;
 	// generate samples at each tritille node
 	sample::SamplePool const samples(sample::poolOfSamples(xyDomain, trigeo));
 
+	// interpolate surface value at raster grid locations
+	size_t numNull{ 0u };
+	size_t numGood{ 0u };
+	double sumSqDiff{ 0. };
+
 	// check evaluation directly at sample locations
-	std::ofstream ofs("testExpGot.dat");
 	for (tri::NodeIterator iter(trigeo, xyDomain) ; iter ; ++iter)
 	{
-		std::pair<long, long> const mnNdxs{ iter.indexPair() };
+		std::pair<long, long> const ndxPair{ iter.indexPair() };
 		tri::IsoGeo::QuantPair const fracPair
-			(trigeo.fracPairForIndices(mnNdxs.first, mnNdxs.second));
+			(trigeo.fracPairForIndices(ndxPair.first, ndxPair.second));
 		dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
-		sample::DataType const expSamp{ sample::valueOnPlaneFor(xyLoc) };
+		sample::DataType const expSamp{ sample::valueOnPlaneAtXY(xyLoc) };
 
 		if (xyDomain.contains(xyLoc))
 		{
 			sample::DataType const gotSamp{ trinet(xyLoc, samples) };
-			dat::Spot const mnLoc(trigeo.tileSpotForFracPair(fracPair));
+			if (gotSamp.isValid())
+			{
+				++numGood;
+				double const diff{ gotSamp.testValue() - expSamp.testValue() };
+				sumSqDiff += math::sq(diff);
+			}
+			else
+			{
+				++numNull;
+			}
+
+			/*
 			io::out()
-				<< " " << dat::infoString(mnLoc, "r.mnLoc")
+				<< " " << dat::infoString(ndxPair, "r.ndxPair")
+				<< " " << dat::infoString(fracPair, "r.fracPair")
 				<< " " << dat::infoString(xyLoc, "r.xyLoc")
 				<< " " << dat::infoString(expSamp, "r.exp")
 				<< " " << dat::infoString(gotSamp, "r.got")
 				<< std::endl;
-
-			ofs
-				<< " " << dat::infoString(mnLoc, "mnLoc")
-				<< " " << dat::infoString(xyLoc, "xyLoc")
-				<< " " << dat::infoString(expSamp, "expSamp")
-				<< " " << dat::infoString(gotSamp, "gotSamp")
-				<< '\n';
+			*/
 		}
 	}
-
-	// interpolate tritille samples at raster grid locations
-	dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
-	dat::grid<sample::DataType> surfSamps(17u, 19u);
-	math::MapSizeArea const map(surfSamps.hwSize(), rngArea);
-	for (dat::ExtentsIterator iter{surfSamps.hwSize()} ; iter ; ++iter)
+	assert(numNull < numGood);
+	double const diffPerNode{ std::sqrt(sumSqDiff / double(numGood)) };
+	constexpr double tolPerNode{ math::eps };
+	if (! (diffPerNode < tolPerNode))
 	{
-		// get domain location for sample raster element
-		dat::RowCol const & sampRowCol = *iter;
-		dat::Spot const sampSpot(dat::cast::Spot(sampRowCol));
-		dat::Spot const surfSpot(map.xyAreaSpotFor(sampSpot));
-
-		// interpolate surface properties
-		sample::DataType const sampValue(trinet(surfSpot, samples));
+		std::ostringstream oss;
+		oss << "Failure of interpolation test" << std::endl;
+		oss << dat::infoString(numNull, "numNull") << std::endl;
+		oss << dat::infoString(numGood, "numGood") << std::endl;
+		oss
+			<< dat::infoString(sumSqDiff, "sumSqDiff") << '\n'
+			<< "diffPerNode: " << io::sprintf("%12.5e", diffPerNode) << '\n'
+			<< " tolPerNode: " << io::sprintf("%12.5e", tolPerNode) << '\n'
+			<< '\n';
+		io::out() << oss.str() << std::endl;
 	}
 
-	// interpolate surface value at raster grid locations
+	constexpr bool saveGrid{ false };
+	if (saveGrid)
+	{
+		saveNodeStates(trigeo, xyDomain, "testNodeLocs.dat");
+		tri::NodeIterator const itBeg(trigeo, xyDomain);
+		saveNodeInterp(trinet, itBeg, xyDomain, samples);
 
-	io::out() << dat::infoString(trigeo, "trigeo") << std::endl;
-	io::out() << dat::infoString(xyArea, "xyArea") << std::endl;
-	io::out() << dat::infoString(rngArea, "rngArea") << std::endl;
+		// probably don't want to write file with very large rasters
+		assert(gridHigh <= 1024u);
+		assert(gridWide <= 1024u);
+		std::ofstream ofsGrid("testNodeGrid.dat");
+
+		// interpolate tritille samples at raster grid locations
+		dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
+		dat::grid<sample::DataType> gridValues(gridHigh, gridWide);
+		math::MapSizeArea const map(gridValues.hwSize(), rngArea);
+		for (dat::ExtentsIterator iter{gridValues.hwSize()} ; iter ; ++iter)
+		{
+			// get domain location for sample raster element
+			dat::RowCol const & gridRowCol = *iter;
+			dat::Spot const rcSpot(dat::cast::Spot(gridRowCol));
+			dat::Spot const xySpot(map.xyAreaSpotFor(rcSpot));
+
+			// interpolate surface properties
+			sample::DataType const sampValue(trinet(xySpot, samples));
+			if (sampValue.isValid())
+			{
+				gridValues(gridRowCol) = sampValue;
+				ofsGrid << dat::infoString(xySpot) << "   0.000" << '\n';
+			}
+
+		}
+	}
 
 	return 0;
 }

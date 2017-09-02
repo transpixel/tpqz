@@ -55,6 +55,8 @@ namespace tri
 */
 class IsoTille
 {
+public: // static methods
+
 	tri::IsoGeo theTileGeo;
 
 public: // static methods

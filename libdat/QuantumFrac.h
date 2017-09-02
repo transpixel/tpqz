@@ -73,6 +73,9 @@ E.g.:
 
 class QuantumFrac
 {
+
+public: // data
+
 	using Type = double;
 
 	quantum::Splitter<long, Type> theQuant{ dat::nullValue<Type>() };

@@ -47,61 +47,26 @@ template
 inline
 std::pair<BaseType, FracType>
 Splitter<BaseType, FracType> :: operator()
-	( FracType const & someValue
+	( FracType const & valueInReal
 	) const
 {
-	std::pair<BaseType, FracType> bfResult;
+	std::pair<BaseType, FracType> qfValue;
+	BaseType & numQuanta = qfValue.first;
+	FracType & residInQuanta = qfValue.second;
 
-	constexpr FracType zero{ 0 };
-	if (! (someValue < zero))
-	{
-		//
-		// handle positive input value
-		//
+	// normalize input w.r.t. quanta size
+	constexpr FracType fOne{ 1 };
+	FracType const invDelta{ (fOne/theDelta) };
+	FracType const valueInQuanta{ invDelta * valueInReal };
 
-		BaseType const numDeltas
-			{ static_cast<BaseType>(std::floor(someValue / theDelta)) };
+	// determine floor
+	FracType const floorInQuanta{ std::floor(valueInQuanta) };
+	numQuanta = static_cast<BaseType>(floorInQuanta);
 
-		FracType const baseValue{ static_cast<FracType>(numDeltas) * theDelta };
-		FracType const magResid{ someValue - baseValue };
-		FracType fracResid{ magResid / theDelta };
+	// set residual to remainder above the floor
+	residInQuanta = valueInQuanta - floorInQuanta;
 
-		bfResult = { numDeltas, fracResid };
-	}
-	else
-	{
-		//
-		// handle negative input value
-		//
-
-		FracType const posValue{ std::abs(someValue) };
-		BaseType const posBase
-			{ static_cast<BaseType>(std::floor(posValue / theDelta)) };
-
-		constexpr BaseType bOne{ 1 };
-		BaseType numDeltas{ -posBase - bOne};
-
-		// compute value at floor
-		FracType const baseValue{ static_cast<FracType>(numDeltas) * theDelta };
-		FracType const magResid{ someValue - baseValue };
-		FracType fracResid{ magResid / theDelta };
-
-		constexpr FracType fOne{ 1 };
-		if (fOne <= fracResid)
-		{
-			++numDeltas;
-			fracResid = fracResid - fOne;
-			assert(fracResid < fOne);
-		}
-
-		bfResult = { numDeltas, fracResid };
-	}
-
-	assert((bfResult.first*theDelta) <= someValue);
-	assert(FracType{0} <= bfResult.second);
-	assert(bfResult.second < FracType{1});
-
-	return bfResult;
+	return qfValue;
 }
 
 } // quantum

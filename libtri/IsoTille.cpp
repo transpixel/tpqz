@@ -68,6 +68,18 @@ IsoTille :: begin
 	return NodeIterator(theTileGeo, theDomain);
 }
 
+size_t
+IsoTille :: sizeValidNodes
+	() const
+{
+	size_t numValid{ 0u };
+	for (NodeIterator iter{begin()} ; iter ; ++iter)
+	{
+		++numValid;
+	}
+	return numValid;
+}
+
 std::string
 IsoTille :: infoString
 	( std::string const & title

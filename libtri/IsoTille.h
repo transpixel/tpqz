@@ -97,6 +97,11 @@ public: // methods
 	begin
 		() const;
 
+	//! Number nodes associated with valid domain location (NOTE! expensive)!
+	size_t
+	sizeValidNodes
+		() const;
+
 	//! Perform interpolation at xyRel
 	template <typename SampFunc>
 	inline

@@ -36,8 +36,10 @@
 
 #include "libdat/Spot.h"
 #include "libdat/validity.h"
+#include "libtri/Domain.h"
 #include "libtri/FaceVerts.h"
 #include "libtri/IsoGeo.h"
+#include "libtri/NodeIterator.h"
 #include "libtri/tri.h"
 
 #include <string>
@@ -55,9 +57,11 @@ namespace tri
 */
 class IsoTille
 {
-public: // static methods
+
+public: // data
 
 	tri::IsoGeo theTileGeo;
+	tri::Domain theDomain;
 
 public: // static methods
 
@@ -80,11 +84,17 @@ public: // methods
 	explicit
 	IsoTille
 		( tri::IsoGeo const & geometry
+		, tri::Domain const & domain
 		);
 
 	//! True if instance is valid
 	bool
 	isValid
+		() const;
+
+	//! Beginning iterator over nodes associated with valid domain locations.
+	NodeIterator
+	begin
 		() const;
 
 	//! Perform interpolation at xyRel

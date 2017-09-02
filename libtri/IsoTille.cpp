@@ -45,8 +45,10 @@ namespace tri
 // explicit
 IsoTille :: IsoTille
 	( tri::IsoGeo const & geometry
+	, tri::Domain const & domain
 	)
 	: theTileGeo{ geometry }
+	, theDomain{ domain }
 {
 }
 
@@ -57,6 +59,13 @@ IsoTille :: isValid
 	return
 		{  dat::isValid(theTileGeo)
 		};
+}
+
+NodeIterator
+IsoTille :: begin
+	() const
+{
+	return NodeIterator(theTileGeo, theDomain);
 }
 
 std::string

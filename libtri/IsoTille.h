@@ -64,7 +64,7 @@ public: // static methods
 	inline
 	FaceVerts
 	triangleFor
-		( dat::Spot const & xrel
+		( dat::Spot const & xyRel
 		, IsoGeo const & tileGeo
 		);
 
@@ -85,12 +85,12 @@ public: // methods
 	isValid
 		() const;
 
-	//! Perform interpolation at xrel
+	//! Perform interpolation at xyRel
 	template <typename SampFunc>
 	inline
 	typename SampFunc::value_type
 	operator()
-		( Vec2D const & xrel //!< location relative to tile origin
+		( Vec2D const & xyRel //!< location relative to tile origin
 		, SampFunc const & propSampFunc
 		) const;
 

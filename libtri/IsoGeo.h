@@ -93,54 +93,96 @@ public: // methods
 
 private:
 
-	//! Projection of xyRel onto udir axis
+	//! Projection of xyLoc onto udir axis
 	inline
 	double
-	mu
-		( dat::Spot const & xyRel //!< location relative to tile origin
+	muForXY
+		( dat::Spot const & xyLoc //!< location relative to tile origin
 		) const;
 
-	//! Projection of xyRel onto vdir axis
+	//! Projection of xyLoc onto vdir axis
 	inline
 	double
-	nu
-		( dat::Spot const & xyRel //!< location relative to tile origin
+	nuForXY
+		( dat::Spot const & xyLoc //!< location relative to tile origin
 		) const;
 
 public:
 
-	//! Projection of xyRel onto (udir,vdir) axis - relative to origin
+	//! Projection of xyLoc onto (udir,vdir) axis - relative to origin
 	inline
 	dat::Spot
-	mnLoc
-		( dat::Spot const & xyRel //!< location relative to tile origin
-		) const;
-
-	//! Reconstruction of (orthogonal) xyRel from (non-ortho) tile coordinates
-	inline
-	dat::Spot
-	xyRelative
-		( dat::Spot const & mnRel
-		) const;
-
-	//! Index and residual fraction along "u" direction
-	inline
-	dat::QuantumFrac
-	muNdxFrac
-		( dat::Spot const & xyRel //!< location relative to tile origin
-		) const;
-
-	//! Index and residual fraction along "v" direction
-	inline
-	dat::QuantumFrac
-	nuNdxFrac
-		( dat::Spot const & xyRel //!< location relative to tile origin
+	mnLocForXY
+		( dat::Spot const & xyLoc //!< location relative to tile origin
 		) const;
 
 	//! Limits (half open) on mu and nu values given domain area limits
 	dat::Area<double>
-	mnArea
+	mnAreaForXY
 		( Domain const & xyDomain
+		) const;
+
+	//! Node index and fraction into cell along ("u","v") directions
+	inline
+	std::pair<dat::QuantumFrac, dat::QuantumFrac>
+	cellPairForXY
+		( dat::Spot const & xyLoc
+		) const;
+
+	//! Node index associated with mu value
+	inline
+	long
+	indexForMu
+		( double const & mu
+		) const;
+
+	//! Node index associated with nu value
+	inline
+	long
+	indexForNu
+		( double const & nu
+		) const;
+
+	//! Value of mu from node index in "u" direction
+	inline
+	double
+	muFromIndex
+		( long const & muNdx
+		) const;
+
+	//! Value of nu from node index in "v" direction
+	inline
+	double
+	nuFromIndex
+		( long const & nuNdx
+		) const;
+
+	//! Range value of (mu,nu) for node with indices
+	inline
+	dat::Spot
+	mnLocForNode
+		( std::pair<long, long> const & ndxPairMuNu
+		) const;
+
+	//! Node index and fraction into cell along ("u","v") directions
+	inline
+	std::pair<dat::QuantumFrac, dat::QuantumFrac>
+	cellPairForMuNu
+		( dat::Spot const & mnLoc
+		) const;
+
+	//! Reconstruction of (orthogonal) xyLoc from (non-ortho) tile coordinates
+	inline
+	dat::Spot
+	xyLocForMuNu
+		( dat::Spot const & mnRel
+		) const;
+
+	//! Domain value of (x,y) for node with indices
+	inline
+	dat::Spot
+	xyLocForNode
+		( std::pair<long, long> const & ndxPairMuNu
 		) const;
 
 	//! Descriptive information about this instance.

@@ -78,22 +78,25 @@ tri_NodeIterator_test1
 	tri::Domain const xyDomain{ xyBounds };
 
 	constexpr std::array<double, 2u> aDir{{ 0., 1. }};
-	tri::IsoGeo const trigeo( 5., 7., aDir);
+	constexpr double da{ 5. };
+	constexpr double db{ 7. };
+	tri::IsoGeo const trigeo( da, db, aDir);
 
 	// determine acceptable iterator
 	std::set<std::pair<long, long> > expMuNus;
 	{
-		dat::Area<double> const rngArea{ trigeo.mnArea(xyDomain) };
-		long const muBeg{ (long)std::floor(rngArea[0].min()) };
-		long const muEnd{ (long)std::ceil(rngArea[0].max()) };
-		long const nuBeg{ (long)std::floor(rngArea[1].min()) };
-		long const nuEnd{ (long)std::ceil(rngArea[1].max()) };
-		for (long ndxNu{nuBeg} ; ndxNu < nuEnd ; ++ndxNu)
+		dat::Area<double> const mnRange{ trigeo.mnAreaForXY(xyDomain) };
+		long const muBeg{ (long)std::floor(mnRange[0].min() / da) };
+		long const muEnd{ (long)std::ceil(mnRange[0].max() / da) };
+		long const nuBeg{ (long)std::floor(mnRange[1].min() / db) };
+		long const nuEnd{ (long)std::ceil(mnRange[1].max() / db) };
+		for (long ndxNu{nuBeg} ; ndxNu <= nuEnd ; ++ndxNu)
 		{
-			for (long ndxMu{muBeg} ; ndxMu < muEnd ; ++ndxMu)
+			for (long ndxMu{muBeg} ; ndxMu <= muEnd ; ++ndxMu)
 			{
-				dat::Spot const mnLoc{{ double(ndxMu), double(ndxNu) }};
-				dat::Spot const xyLoc(trigeo.xyRelative(mnLoc));
+				dat::Spot const mnLoc
+					(trigeo.mnLocForNode({ ndxMu, ndxNu }));
+				dat::Spot const xyLoc(trigeo.xyLocForMuNu(mnLoc));
 				if (xyDomain.contains(xyLoc))
 				{
 					expMuNus.insert(std::make_pair(ndxMu, ndxNu));

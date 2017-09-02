@@ -40,19 +40,21 @@ namespace tri
 inline
 FaceVerts
 IsoTille :: triangleFor
-	( dat::Spot const & xrel
+	( dat::Spot const & xyLoc
 	, IsoGeo const & tileGeo
 	)
 {
 	FaceVerts triangle;
 
-	dat::QuantumFrac const muNdxFrac{ tileGeo.muNdxFrac(xrel) };
-	dat::QuantumFrac const nuNdxFrac{ tileGeo.nuNdxFrac(xrel) };
+	std::pair<dat::QuantumFrac, dat::QuantumFrac>
+		const mnNodeFracPair{ tileGeo.cellPairForXY(xyLoc) };
+	dat::QuantumFrac const & muNodeFrac = mnNodeFracPair.first;
+	dat::QuantumFrac const & nuNodeFrac = mnNodeFracPair.second;
 
-	size_t const & ndxI = muNdxFrac.floor();
-	size_t const & ndxJ = nuNdxFrac.floor();
-	double const & muFrac = muNdxFrac.fraction();
-	double const & nuFrac = nuNdxFrac.fraction();
+	size_t const & ndxI = muNodeFrac.floor();
+	size_t const & ndxJ = nuNodeFrac.floor();
+	double const & muFrac = muNodeFrac.fraction();
+	double const & nuFrac = nuNodeFrac.fraction();
 
 	if (muFrac < nuFrac)
 	{
@@ -92,12 +94,12 @@ template <typename SampFunc>
 inline
 typename SampFunc::value_type
 IsoTille :: operator()
-	( Vec2D const & xrel //!< location relative to tile origin
+	( Vec2D const & xyLoc
 	, SampFunc const & propSampFunc
 	) const
 {
 	// get triangle covering this area...
-	FaceVerts const triangle{ triangleFor(xrel, theTileGeo) };
+	FaceVerts const triangle{ triangleFor(xyLoc, theTileGeo) };
 	// ... and return interpolated value
 	return triangle.valueFrom<SampFunc>(propSampFunc);
 }

@@ -256,15 +256,15 @@ main
 		double const da{ 1. }; // azimuth tritille spacing
 		double const db{ 1. }; // zenith tritille spacing
 		PairZA const adir{ 1., 0. }; // primary tesselation axis
-		tri::IsoGeo const geo(da, db, adir);
-		tri::IsoTille const tin(geo);
+		tri::IsoGeo const trigeo(da, db, adir);
+		tri::IsoTille const trinet(trigeo);
 
 		// check boundaries
 		dat::Range<double> const zenithRange{ 0., math::pi };
 		dat::Range<double> const azimuthRange{ 0., math::twoPi };
 		dat::Area<double> const zaArea{ zenithRange, azimuthRange };
 		tri::Domain const zaDomain{ zaArea };
-		dat::Area<double> const mnArea{ geo.mnArea(zaDomain) };
+		dat::Area<double> const mnArea{ trigeo.mnAreaForXY(zaDomain) };
 
 /*
 io::out() << std::endl;
@@ -273,14 +273,14 @@ io::out() << dat::infoString(mnArea, "mnArea") << std::endl;
 io::out() << std::endl;
 */
 
-		io::out() << dat::infoString(tin, "tin") << std::endl;
+		io::out() << dat::infoString(trinet, "trinet") << std::endl;
 
 		// compute histogram of interpolation errors
 		for (ga::Vector const & dir : dirs)
 		{
 			using namespace geo::sphere;
 			PairZA const zaLoc{ zenithOf(dir), azimuthOf(dir) };
-			PropType const gotRad{ tin(zaLoc, radiusPropertyStore) };
+			PropType const gotRad{ trinet(zaLoc, radiusPropertyStore) };
 
 			if (dat::isValid(gotRad))
 			{

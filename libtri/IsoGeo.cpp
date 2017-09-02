@@ -77,8 +77,8 @@ IsoGeo :: IsoGeo
 		Vec2D const vbar( beta*udir + alpha*vdir);
 
 		// set members
-		theSplitterMu = { da };
-		theSplitterNu = { db };
+		theSplitterMu = dat::quantum::Splitter<long, double>(da);
+		theSplitterNu = dat::quantum::Splitter<long, double>(db);
 		theDirA = adir;
 		theDirU = udir;
 		theDirV = vdir;
@@ -105,7 +105,7 @@ IsoGeo :: delta
 }
 
 dat::Area<double>
-IsoGeo :: mnArea
+IsoGeo :: mnAreaForXY
 	( Domain const & xyDomain
 	) const
 {
@@ -120,8 +120,8 @@ IsoGeo :: mnArea
 		for (dat::Spot const & xyCorner : xyCorners)
 		{
 			// expand the mu,nu dimensions (independently)
-			muMinMax = muMinMax.expandedWith(mu(xyCorner));
-			nuMinMax = nuMinMax.expandedWith(nu(xyCorner));
+			muMinMax = muMinMax.expandedWith(muForXY(xyCorner));
+			nuMinMax = nuMinMax.expandedWith(nuForXY(xyCorner));
 		}
 		mnArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
 	}

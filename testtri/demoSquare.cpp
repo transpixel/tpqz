@@ -44,6 +44,7 @@
 #include "libio/stream.h"
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <map>
 
@@ -72,6 +73,28 @@ namespace sample
 			)
 			: theABC{{ aa, bb, cc }}
 		{ }
+
+		std::string
+		infoString
+			( std::string const & title = {}
+			) const
+		{
+			std::ostringstream oss;
+			if (! title.empty())
+			{
+				oss << title << " ";
+			}
+			oss
+				<< "abc:"
+				<< " " << dat::infoString(theABC[0] + theABC[1] + theABC[2])
+				/*
+				<< " " << dat::infoString(theABC[0])
+				<< " " << dat::infoString(theABC[1])
+				<< " " << dat::infoString(theABC[2])
+				*/
+				;
+			return oss.str();
+		}
 	};
 
 	//! DataType: multiplication
@@ -119,8 +142,8 @@ namespace sample
 
 		DataType
 		operator()
-			( size_t const & keyI
-			, size_t const & keyJ
+			( long const & keyI
+			, long const & keyJ
 			) const
 		{
 			DataType samp;
@@ -138,7 +161,20 @@ namespace sample
 
 	// Planar "surface"
 	DataType
-	sampleOnPlaneFor
+	valueOnPlaneFor
+		( dat::Spot const & xyLoc
+		)
+	{
+		constexpr double bias{ 7000. };
+		double const xRamp{  10.*xyLoc[0] };
+		double const yRamp{ 100.*xyLoc[1] };
+		return DataType(bias, xRamp, yRamp);
+	}
+
+	/*
+	// Planar "surface"
+	DataType
+	valueOnPlaneFor
 		( std::pair<long, long> const & keyIJ
 		)
 	{
@@ -147,6 +183,7 @@ namespace sample
 		double const yRamp{ 100.*double(keyIJ.second) };
 		return DataType(bias, xRamp, yRamp);
 	}
+	*/
 
 	//! Generate samples over domain - (from planar surface)
 	SamplePool
@@ -159,7 +196,8 @@ namespace sample
 		for (tri::NodeIterator iter(trigeo, domain) ; iter ; ++iter)
 		{
 			SamplePool::KeyType const key(*iter);
-			pool.addSample(sampleOnPlaneFor(key), key);
+			dat::Spot const xyLoc(trigeo.xyLocForNode(key));
+			pool.addSample(valueOnPlaneFor(xyLoc), key);
 		}
 		return pool;
 	}
@@ -181,19 +219,50 @@ main
 	tri::IsoGeo const trigeo(deltaHigh, deltaWide, aDir);
 
 	// construct tritille
-	tri::IsoTille const tin(trigeo);
+	tri::IsoTille const trinet(trigeo);
+
+io::out() << std::endl;
+io::out() << dat::infoString(trinet, "trinet") << std::endl;
+io::out() << std::endl;
 
 	dat::Range<double> xRange{ -1., 1. };
 	dat::Range<double> yRange{ -1., 1. };
 	dat::Area<double> xyArea{ xRange, yRange };
-	tri::Domain const triDomain{ xyArea };
-	dat::Area<double> const rngArea{ trigeo.mnArea(triDomain) };
+	tri::Domain const xyDomain{ xyArea };
 
 	// generate samples at each tritille node
-	sample::SamplePool const samples(sample::poolOfSamples(triDomain, trigeo));
+	sample::SamplePool const samples(sample::poolOfSamples(xyDomain, trigeo));
 
+	// check evaluation directly at sample locations
+	std::ofstream ofs("testExpGot.dat");
+	for (tri::NodeIterator iter(trigeo, xyDomain) ; iter ; ++iter)
+	{
+		std::pair<long, long> const mnNdxs{ *iter };
+		dat::Spot const xyLoc(trigeo.xyLocForNode(mnNdxs));
+		sample::DataType const expSamp{ sample::valueOnPlaneFor(xyLoc) };
+
+		if (xyDomain.contains(xyLoc))
+		{
+			sample::DataType const gotSamp{ trinet(xyLoc, samples) };
+			dat::Spot const mnLoc(trigeo.mnLocForNode(mnNdxs));
+			io::out()
+				<< " " << dat::infoString(mnLoc, "r.mnLoc")
+				<< " " << dat::infoString(xyLoc, "r.xyLoc")
+				<< " " << dat::infoString(expSamp, "r.exp")
+				<< " " << dat::infoString(gotSamp, "r.got")
+				<< std::endl;
+
+			ofs
+				<< " " << dat::infoString(mnLoc, "mnLoc")
+				<< " " << dat::infoString(xyLoc, "xyLoc")
+				<< " " << dat::infoString(expSamp, "expSamp")
+				<< " " << dat::infoString(gotSamp, "gotSamp")
+				<< '\n';
+		}
+	}
 
 	// interpolate tritille samples at raster grid locations
+	dat::Area<double> const rngArea{ trigeo.mnAreaForXY(xyDomain) };
 	dat::grid<sample::DataType> surfSamps(17u, 19u);
 	math::MapSizeArea const map(surfSamps.hwSize(), rngArea);
 	for (dat::ExtentsIterator iter{surfSamps.hwSize()} ; iter ; ++iter)
@@ -204,13 +273,7 @@ main
 		dat::Spot const surfSpot(map.xyAreaSpotFor(sampSpot));
 
 		// interpolate surface properties
-		sample::DataType const sampValue(tin(surfSpot, samples));
-
-io::out()
-	<< " " << dat::infoString(sampSpot, "sampSpot")
-	<< " " << dat::infoString(surfSpot, "surfSpot")
-	<< std::endl;
-
+		sample::DataType const sampValue(trinet(surfSpot, samples));
 	}
 
 	// interpolate surface value at raster grid locations
@@ -218,22 +281,6 @@ io::out()
 	io::out() << dat::infoString(trigeo, "trigeo") << std::endl;
 	io::out() << dat::infoString(xyArea, "xyArea") << std::endl;
 	io::out() << dat::infoString(rngArea, "rngArea") << std::endl;
-
-	/*
-	std::array<dat::Spot, 4u> const domCorners(domain.corners());
-	for (dat::Spot const & domCorner : domCorners)
-	{
-		dat::Spot const rngCorner(trigeo.mnLoc(domCorner));
-		dat::QuantumFrac const muQF{ trigeo.muNdxFrac(domCorner) };
-		dat::QuantumFrac const nuQF{ trigeo.nuNdxFrac(domCorner) };
-
-		io::out() << std::endl;
-		io::out() << dat::infoString(domCorner, "domCorner") << std::endl;
-		io::out() << dat::infoString(rngCorner, "rngCorner") << std::endl;
-		io::out() << dat::infoString(muQF, "muQF") << std::endl;
-		io::out() << dat::infoString(nuQF, "nuQF") << std::endl;
-	}
-	*/
 
 	return 0;
 }

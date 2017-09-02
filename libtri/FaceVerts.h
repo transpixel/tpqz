@@ -37,6 +37,7 @@
 #include "libdat/validity.h"
 
 #include <array>
+#include <string>
 
 
 namespace tri
@@ -55,9 +56,16 @@ struct FaceVerts
 	//! Tessellation indices and weight associated with the (i,j)-th node
 	struct Vertex
 	{
-		size_t theI{ dat::nullValue<size_t>() };
-		size_t theJ{ dat::nullValue<size_t>() };
+		long theI{ dat::nullValue<long>() };
+		long theJ{ dat::nullValue<long>() };
 		double theW{ dat::nullValue<double>() };
+
+		//! Descriptive information about this instance.
+		std::string
+		infoString
+			( std::string const & title = std::string()
+			, std::string const & fmt = std::string("%12.6f")
+			) const;
 	};
 
 	std::array<Vertex, 3u> theVerts{{}};
@@ -65,7 +73,7 @@ struct FaceVerts
 	/*! Interpolate value from a collection of properties
 	 *
 	 * PropSampFunc: Property sampling function. Must support
-	 *   PropType = PropSampFunc(size_t, size_t) const
+	 *   PropType = PropSampFunc(long, long) const
 	 *   using value_type = PropType
 	 *
 	 * Need operations for:
@@ -77,33 +85,21 @@ struct FaceVerts
 	typename PropSampFunc::value_type
 	valueFrom
 		( PropSampFunc const & propGrid
-		) const
-	{
-		size_t const & i1 = theVerts[0].theI;
-		size_t const & i2 = theVerts[1].theI;
-		size_t const & i3 = theVerts[2].theI;
+		) const;
 
-		size_t const & j1 = theVerts[0].theJ;
-		size_t const & j2 = theVerts[1].theJ;
-		size_t const & j3 = theVerts[2].theJ;
-
-		double const & w1 = theVerts[0].theW;
-		double const & w2 = theVerts[1].theW;
-		double const & w3 = theVerts[2].theW;
-
-		return typename PropSampFunc::value_type
-			( w1 * propGrid(i1, j1)
-			+ w2 * propGrid(i2, j2)
-			+ w3 * propGrid(i3, j3)
-			);
-	}
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		, std::string const & fmt = std::string("%12.6f")
+		) const;
 
 }; // FaceVerts
 
 } // tri
 
 // Inline definitions
-// #include "libtri/FaceVerts.inl"
+#include "libtri/FaceVerts.inl"
 
 #endif // tri_FaceVerts_INCL_
 

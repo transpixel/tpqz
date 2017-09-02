@@ -82,14 +82,13 @@ public: // methods
 		)
 		: NodeIterator()
 	{
-		dat::Area<double> const mnRange{ trigeo.mnArea(xyDomain) };
-
+		dat::Area<double> const mnRange{ trigeo.mnAreaForXY(xyDomain) };
 		if (mnRange.isValid())
 		{
-			long const muMin{ static_cast<long>(mnRange[0].min()) };
-			long const muMax{ static_cast<long>(mnRange[0].max()) };
-			long const nuMin{ static_cast<long>(mnRange[1].min()) };
-			long const nuMax{ static_cast<long>(mnRange[1].max()) };
+			long const muMin{ trigeo.indexForMu(mnRange[0].min()) };
+			long const muMax{ trigeo.indexForMu(mnRange[0].max()) };
+			long const nuMin{ trigeo.indexForNu(mnRange[1].min()) };
+			long const nuMax{ trigeo.indexForNu(mnRange[1].max()) };
 			assert (muMin <= muMax);
 			assert (nuMin <= nuMax);
 
@@ -178,9 +177,10 @@ private:
 	atNodeIsValid
 		() const
 	{
-		dat::Spot const mnSpot
-			{{ double(theAtMuNu.first), double(theAtMuNu.second) }};
-		return theDomain.contains(theGeo.xyRelative(mnSpot));
+		double const mu{ theGeo.muFromIndex(theAtMuNu.first) };
+		double const nu{ theGeo.nuFromIndex(theAtMuNu.second) };
+		dat::Spot const mnLoc{{ mu, nu }};
+		return theDomain.contains(theGeo.xyLocForMuNu(mnLoc));
 	}
 
 	//! Increment theAtMuNu to next node (whether valid or not)

@@ -65,14 +65,13 @@ IsoGeo :: IsoGeo
 	Vec2D const vdir(dat::unit(da * adir + db * bdir));
 
 	// check for singularity
-	double const gamma{ dat::dot(udir, vdir) };
-	double const tmp{ 1. - math::sq(gamma) };
-	if (std::numeric_limits<double>::min() < tmp)
+	double const cosUV{ dat::dot(udir, vdir) };
+	double const sinSqUV{ 1. - math::sq(cosUV) };
+	if (std::numeric_limits<double>::min() < sinSqUV)
 	{
 		// compute cache values
-		double const inv{ 1./tmp };
-		double const & beta = inv;
-		double const alpha{ -inv * gamma };
+		double const alpha{ 1. / sinSqUV };
+		double const beta{ -cosUV / sinSqUV };
 		Vec2D const ubar(alpha*udir +  beta*vdir);
 		Vec2D const vbar( beta*udir + alpha*vdir);
 
@@ -84,6 +83,22 @@ IsoGeo :: IsoGeo
 		theDirV = vdir;
 		theBarU = ubar;
 		theBarV = vbar;
+
+		/*
+		double const & gamma = cosUV;
+		io::out() << std::endl;
+		io::out() << dat::infoString(theDirA, "theDirA") << std::endl;
+		io::out() << dat::infoString(theDirU, "theDirU") << std::endl;
+		io::out() << dat::infoString(theDirV, "theDirV") << std::endl;
+		io::out() << std::endl;
+		io::out() << dat::infoString(gamma, "gamma") << std::endl;
+		io::out() << dat::infoString(alpha, "alpha") << std::endl;
+		io::out() << dat::infoString(beta, "beta") << std::endl;
+		io::out() << std::endl;
+		io::out() << dat::infoString(theBarU, "theBarU") << std::endl;
+		io::out() << dat::infoString(theBarV, "theBarV") << std::endl;
+		io::out() << std::endl;
+		*/
 	}
 }
 

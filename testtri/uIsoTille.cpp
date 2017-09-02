@@ -228,17 +228,15 @@ namespace example
 	//! Generate samples over domain - (from planar surface)
 	SamplePool
 	poolOfSamples
-		( tri::Domain const & domain
-		, tri::IsoGeo const & trigeo
+		( tri::IsoTille const & trinet
 		)
 	{
 		SamplePool pool;
-		for (tri::NodeIterator iter(trigeo, domain) ; iter ; ++iter)
+		tri::IsoGeo const & trigeo = trinet.theTileGeo;
+		for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 		{
 			SamplePool::KeyType const key(iter.indexPair());
-			tri::IsoGeo::QuantPair const fracPair
-				(trigeo.fracPairForIndices(key.first, key.second));
-			dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
+			dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 			pool.addSample(valueOnPlaneAtXY(xyLoc), key);
 		}
 		return pool;
@@ -263,16 +261,17 @@ tri_IsoTille_test1
 	constexpr std::array<double, 2u> aDir{{ .125, 1. }};
 	tri::IsoGeo const trigeo(deltaHigh, deltaWide, aDir);
 
-	// construct tritille
-	tri::IsoTille const trinet(trigeo);
-
-	dat::Range<double> xRange{ -1., 1. };
-	dat::Range<double> yRange{ -1., 1. };
+	// define domain (simple square)
+	dat::Range<double> xRange{ -1., 2. };
+	dat::Range<double> yRange{ -1.5, .5 };
 	dat::Area<double> xyArea{ xRange, yRange };
 	tri::Domain const xyDomain{ xyArea };
 
+	// construct tritille
+	tri::IsoTille const trinet(trigeo, xyDomain);
+
 	// generate samples at each tritille node
-	example::SamplePool const samples(example::poolOfSamples(xyDomain, trigeo));
+	example::SamplePool const samples(example::poolOfSamples(trinet));
 
 	// interpolate surface value at raster grid locations
 	size_t numNull{ 0u };
@@ -282,7 +281,7 @@ tri_IsoTille_test1
 	double sumSqMags{ 0. };
 
 	// check evaluation directly at sample locations
-	for (tri::NodeIterator iter(trigeo, xyDomain) ; iter ; ++iter)
+	for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 	{
 		dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 		example::DataType const expSamp{ example::valueOnPlaneAtXY(xyLoc) };

@@ -252,21 +252,21 @@ main
 	// for each case
 	for (SampleTracker & errPot : errPots)
 	{
-		// define iso-tritille
-		double const da{ 1. }; // azimuth tritille spacing
-		double const db{ 1. }; // zenith tritille spacing
-		PairZA const adir{ 1., 0. }; // primary tesselation axis
-		tri::IsoGeo const trigeo(da, db, adir);
-		tri::IsoTille const trinet(trigeo);
-
 		// check boundaries
 		dat::Range<double> const zenithRange{ 0., math::pi };
 		dat::Range<double> const azimuthRange{ 0., math::twoPi };
 		dat::Area<double> const zaArea{ zenithRange, azimuthRange };
 		tri::Domain const zaDomain{ zaArea };
-		dat::Area<double> const mnArea{ trigeo.tileAreaForRefArea(zaDomain) };
+
+		// define iso-tritille
+		double const da{ 1. }; // azimuth tritille spacing
+		double const db{ 1. }; // zenith tritille spacing
+		PairZA const adir{ 1., 0. }; // primary tesselation axis
+		tri::IsoGeo const trigeo(da, db, adir);
+		tri::IsoTille const trinet(trigeo, zaDomain);
 
 /*
+dat::Area<double> const mnArea{ trigeo.tileAreaForRefArea(zaDomain) };
 io::out() << std::endl;
 io::out() << dat::infoString(zaArea, "zaArea") << std::endl;
 io::out() << dat::infoString(mnArea, "mnArea") << std::endl;

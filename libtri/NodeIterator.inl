@@ -74,7 +74,7 @@ IsoGeo::QuantPair
 NodeIterator :: fracPairAt
 	() const
 {
-	return theGeo.fracPairForIndices(theAtIJ.first, theAtIJ.second);
+	return theTileGeo.fracPairForIndices(theAtIJ.first, theAtIJ.second);
 }
 
 inline
@@ -82,7 +82,7 @@ bool
 NodeIterator :: atNodeIsValid
 	() const
 {
-	dat::Spot const xyLoc(theGeo.refSpotForFracPair(fracPairAt()));
+	dat::Spot const xyLoc(theTileGeo.refSpotForFracPair(fracPairAt()));
 	return theDomain.contains(xyLoc);
 }
 

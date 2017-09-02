@@ -41,46 +41,74 @@ namespace tri
 {
 
 // explicit
+NodeIterator::IndexLimits :: IndexLimits
+	( tri::IsoGeo const & trigeo
+	, dat::Area<double> const & mnArea
+	)
+{
+	// get bounding (mu,nu) limits of tile space
+	dat::Spot const tileSpotBeg{{ mnArea[0].min(), mnArea[1].min() }};
+	dat::Spot const tileSpotEnd{{ mnArea[0].max(), mnArea[1].max() }};
+
+	// transform to index+resid form
+	theFracPairBeg = trigeo.fracPairForTileSpot(tileSpotBeg);
+	theFracPairEnd = trigeo.fracPairForTileSpot(tileSpotEnd);
+}
+
+std::pair<long, long>
+NodeIterator::IndexLimits :: ndxBegEndI
+	() const
+{
+	std::pair<long, long> pairBegEndI
+		{ dat::nullValue<long>(), dat::nullValue<long>() };
+
+	long const & iBeg = theFracPairBeg.first.theFloor;
+	long const iEnd{ theFracPairEnd.first.theFloor + 1 };
+	assert (iBeg < iEnd);
+	pairBegEndI = { iBeg, iEnd };
+
+	return pairBegEndI;
+}
+
+std::pair<long, long>
+NodeIterator::IndexLimits :: ndxBegEndJ
+	() const
+{
+	std::pair<long, long> pairBegEndJ
+		{ dat::nullValue<long>(), dat::nullValue<long>() };
+
+	long const & jBeg = theFracPairBeg.second.theFloor;
+	long const jEnd{ theFracPairEnd.second.theFloor + 1 };
+	assert (jBeg < jEnd);
+	pairBegEndJ = { jBeg, jEnd };
+
+	return pairBegEndJ;
+}
+
+
+//======================================================================
+//======================================================================
+//======================================================================
+
+
+
+// explicit
 NodeIterator :: NodeIterator
 	( IsoGeo const & trigeo
 	, Domain const & xyDomain
 	)
-	: NodeIterator()
+	: theTileGeo{ trigeo }
+	, theDomain{ xyDomain }
+	, theNdxLimits
+		{ IndexLimits(trigeo, theTileGeo.tileAreaForRefArea(xyDomain)) }
+	, theBegEndI{ theNdxLimits.ndxBegEndI() }
+	, theBegEndJ{ theNdxLimits.ndxBegEndJ() }
+	, theAtIJ{ theBegEndI.first, theBegEndJ.first }
+	, theIsActive{ true }
 {
-	dat::Area<double> const mnRange{ trigeo.tileAreaForRefArea(xyDomain) };
-	if (mnRange.isValid())
+	if (! atNodeIsValid())
 	{
-		// get bounding (mu,nu) limits of tile space
-		dat::Spot const tileSpotBeg{{ mnRange[0].min(), mnRange[1].min() }};
-		dat::Spot const tileSpotEnd{{ mnRange[0].max(), mnRange[1].max() }};
-
-		// transform to index+resid form
-		IsoGeo::QuantPair const fracPairBeg
-			(trigeo.fracPairForTileSpot(tileSpotBeg));
-		IsoGeo::QuantPair const fracPairEnd
-			(trigeo.fracPairForTileSpot(tileSpotEnd));
-
-		// identify node indices with STL style iterators
-		long const & iBeg = fracPairBeg.first.theFloor;
-		long const iEnd{ fracPairEnd.first.theFloor + 1 };
-		long const & jBeg = fracPairBeg.second.theFloor;
-		long const jEnd{ fracPairEnd.second.theFloor + 1 };
-		assert (iBeg < iEnd);
-		assert (jBeg < jEnd);
-
-		// set member vars
-		theGeo = trigeo;
-		theDomain = xyDomain;
-		theBegEndI = { iBeg, iEnd };
-		theBegEndJ = { jBeg, jEnd };
-		theAtIJ = { theBegEndI.first, theBegEndJ.first };
-
-		// ensure first node is over valid domain location (or end)
-		theIsActive = true; // assume unless contradicted
-		if (! atNodeIsValid())
-		{
-			advanceToNextValid();
-		}
+		advanceToNextValid();
 	}
 }
 
@@ -95,7 +123,7 @@ NodeIterator :: infoString
 		oss << title << std::endl;
 	}
 
-	// oss << theGeo.infoString("theGeo");
+	// oss << theTileGeo.infoString("theTileGeo");
 	// oss << std::endl;
 
 	oss << "theBegEndI: " << dat::infoString(theBegEndI);

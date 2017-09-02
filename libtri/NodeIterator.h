@@ -55,16 +55,61 @@ namespace tri
 class NodeIterator
 {
 
-	IsoGeo theGeo{};
-	Domain theDomain;
+public: // types
 
+	//! STL style [begin,end) iterator pairs for tessellation geometry.
+	struct IndexLimits
+	{
+		IsoGeo::QuantPair theFracPairBeg{};
+		IsoGeo::QuantPair theFracPairEnd{};
+
+		IndexLimits
+			() = default;
+
+		//! Construct indices into trigeo which span *entire* mnArea.
+		explicit
+		IndexLimits
+			( tri::IsoGeo const & trigeo
+			, dat::Area<double> const & mnArea
+			);
+
+		//! Start and (one-past) end iterator for 'mu/u' direction.
+		std::pair<long, long>
+		ndxBegEndI
+			() const;
+
+		//! Start and (one-past) end iterator for 'nu/v' direction.
+		std::pair<long, long>
+		ndxBegEndJ
+			() const;
+	};
+
+public: // data
+
+	//! Tritille geometry (used to compute indices)
+	IsoGeo theTileGeo{};
+
+	//! Tritille domain of definition (used to evaluate validity)
+	Domain theDomain{};
+
+	//! STL-style iterators into all possible nodes
+	IndexLimits theNdxLimits{};
+
+private: // data
+
+	//! Node indices ala STL style iterators (for mu)
 	std::pair<long, long> theBegEndI
 		{ dat::nullValue<long>(), dat::nullValue<long>() };
+
+	//! Node indices ala STL style iterators (for nu)
 	std::pair<long, long> theBegEndJ
 		{ dat::nullValue<long>(), dat::nullValue<long>() };
 
+	//! Indices to currently active node (or invalid values)
 	std::pair<long, long> theAtIJ
 		{ dat::nullValue<long>(), dat::nullValue<long>() };
+
+	//! True if current iterator position is valid (not yet at end)
 	bool theIsActive{ false };
 
 public: // methods

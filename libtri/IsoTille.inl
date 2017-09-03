@@ -51,10 +51,10 @@ IsoTille :: triangleFor
 	dat::QuantumFrac const & muNodeFrac = mnNodeFracPair.first;
 	dat::QuantumFrac const & nuNodeFrac = mnNodeFracPair.second;
 
-	long const & ndxI = muNodeFrac.floor();
-	long const & ndxJ = nuNodeFrac.floor();
-	double const & muFrac = muNodeFrac.fraction();
-	double const & nuFrac = nuNodeFrac.fraction();
+	long const & ndxI = muNodeFrac.theFloor;
+	long const & ndxJ = nuNodeFrac.theFloor;
+	double const & muFrac = muNodeFrac.theResid;
+	double const & nuFrac = nuNodeFrac.theResid;
 
 	if (muFrac < nuFrac)
 	{

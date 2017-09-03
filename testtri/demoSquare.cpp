@@ -43,6 +43,8 @@
 #include "libmath/MapSizeArea.h"
 #include "libmath/math.h"
 
+#include "libdat/MinMax.h"
+
 #include <cassert>
 #include <complex>
 #include <fstream>
@@ -52,11 +54,21 @@
 
 namespace
 {
+	static dat::MinMax<long> sMinMaxI{};
+	static dat::MinMax<long> sMinMaxJ{};
+
 
 namespace example
 {
 	//! example data type (support op+() and op*()
 	using DataType = std::complex<double>;
+
+#define UseMap // 6.1 sec
+// #define UseGrid
+
+	// static DataType const sNull{ dat::nullValue<std::complex<double> >() };
+	static DataType const sNull
+		(dat::nullValue<double>(), dat::nullValue<double>());
 
 	//! Value for used to evaluate surface fit
 	double
@@ -73,7 +85,33 @@ namespace example
 		using value_type = DataType;
 		using KeyType = std::pair<long, long>;
 
-		std::map<KeyType, DataType> theSamps;
+		std::pair<long, long> theBegEndI
+			{ dat::nullValue<long>(), dat::nullValue<long>() };
+		std::pair<long, long> theBegEndJ
+			{ dat::nullValue<long>(), dat::nullValue<long>() };
+
+		explicit
+		SamplePool
+			( tri::NodeIterator::IndexLimits const & indexLimits
+			)
+			: theBegEndI{ indexLimits.ndxBegEndI() }
+			, theBegEndJ{ indexLimits.ndxBegEndJ() }
+		{ }
+
+		bool
+		keyIsValid
+			( KeyType const & key
+			) const
+		{
+			long const & keyI = key.first;
+			long const & keyJ = key.second;
+			return
+				{  (theBegEndI.first <= keyI)
+				&& (keyI < theBegEndI.second)
+				&& (theBegEndJ.first <= keyJ)
+				&& (keyJ < theBegEndJ.second)
+				};
+		}
 
 		void
 		addSample
@@ -81,7 +119,10 @@ namespace example
 			, KeyType const & key
 			)
 		{
-			theSamps[key] = sample;
+			sMinMaxI = sMinMaxI.expandedWith(key.first);
+			sMinMaxJ = sMinMaxJ.expandedWith(key.second);
+			assert(keyIsValid(key));
+			insertSample(sample, key);
 		}
 
 		DataType
@@ -90,17 +131,30 @@ namespace example
 			, long const & keyJ
 			) const
 		{
-			DataType samp(dat::nullValue<double>(), dat::nullValue<double>());
+			DataType sample{};
 			KeyType const key{ keyI, keyJ };
-			std::map<KeyType, DataType>::const_iterator
-				const itFind{ theSamps.find(key) };
-			if (theSamps.end() != itFind)
+			if (keyIsValid(key))
 			{
-				samp = itFind->second;
+				sample = extractSample(keyI, keyJ);
 			}
-			return samp;
+			return sample;
 		}
 
+		virtual
+		void
+		insertSample
+			( DataType const & sample
+			, KeyType const & key
+			) = 0;
+
+		virtual
+		DataType
+		extractSample
+			( long const & keyI
+			, long const & keyJ
+			) const = 0;
+
+		virtual
 		std::string
 		infoString
 			( std::string const & title = {}
@@ -111,7 +165,70 @@ namespace example
 			{
 				oss << title << std::endl;
 			}
-			oss << dat::infoString(theSamps.size(), "numSamp") << '\n';
+			
+			oss << dat::infoString(theBegEndI, "theBegEndI") << std::endl;
+
+			oss << std::endl;
+			oss << dat::infoString(theBegEndJ, "theBegEndJ") << std::endl;
+
+			return oss.str();
+		}
+
+	};
+
+	//! "Database" of DataTypes keyed to tritille lattice node indices
+	struct SampleMap : public SamplePool
+	{
+		std::map<KeyType, DataType> theSamps;
+
+		explicit
+		SampleMap
+			( tri::NodeIterator::IndexLimits const & indexLimits
+			)
+			: SamplePool(indexLimits)
+			, theSamps{}
+		{ }
+
+		virtual
+		void
+		insertSample
+			( DataType const & sample
+			, KeyType const & key
+			)
+		{
+			theSamps[key] = sample;
+		}
+
+		virtual
+		DataType
+		extractSample
+			( long const & keyI
+			, long const & keyJ
+			) const
+		{
+			DataType samp{ sNull };
+			KeyType const key{ keyI, keyJ };
+			std::map<KeyType, DataType>::const_iterator
+				const itFind{ theSamps.find(key) };
+			if (theSamps.end() != itFind)
+			{
+				samp = itFind->second;
+			}
+			return samp;
+		}
+
+		virtual
+		std::string
+		infoString
+			( std::string const & title = {}
+			) const
+		{
+			std::ostringstream oss;
+
+			oss << SamplePool::infoString(title);
+
+			oss << std::endl;
+			oss << dat::infoString(theSamps.size(), "numSamp") << std::endl;
 			for (std::pair<KeyType, DataType> const & samp: theSamps)
 			{
 				oss
@@ -125,6 +242,93 @@ namespace example
 
 	};
 
+	//! "Database" of DataTypes keyed to tritille lattice node indices
+	struct SampleGrid : public SamplePool
+	{
+		dat::grid<DataType> theSamps;
+
+		explicit
+		SampleGrid
+			( tri::NodeIterator::IndexLimits const & indexLimits
+			)
+			: SamplePool(indexLimits)
+			, theSamps
+				( theBegEndI.second - theBegEndI.first
+				, theBegEndJ.second - theBegEndJ.first
+				)
+		{
+			std::fill(theSamps.begin(), theSamps.end(), sNull);
+		}
+
+		dat::RowCol
+		gridRowColFor
+			( long const & keyI
+			, long const & keyJ
+			) const
+		{
+			long const row{ keyI - theBegEndI.first};
+			long const col{ keyJ - theBegEndJ.first};
+			assert(0u <= row);
+			assert(0u <= col);
+			return {{ size_t(row), size_t(col) }};
+		}
+
+		virtual
+		void
+		insertSample
+			( DataType const & sample
+			, KeyType const & key
+			)
+		{
+			long const & keyI = key.first;
+			long const & keyJ = key.second;
+			theSamps(gridRowColFor(keyI, keyJ)) = sample;
+		}
+
+		virtual
+		DataType
+		extractSample
+			( long const & keyI
+			, long const & keyJ
+			) const
+		{
+			DataType samp{ sNull };
+			dat::RowCol const gridRowCol(gridRowColFor(keyI, keyJ));
+			if (theSamps.hwSize().includes(gridRowCol))
+			{
+				samp = theSamps(gridRowCol);
+			}
+			return samp;
+		}
+
+		virtual
+		std::string
+		infoString
+			( std::string const & title = {}
+			) const
+		{
+			std::ostringstream oss;
+
+			oss << SamplePool::infoString(title);
+
+			oss << std::endl;
+			oss << dat::infoString(theSamps.size(), "numSamp") << std::endl;
+			/*
+			for (dat::ExtentsIterator iter(theSamps.hwSize()) ; iter ; ++iter)
+			{
+				dat::RowCol const & rowcol = *iter;
+				oss
+					<< "rowcol: " << dat::infoString(rowcol)
+					<< "samp: " << dat::infoString(theSamps(rowcol))
+					<< std::endl;
+			}
+			*/
+			return oss.str();
+		}
+
+	};
+
+
 	// Planar "surface"
 	DataType
 	valueOnSurfaceAtXY
@@ -137,20 +341,20 @@ namespace example
 	}
 
 	//! Generate samples over domain - (from planar surface)
-	SamplePool
-	poolOfSamples
-		( tri::IsoTille const & trinet
+	template <typename SamplePool>
+	void
+	fillSamples
+		( SamplePool * const & ptPool
+		, tri::IsoTille const & trinet
 		)
 	{
-		SamplePool pool;
 		tri::IsoGeo const & trigeo = trinet.theTileGeo;
 		for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 		{
-			SamplePool::KeyType const key(iter.indexPair());
+			SampleMap::KeyType const key(iter.indexPair());
 			dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
-			pool.addSample(valueOnSurfaceAtXY(xyLoc), key);
+			ptPool->addSample(valueOnSurfaceAtXY(xyLoc), key);
 		}
-		return pool;
 	}
 
 }
@@ -204,10 +408,11 @@ namespace tmp
 	}
 }
 
+template <typename SamplePool>
 void
 saveNodeInterp
 	( tri::IsoTille const & trinet
-	, example::SamplePool const & samples
+	, SamplePool const & samples
 	)
 {
 	tri::IsoGeo const & trigeo = trinet.theTileGeo;
@@ -324,8 +529,17 @@ io::out() << std::endl;
 
 	// generate samples at each tritille node
 	timer.start("pool.genSamples");
-	example::SamplePool const samples(example::poolOfSamples(trinet));
+#	if defined (UseMap)
+	example::SampleMap samples(trinet.begin().theNdxLimits);
+#	endif
+#	if defined (UseGrid)
+	example::SampleGrid samples(trinet.begin().theNdxLimits);
+#	endif
+	example::fillSamples(&samples, trinet);
 	timer.stop();
+
+io::out() << dat::infoString(sMinMaxI, "sMinMaxI") << std::endl;
+io::out() << dat::infoString(sMinMaxJ, "sMinMaxJ") << std::endl;
 
 	// interpolate surface value at raster grid locations
 	size_t numNull{ 0u };

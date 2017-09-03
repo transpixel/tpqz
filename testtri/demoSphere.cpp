@@ -280,7 +280,8 @@ io::out() << std::endl;
 		{
 			using namespace geo::sphere;
 			PairZA const zaLoc{ zenithOf(dir), azimuthOf(dir) };
-			PropType const gotRad{ trinet(zaLoc, radiusPropertyStore) };
+			PropType const gotRad
+				{ trinet.linearInterpWithCheck(zaLoc, radiusPropertyStore) };
 
 			if (dat::isValid(gotRad))
 			{

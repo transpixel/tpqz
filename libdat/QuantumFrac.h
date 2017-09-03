@@ -41,10 +41,6 @@
 #include <cmath>
 #include <string>
 
-#include "libio/stream.h"
-#include "libdat/info.h"
-#include <sstream>
-
 
 namespace dat
 {
@@ -89,112 +85,53 @@ public: // methods
 		() = default;
 
 	//! Construct by partitioning value
+	inline
 	explicit
 	QuantumFrac
 		( Type const & value
 		, quantum::Splitter<long, Type> const & quantFunc
-		)
-		: theQuant(quantFunc)
-	{
-		std::pair<long, Type> const qf{ quantFunc(value) };
-		theFloor = qf.first;
-		theResid = qf.second;
-	}
+		);
 
 	//! Value constructor
+	inline
 	explicit
 	QuantumFrac
 		( long const & floor
 		, Type const & resid
 		, quantum::Splitter<long, Type> const & quantFunc
-		)
-		: theQuant(quantFunc)
-		, theFloor{ floor }
-		, theResid{ resid }
-	{
-	}
+		);
 
 	//! True if instance is valid
+	inline
 	bool
 	isValid
-		() const
-	{
-		return dat::isValid(theResid);
-	}
-
-	//! The intergral floor part of construction value.
-	long const &
-	floor
-		() const
-	{
-		return theFloor;
-	}
-
-	//! The residual part of construction value.
-	Type const &
-	fraction
-		() const
-	{
-		return theResid;
-	}
+		() const;
 
 	//! The unit of quantization
+	inline
 	Type const &
 	delta
-		() const
-	{
-		return theQuant.theDelta;
-	}
+		() const;
 
 	//! True if this is same as other within residual tolerance
 	bool
 	nearlyEquals
 		( QuantumFrac const & other
 		, Type const & tolResid = dat::smallValue<Type>()
-		) const
-	{
-		bool same{ false };
-		if (other.theFloor == theFloor)
-		{
-			same = dat::nearlyEquals(other.theResid, theResid, tolResid);
-		}
-		return same;
-	}
+		) const;
 
 	//! Descriptive information about this instance.
 	std::string
 	infoString
 		( std::string const & title = std::string()
-		) const
-	{
-		std::ostringstream oss;
-		if (! title.empty())
-		{
-			oss << title << " ";
-		}
-		if (isValid())
-		{
-			oss
-				<< "floor,resid:"
-				<< " " << dat::infoString(floor())
-				<< " " << dat::infoString(fraction())
-				<< " " << "delta:"
-				<< " " << dat::infoString(delta())
-				;
-		}
-		else
-		{
-			oss << " <null>";
-		}
-		return oss.str();
-	}
+		) const;
 
 }; // QuantumFrac
 
 } // dat
 
 // Inline definitions
-// #include "libdat/QuantumFrac.inl"
+#include "libdat/QuantumFrac.inl"
 
 #endif // dat_QuantumFrac_INCL_
 

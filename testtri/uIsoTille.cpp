@@ -289,7 +289,8 @@ tri_IsoTille_test1
 		if (xyDomain.contains(xyLoc))
 		{
 			++numInDom;
-			example::DataType const gotSamp{ trinet(xyLoc, samples) };
+			example::DataType const gotSamp
+				{ trinet.linearInterpForValid(xyLoc, samples) };
 			if (gotSamp.isValid())
 			{
 				++numDiff;
@@ -325,7 +326,8 @@ tri_IsoTille_test1
 		example::DataType const expSamp{ example::valueOnPlaneAtXY(xySpot) };
 
 		// interpolated value from tritille
-		example::DataType const gotSamp(trinet(xySpot, samples));
+		example::DataType const gotSamp
+			{ trinet.linearInterpWithCheck(xySpot, samples) };
 		if (gotSamp.isValid())
 		{
 			// track differences

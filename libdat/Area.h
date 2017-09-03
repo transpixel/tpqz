@@ -38,10 +38,9 @@
 namespace dat
 {
 
-// TODO - move from Region ! Classic 2D region
-//template <typename Type>
-//using Area = Region<2u, Type>;
-
+	//! Classic 2D region
+	template <typename Type>
+	using Area = Region<2u, Type>;
 
 }
 

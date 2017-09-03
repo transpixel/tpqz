@@ -1,0 +1,3125 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Surface Interpolation via Isosceles Triangle Tiling
+\end_layout
+
+\begin_layout Author
+Stellacore Corporation
+\begin_inset Newline newline
+\end_inset
+
+Dave Knopp
+\end_layout
+
+\begin_layout Abstract
+Triangle meshes are frequently utilized to represent arbitrary surface shapes.
+ Although they are reasonably fast, triangle networks in general configuration
+ can still involve time consuming search operations.
+ This technical note presents a mathematic description of a special case
+ triangle network comprising a regular planar tiling of isosceles triangles,
+ herein called a iso-tritille
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Also known as a deltille and kishextille (cf.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "wikiTiling"
+
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+
+.
+ Although not as general as an arbitrary network, a regularly structured
+ tritille can be a useful structure for approximating arbitrary two-dimensional
+ functions.
+ This includes representation of various surfaces embedded within three-dimensio
+nal space when the surface can be expressed as a function defined over a
+ two-dimensional domain.
+ Because of the underling regularity within the iso-tritille, point location
+ and vertex value interpolation algorithms can be implemented with great
+ efficiency (constant order complexity).
+ This technical node describes a mathematical representation of the iso-tritille
+ geometry and the presents a simple algorithm for determining which triangle
+ contains an arbitrary point.
+ The point location algorithm is extended to interpolation of triangle faces
+ at points regularly spaced (along a line in the reference domain).
+ This presentation emphasizes practical implementation aspects over theoretical
+ rigor or completeness.
+ Examples are presented including use of an iso-tritille tessellation defined
+ in spherical coordinates and another defined in cylindrical coordinates.
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+TODO....
+\end_layout
+
+\begin_layout Subsection
+Concepts and Terminology
+\end_layout
+
+\begin_layout Itemize
+Application Domain: A 2D orthonormal coordinate frame which is the application-s
+pecific domain in which the tritrille is defined.
+\end_layout
+
+\begin_layout Itemize
+Tile Domain: A two-degree of freedom data storage structure associated with
+ the enumeration of tile entities.
+\end_layout
+
+\begin_layout Subsection
+Application Domain
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename TriTileFrames.svg
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Tessellation-geometry"
+
+\end_inset
+
+Tessellation geometry.
+ An arbitrary application coordinate frame is associated with the orthonormal
+ dextral basis vectors, 
+\begin_inset Formula $e_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $e_{2}$
+\end_inset
+
+.
+ The primary tritille axis is aligned with direction, 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ The secondary tritille axis is the dextral complimentary direction, 
+\begin_inset Formula $b=ae_{1}e_{2}$
+\end_inset
+
+.
+ Directions, 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are symmetric about 
+\begin_inset Formula $a$
+\end_inset
+
+ (i.e.
+ 
+\begin_inset Formula $v=aua$
+\end_inset
+
+).
+ The unit magnitude direction of 
+\begin_inset Formula $u$
+\end_inset
+
+ (hence that of 
+\begin_inset Formula $v$
+\end_inset
+
+) is determined by the ratio of spacing values, 
+\begin_inset Formula $\delta_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta_{b}$
+\end_inset
+
+ such that 
+\begin_inset Formula $u\propto\delta_{a}a-\delta_{b}b$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Assume a 2D orthonormal coordinate system and operations that are described
+ mathematically via geometric algebra
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GA.Cambridge,GA.Hestenes"
+
+\end_inset
+
+ including the following concepts:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $e_{1},e_{2}$
+\end_inset
+
+: Spanning orthogonal unitary basis vectors
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $E_{12}\equiv e_{1}e_{2}$
+\end_inset
+
+: The unitary basis bivector
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x$
+\end_inset
+
+: Vector associated with an arbitrary point location in the application
+ domain, e.g.
+\begin_inset Formula 
+\begin{equation}
+x=\xi_{1}e_{1}+\xi_{2}e_{2}\label{eq:DefAppLoc}
+\end{equation}
+
+\end_inset
+
+where the two scalar quantities, 
+\begin_inset Formula $\xi_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\xi_{2}$
+\end_inset
+
+ are the coordinates of a point location.
+\end_layout
+
+\begin_layout Subsection
+Tessellation
+\end_layout
+
+\begin_layout Standard
+A unique iso-tritille may be defined uniquely over an application-specific
+ region of interest, 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+, given the following information:
+\end_layout
+
+\begin_layout Itemize
+Extents: the minimum and maximum values for each coordinate that bound the
+ domain of interest.
+ E.g.
+\begin_inset Formula 
+\begin{eqnarray*}
+\xi_{1\text{min}} & \le & \xi_{1}<\xi_{1\text{max}}\\
+\xi_{2\text{min}} & \le & \xi_{2}<\xi_{2\text{max}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Validity: a method to determine if a point is contained within a region
+ of interest.
+ E.g.
+ a function,
+\begin_inset Formula 
+\[
+V\left(x\right)=\begin{cases}
+1 & x\in\mathcal{D}\\
+0 & x\notin\mathcal{D}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Primary Axis, 
+\begin_inset Formula $a$
+\end_inset
+
+: Unitary direction vector aligned with primary tiling edges.
+ Rows of nodes are defined in direction 
+\emph on
+orthogonal
+\emph default
+ to the primary axis.
+\end_layout
+
+\begin_layout Itemize
+Primary Spacing, 
+\begin_inset Formula $\delta_{a}$
+\end_inset
+
+: The magnitude of the separation between tiling rows that have the same
+ phase.
+ E.g.
+ twice the spacing between adjacent out-of-phase rows.
+\end_layout
+
+\begin_layout Itemize
+Secondary Spacing, 
+\begin_inset Formula $\delta_{b}$
+\end_inset
+
+: The magnitude of the separation between two nodes on the same row.
+\end_layout
+
+\begin_layout Itemize
+Origin Node, 
+\begin_inset Formula $x_{0}$
+\end_inset
+
+: A location in the application domain that coincides with the tiling node
+ used as reference for phase.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename TriTileLocation.svg
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Location-in-application"
+
+\end_inset
+
+Location in application domain and corresponding (non-orthogonal) projections
+ onto 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+.
+ The origin of the origin of the tile lattice, 
+\begin_inset Formula $\left\{ \mu=0,\nu=0\right\} $
+\end_inset
+
+, is at location, 
+\begin_inset Formula $x_{0}$
+\end_inset
+
+ in the application frame.
+ An arbitrary point location expressed by vector, 
+\begin_inset Formula $x$
+\end_inset
+
+, has (non-orthogonal) coordinates, 
+\begin_inset Formula $\left\{ \mu,\nu\right\} $
+\end_inset
+
+, expressed relative to the 
+\begin_inset Formula $u,v$
+\end_inset
+
+ directions such that 
+\begin_inset Formula $x=x_{0}+\mu u+\nu v$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+The tritille construction is illustrated in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Location-in-application"
+
+\end_inset
+
+.
+ Several ancillary quantities may be represented in terms of the defining
+ characteristics.
+\end_layout
+
+\begin_layout Itemize
+Secondary Axis, 
+\begin_inset Formula $b$
+\end_inset
+
+: Unitary direction vector orthogonal to 
+\begin_inset Formula $a$
+\end_inset
+
+ in dextral sense.
+ E.g.
+\begin_inset Formula 
+\[
+b\equiv aE_{12}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Major Axis, 
+\begin_inset Formula $u$
+\end_inset
+
+: Unitary direction vector defined as
+\begin_inset Formula 
+\[
+u=\frac{\delta_{a}a-\delta_{b}b}{\left|\delta_{a}a-\delta_{b}b\right|}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Minor Axis, 
+\begin_inset Formula $v$
+\end_inset
+
+: Unitary direction vector defined as
+\begin_inset Formula 
+\[
+v=\frac{\delta_{a}a+\delta_{b}b}{\left|\delta_{a}a+\delta_{b}b\right|}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Location, 
+\begin_inset Formula $y$
+\end_inset
+
+, expressed in tile space: Vector associated with arbitrary location expressed
+ with respect to the NON-orthogonal tiling axes.
+ I.e.
+\begin_inset Formula 
+\begin{equation}
+y=\mu u+\nu v\label{eq:DefTileLoc}
+\end{equation}
+
+\end_inset
+
+where the two scalar quantities, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+, are the coordinates of the tile location.
+\end_layout
+
+\begin_layout Itemize
+Extents, 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\left\{ \mu,\nu\right\} _{\left\{ \text{min},\text{max}\right\} }$
+\end_inset
+
+: limits on the 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+valid range of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+ values.
+ E.g.
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu_{\text{min}} & \le & \mu<\mu_{\text{max}}\\
+\nu_{\text{min}} & \le & \nu<\nu_{\text{max}}
+\end{eqnarray*}
+
+\end_inset
+
+where the extremes are a function of image of the application domain 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+ after transformation into the tile space.
+\end_layout
+
+\begin_layout Subsection
+Tile Domain
+\end_layout
+
+\begin_layout Standard
+The tile domain is associated with quantities:
+\end_layout
+
+\begin_layout Itemize
+Index, 
+\begin_inset Formula $i$
+\end_inset
+
+: major node index specifying node locations in direction of major axis,
+ 
+\begin_inset Formula $u$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Index, 
+\begin_inset Formula $j$
+\end_inset
+
+: minor node index specifying node locations in direction of minor axis,
+ 
+\begin_inset Formula $v$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Latice Spacing, 
+\begin_inset Formula $\delta$
+\end_inset
+
+: the distance between adjacent nodes in either the major or minor direction.
+ The requirement that this distance is the same in both directions is what
+ makes this tritille an isosceles one.
+ The magnitude is a function of input properties via
+\begin_inset Formula 
+\[
+\delta\sqrt{\delta_{a}^{2}+\delta_{b}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Rhobic Cell: Tile edges aligned with the 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ edge directions form a rhombic lattice.
+ Each rhombic cell is defined by four nodes, 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+, 
+\begin_inset Formula $\left\{ i+1,j\right\} $
+\end_inset
+
+, 
+\begin_inset Formula $\left\{ i+1,j+1\right\} $
+\end_inset
+
+, and 
+\begin_inset Formula $\left\{ i,j+1\right\} $
+\end_inset
+
+ and can be associated with an unique individual node of the lattice (the
+ 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+th node).
+ The final tritille topology is obtained by partitioning each rhombic cell
+ in half with an edge directed parallel to the primary axis.
+\end_layout
+
+\begin_layout Itemize
+Triangle Cell/Face: An isosceles triangle is the fundamental element of
+ the tiling.
+ The equal length sides of each triangle are aligned with the 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ directions.
+ The triangle edge aligned with the primary axis may be any (non-zero) length.
+ For the iso-tritille, all faces may be classified into one of two categories.
+ One class of faces is on the 
+\begin_inset Quotes eld
+\end_inset
+
+negative
+\begin_inset Quotes erd
+\end_inset
+
+ side of the axis of symmetry (toward the 
+\begin_inset Formula $-b$
+\end_inset
+
+ and 
+\begin_inset Formula $u$
+\end_inset
+
+ directions), the other is on the 
+\begin_inset Quotes eld
+\end_inset
+
+positive
+\begin_inset Quotes erd
+\end_inset
+
+ side (toward the 
+\begin_inset Formula $+b$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ directions).
+\end_layout
+
+\begin_layout Subsection
+Tritille Data Structures
+\end_layout
+
+\begin_layout Standard
+For practical uses, it is often important to assign various properties to
+ the individual tritille nodes.
+ There are various options available for doing this, many of which are facilitat
+ed by the regular structure of the tritille.
+\end_layout
+
+\begin_layout Standard
+The node indices, 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $j$
+\end_inset
+
+, form a regular partition in the 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ directions respectively.
+ Therefore, an obvious and simple solution is to store the properties in
+ a simple raster grid structure which is addressable using (
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $i$
+\end_inset
+
+,
+\begin_inset Formula $j$
+\end_inset
+
+)
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ as (row,col) indices into the grid and storing a null property indicator
+ at grid locations which are not in the domain of interest, 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Methodology
+\end_layout
+
+\begin_layout Subsection
+Tritille Definition
+\end_layout
+
+\begin_layout Standard
+The tiling of triangles can be accomplished by introducing a diagonal slash
+ across an initial rhombic tiling consistent with the 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ directions.
+ Herein the slash direction is consistently aligned with the primary axis
+ direction, 
+\begin_inset Formula $a$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The initial rhombic tessellation may be started by placing by a node at
+ a predetermined location, 
+\begin_inset Formula $x_{0}$
+\end_inset
+
+, and associating this node with tile indices, 
+\begin_inset Formula $\left\{ i,j\right\} =\left\{ 0,0\right\} $
+\end_inset
+
+.
+ In practice, it is often convenient to select the origin node, 
+\begin_inset Formula $x_{0}$
+\end_inset
+
+, such that all subsequently relevant tile index values are positive.
+\end_layout
+
+\begin_layout Standard
+The next node in the tile major direction may be associated with index pair
+ 
+\begin_inset Formula $\left\{ i,j\right\} =\left\{ 1,0\right\} $
+\end_inset
+
+ which is located at a point that is one tile spacing, 
+\begin_inset Formula $\delta$
+\end_inset
+
+, along the major axis direction, 
+\begin_inset Formula $u$
+\end_inset
+
+.
+ Similarly, nodes in the tile minor direction are associated with steps
+ of magnitude, 
+\begin_inset Formula $\delta$
+\end_inset
+
+, taken in the minor axis direction, 
+\begin_inset Formula $v$
+\end_inset
+
+.
+ This construction may be summarized by specifying the location of the 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+th node, 
+\begin_inset Formula $N_{ij}$
+\end_inset
+
+, to be at
+\begin_inset Formula 
+\[
+x_{ij}=i\delta u+j\delta v
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the iso-tritille tessellation with finite tile spacing, this relationship
+ may be summarized in a normalized form, as
+\begin_inset Formula 
+\[
+\delta^{-1}x_{ij}=iu+jv
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The tritille nodes of interest are those for which the corresponding location,
+ 
+\begin_inset Formula $x_{ij}$
+\end_inset
+
+, is in the domain of interest, 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+.
+ I.e.
+ locations for which 
+\begin_inset Formula $V\left(x_{ij}\right)=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The tritille tessellation may be considered as a graph in which the vertices
+ are associated with the tiling nodes, 
+\begin_inset Formula $N_{ij}$
+\end_inset
+
+, and edges are associated with sides of triangles which form the tiling.
+ Each 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+th node, may be associated with two of the rhombic cell edges,
+\begin_inset Formula 
+\begin{eqnarray*}
+\left\{ i,j\right\}  & \leftrightarrow & \left\{ i+1,j\right\} \\
+\left\{ i,j\right\}  & \leftrightarrow & \left\{ i,j+1\right\} 
+\end{eqnarray*}
+
+\end_inset
+
+The triangle slash is performed by associating a third edge with that same
+ node.
+\begin_inset Formula 
+\[
+\left\{ i+1,j\right\} \leftrightarrow\left\{ i,j+1\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each node is therefore associated with a rhombic cell that is partitioned
+ into two equal isosceles triangles.
+ Identify these triangles as 
+\begin_inset Formula $\mathbb{T}_{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbb{T}_{v}$
+\end_inset
+
+ and associate them with ordered vertices.
+ Associate each 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+th node with two specific (positive) triangles defined in terms of (ordered)
+ nodes forming the vertices as:
+\begin_inset Formula 
+\begin{eqnarray*}
+\mathbb{T}_{uij} & : & \left\{ \left\{ i,j\right\} ,\left\{ i+1,j\right\} ,\left\{ i+1,j+1\right\} \right\} \\
+\mathbb{T}_{vij} & : & \left\{ \left\{ i,j\right\} ,\left\{ i+1,j+1\right\} ,\left\{ i,j+1\right\} \right\} 
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Transformations
+\end_layout
+
+\begin_layout Standard
+Given an arbitrary location in the application frame, 
+\begin_inset Formula $x$
+\end_inset
+
+, the corresponding tile space vector, 
+\begin_inset Formula $y$
+\end_inset
+
+, is expressed relative to the major and minor tile axes via equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:DefTileLoc"
+
+\end_inset
+
+.
+ The two expressions specify the same point such that,
+\begin_inset Formula 
+\begin{equation}
+\mu u+\nu v=x\label{eq:xferInverse}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Forming the inner product of this equation with each of 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, produces the simultaneous scalar equation system,
+\begin_inset Formula 
+\begin{eqnarray*}
+\mu+\nu\left(u\cdot v\right) & = & u\cdot x\\
+\mu\left(v\cdot u\right)+\nu & = & v\cdot x
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+Via matrices
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+\left[\begin{array}{cc}
+1 & \gamma\\
+\gamma & 1
+\end{array}\right]\left[\begin{array}{c}
+\mu\\
+\nu
+\end{array}\right]=\left[\begin{array}{c}
+u\cdot x\\
+v\cdot x
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+\mu\\
+\nu
+\end{array}\right]=\frac{1}{1-\gamma^{2}}\left[\begin{array}{cc}
+1 & -\gamma\\
+-\gamma & 1
+\end{array}\right]\left[\begin{array}{c}
+u\cdot x\\
+v\cdot x
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+\mu\\
+\nu
+\end{array}\right]=\left[\begin{array}{cc}
+\alpha & \alpha\\
+\beta & \alpha
+\end{array}\right]\left[\begin{array}{c}
+u\cdot x\\
+v\cdot x
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\alpha & = & \frac{1}{1-\gamma^{2}}\\
+\beta & = & \frac{-\gamma}{1-\gamma^{2}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+With some simple algebra, the values which satisfy this system may be expressed
+ as
+\begin_inset Formula 
+\begin{eqnarray}
+\mu & = & \overline{u}\cdot x\label{eq:muFromX}\\
+\nu & = & \overline{v}\cdot x\label{eq:nuFromX}
+\end{eqnarray}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{eqnarray*}
+\overline{u} & \equiv & \alpha u+\beta v\\
+\overline{v} & \equiv & \beta u+\alpha v\\
+\alpha & \equiv & \left(1-\gamma^{2}\right)^{-1}\\
+\beta & \equiv & -\gamma\left(1-\gamma^{2}\right)^{-1}\\
+\gamma & \equiv & u\cdot v
+\end{eqnarray*}
+
+\end_inset
+
+Note that the transformation vectors, 
+\begin_inset Formula $\overline{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\overline{v}$
+\end_inset
+
+, are constants determined entirely by the tessellation geometry and are
+ therefore fixed constants for a given tritille configuration.
+ After expanding the dot product in terms of the definitions of 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, and a small amount of basic algebra
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+For
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+u=\frac{\delta_{a}a-\delta_{b}b}{\left|\delta_{a}a-\delta_{b}b\right|}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+v=\frac{\delta_{a}a+\delta_{b}b}{\left|\delta_{a}a+\delta_{b}b\right|}
+\]
+
+\end_inset
+
+E.g.
+\begin_inset Formula 
+\[
+\kappa=\sqrt{\left(\delta_{a}a-\delta_{b}b\right)^{2}}\sqrt{\left(\delta_{a}a+\delta_{b}b\right)^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\kappa=\sqrt{\left(\delta_{a}^{2}-2\delta_{a}\delta_{b}a\cdot b+\delta_{b}^{2}\right)\left(\delta_{a}^{2}+2\delta_{a}\delta_{b}a\cdot b+\delta_{b}^{2}\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\kappa=\sqrt{\left(\delta_{a}^{2}+\delta_{b}^{2}\right)\left(\delta_{a}^{2}+\delta_{b}^{2}\right)}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\kappa=\left(\delta_{a}^{2}+\delta_{b}^{2}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+u\cdot v=\frac{1}{\kappa}\left(\delta_{a}a-\delta_{b}b\right)\cdot\left(\delta_{a}a+\delta_{b}b\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+u\cdot v=\frac{1}{\kappa}\left(\delta_{a}^{2}-\delta_{b}^{2}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+u\cdot v=\frac{\delta_{a}^{2}-\delta_{b}^{2}}{\delta_{a}^{2}+\delta_{b}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+, the cosine factor, 
+\begin_inset Formula $\gamma$
+\end_inset
+
+, may be expressed in terms of the tritille spacing parameters,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\gamma=\frac{\delta_{a}^{2}-\delta_{b}^{2}}{\delta_{a}^{2}+\delta_{b}^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+expand 
+\begin_inset Formula $\gamma^{2}$
+\end_inset
+
+, as
+\begin_inset Formula 
+\[
+\gamma^{2}=\frac{\left(\delta_{a}^{2}-\delta_{b}^{2}\right)^{2}}{\left(\delta_{a}^{2}+\delta_{b}^{2}\right)^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\gamma^{2}=\frac{\left(\delta_{a}^{2}-\delta_{b}^{2}\right)\left(\delta_{a}^{2}-\delta_{b}^{2}\right)}{\left(\delta_{a}^{2}+\delta_{b}^{2}\right)^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\gamma^{2}=\frac{\left(\delta_{a}^{2}\delta_{a}^{2}-\delta_{b}^{2}\delta_{a}^{2}\right)+\left(-\delta_{a}^{2}\delta_{b}^{2}--\delta_{b}^{2}\delta_{b}^{2}\right)}{\left(\delta_{a}^{2}+\delta_{b}^{2}\right)^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\gamma^{2}=\frac{\delta_{a}^{4}-2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{4}}{\left(\delta_{a}^{2}+\delta_{b}^{2}\right)^{2}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\gamma^{2}=\frac{\delta_{a}^{4}-2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{4}}{\delta_{a}^{4}+2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{4}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+1-\gamma^{2}=\frac{\delta_{a}^{4}+2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{4}-\delta_{a}^{4}+2\delta_{b}^{2}\delta_{a}^{2}-\delta_{b}^{4}}{\delta_{a}^{4}+2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{4}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+1-\gamma^{2}=\frac{4\delta_{b}^{2}\delta_{a}^{2}}{\delta_{a}^{4}+2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{4}}
+\]
+
+\end_inset
+
+thus
+\begin_inset Formula 
+\[
+\left(1-\gamma^{2}\right)^{-1}=\frac{1}{4\delta_{a}^{2}\delta_{b}^{2}}\left(\delta_{a}^{4}+2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{4}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(1-\gamma^{2}\right)^{-1}=\frac{1}{4\delta_{a}^{2}\delta_{b}^{2}}\left(\delta_{a}^{2}\delta_{a}^{2}+2\delta_{b}^{2}\delta_{a}^{2}+\delta_{b}^{2}\delta_{b}^{2}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(1-\gamma^{2}\right)^{-1}=\frac{1}{4}\left(\left(\frac{\delta_{a}}{\delta_{b}}\right)^{2}+2+\left(\frac{\delta_{a}}{\delta_{b}}\right)^{-2}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+If 
+\begin_inset Formula $\delta_{a}=\delta_{b}$
+\end_inset
+
+, then 
+\begin_inset Formula $\left(1-\gamma^{2}\right)^{\pm1}=1$
+\end_inset
+
+, and the iso-tritille becomes orthogonal edges.
+ E.g.
+ 
+\begin_inset Formula $\gamma=1$
+\end_inset
+
+, where 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are orthogonal.
+\end_layout
+
+\end_inset
+
+When 
+\begin_inset Formula $\delta_{a}=\delta_{b}$
+\end_inset
+
+, then 
+\begin_inset Formula $\gamma=0$
+\end_inset
+
+ corresponding to an orthogonal configuration of 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+, and the iso-tritille corresponds with a diagonally slashed square tessellation.
+ If either 
+\begin_inset Formula $\delta_{a}=0$
+\end_inset
+
+, or 
+\begin_inset Formula $\delta_{b}=0$
+\end_inset
+
+, then 
+\begin_inset Formula $\gamma^{2}=1$
+\end_inset
+
+ and both 
+\begin_inset Formula $\overline{u}=\overline{v}=0$
+\end_inset
+
+, such that the tritille collapses into singularity.
+\end_layout
+
+\begin_layout Standard
+The tile location may be expressed in vector form, as
+\begin_inset Formula 
+\begin{equation}
+y=\left(\overline{u}\cdot x\right)u+\left(\overline{v}\cdot x\right)v\label{eq:xferForward}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:xferForward"
+
+\end_inset
+
+ embody a linear transformation from the domain of the application space
+ into the range of the tiling space
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+E.g.
+ in matrix notation, 
+\begin_inset Formula $\overline{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\overline{v}$
+\end_inset
+
+ would be the rows of a 2x2 transition matrix that operations on 2x1 vector
+ with components from 
+\begin_inset Formula $x$
+\end_inset
+
+, producing a 2x1 vector with components of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+.
+ The transformation is defined and well behaved (e.g.
+ invertible) provided that 
+\begin_inset Formula $\gamma\ne\pm1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:xferForward"
+
+\end_inset
+
+ provide an function for determining tile space coordinates given application
+ frame coordinates.
+ The inverse transformation, determination of application frame coordinates
+ from a tile space location, is provided directly by equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:xferInverse"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since the transformation is linear, pessimistic tile coordinate bounding
+ values, 
+\begin_inset Formula $\mu_{\left\{ \text{min,max}\right\} }$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{\left\{ \text{min,max}\right\} }$
+\end_inset
+
+, may be established by transforming each of the application domain extent
+ limits, 
+\begin_inset Formula $\xi_{\left\{ 1,2\right\} \left\{ \text{min,max}\right\} }$
+\end_inset
+
+ and selecting the largest and smallest results.
+ A tighter bound may be computed by evaluating each tritille node on the
+ convex hull of the nodes contained in the domain, 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+, (e.g.
+ collection of nodes for which 
+\begin_inset Formula $V\left(x\right)=1$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+Point Location
+\end_layout
+
+\begin_layout Standard
+To determine which tile contains an arbitrary point location, 
+\begin_inset Formula $x$
+\end_inset
+
+, first determine the tile coordinate components, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+, via the transformation relationship above.
+ Then decompose the components, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+, into integral and fractional parts as follows.
+\end_layout
+
+\begin_layout Standard
+Let scalar values, 
+\begin_inset Formula $\mu_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{f}$
+\end_inset
+
+ represent fractions which satisfy
+\begin_inset Formula 
+\[
+0\le\left\{ \mu_{f},\nu_{f}\right\} <1
+\]
+
+\end_inset
+
+Let 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $j$
+\end_inset
+
+ be the unique integers that satisfy the iso-tritille's spacing-normalized
+ relationship
+\begin_inset Formula 
+\begin{eqnarray*}
+\delta^{-1}\mu & = & i+\mu_{f}\\
+\delta^{-1}\nu & = & j+\nu_{f}
+\end{eqnarray*}
+
+\end_inset
+
+For which:
+\begin_inset Formula 
+\begin{eqnarray}
+i & = & \left\lfloor \frac{\mu}{\delta}\right\rfloor =\left\lfloor \frac{x\cdot\overline{u}}{\delta}\right\rfloor \label{eq:Def_i}\\
+\mu_{f} & = & \mu-i\delta\label{eq:Def_muFrac}\\
+j & = & \left\lfloor \frac{\nu}{\delta}\right\rfloor =\left\lfloor \frac{x\cdot\overline{v}}{\delta}\right\rfloor \label{eq:Def_j}\\
+\nu_{f} & = & \nu-j\delta\label{eq:Def_nuFrac}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The indices, 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $j$
+\end_inset
+
+, are the tritille node indices and define a specific rhombic cell which
+ contains the tile location, 
+\begin_inset Formula $y=\mu u+\nu v$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The fractional values, 
+\begin_inset Formula $\mu_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{f}$
+\end_inset
+
+, are the relative positions within that rhombic cell.
+ Membership within the appropriate one of the two partitioning triangles,
+ of the location 
+\begin_inset Formula $y$
+\end_inset
+
+, may be determined via
+\begin_inset Formula 
+\begin{equation}
+y\in\begin{cases}
+\mathbb{T}_{u} & \nu_{f}\le\mu_{f}\\
+\mathbb{T}_{v} & \text{else}
+\end{cases}\label{eq:TestTuTv}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Due to the regularity of the tritille structure, this triangle location
+ process has constant complexity independent of the size of the tessellation
+ (e.g.
+ independent of the number of nodes).
+\end_layout
+
+\begin_layout Standard
+The triangle selection process may be summarized as:
+\end_layout
+
+\begin_layout Enumerate
+Given 
+\begin_inset Formula $x$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Enumerate
+Determine 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+ via equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:muFromX"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:nuFromX"
+
+\end_inset
+
+ respectively.
+\end_layout
+
+\begin_layout Enumerate
+Determine integer and fractional components 
+\begin_inset Formula $\left(i,\mu_{f}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(j,\nu_{f}\right)$
+\end_inset
+
+ via equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_i"
+
+\end_inset
+
+ thru
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_nuFrac"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Compare 
+\begin_inset Formula $\mu_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{f}$
+\end_inset
+
+ to select triangle as either 
+\begin_inset Formula $\mathbb{T}_{uij}$
+\end_inset
+
+ or 
+\begin_inset Formula $\mathbb{T}_{vij}$
+\end_inset
+
+ using test
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:TestTuTv"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Face Interpolation
+\end_layout
+
+\begin_layout Standard
+A common and significant use of triangulated networks is to interpolate
+ arbitrary properties when sample property values are known only at tritille
+ node locations.
+ For the iso-tritille, the network regularity can be exploited to perform
+ interpolation using a small number of computations.
+ The following describes the case of simple linear interpolation of properties
+ utilizing the barycentric coordinates (cf.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "wikiBary"
+
+\end_inset
+
+) for point locations interior to a tritille triangle.
+\end_layout
+
+\begin_layout Subsubsection
+Face definition
+\end_layout
+
+\begin_layout Standard
+Consider a (directed) triangle represented by (ordered) vertices described
+ by vectors, 
+\begin_inset Formula $r_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $r_{2}$
+\end_inset
+
+, and 
+\begin_inset Formula $r_{3}$
+\end_inset
+
+.
+ The first step is to determine the barycentric coordinates of an arbitrary
+ point, 
+\begin_inset Formula $q$
+\end_inset
+
+, which is here assumed to be coplanar with the triangle.
+\end_layout
+
+\begin_layout Standard
+Let the barycentric coordinates of 
+\begin_inset Formula $q$
+\end_inset
+
+ be denoted as 
+\begin_inset Formula $\omega_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $\omega_{2}$
+\end_inset
+
+, and 
+\begin_inset Formula $\omega_{3}$
+\end_inset
+
+ and introduce indices 
+\begin_inset Formula $l$
+\end_inset
+
+, 
+\begin_inset Formula $m$
+\end_inset
+
+, 
+\begin_inset Formula $n$
+\end_inset
+
+ to identify the triangle vertices.
+ In the following, the vertex indices 
+\begin_inset Formula $\left\{ l,m,n\right\} =\left\{ 1,2,3\right\} $
+\end_inset
+
+ are understood to represent values in cyclic order (e.g.
+ 
+\begin_inset Formula $lmn=\left\{ 123,231,312\right\} $
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename TriTileBary.svg
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Barycenter"
+
+\end_inset
+
+Fractional cell and barycentric coordinates.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Within the iso-tritille construction each rhombic cell is split into two
+ triangles, 
+\begin_inset Formula $\mathbb{T}_{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbb{T}_{v}$
+\end_inset
+
+ each of these must be considered individually.
+ As illustrated in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Barycenter"
+
+\end_inset
+
+, the fractional values, 
+\begin_inset Formula $\mu_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{f}$
+\end_inset
+
+ are directly related to the barycentric coordinates of point 
+\begin_inset Formula $q$
+\end_inset
+
+.
+ The barycentric coordinate component, 
+\begin_inset Formula $\omega_{l}$
+\end_inset
+
+, associated with a vertex, 
+\begin_inset Formula $r_{l}$
+\end_inset
+
+ can be interpreted as the distance between the point 
+\begin_inset Formula $q$
+\end_inset
+
+ and the side of the triangle defined by vertices, 
+\begin_inset Formula $r_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $r_{n}$
+\end_inset
+
+.
+ Two of the barycenter values can be obtained from the figure by inspection
+ and the third can be computed from the requirement that (normalized) barycentri
+c coordinates sum to unity (i.e.
+ 
+\begin_inset Formula $\sum_{k}\omega_{k}=1$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsubsection
+Triangle Class 
+\begin_inset Formula $\mathbb{T}_{u}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For triangle, 
+\begin_inset Formula $\mathbb{T}_{u}$
+\end_inset
+
+, barycentric values, 
+\begin_inset Formula $\omega_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\omega_{3}$
+\end_inset
+
+ can be expressed in terms of fractional offsets, 
+\begin_inset Formula $\mu_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{f}$
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{eqnarray*}
+\omega_{1} & = & 1-\mu_{f}\\
+\omega_{3} & = & \nu_{f}
+\end{eqnarray*}
+
+\end_inset
+
+and from the normalization relationship
+\begin_inset Formula 
+\begin{eqnarray*}
+\omega_{2} & = & 1-\omega_{1}-\omega_{3}\\
+ & = & \mu_{f}-\nu_{f}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Triangle Class 
+\begin_inset Formula $\mathbb{T}_{v}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the triangle, 
+\begin_inset Formula $\mathbb{T}_{v}$
+\end_inset
+
+, barycentric values, 
+\begin_inset Formula $\omega_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\omega_{2}$
+\end_inset
+
+ may be read directly from the figure as
+\begin_inset Formula 
+\begin{eqnarray*}
+\omega_{1} & = & 1-\nu_{f}\\
+\omega_{2} & = & \mu_{f}
+\end{eqnarray*}
+
+\end_inset
+
+and by normalization,
+\begin_inset Formula 
+\begin{eqnarray*}
+\omega_{3} & = & 1-\omega_{1}-\omega_{2}\\
+ & = & \nu_{f}-\mu_{f}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Property Interpolation
+\end_layout
+
+\begin_layout Standard
+Assume the three vertices, 
+\begin_inset Formula $r_{l}$
+\end_inset
+
+, 
+\begin_inset Formula $r_{m}$
+\end_inset
+
+, and 
+\begin_inset Formula $r_{n}$
+\end_inset
+
+, (pertaining to either of the two triangles, 
+\begin_inset Formula $\mathbb{T}_{u}$
+\end_inset
+
+ or 
+\begin_inset Formula $\mathbb{T}_{v}$
+\end_inset
+
+) have some property associated with each.
+ Let this property be denoted by some arbitrary entity 
+\begin_inset Formula $P$
+\end_inset
+
+.
+ The property is assumed to be arbitrary as along as its expression supports
+ linear operations (e.g.
+ 
+\begin_inset Formula $P$
+\end_inset
+
+ is associated with a mathematical ring).
+\end_layout
+
+\begin_layout Standard
+Given discrete property values at the three vertices, 
+\begin_inset Formula $P\left(r_{l}\right)$
+\end_inset
+
+, 
+\begin_inset Formula $P\left(r_{m}\right)$
+\end_inset
+
+, and 
+\begin_inset Formula $P\left(r_{n}\right)$
+\end_inset
+
+, the linearly interpolated property value at location 
+\begin_inset Formula $q$
+\end_inset
+
+, may be expressed as the weighted sum of the vertex properties, wherein
+ the weight factor is the corresponding barycentric coordinate.
+ I.e.
+\begin_inset Formula 
+\[
+P\left(q\right)=\sum_{k}\omega_{k}P\left(r_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This may be expressed for each component triangle in the tritille by associating
+ each vertex with an 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $j$
+\end_inset
+
+ index pair.
+\begin_inset Formula 
+\[
+\mathbb{T}_{uij}:\begin{cases}
+r_{1} & :\, N\left(i,j\right)\\
+r_{2} & :\, N\left(i+1,j\right)\\
+r_{3} & :\, N\left(i+1,j+1\right)
+\end{cases}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathbb{T}_{vij}:\begin{cases}
+r_{1} & :\, N\left(i,j\right)\\
+r_{2} & :\, N\left(i+1,j+1\right)\\
+r_{3} & :\, N\left(i,j+1\right)
+\end{cases}
+\]
+
+\end_inset
+
+The following paragraphs provide an explicit expression of the interpolated
+ property value for each class of triangle.
+\end_layout
+
+\begin_layout Paragraph
+Triangle Class 
+\begin_inset Formula $\mathbb{T}_{u}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the first triangle, the linearly interpolated property is
+\begin_inset Formula 
+\begin{eqnarray}
+P\left(q\right) & = & \left(1-\mu_{f}\right)P\left(i,j\right)\nonumber \\
+ & + & \left(\nu_{f}\right)P\left(i+1,j\right)\nonumber \\
+ & + & \left(\mu_{f}-\nu_{f}\right)P\left(i+1,j+1\right)\label{eq:InterpTu}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+Expand
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & \left(1-\mu_{f}\right)P_{i,j}\\
+ & + & \left(\nu_{f}\right)P_{i+1,j}\\
+ & + & \left(\mu_{f}-\nu_{f}\right)P_{i+1,j+1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{i,j}\\
+ & + & \mu_{f}P_{i+1,j+1}-\mu_{f}P_{i,j}\\
+ & + & \nu_{f}P_{i+1,j}-\nu_{f}P_{i+1,j+1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{i,j}\\
+ & + & \mu_{f}\left(P_{i+1,j+1}-P_{i,j}\right)\\
+ & - & \nu_{f}\left(P_{i+1,j+1}-P_{i+1,j}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{00}\\
+ & + & \mu_{f}\left(P_{11}-P_{00}\right)\\
+ & - & \nu_{f}\left(P_{11}-P_{10}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{00}+\mu_{f}K_{1100}-\nu_{f}K_{1110}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+This may also be expressed in terms of property differences (associated
+ with the 
+\begin_inset Formula $i,j$
+\end_inset
+
+ node) as
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P\left(i,j\right)+\mu_{f}K_{1100}-\nu_{f}K_{1110}
+\end{eqnarray*}
+
+\end_inset
+
+for
+\begin_inset Formula 
+\begin{eqnarray*}
+K_{1100} & = & P\left(i+1,j+1\right)-P\left(i,j\right)\\
+K_{1110} & = & P\left(i+1,j+1\right)-P\left(i+1,j\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Triangle Class 
+\begin_inset Formula $\mathbb{T}_{v}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the second triangle, the linearly interpolated property is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+P\left(q\right) & = & \left(1-\nu_{f}\right)P\left(i,j\right)\nonumber \\
+ & + & \left(\mu_{f}\right)P\left(i+1,j+1\right)\nonumber \\
+ & + & \left(\nu_{f}-\mu_{f}\right)P\left(i,j+1\right)\label{eq:InterpTv}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+Expand
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & \left(1-\nu_{f}\right)P_{i,j}\\
+ & + & \left(\mu_{f}\right)P_{i+1,j+1}\\
+ & + & \left(\nu_{f}-\mu_{f}\right)P_{i,j+1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{i,j}\\
+ & + & \mu_{f}\left(P_{i+1,j+1}-P_{i,j+1}\right)\\
+ & + & \nu_{f}\left(P_{i,j+1}-P_{i,j}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{i,j}\\
+ & + & \mu_{f}\left(P_{i+1,j+1}-P_{i,j+1}\right)\\
+ & + & \nu_{f}\left(\left(P_{i+1,j+1}-P_{i,j}\right)-\left(P_{i+1,j+1}-P_{i,j+1}\right)\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{00}\\
+ & + & \mu_{f}\left(P_{11}-P_{01}\right)\\
+ & + & \nu_{f}\left(\left(P_{11}-P_{00}\right)-\left(P_{11}-P_{01}\right)\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{00}+\mu_{f}K_{1101}+\nu_{f}\left(K_{1100}-K_{1101}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P_{00}+\mu_{f}K_{1101}+\nu_{f}K_{0100}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+This may also be expressed in terms of property differences as
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(q\right) & = & P\left(i,j\right)+\mu_{f}K_{1101}+\nu_{f}K_{0100}
+\end{eqnarray*}
+
+\end_inset
+
+for
+\begin_inset Formula 
+\begin{eqnarray*}
+K_{1101} & = & P\left(i+1,j+1\right)-P\left(i,j+1\right)\\
+K_{0100} & = & P\left(i,j+1\right)-P\left(i,j\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Missing Nodes
+\end_layout
+
+\begin_layout Standard
+In a practical setting, it is necessary to handle the situation in which
+ one or more of the node properties is not defined.
+ Certainly this is the situation near the edge of the domain of interest,
+ 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+.
+ There are several obvious options for handling this case in which one or
+ more of nodes (or associated property values) are not available.
+ If one node is missing, options include:
+\end_layout
+
+\begin_layout Itemize
+Consider the entire face to be invalid.
+\end_layout
+
+\begin_layout Itemize
+Replace the missing property with a zero value.
+ This has the effect of extending the valid edge property orthogonally outward
+ from the edge.
+\end_layout
+
+\begin_layout Itemize
+Reflect the missing node through the valid edge, negate the corresponding
+ barycentric value and estimate the property value via extrapolation from
+ the adjacent triangle.
+\end_layout
+
+\begin_layout Standard
+If two nodes are missing
+\end_layout
+
+\begin_layout Itemize
+Replace both missing properties with zero values.
+ This has the effect of extending the valid node property through the triangle
+ with the missing nodes.
+\end_layout
+
+\begin_layout Itemize
+Search for nearby valid tessellation faces and use one or more of those
+ in an extrapolation process.
+\end_layout
+
+\begin_layout Subsubsection
+Recapitulation
+\end_layout
+
+\begin_layout Standard
+Consider estimating a surface property at an arbitrary location, 
+\begin_inset Formula $x$
+\end_inset
+
+, given an established tritille structure which has sample property values
+ assigned to its nodes.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+To obtain a linearly interpolated value from known vertex properties, utilize
+ the preceding framework as follows:
+\end_layout
+
+\begin_layout Enumerate
+Start with an arbitrary application frame location, 
+\begin_inset Formula $x$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Transform, 
+\begin_inset Formula $x$
+\end_inset
+
+, into tile space to obtain (non-orthogonal) coordinate values, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+ (equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:muFromX"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:nuFromX"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Enumerate
+Determine node indices, 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $j$
+\end_inset
+
+, as the integral floor values of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+ (equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_i"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_j"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+Determine fractional offsets, 
+\begin_inset Formula $\mu_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{f}$
+\end_inset
+
+ as the fractional 
+\begin_inset Quotes eld
+\end_inset
+
+remainder
+\begin_inset Quotes erd
+\end_inset
+
+ of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+ (via equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_muFrac"
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_nuFrac"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+Compare 
+\begin_inset Formula $\mu_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu_{f}$
+\end_inset
+
+ to select triangle class:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+For 
+\begin_inset Formula $\nu_{f}\le\mu_{f}$
+\end_inset
+
+, use 
+\begin_inset Formula $\mathbb{T}_{u}$
+\end_inset
+
+:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+with 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+ select the neighbor nodes, 
+\begin_inset Formula $\left\{ i+1,j\right\} $
+\end_inset
+
+, and 
+\begin_inset Formula $\left\{ i+1,j+1\right\} $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+evaluate interpolated property value via equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:InterpTu"
+
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Otherwise (
+\begin_inset Formula $\mu_{f}<\nu_{f}$
+\end_inset
+
+), use 
+\begin_inset Formula $\mathbb{T}_{v}$
+\end_inset
+
+:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+with 
+\begin_inset Formula $\left\{ i,j\right\} $
+\end_inset
+
+ select the neighbor nodes, 
+\begin_inset Formula $\left\{ i+1,j+1\right\} $
+\end_inset
+
+, and 
+\begin_inset Formula $\left\{ i,j+1\right\} $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+evaluate interpolated property value via equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:InterpTv"
+
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\end_deeper
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Interpolation along a Line
+\end_layout
+
+\begin_layout Standard
+A common operation involving surfaces is the evaluation of surface properties
+ along a linear path.
+ This section addresses optimizations associated with evaluating linear
+ interpolation of the tritille along a line segment defined in the application
+ coordinate frame.
+\end_layout
+
+\begin_layout Subsubsection
+Line in Application Frame
+\end_layout
+
+\begin_layout Standard
+Consider an infinite line defined in the application frame.
+ Location, 
+\begin_inset Formula $x$
+\end_inset
+
+, is on the line if it satisfies the parametric equation,
+\begin_inset Formula 
+\begin{equation}
+x=s+\lambda d\label{eq:LineInApp}
+\end{equation}
+
+\end_inset
+
+where
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $d$
+\end_inset
+
+ is a unit direction vector (
+\begin_inset Formula $d^{2}=1$
+\end_inset
+
+) which specifies the direction of the line.
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is a scalar free parameter which specifies 
+\begin_inset Quotes eld
+\end_inset
+
+distance along
+\begin_inset Quotes erd
+\end_inset
+
+ the line.
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $s$
+\end_inset
+
+ is a vector specifying a 
+\begin_inset Quotes eld
+\end_inset
+
+start
+\begin_inset Quotes erd
+\end_inset
+
+ point that lies on the line (corresponding with 
+\begin_inset Formula $\lambda=0$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsubsection
+Line in Tile Space
+\end_layout
+
+\begin_layout Standard
+An expression for this same line in tile space may be obtained by transforming
+ expression
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:LineInApp"
+
+\end_inset
+
+, via equations
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:xferForward"
+
+\end_inset
+
+ to obtain
+\begin_inset Formula 
+\[
+y=\left(\left(s+\lambda d\right)\cdot\overline{u}\right)u+\left(\left(s+\lambda d\right)\cdot\overline{v}\right)v
+\]
+
+\end_inset
+
+After some simple algebra
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+y=\left(s\cdot\overline{u}+\lambda d\cdot\overline{u}\right)u+\left(s\cdot\overline{v}+\lambda d\cdot\overline{v}\right)v
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+y=\left(s\cdot\overline{u}\right)u+\lambda\left(d\cdot\overline{u}\right)u+\left(s\cdot\overline{v}\right)v+\lambda\left(d\cdot\overline{v}\right)v
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+y=\left(\left(s\cdot\overline{u}\right)u+\left(s\cdot\overline{v}\right)v\right)+\lambda\left(\left(d\cdot\overline{u}\right)u+\left(d\cdot\overline{v}\right)v\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+, this may be expressed as
+\begin_inset Formula 
+\begin{equation}
+y=\overline{s}+\lambda\overline{d}\label{eq:LineInTile}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{eqnarray*}
+\overline{s} & \equiv & \left(s\cdot\overline{u}\right)u+\left(s\cdot\overline{v}\right)v\\
+\overline{d} & \equiv & \left(d\cdot\overline{u}\right)u+\left(d\cdot\overline{v}\right)v
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that these values are fixed one a particular line is specified.
+ Also, if interpolation is performed along multiple lines which are mutually
+ parallel (as common in raster interpolation), only the start value, 
+\begin_inset Formula $\overline{s}$
+\end_inset
+
+, needs be updated once for each line, while the direction, 
+\begin_inset Formula $\overline{d}$
+\end_inset
+
+, is constant for the entire collection of parallel lines.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Subsubsection
+Incremental Sampling
+\end_layout
+
+\begin_layout Plain Layout
+For uniform sampling along a line, the tile space locations may be computed
+ incrementally.
+ If the sample spacing is dense compared with the size of triangles in the
+ tritille, the incremental approach can reduce the number of tritille index
+ operations.
+\end_layout
+
+\begin_layout Plain Layout
+Denote differentiation with respect to an arbitrary scalar with overdot
+ notation.
+ The derivative of equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:LineInTile"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\[
+\dot{y}=\dot{\overline{s}}+\dot{\lambda}\overline{d}+\lambda\dot{\overline{d}}
+\]
+
+\end_inset
+
+However, both 
+\begin_inset Formula $\overline{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\overline{d}$
+\end_inset
+
+ are constant, so that
+\begin_inset Formula 
+\[
+\dot{y}=\dot{\lambda}\overline{d}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+A change in tile location, 
+\begin_inset Formula $\Delta y$
+\end_inset
+
+, for a given change in line parameter, 
+\begin_inset Formula $\Delta\lambda$
+\end_inset
+
+, may be estimated as,
+\begin_inset Formula 
+\[
+\Delta y=\Delta\lambda\overline{d}
+\]
+
+\end_inset
+
+Since the underlying equations are linear, this is an exact relationships.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+The following section describes results of a computer simulations associated
+ with geometric shape interpolation.
+\end_layout
+
+\begin_layout Subsection
+Sphere Interpolation
+\end_layout
+
+\begin_layout Standard
+For this experiment, a unit sphere is approximated by an iso-tritille network
+ defined over the two-dimensional domain of zenith and azimuth coordinates.
+ A software program generates several tritille tessellations with different
+ defining characteristics and evaluates the difference between an tritille-inter
+polated radius and the known value.
+\end_layout
+
+\begin_layout Subsection
+Cylinder Interpolation
+\end_layout
+
+\begin_layout Standard
+This is similar to the sphere interpolation case, except applied to a section
+ of a right circular cylinder of unit radius and a height of twice the radius.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "GA.Cambridge"
+
+\end_inset
+
+University of Cambridge, 
+\begin_inset Quotes eld
+\end_inset
+
+Geometric Algebra
+\begin_inset Quotes erd
+\end_inset
+
+, Website, http://geometry.mrao.cam.ac.uk/
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "GA.Hestenes"
+
+\end_inset
+
+Hestenes, David, "New Foundations for Classical Mechanics", Kluwer Academic
+ Press, 1999.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "wikiBary"
+
+\end_inset
+
+Wikipedia, 
+\begin_inset Quotes eld
+\end_inset
+
+Barycentric coordinate system
+\begin_inset Quotes erd
+\end_inset
+
+ https://en.wikipedia.org/wiki/Barycentric_coordinate_system#Barycentric_coordinat
+es_on_triangles.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "wikiTiling"
+
+\end_inset
+
+Wikipedia, 
+\begin_inset Quotes eld
+\end_inset
+
+Triangular Tiling
+\begin_inset Quotes erd
+\end_inset
+
+, https://en.wikipedia.org/wiki/Triangular_tiling.
+\end_layout
+
+\end_body
+\end_document

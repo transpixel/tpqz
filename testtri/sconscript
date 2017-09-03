@@ -36,41 +36,40 @@ if showSconsProgress :
 
 env = env.Clone() # allow module to change anything it wants
 
-cpppaths = \
-	[ '/usr/include/opencv2/'
-	]
-
 libpaths = \
-	[ '../libsig/'
-	, '../libimg/'
+	[ '../libtri/'
+
+	, '../libga/'
 	, '../libmath/'
+
 	, '../libio/'
+
 	, '../libapp/'
-	, '../libdat/'
-	, '../libsys/'
+#	, '../libmem/'
+#	, '../libdat/'
+#	, '../libsys/'
 	]
 
 linklibs = \
-	[ 'sig'
-	, 'img'
-	, 'math'
-	, 'io'
-	, 'app'
-	, 'dat'
-	, 'sys'
+	[ 'tri'
 
-	, 'opencv_highgui'
-	, 'opencv_imgproc'
-	, 'opencv_core'
+	, 'ga'
+	, 'math'
+
+	, 'io'
+
+	, 'app'
+#	, 'mem'
+#	, 'dat'
+#	, 'sys'
 	]
 
-env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('uFilterContext.cpp')
-env.Program('ufilter.cpp')
-env.Program('umatch.cpp')
-env.Program('uPeak.cpp')
-
+#env.Program('demoCylinder.cpp')
+env.Program('demoSphere.cpp')
+env.Program('demoSquare.cpp')
+env.Program('uIsoTille.cpp')
+env.Program('uNodeIterator.cpp')
 

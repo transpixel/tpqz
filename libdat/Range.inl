@@ -157,6 +157,26 @@ Range<Type> :: pair
 template <typename Type>
 inline
 Type
+Range<Type> :: operator[]
+	( size_t const & ndx
+	) const
+{
+	Type value{ dat::nullValue<Type>() };
+	if (0u == ndx)
+	{
+		value = min();
+	}
+	else
+	if (1u == ndx)
+	{
+		value = max();
+	}
+	return value;
+}
+
+template <typename Type>
+inline
+Type
 Range<Type> :: min
 	() const
 {

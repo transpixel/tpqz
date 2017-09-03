@@ -34,6 +34,7 @@
 */
 
 
+#include "libdat/Area.h"
 #include "libdat/dat.h"
 #include "libdat/grid.h"
 #include "libdat/Region.h"

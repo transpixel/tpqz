@@ -1,6 +1,7 @@
 demoEnableIf
 ualgorithm
 uArea
+uarray
 ubit
 ucompare
 udat
@@ -17,6 +18,8 @@ ulayout
 uMinMax
 uNdxBegEnd
 uops
+uquantum
+uQuantumFrac
 urandom
 uRange
 uRegion

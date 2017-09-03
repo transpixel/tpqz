@@ -131,6 +131,13 @@ public: // methods
 	pair
 		() const;
 
+	//! Access to endpoints ([0]==min(), [1]==max())
+	inline
+	Type
+	operator[]
+		( size_t const & ndx
+		) const;
+
 	//! Minimum end point (same as .first) treated as Included
 	inline
 	Type

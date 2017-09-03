@@ -106,6 +106,17 @@ namespace dat
 		( std::array<Type, Dim> const & vals
 		);
 
+	//! Direction of vec (or null)
+	template
+		< typename FType, size_t Dim
+		, EnableIf< std::is_floating_point<FType> >...
+		>
+	inline
+	std::array<FType, Dim>
+	unit
+		( std::array<FType, Dim> const & vec
+		);
+
 	//! Array addition
 	template <typename Type, size_t Dim>
 	inline

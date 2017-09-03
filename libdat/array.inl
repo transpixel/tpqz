@@ -130,6 +130,27 @@ magnitude
 	return std::sqrt(magSq(vals));
 }
 
+template
+	< typename FType, size_t Dim
+	, EnableIf< std::is_floating_point<FType> >...
+	>
+inline
+std::array<FType, Dim>
+unit
+	( std::array<FType, Dim> const & vec
+	)
+{
+	std::array<FType, Dim> result{{ dat::nullValue<FType>() }};
+	FType const mag{ magnitude(vec) };
+	if (std::numeric_limits<FType>::min() < mag)
+	{
+		// for non-zero arguments, normalize data
+		FType const inv{ static_cast<FType>(1./mag) };
+		result = inv * vec;
+	}
+	return result;
+}
+
 template <typename Type, size_t Dim>
 inline
 std::array<Type, Dim>

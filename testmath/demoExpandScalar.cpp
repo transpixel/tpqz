@@ -434,7 +434,10 @@ namespace
 				resid = trPair.second;
 
 				// safety catch for dev/debug operations
-				assert(! (maxTerms < termStack.size()));
+				if (maxTerms < termStack.size())
+				{
+					assert(! (maxTerms < termStack.size()));
+				}
 			}
 		}
 

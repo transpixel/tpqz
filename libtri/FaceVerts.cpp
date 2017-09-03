@@ -28,81 +28,58 @@
 
 
 /*! \file
-\brief Inline Definitions for sys::Utilization
+\brief Definitions for tri::FaceVerts
 */
 
 
-namespace sys
+#include "libtri/FaceVerts.h"
+
+#include "libdat/info.h"
+#include "libio/sprintf.h"
+#include <sstream>
+
+
+namespace tri
 {
 
-inline
-// explicit
-Utilization :: Utilization
-	( size_t const & maxCount
-	)
-	: theMutex{}
-	, theMaxCount{ maxCount }
-	, theCount{ 0u }
-	, theIsValid{ (0u < theMaxCount) }
-{}
-
-inline
-void
-Utilization :: increase
-	()
+std::string
+FaceVerts::Vertex :: infoString
+	( std::string const & title
+	, std::string const & fmt
+	) const
 {
-	if (isValid())
+	std::ostringstream oss;
+	if (! title.empty())
 	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			assert(theCount < theMaxCount);
-			++theCount;
-		}
+		oss << title << " ";
 	}
+	oss
+		<< "I,J,W:"
+		<< " "<< dat::infoString(theI)
+		<< " "<< dat::infoString(theJ)
+		<< " "<< io::sprintf(fmt, theW)
+		;
+	return oss.str();
 }
 
-inline
-void
-Utilization :: decrease
-	()
+std::string
+FaceVerts :: infoString
+	( std::string const & title
+	, std::string const & fmt
+	) const
 {
-	if (isValid())
+	std::ostringstream oss;
+	if (! title.empty())
 	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			if (0u < theCount)
-			{
-				--theCount;
-			}
-			else
-			{
-				assert(false);
-			}
-		}
+		oss << title << std::endl;
 	}
+	oss << theVerts[0].infoString("", fmt);
+	oss << std::endl;
+	oss << theVerts[1].infoString("", fmt);
+	oss << std::endl;
+	oss << theVerts[2].infoString("", fmt);
+	return oss.str();
 }
 
-inline
-bool
-Utilization :: isZero
-	()
-{
-	bool atzero;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		atzero = (0u == theCount);
-	}
-	return atzero;
-}
-
-inline
-bool
-Utilization :: isIncomplete
-	()
-{
-	bool hasRoom;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		hasRoom = (theCount < theMaxCount);
-	}
-	return hasRoom;
-}
-
-}
+} // tri
 

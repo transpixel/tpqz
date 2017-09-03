@@ -26,83 +26,35 @@
 //
 //
 
+#ifndef tri_tri_INCL_
+#define tri_tri_INCL_
 
 /*! \file
-\brief Inline Definitions for sys::Utilization
+\brief Declarations for namespace tri
 */
 
 
-namespace sys
+#include "libdat/Area.h"
+#include "libdat/array.h"
+
+
+/*! \brief Triangulation related types and values
+
+\par Example
+\dontinclude testtri/utri.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace tri
 {
+	//! Representation for tessellation domain locations.
+	using Vec2D = std::array<double, 2u>;
 
-inline
-// explicit
-Utilization :: Utilization
-	( size_t const & maxCount
-	)
-	: theMutex{}
-	, theMaxCount{ maxCount }
-	, theCount{ 0u }
-	, theIsValid{ (0u < theMaxCount) }
-{}
+} // tri
 
-inline
-void
-Utilization :: increase
-	()
-{
-	if (isValid())
-	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			assert(theCount < theMaxCount);
-			++theCount;
-		}
-	}
-}
+// Inline definitions
+// #include "libtri/tri.inl"
 
-inline
-void
-Utilization :: decrease
-	()
-{
-	if (isValid())
-	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			if (0u < theCount)
-			{
-				--theCount;
-			}
-			else
-			{
-				assert(false);
-			}
-		}
-	}
-}
-
-inline
-bool
-Utilization :: isZero
-	()
-{
-	bool atzero;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		atzero = (0u == theCount);
-	}
-	return atzero;
-}
-
-inline
-bool
-Utilization :: isIncomplete
-	()
-{
-	bool hasRoom;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		hasRoom = (theCount < theMaxCount);
-	}
-	return hasRoom;
-}
-
-}
+#endif // tri_tri_INCL_
 

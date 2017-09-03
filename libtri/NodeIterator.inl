@@ -28,81 +28,96 @@
 
 
 /*! \file
-\brief Inline Definitions for sys::Utilization
+\brief Inline definitions for tri::NodeIterator
 */
 
 
-namespace sys
+
+namespace tri
 {
 
 inline
 // explicit
-Utilization :: Utilization
-	( size_t const & maxCount
-	)
-	: theMutex{}
-	, theMaxCount{ maxCount }
-	, theCount{ 0u }
-	, theIsValid{ (0u < theMaxCount) }
-{}
+NodeIterator :: operator bool
+	() const
+{
+	return theIsActive;
+}
+
+inline
+IsoGeo::QuantPair
+NodeIterator :: fracPair
+	() const
+{
+	return fracPairAt();
+}
+
+inline
+std::pair<long, long>
+NodeIterator :: indexPair
+	() const
+{
+	return { theAtIJ.first, theAtIJ.second };
+}
+
+inline
+NodeIterator &
+NodeIterator :: operator++
+	()
+{
+	advanceToNextValid();
+	return *this;
+}
+
+inline
+IsoGeo::QuantPair
+NodeIterator :: fracPairAt
+	() const
+{
+	return theTileGeo.fracPairForIndices(theAtIJ.first, theAtIJ.second);
+}
+
+inline
+bool
+NodeIterator :: atNodeIsValid
+	() const
+{
+	dat::Spot const xyLoc(theTileGeo.refSpotForFracPair(fracPairAt()));
+	return theDomain.contains(xyLoc);
+}
 
 inline
 void
-Utilization :: increase
+NodeIterator :: advanceToNextAny
 	()
 {
-	if (isValid())
+	long & ndxAtI = theAtIJ.first;
+	long & ndxAtJ = theAtIJ.second;
+	++ndxAtJ;
+	if (theBegEndJ.second < ndxAtJ)
 	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			assert(theCount < theMaxCount);
-			++theCount;
+		ndxAtJ = theBegEndJ.first;
+		++ndxAtI;
+		if (theBegEndI.second < ndxAtI)
+		{
+			theIsActive = false;
+			ndxAtI = dat::nullValue<long>();
+			ndxAtJ = dat::nullValue<long>();
 		}
 	}
 }
 
 inline
 void
-Utilization :: decrease
+NodeIterator :: advanceToNextValid
 	()
 {
-	if (isValid())
+	do
 	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			if (0u < theCount)
-			{
-				--theCount;
-			}
-			else
-			{
-				assert(false);
-			}
-		}
+		advanceToNextAny();
 	}
+	while (theIsActive && (! atNodeIsValid()));
 }
 
-inline
-bool
-Utilization :: isZero
-	()
-{
-	bool atzero;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		atzero = (0u == theCount);
-	}
-	return atzero;
-}
-
-inline
-bool
-Utilization :: isIncomplete
-	()
-{
-	bool hasRoom;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		hasRoom = (theCount < theMaxCount);
-	}
-	return hasRoom;
-}
-
-}
+} // tri
 

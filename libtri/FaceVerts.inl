@@ -28,81 +28,38 @@
 
 
 /*! \file
-\brief Inline Definitions for sys::Utilization
+\brief Inline definitions for tri::FaceVerts
 */
 
 
-namespace sys
+namespace tri
 {
 
+template <typename PropSampFunc>
 inline
-// explicit
-Utilization :: Utilization
-	( size_t const & maxCount
-	)
-	: theMutex{}
-	, theMaxCount{ maxCount }
-	, theCount{ 0u }
-	, theIsValid{ (0u < theMaxCount) }
-{}
-
-inline
-void
-Utilization :: increase
-	()
+typename PropSampFunc::value_type
+FaceVerts :: valueFrom
+	( PropSampFunc const & propGrid
+	) const
 {
-	if (isValid())
-	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			assert(theCount < theMaxCount);
-			++theCount;
-		}
-	}
+	long const & i1 = theVerts[0].theI;
+	long const & i2 = theVerts[1].theI;
+	long const & i3 = theVerts[2].theI;
+
+	long const & j1 = theVerts[0].theJ;
+	long const & j2 = theVerts[1].theJ;
+	long const & j3 = theVerts[2].theJ;
+
+	double const & w1 = theVerts[0].theW;
+	double const & w2 = theVerts[1].theW;
+	double const & w3 = theVerts[2].theW;
+
+	return typename PropSampFunc::value_type
+		( w1 * propGrid(i1, j1)
+		+ w2 * propGrid(i2, j2)
+		+ w3 * propGrid(i3, j3)
+		);
 }
 
-inline
-void
-Utilization :: decrease
-	()
-{
-	if (isValid())
-	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			if (0u < theCount)
-			{
-				--theCount;
-			}
-			else
-			{
-				assert(false);
-			}
-		}
-	}
-}
-
-inline
-bool
-Utilization :: isZero
-	()
-{
-	bool atzero;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		atzero = (0u == theCount);
-	}
-	return atzero;
-}
-
-inline
-bool
-Utilization :: isIncomplete
-	()
-{
-	bool hasRoom;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		hasRoom = (theCount < theMaxCount);
-	}
-	return hasRoom;
-}
-
-}
+} // tri
 

@@ -35,42 +35,5 @@ if showSconsProgress :
 	print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
 
 env = env.Clone() # allow module to change anything it wants
-
-cpppaths = \
-	[ '/usr/include/opencv2/'
-	]
-
-libpaths = \
-	[ '../libsig/'
-	, '../libimg/'
-	, '../libmath/'
-	, '../libio/'
-	, '../libapp/'
-	, '../libdat/'
-	, '../libsys/'
-	]
-
-linklibs = \
-	[ 'sig'
-	, 'img'
-	, 'math'
-	, 'io'
-	, 'app'
-	, 'dat'
-	, 'sys'
-
-	, 'opencv_highgui'
-	, 'opencv_imgproc'
-	, 'opencv_core'
-	]
-
-env.Append(CPPPATH=cpppaths)
-env.Append(LIBS=linklibs)
-env.Append(LIBPATH=libpaths)
-
-env.Program('uFilterContext.cpp')
-env.Program('ufilter.cpp')
-env.Program('umatch.cpp')
-env.Program('uPeak.cpp')
-
+env.StaticLibrary (modname, Glob('*.cpp'))
 

@@ -31,6 +31,7 @@
 */
 
 
+#include "libdat/Area.h"
 #include "libdat/Region.h"
 
 #include "libdat/compare.h"
@@ -72,6 +73,17 @@ dat_Region_test0
 		oss << "Failure of nullVolume test" << std::endl;
 	}
 
+	// construct from pairs
+	using Type = long;
+	std::pair<Type, Type> const rangePair{ 7L, 17L };
+	dat::Region<2u, size_t> const d1pairs{ rangePair };
+	dat::Area<size_t> const d2pairs{ rangePair, rangePair };
+	dat::Volume<size_t> const d3pairs{ rangePair, rangePair, rangePair };
+	if (! (d1pairs.isValid() && d2pairs.isValid() && d3pairs.isValid()))
+	{
+		oss << "Failure of valid pair construction test" << std::endl;
+	}
+
 	// basic equality test
 	dat::Region<3, size_t> const region3
 		{ dat::Range<size_t>{ 4u, 9u }
@@ -107,9 +119,17 @@ dat_Region_test1
 	dat::Range<size_t> const xRange(3u, 7u);
 	dat::Range<size_t> const yRange(5u, 19u);
 
+	// check 1D
+	{
+		dat::Length<double> const length;
+		// check compilation
+	//	std::array<double, 2u> const verts(length.extrema<double>());
+		(void)(length.extrema<double>());
+	}
+
 	// check 2D
 	{
-		dat::Area<size_t> const area{xRange, yRange};
+		dat::Area<size_t> const area{ xRange, yRange };
 
 		double const expMag(xRange.magnitude() * yRange.magnitude());
 		double const gotMag(area.magnitude());
@@ -126,6 +146,10 @@ dat_Region_test1
 		std::array<size_t, 2u> const gotMaxs(area.maximums());
 		std::array<size_t, 2u> const expMins{{xRange.min(), yRange.min()}};
 		std::array<size_t, 2u> const expMaxs{{xRange.max(), yRange.max()}};
+
+		// check compilation
+	//	std::array<dat::RowCol, 4u> const verts(area.extrema<dat::RowCol>());
+		(void)(area.extrema<dat::RowCol>());
 
 		if (! dat::nearlyEquals(gotMins, expMins))
 		{
@@ -145,7 +169,7 @@ dat_Region_test1
 	// check 3D
 	{
 		dat::Range<size_t> const zRange(17u, 19u);
-		dat::Volume<size_t> const volume{xRange, yRange, zRange};
+		dat::Volume<size_t> const volume{ xRange, yRange, zRange };
 
 		double const expMag
 			(xRange.magnitude() * yRange.magnitude() * zRange.magnitude());
@@ -165,6 +189,13 @@ dat_Region_test1
 		{
 			oss << "Failure of op[] test" << std::endl;
 		}
+
+		using Vert = std::array<size_t, 3u>;
+		// check compilation
+	//	std::array<Vert, 8u> const verts(volume.extrema<Vert>());
+		(void)(volume.extrema<Vert>());
+
+
 	}
 
 	return oss.str();

@@ -26,83 +26,87 @@
 //
 //
 
+#ifndef tri_Domain_INCL_
+#define tri_Domain_INCL_
 
 /*! \file
-\brief Inline Definitions for sys::Utilization
+\brief Declarations for tri::Domain
 */
 
 
-namespace sys
+#include "libdat/Area.h"
+
+#include <string>
+
+
+namespace tri
 {
 
-inline
-// explicit
-Utilization :: Utilization
-	( size_t const & maxCount
-	)
-	: theMutex{}
-	, theMaxCount{ maxCount }
-	, theCount{ 0u }
-	, theIsValid{ (0u < theMaxCount) }
-{}
+/*! \brief Representation of region over which tritille nodes should be valid.
 
-inline
-void
-Utilization :: increase
-	()
+\par Example
+\dontinclude testtri/uDomain.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+class Domain
 {
-	if (isValid())
-	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			assert(theCount < theMaxCount);
-			++theCount;
-		}
-	}
-}
 
-inline
-void
-Utilization :: decrease
-	()
-{
-	if (isValid())
-	{
-		{ std::lock_guard<std::mutex> lock(theMutex);
-			if (0u < theCount)
-			{
-				--theCount;
-			}
-			else
-			{
-				assert(false);
-			}
-		}
-	}
-}
+protected: // data
 
-inline
-bool
-Utilization :: isZero
-	()
-{
-	bool atzero;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		atzero = (0u == theCount);
-	}
-	return atzero;
-}
+	dat::Area<double> theAreaBounds{};
 
-inline
-bool
-Utilization :: isIncomplete
-	()
-{
-	bool hasRoom;
-	{ std::lock_guard<std::mutex> lock(theMutex);
-		hasRoom = (theCount < theMaxCount);
-	}
-	return hasRoom;
-}
+public: // methods
 
-}
+	//! default null constructor
+	Domain
+		() = default;
+
+	//! Defined via rectangular area
+	explicit
+	Domain
+		( dat::Area<double> const & area
+		);
+
+	//! Noop dtor
+	virtual
+	~Domain
+		() = default;
+
+	//! Bounding area of valid domain region
+	dat::Area<double>
+	areaBounds
+		() const;
+
+public: // virtual methods
+
+	//! True if instance is valid
+	virtual
+	bool
+	isValid
+		() const;
+
+	//! True if xyLoc is within valid region of domain
+	virtual
+	bool
+	contains
+		( dat::Spot const & xyLoc
+		) const;
+
+	//! Descriptive information about this instance.
+	virtual
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // Domain
+
+} // tri
+
+// Inline definitions
+// #include "libtri/Domain.inl"
+
+#endif // tri_Domain_INCL_
 

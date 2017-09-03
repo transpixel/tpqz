@@ -307,12 +307,10 @@ averagePoints
 	std::vector<ga::Vector> avePnts;
 
 	// ensure consistent input data
-	size_t const rayPntCap{ rayTab.pntCapacity() };
-	size_t const rayAcqCap{ rayTab.acqCapacity() };
 	size_t const distPntCap{ distTab.pntCapacity() };
 	size_t const distAcqCap{ distTab.acqCapacity() };
-	assert(rayPntCap == distPntCap);
-	assert(rayAcqCap == distAcqCap);
+	assert(distPntCap == rayTab.pntCapacity());
+	assert(distAcqCap == rayTab.acqCapacity());
 
 	// allocate space
 	size_t const & numPnts = distPntCap;

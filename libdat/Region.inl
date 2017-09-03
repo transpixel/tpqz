@@ -34,6 +34,7 @@
 
 #include "libdat/info.h"
 
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 
@@ -42,15 +43,47 @@ namespace dat
 {
 //======================================================================
 
+namespace priv
+{
+	//! Cast pairs to dat::Range instances
+	template <size_t Dim, typename Type>
+	inline
+	std::array<dat::Range<Type>, Dim>
+	rangesFrom
+		( std::initializer_list<std::pair<Type, Type> > const & rangePairs
+		)
+	{
+		std::array<dat::Range<Type>, Dim> ranges;
+		std::transform
+			( rangePairs.begin(), rangePairs.end()
+			, ranges.begin()
+			, [] (std::pair<Type, Type> const & pair)
+				{ return dat::Range<Type>(pair); }
+			);
+		return ranges;
+	}
+}
+
 template <size_t Dim, typename Type>
 inline
 // explicit
 Region<Dim, Type> :: Region
 	( std::initializer_list<Range<Type> > const & ranges
 	)
-	: theRanges(ranges.begin(), ranges.end())
+	: theRanges{{}}
 {
-	assert(Dim == theRanges.size());
+	assert(Dim == ranges.size());
+	std::copy(ranges.begin(), ranges.end(), theRanges.begin());
+}
+
+template <size_t Dim, typename Type>
+inline
+// explicit
+Region<Dim, Type> :: Region
+	( std::initializer_list<std::pair<Type, Type> > const & rangePairs
+	)
+	: theRanges(priv::rangesFrom<Dim, Type>(rangePairs))
+{
 }
 
 // copy constructor -- compiler provided
@@ -63,7 +96,12 @@ bool
 Region<Dim, Type> :: isValid
 	() const
 {
-	return (! theRanges.empty());
+	bool okay{ false };
+	if (0u < Dim)
+	{
+		return theRanges[0].isValid();
+	}
+	return okay;
 }
 
 template <size_t Dim, typename Type>
@@ -138,6 +176,59 @@ Region<Dim, Type> :: center
 }
 
 template <size_t Dim, typename Type>
+template <typename Vertex>
+inline
+typename std::enable_if<(1uL == Dim), std::array<Vertex, 2u> >::type
+Region<Dim, Type> :: extrema
+	() const
+{
+	std::array<Type, 1u> const mins(minimums());
+	std::array<Type, 1u> const maxs(maximums());
+	return std::array<Vertex, 2u>
+		{{ mins[0]
+		 , maxs[0]
+		}};
+}
+
+template <size_t Dim, typename Type>
+template <typename Vertex>
+inline
+typename std::enable_if<(2uL == Dim), std::array<Vertex, 4u> >::type
+Region<Dim, Type> :: extrema
+	() const
+{
+	std::array<Type, 2u> const mins(minimums());
+	std::array<Type, 2u> const maxs(maximums());
+	return std::array<Vertex, 4u>
+		{ Vertex{{ mins[0], mins[1] }}
+		, Vertex{{ mins[0], maxs[1] }}
+		, Vertex{{ maxs[0], mins[1] }}
+		, Vertex{{ maxs[0], maxs[1] }}
+		};
+}
+
+template <size_t Dim, typename Type>
+template <typename Vertex>
+inline
+typename std::enable_if<(3uL == Dim), std::array<Vertex, 8u> >::type
+Region<Dim, Type> :: extrema
+	() const
+{
+	std::array<Type, 3u> const mins(minimums());
+	std::array<Type, 3u> const maxs(maximums());
+	return std::array<Vertex, 8u>
+		{ Vertex{{ mins[0], mins[1], mins[2] }}
+		, Vertex{{ maxs[0], mins[1], mins[2] }}
+		, Vertex{{ mins[0], maxs[1], mins[2] }}
+		, Vertex{{ maxs[0], maxs[1], mins[2] }}
+		, Vertex{{ mins[0], mins[1], maxs[2] }}
+		, Vertex{{ maxs[0], mins[1], maxs[2] }}
+		, Vertex{{ mins[0], maxs[1], maxs[2] }}
+		, Vertex{{ maxs[0], maxs[1], maxs[2] }}
+		};
+}
+
+template <size_t Dim, typename Type>
 inline
 bool
 Region<Dim, Type> :: contains
@@ -171,12 +262,11 @@ Region<Dim, Type> :: intersectWith
 	Region<Dim, Type> common;
 	if (isValid() && other.isValid())
 	{
-		common.theRanges.reserve(Dim);
 		for (size_t ndx(0u) ; ndx < Dim ; ++ndx)
 		{
 			Range<Type> const & rangeThis = theRanges[ndx];
 			Range<Type> const & rangeThat = other.theRanges[ndx];
-			common.theRanges.emplace_back(rangeThis.intersectWith(rangeThat));
+			common.theRanges[ndx] = rangeThis.intersectWith(rangeThat);
 		}
 	}
 	return common;

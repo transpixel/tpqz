@@ -169,7 +169,6 @@ IsoGeo :: infoString
 		double const uDeg{ uRad * 180. / math::pi };
 		double const vDeg{ vRad * 180. / math::pi };
 
-		oss << std::endl;
 		oss << dat::infoString(theSplitterMu.theDelta, "muDelta");
 		oss << std::endl;
 		oss << dat::infoString(theSplitterNu.theDelta, "nuDelta");

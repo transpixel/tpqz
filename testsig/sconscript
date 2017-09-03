@@ -45,6 +45,7 @@ libpaths = \
 	, '../libimg/'
 	, '../libmath/'
 	, '../libio/'
+	, '../libapp/'
 	, '../libdat/'
 	, '../libsys/'
 	]
@@ -54,6 +55,7 @@ linklibs = \
 	, 'img'
 	, 'math'
 	, 'io'
+	, 'app'
 	, 'dat'
 	, 'sys'
 

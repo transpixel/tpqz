@@ -82,6 +82,12 @@ public: // types
 		std::pair<long, long>
 		ndxBegEndJ
 			() const;
+
+		//! Descriptive information about this instance.
+		std::string
+		infoString
+			( std::string const & title
+			) const;
 	};
 
 public: // data

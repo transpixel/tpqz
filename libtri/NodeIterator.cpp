@@ -85,6 +85,25 @@ NodeIterator::IndexLimits :: ndxBegEndJ
 	return pairBegEndJ;
 }
 
+std::string
+NodeIterator::IndexLimits :: infoString
+	( std::string const & title
+	) const
+{
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << std::endl;
+	}
+
+	oss << "ndxBegEndI: " << dat::infoString(ndxBegEndI());
+
+	oss << std::endl;
+	oss << "ndxBegEndJ: " << dat::infoString(ndxBegEndJ());
+
+	return oss.str();
+}
+
 
 //======================================================================
 //======================================================================

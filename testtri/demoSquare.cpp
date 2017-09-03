@@ -30,6 +30,8 @@
 \brief  This file contains main application program demoSquare
 */
 
+#include "libapp/Usage.h"
+#include "build/version.h"
 
 #include "libtri/IsoTille.h"
 
@@ -40,6 +42,7 @@
 #include "libdat/validity.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libio/string.h"
 #include "libmath/MapSizeArea.h"
 #include "libmath/math.h"
 
@@ -50,6 +53,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 
 
 namespace
@@ -62,9 +66,6 @@ namespace example
 {
 	//! example data type (support op+() and op*()
 	using DataType = std::complex<double>;
-
-#define UseMap // 6.1 sec
-// #define UseGrid
 
 	// static DataType const sNull{ dat::nullValue<std::complex<double> >() };
 	static DataType const sNull
@@ -498,10 +499,40 @@ saveNodeInterp
 //! Demonstrate iso-tritille tiling of a square region
 int
 main
-	( int const // argc
-	, char const * const * const // argv
+	( int const argc
+	, char const * const * const argv
 	)
 {
+	// check args
+	app::Usage usage;
+	usage.setSummary
+		( "Demonstrate iso-tritille interpolation w/ timing"
+		);
+	usage.addArg("numNodes(k)", "Number of tritille nodes (in kilo-Nodes)");
+	usage.addArg("numElems(k)", "Number of grid elements (in mega-Elements)");
+	usage.addArg("dataStoreType", "Sample data structure {grid|map}");
+	// ...
+	if (usage.argStatus(argc, argv) != app::Usage::Valid)
+	{
+		std::string const fname(argv[0]);
+		io::err()
+			<< std::endl << build::version::buildInfo(argv[0]) << std::endl
+			<< usage.infoString(fname) << std::endl;
+		return 1;
+	}
+
+	// parse input argument
+	int argnum(0);
+	std::string const strNumNodes(argv[++argnum]);
+	std::string const strNumElems(argv[++argnum]);
+	std::string const strPoolType(argv[++argnum]);
+	size_t const numNodes
+		{ io::string::from(strNumNodes, dat::nullValue<size_t>()) };
+	size_t const numElems
+		{ io::string::from(strNumElems, dat::nullValue<size_t>()) };
+	assert(dat::isValid(numNodes));
+	assert(dat::isValid(numElems));
+
 	// define area domain (simple square)
 	dat::Range<double> xRange{ -1., 1. };
 	dat::Range<double> yRange{ -1., 1. };
@@ -509,13 +540,19 @@ main
 	tri::Domain const xyDomain{ xyArea };
 
 	// define iso-tritille geometry
-	constexpr double deltaHigh{ 1./128. };
-	constexpr double deltaWide{ 1./128. };
+	double const apxNumNodes{   double(numNodes) * 1024. };
+	double const apxGridSize{   double(numElems) * 1024. * 1024. };
 
-	constexpr size_t gridHigh{ 4u * 1024u };
-	constexpr size_t gridWide{ 4u * 1024u };
+	double const dab{ 1. / std::sqrt(apxNumNodes / 4.) };
+	double const deltaHigh{ dab };
+	double const deltaWide{ dab };
+
+	size_t const gridHW{ size_t(std::sqrt(double(apxGridSize))) };
+	size_t const gridHigh{ gridHW };
+	size_t const gridWide{ gridHW };
 
 	app::Timer timer;
+	app::Timer timeInterp;
 
 	// define tessellation geometry
 	constexpr std::array<double, 2u> aDir{{ .125, 1. }};
@@ -524,26 +561,34 @@ main
 	// construct tritille
 	tri::IsoTille const trinet(trigeo, xyDomain);
 
-io::out() << dat::infoString(trinet, "trinet") << std::endl;
-io::out() << std::endl;
+	//
+	// configure based on args
+	//
 
 	// generate samples at each tritille node
+	std::shared_ptr<example::SamplePool> ptSamples{};
+	using io::string::upper;
+	if (upper("map") == upper(strPoolType))
+	{
+		ptSamples = std::make_shared<example::SampleMap>
+			(trinet.begin().theNdxLimits);
+	}
+	else
+	if (upper("grid") == upper(strPoolType))
+	{
+		ptSamples = std::make_shared<example::SampleGrid>
+			(trinet.begin().theNdxLimits);
+	}
+
+	// fill samples
 	timer.start("pool.genSamples");
-#	if defined (UseMap)
-	example::SampleMap samples(trinet.begin().theNdxLimits);
-#	endif
-#	if defined (UseGrid)
-	example::SampleGrid samples(trinet.begin().theNdxLimits);
-#	endif
+	example::SamplePool & samples = *ptSamples;
 	example::fillSamples(&samples, trinet);
 	timer.stop();
 
-io::out() << dat::infoString(sMinMaxI, "sMinMaxI") << std::endl;
-io::out() << dat::infoString(sMinMaxJ, "sMinMaxJ") << std::endl;
-
 	// interpolate surface value at raster grid locations
-	size_t numNull{ 0u };
-	size_t numGridInDom{ 0u };
+	size_t numNullSamp{ 0u };
+	size_t numElemInDom{ 0u };
 	size_t numDiff{ 0u };
 	double sumSqDiff{ 0. };
 	timer.start("trinet.nodes");
@@ -553,6 +598,7 @@ io::out() << dat::infoString(sMinMaxJ, "sMinMaxJ") << std::endl;
 
 	// check tritille interpolation at raster locations
 	timer.start("raster.interp");
+	timeInterp.start("interp");
 	dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
 	dat::Extents gridSize{ gridHigh, gridWide };
 	math::MapSizeArea const map(gridSize, rngArea);
@@ -566,46 +612,90 @@ io::out() << dat::infoString(sMinMaxJ, "sMinMaxJ") << std::endl;
 
 		if (xyDomain.contains(xySpot))
 		{
-			++numGridInDom;
-		}
+			++numElemInDom;
 
-		// expected value (from test case surface model)
-		example::DataType const expSamp{ example::valueOnSurfaceAtXY(xySpot) };
+			// expected value (from test case surface model)
+			example::DataType const expSamp
+				{ example::valueOnSurfaceAtXY(xySpot) };
 
-		// interpolated value from tritille
-		example::DataType const gotSamp(trinet(xySpot, samples));
-		if (tmp::isValid(gotSamp))
-		{
-			// track differences
-			++numDiff;
-			using example::testValue;
-			double const diff{ testValue(gotSamp) - testValue(expSamp) };
-			sumSqDiff += math::sq(diff);
-		}
-		else
-		{
-			++numNull;
+			// interpolated value from tritille
+			example::DataType const gotSamp(trinet(xySpot, samples));
+
+			if (! tmp::isValid(expSamp))
+			{
+				assert(! tmp::isValid(gotSamp));
+			}
+
+			if (tmp::isValid(gotSamp))
+			{
+				assert(tmp::isValid(expSamp));
+
+				// track differences
+				++numDiff;
+				using example::testValue;
+				double const diff{ testValue(gotSamp) - testValue(expSamp) };
+				sumSqDiff += math::sq(diff);
+			}
+			else
+			{
+				++numNullSamp;
+			}
 		}
 	}
+	timeInterp.stop();
 	timer.stop();
 
 	assert(0u < numDiff);
 	double const diffPerNode{ std::sqrt(sumSqDiff / double(numDiff)) };
 	constexpr double tolPerNode{ math::eps };
 
-	io::out() << "Failure of interpolation test" << std::endl;
-	io::out() << dat::infoString(numNull, "numNull") << std::endl;
-	io::out() << dat::infoString(numDiff, "numDiff") << std::endl;
-	io::out()
-		<< dat::infoString(sumSqDiff, "sumSqDiff") << '\n'
-		<< "diffPerNode: " << io::sprintf("%12.5e", diffPerNode) << '\n'
-		<< " tolPerNode: " << io::sprintf("%12.5e", tolPerNode) << '\n'
-		<< '\n';
+	double const interpTimeTotal{ timeInterp.total() };
+	double const interpTimePer{ interpTimeTotal / double(numDiff) };
 
 	// report information
-	io::out() << dat::infoString(numNodeInDom, "numNodeInDom") << std::endl;
-	io::out() << dat::infoString(numGridInDom, "numGridInDom") << std::endl;
-	io::out() << dat::infoString(timer, "timer") << std::endl;
+	std::ostringstream rpt;
+	rpt << "#===================" << '\n';
+	rpt << dat::infoString(numNodes, "numNodes(k)") << '\n';
+	rpt << dat::infoString(numElems, "numElems(M)") << '\n';
+	rpt << dat::infoString(strPoolType, "strPoolType") << '\n';
+	rpt << dat::infoString(numNodeInDom, "numNodeInDom")
+		<< "  of " << dat::infoString((size_t)apxNumNodes)
+		<< '\n';
+	rpt << dat::infoString(numElemInDom, "numElemInDom")
+		<< "  of " << dat::infoString(gridSize.size())
+		<< '\n';
+	rpt << dat::infoString(interpTimeTotal, "gridGenTime") << '\n';
+	rpt << "timePerElem: " << io::sprintf("%12.9f", interpTimePer) << '\n';
+	rpt << "#-------------------" << '\n';
+	rpt << dat::infoString(trinet) << '\n';
+	rpt << dat::infoString(sMinMaxI, "sMinMaxI") << '\n';
+	rpt << dat::infoString(sMinMaxJ, "sMinMaxJ") << '\n';
+	rpt << "#-------------------" << '\n';
+	rpt << dat::infoString(numNullSamp, "numNullSamp") << '\n';
+	rpt << dat::infoString(numDiff, "numDiff") << '\n';
+	rpt
+		<< dat::infoString(sumSqDiff, "sumSqDiff") << '\n'
+		<< "  sumSqDiff: " << io::sprintf("%12.9f", sumSqDiff) << '\n'
+		<< "diffPerNode: " << io::sprintf("%12.5e", diffPerNode) << '\n'
+		<< " tolPerNode: " << io::sprintf("%12.5e", tolPerNode) << '\n'
+		;
+	rpt << "#===================" << '\n';
+	rpt << dat::infoString(timer) << '\n';
+	rpt << "#===================" << '\n';
+
+	// echo
+	io::out() << rpt.str() << std::endl;
+
+	// save to file
+	std::string const rptName
+		{ "time"
+		+ strPoolType
+		+ io::sprintf("_n%08d", numNodes)
+		+ io::sprintf("_e%08d", numElems)
+		+ std::string(".dat")
+		};
+	std::ofstream ofsOut(rptName);
+	ofsOut << rpt.str() << std::endl;
 
 	constexpr bool saveGrid{ false };
 	if (saveGrid)

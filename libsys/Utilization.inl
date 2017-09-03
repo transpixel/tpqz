@@ -67,7 +67,6 @@ Utilization :: decrease
 {
 	if (isValid())
 	{
-		bool hadSomething{ true };
 		{ std::lock_guard<std::mutex> lock(theMutex);
 			if (0u < theCount)
 			{
@@ -75,10 +74,9 @@ Utilization :: decrease
 			}
 			else
 			{
-				hadSomething = false;
+				assert(false);
 			}
 		}
-		assert(hadSomething);
 	}
 }
 

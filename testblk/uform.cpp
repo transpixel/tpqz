@@ -144,9 +144,7 @@ blk_form_test1
 			blk::EdgeOri const & gotEdge = gotEdges[nn];
 
 			// verify test case generating same ROs
-			blk::EdgeKey const & keySim = expEdge.first;
-			blk::EdgeKey const & keyBlk = gotEdge.first;
-			assert(keySim == keyBlk);
+			assert(expEdge.first == gotEdge.first);
 
 			ga::Rigid const & expOri = expEdge.second;
 			ga::Rigid const & gotOri = gotEdge.second;

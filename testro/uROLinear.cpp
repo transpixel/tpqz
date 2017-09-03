@@ -598,12 +598,14 @@ ro_ROLinear_test1
 
 	for (ro::PairBaseZ const & roPair : roPairs)
 	{
+#		if defined(SaveData)
 		ga::BiVector const del1{ roPair.angle1w0() - roPair0.angle1w0() };
 		ga::BiVector const del2{ roPair.angle2w0() - roPair0.angle2w0() };
 		double const magDelPhi{ ga::magnitude(del1) };
 		double const magDelTheta{ ga::magnitude(del2) };
 		assert(magDelPhi < std::sqrt(3.)*sMaxTweakAngleMag);
 		assert(magDelTheta < std::sqrt(3.)*sMaxTweakAngleMag);
+#		endif
 
 		for (DirPair const & uv: uvs)
 		{

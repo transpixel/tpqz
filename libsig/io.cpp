@@ -136,12 +136,10 @@ saveMatchConfig
 	// sample the overlap with this number of samples high and wide
 	dat::SubExtents const cropOverInA(matchBwA.overCropInReference());
 	dat::SubExtents const cropWorkInA(matchBwA.workCropInReference());
-	dat::Extents const & workSize = cropWorkInA.theSize;
 
 	// if no overlap, something is very bad
 	assert(cropOverInA.isValid());
 	assert(cropWorkInA.isValid());
-	assert(workSize.isValid());
 
 	// reference grid info
 	dat::Extents const & sizeA = matchBwA.theSizeA;

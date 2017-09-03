@@ -55,11 +55,7 @@ Tweak :: from
 	ga::BiVector const bivB{ attB.physicalAngle() };
 	if (bivA.isValid() && bivB.isValid())
 	{
-		double const & alphaA = bivA[2];
-		double const & alphaB = bivB[2];
-		double const sumAlpha{ alphaA + alphaB };
-
-		assert(dat::nearlyEquals(sumAlpha, 0.));
+		assert(dat::nearlyEquals((bivA[2]+bivB[2]), 0.));
 
 		twk.thePhi1 = bivA[0];
 		twk.thePhi2 = bivA[1];

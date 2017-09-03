@@ -93,23 +93,32 @@ IsoTille :: triangleFor
 template <typename SampFunc>
 inline
 typename SampFunc::value_type
-IsoTille :: operator()
-	( Vec2D const & xyLoc
+IsoTille :: linearInterpWithCheck
+	( Vec2D const & refSpot
 	, SampFunc const & propSampFunc
 	) const
 {
 	typename SampFunc::value_type samp{};
-
-	if (theDomain.contains(xyLoc))
+	if (theDomain.contains(refSpot))
 	{
-		// get triangle covering this area...
-		FaceVerts const triangle{ triangleFor(xyLoc, theTileGeo) };
-
-		// ... and return interpolated value
-		samp = triangle.valueFrom<SampFunc>(propSampFunc);
+		samp = linearInterpForValid(refSpot, propSampFunc);
 	}
-
 	return samp;
+}
+
+template <typename SampFunc>
+inline
+typename SampFunc::value_type
+IsoTille :: linearInterpForValid
+	( Vec2D const & refSpot
+	, SampFunc const & propSampFunc
+	) const
+{
+	// get triangle covering this area...
+	FaceVerts const triangle{ triangleFor(refSpot, theTileGeo) };
+
+	// ... and return interpolated value
+	return triangle.valueFrom<SampFunc>(propSampFunc);
 }
 
 } // tri

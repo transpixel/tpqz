@@ -429,7 +429,8 @@ saveNodeInterp
 		std::pair<long, long> const ndxPair{ iter.indexPair() };
 		dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 
-		example::DataType const tinValue{ trinet(xyLoc, samples) };
+		example::DataType const tinValue
+			{ trinet.linearInterpWithCheck(xyLoc, samples) };
 		bool const hasValue{ tmp::isValid(tinValue) };
 
 		std::ostringstream oss;
@@ -508,8 +509,8 @@ main
 	usage.setSummary
 		( "Demonstrate iso-tritille interpolation w/ timing"
 		);
-	usage.addArg("numNodes(k)", "Number of tritille nodes (in kilo-Nodes)");
-	usage.addArg("numElems(k)", "Number of grid elements (in mega-Elements)");
+	usage.addArg("kiloNodes(k)", "Number of tritille nodes (in kilo-Nodes)");
+	usage.addArg("megaElems(M)", "Number of grid elements (in mega-Elements)");
 	usage.addArg("dataStoreType", "Sample data structure {grid|map}");
 	// ...
 	if (usage.argStatus(argc, argv) != app::Usage::Valid)
@@ -619,7 +620,8 @@ main
 				{ example::valueOnSurfaceAtXY(xySpot) };
 
 			// interpolated value from tritille
-			example::DataType const gotSamp(trinet(xySpot, samples));
+			example::DataType const gotSamp
+				{ trinet.linearInterpForValid(xySpot, samples) };
 
 			if (! tmp::isValid(expSamp))
 			{
@@ -721,7 +723,8 @@ main
 			dat::Spot const xySpot(map.xyAreaSpotFor(rcSpot));
 
 			// interpolate surface properties
-			example::DataType const sampValue(trinet(xySpot, samples));
+			example::DataType const sampValue
+				(trinet.linearInterpWithCheck(xySpot, samples));
 			if (tmp::isValid(sampValue))
 			{
 				gridValues(gridRowCol) = sampValue;

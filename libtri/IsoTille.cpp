@@ -93,6 +93,14 @@ IsoTille :: infoString
 	if (isValid())
 	{
 		oss << dat::infoString(theTileGeo, "theTileGeo");
+
+		oss << std::endl;
+		oss << dat::infoString(theDomain, "theDomain");
+
+		dat::Area<double> const mnArea
+			{ theTileGeo.tileAreaForRefArea(theDomain) };
+		oss << std::endl;
+		oss << dat::infoString(mnArea, "mnArea");
 	}
 	else
 	{

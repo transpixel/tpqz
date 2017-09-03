@@ -51,8 +51,8 @@ IsoTille :: triangleFor
 	dat::QuantumFrac const & muNodeFrac = mnNodeFracPair.first;
 	dat::QuantumFrac const & nuNodeFrac = mnNodeFracPair.second;
 
-	size_t const & ndxI = muNodeFrac.floor();
-	size_t const & ndxJ = nuNodeFrac.floor();
+	long const & ndxI = muNodeFrac.floor();
+	long const & ndxJ = nuNodeFrac.floor();
 	double const & muFrac = muNodeFrac.fraction();
 	double const & nuFrac = nuNodeFrac.fraction();
 
@@ -98,10 +98,18 @@ IsoTille :: operator()
 	, SampFunc const & propSampFunc
 	) const
 {
-	// get triangle covering this area...
-	FaceVerts const triangle{ triangleFor(xyLoc, theTileGeo) };
-	// ... and return interpolated value
-	return triangle.valueFrom<SampFunc>(propSampFunc);
+	typename SampFunc::value_type samp{};
+
+	if (theDomain.contains(xyLoc))
+	{
+		// get triangle covering this area...
+		FaceVerts const triangle{ triangleFor(xyLoc, theTileGeo) };
+
+		// ... and return interpolated value
+		samp = triangle.valueFrom<SampFunc>(propSampFunc);
+	}
+
+	return samp;
 }
 
 } // tri

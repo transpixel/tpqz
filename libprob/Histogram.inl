@@ -50,7 +50,7 @@ Histogram :: Histogram
 	for (FwdIter iter(sampBeg) ; sampEnd != iter ; ++iter)
 	{
 		double const samp(static_cast<double>(*iter));
-		incorporateSample(samp, &theCounts, thePart);
+		incorporateSample(samp);
 	}
 }
 
@@ -60,7 +60,7 @@ Histogram :: addSample
 	( double const & sample
 	)
 {
-	incorporateSample(sample, &theCounts, thePart);
+	incorporateSample(sample);
 }
 
 template <typename FwdIter>
@@ -74,23 +74,30 @@ Histogram :: addSamples
 	for (FwdIter iter(sampBeg) ; sampEnd != iter ; ++iter)
 	{
 		double const samp(static_cast<double>(*iter));
-		incorporateSample(samp, &theCounts, thePart);
+		incorporateSample(samp);
 	}
 }
 
-// static
 inline
 void
 Histogram :: incorporateSample
 	( double const & sample
-	, std::vector<size_t> * const & ptCounts
-	, math::Partition const & part
 	)
 {
-	size_t const binNdx(part.binIndexFor(sample));
-	if (binNdx < ptCounts->size())
+	if (sample < thePart.min())
 	{
-		++( (*ptCounts)[binNdx] );
+		++theCountUnder;
+	}
+	else
+	if (! (sample < thePart.max()))
+	{
+		++theCountOver;
+	}
+	else
+	{
+		size_t const binNdx(thePart.binIndexFor(sample));
+		assert(binNdx < theCounts.size());
+		++( theCounts[binNdx] );
 	}
 }
 

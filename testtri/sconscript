@@ -40,6 +40,7 @@ libpaths = \
 	[ '../libtri/'
 
 	, '../libga/'
+	, '../libprob/'
 	, '../libmath/'
 
 	, '../libio/'
@@ -54,6 +55,7 @@ linklibs = \
 	[ 'tri'
 
 	, 'ga'
+	, 'prob'
 	, 'math'
 
 	, 'io'

@@ -34,15 +34,18 @@
 #include "libtri/IsoTille.h"
 
 #include "libdat/info.h"
+#include "libga/ga.h"
 #include "libgeo/sphere.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
 #include "libmath/interp.h"
 #include "libmath/Partition.h"
 #include "libprob/Histogram.h"
+#include "libprob/Stats.h"
 
 #include <cassert>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <random>
 
@@ -91,6 +94,7 @@ namespace
 		std::string const theName;
 		tri::IsoGeo const theTileGeo;
 		prob::Histogram theHist;
+		prob::Stats theStats;
 
 		//! Construct named testcase
 		TestCase
@@ -112,12 +116,41 @@ namespace
 			, double const & expValue
 			)
 		{
-			double const difValue{ gotValue - expValue };
-			if (dat::isValid(difValue))
+			double const errValue{ gotValue - expValue };
+			if (dat::isValid(errValue))
 			{
-				theHist.addSample(difValue);
+				double const magValue{ std::abs(errValue) };
+				theHist.addSample(magValue);
+				theStats.add(magValue);
 			}
 		}
+
+		//! Descriptive information about this instance.
+		std::string
+		infoString
+			( std::string const & title = std::string()
+			) const
+		{
+			std::ostringstream oss;
+			if (! title.empty())
+			{
+				oss << title << std::endl;
+			}
+			{
+				oss << dat::infoString(theName, "theName");
+
+				oss << std::endl;
+				oss << dat::infoString(theTileGeo, "theTileGeo");
+
+				oss << std::endl;
+				oss << dat::infoString(theHist, "theHist");
+
+				oss << std::endl;
+				oss << dat::infoString(theStats, "theStats");
+			}
+			return oss.str();
+		}
+
 	};
 
 	// write gnuplot data
@@ -133,8 +166,11 @@ namespace
 		std::ofstream ofsplt(pltname);
 
 		// .plt file
-		ofsplt << "plot";
+		ofsplt << "set key top left" << '\n';
+		ofsplt << "plot [-1./4.:1./128.]";
 		size_t col{2u};
+		std::array<int, 2u> colors = { 1, 3 };
+		size_t ndxColor{ 0u };
 		for (TestCase const & testcase : testcases)
 		{
 			if (2u == col)
@@ -147,16 +183,20 @@ namespace
 			}
 			ofsplt
 				<< "'" << datname << "' u 1:" << col << " w l"
+				<< " lc " << colors[ndxColor]
 				<< " ti '" << testcase.theName << "'";
+			++ndxColor;
+			ndxColor = (ndxColor % colors.size());
 			++col;
 		}
-		ofsplt << '\n';
+		ofsplt << ';' << std::endl;
+	//	ofsplt << "pause -1;" << std::endl;
 
 		// get probs from each testcase
 		using PDF = std::vector<double>;
-		size_t const numTrackers{ testcases.size() };
-		std::vector<PDF> pdfs(testcases.size());
-		for (size_t nn{0u} ; nn < numTrackers ; ++nn)
+		size_t const numCases{ testcases.size() };
+		std::vector<PDF> pdfs(numCases);
+		for (size_t nn{0u} ; nn < numCases ; ++nn)
 		{
 			pdfs[nn] = testcases[nn].theHist.pdf();
 		}
@@ -170,7 +210,7 @@ namespace
 			double const subIndex{ errPart.interpIndexFor(errVal) };
 
 			ofsdat << dat::infoString(errVal);
-			for (size_t nn{0u} ; nn < numTrackers ; ++nn)
+			for (size_t nn{0u} ; nn < numCases ; ++nn)
 			{
 				double const eProb
 					{ math::interp::linear<double>(subIndex, pdfs[nn]) };
@@ -189,28 +229,40 @@ int
 main
 	()
 {
-	using PropType = double;
+	using PropType = ga::Vector;
 	using PairZA = dat::Spot;
 
-//	constexpr size_t numDirs{ 32u * 1024u };
-constexpr size_t numDirs{ 256u };
+	constexpr size_t numDirs{  128u * 1024u };
+	constexpr size_t numHist{    4u * 1024u };
 
 	//! Property sampling functor (for unit sphere)
 	struct PropertyStore
 	{
+		tri::IsoGeo theTileGeo;
+
 		//! Define value type (radius of sphere)
 		using value_type = PropType;
 
 		//! Evaluate (radius) property - constant over sphere
 		value_type
 		operator()
-			( size_t const & // ndxI
-			, size_t const & // ndxJ
+			( size_t const & ndxI
+			, size_t const & ndxJ
 			) const
 		{
 			// For this test example, generate properties "on the fly"
 			// without concern for an actual storage structure for node data
-			return { 1. };
+
+			dat::Spot const zaSpot
+				( theTileGeo.refSpotForFracPair
+					( theTileGeo.fracPairForIndices(ndxI, ndxJ) )
+				);
+			double const & zenith = zaSpot[0];
+			double const & azimuth = zaSpot[1];
+			ga::Vector const dir
+				{ geo::sphere::directionFromAZ(azimuth, zenith) };
+
+			return { dir };
 		}
 	};
 
@@ -218,15 +270,36 @@ constexpr size_t numDirs{ 256u };
 	std::vector<ga::Vector> const dirs{ randomDirs(numDirs) };
 
 	// various test cases
-	math::Partition const errPart(dat::Range<double>(-2., 2.), 1024u);
+	math::Partition const errPart(dat::Range<double>(-2., 2.), numHist);
 	PairZA const adir{ 1., 0. }; // primary tesselation axis
+	/*
+	constexpr double f04{ math::qtrPi };
+	constexpr double f08{ .5 * f04 };
+	constexpr double f16{ .5 * f08 };
+	constexpr double f32{ .5 * f16 };
+	constexpr double f64{ .5 * f32 };
+	constexpr double f128{ .5 * f64 };
 	std::vector<TestCase> testcases
-		{ { TestCase("cfg1", errPart, 1.   , 1.   , adir) }
-		, { TestCase("cfg2", errPart,  .1  ,  .1  , adir) }
-		, { TestCase("cfg3", errPart,  .001,  .001, adir) }
+		{ { TestCase("cfg:_2.", errPart, 2.   , 2.   , adir) }
+		, { TestCase("cfg:f04", errPart, f04  , f04  , adir) }
+		, { TestCase("cfg:f08", errPart, f08  , f08  , adir) }
+		, { TestCase("cfg:f16", errPart, f16  , f16  , adir) }
+		, { TestCase("cfg:f32", errPart, f32  , f32  , adir) }
+		, { TestCase("cfg:f64", errPart, f64  , f64  , adir) }
+		, { TestCase("cfg:f128", errPart, f128  , f128  , adir) }
 		};
+	*/
+	std::vector<TestCase> testcases;
+	double frac{ 1. / 2. };
+	for (size_t nn{0u} ; nn < 32u ; ++nn)
+	{
+		frac *= .75;
+		double const zaDelta{ frac * math::pi };
+		std::string const name{ io::sprintf("pi/%06d", nn) };
+		TestCase const testcase(name, errPart, zaDelta  , zaDelta  , adir);
+		testcases.emplace_back(testcase);
+	}
 
-std::ofstream ofsFoo("foo.dat");
 	// for each case
 	for (TestCase & testcase : testcases)
 	{
@@ -240,33 +313,55 @@ std::ofstream ofsFoo("foo.dat");
 		tri::IsoGeo const & trigeo = testcase.theTileGeo;
 		tri::IsoTille const trinet(trigeo, zaDomain);
 
-		io::out() << dat::infoString(trinet, "trinet") << std::endl;
+		// "store" of property values at tritille nodes (generated on-the-fly)
+		PropertyStore const radiusPropertyStore{ trigeo };
 
 		// compute histogram of interpolation errors
 		for (ga::Vector const & dir : dirs)
 		{
-			PropertyStore const radiusPropertyStore;
 			using namespace geo::sphere;
 			PairZA const zaLoc{ zenithOf(dir), azimuthOf(dir) };
-			PropType const gotRad
+			PropType const gotVec
 				{ trinet.linearInterpWithCheck(zaLoc, radiusPropertyStore) };
-			constexpr PropType expRad{ 1. };
-			testcase.recordResult(gotRad, expRad);
-
-ofsFoo
-	<< "z,a,exp,got,dif:"
-	<< " " << dat::infoString(zaLoc)
-	<< " " << io::sprintf("%12.6f", expRad)
-	<< " " << io::sprintf("%12.6f", gotRad)
-	<< " " << io::sprintf("%12.6f", (gotRad-expRad))
-	<< '\n';
-
+			PropType const & expVec = dir;
+			testcase.recordResult
+				( ga::magnitude(gotVec)
+				, ga::magnitude(expVec)
+				);
 		}
 
+		double const dab{ testcase.theTileGeo.delta() };
+		double const dabSq{ math::sq(dab) };
+		double const apxNumNodes{ zaArea.magnitude() / dabSq };
+
+		std::string const fmt{ "%12.9f" };
+		io::out()
+			<< " "
+		//	<< "case:"
+		//	<< " " << std::setw(15u) << testcase.theName
+			<< "apxTiles:"
+			<< " " << io::sprintf("%12.0f.", apxNumNodes)
+			<< " "
+			<< "dab:"
+			<< " " << io::sprintf(fmt, dab)
+			<< " "
+			<< "dabSq:"
+			<< " " << io::sprintf(fmt, dabSq)
+			<< " "
+			<< "min,max,ave,med:"
+			<< " " << io::sprintf(fmt, testcase.theStats.theMinMax.min())
+			<< " " << io::sprintf(fmt, testcase.theStats.theMinMax.max())
+			<< " " << io::sprintf(fmt, testcase.theStats.mean())
+			<< " " << io::sprintf(fmt, testcase.theStats.medianValue())
+			<< std::endl;
 	}
 
-	// write data to file for display
-	saveForGnuplot(testcases, errPart);
+	constexpr bool savePlotData{ false };
+	if (savePlotData)
+	{
+		// write data to file for display
+		saveForGnuplot(testcases, errPart);
+	}
 
 	return 0;
 }

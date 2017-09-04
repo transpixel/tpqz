@@ -35,6 +35,7 @@
 #include "libprob/Stats.h"
 
 #include "libdat/dat.h"
+#include "libdat/info.h"
 
 #include <sstream>
 
@@ -65,6 +66,7 @@ Stats :: add
 	( double const & sample
 	)
 {
+	theMinMax = theMinMax.expandedWith(sample);
 	theSamples.push_back(sample);
 }
 
@@ -85,14 +87,42 @@ Stats :: medianValue
 std::string
 Stats :: infoString
 	( std::string const & title
+	, std::string const & fmt
 	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << title << " ";
+		oss << title << std::endl;
 	}
-	oss << "sampleCount: " << theSamples.size();
+
+	if (isValid())
+	{
+		oss << io::sprintf("%15s", "sampCount")
+			<< io::sprintf(fmt, theSamples.size());
+
+		oss << std::endl;
+		oss << io::sprintf("%15s", "sampMin")
+			<< io::sprintf(fmt, theMinMax.min());
+
+		oss << std::endl;
+		oss << io::sprintf("%15s", "sampMax")
+			<< io::sprintf(fmt, theMinMax.max());
+
+		oss << std::endl;
+		oss << io::sprintf("%15s", "sampMean")
+			<< io::sprintf(fmt, mean());
+
+		oss << std::endl;
+		oss << io::sprintf("%15s", "sampMedian")
+			<< io::sprintf(fmt, medianValue());
+
+	}
+	else
+	{
+		oss << " <null>";
+	}
+
 	return oss.str();
 }
 

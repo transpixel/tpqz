@@ -34,6 +34,8 @@
 */
 
 
+#include "libdat/MinMax.h"
+
 #include <deque>
 #include <string>
 #include <vector>
@@ -54,6 +56,10 @@ class Stats
 {
 	// simple implementation -- TODO add running stats if many samples
 	std::deque<double> theSamples;
+
+public: // data
+
+	dat::MinMax<double> theMinMax;
 
 public: // methods
 
@@ -128,6 +134,7 @@ public: // methods
 	std::string
 	infoString
 		( std::string const & title = std::string()
+		, std::string const & fmt = "%12.6f"
 		) const;
 };
 

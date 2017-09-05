@@ -49,6 +49,8 @@ Histogram :: Histogram
 	()
 	: thePart()
 	, theCounts()
+	, theCountUnder{ 0u }
+	, theCountOver{ 0u }
 {
 }
 
@@ -58,6 +60,8 @@ Histogram :: Histogram
 	)
 	: thePart(part)
 	, theCounts(thePart.size())
+	, theCountUnder{ 0u }
+	, theCountOver{ 0u }
 {
 }
 

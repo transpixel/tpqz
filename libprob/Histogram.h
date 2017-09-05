@@ -57,8 +57,10 @@ class Histogram
 
 public: // data
 
-	math::Partition thePart;
-	std::vector<size_t> theCounts;
+	math::Partition thePart{};
+	std::vector<size_t> theCounts{};
+	size_t theCountUnder{ 0u };
+	size_t theCountOver{ 0u };
 
 public: // methods
 
@@ -154,13 +156,10 @@ public: // methods
 private:
 
 	//! Put sample into collection -- assumes everything is valid
-	static
 	inline
 	void
 	incorporateSample
 		( double const & sample
-		, std::vector<size_t> * const & ptCounts
-		, math::Partition const & part
 		);
 
 };

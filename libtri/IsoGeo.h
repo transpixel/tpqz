@@ -38,6 +38,7 @@
 #include "libdat/QuantumFrac.h"
 #include "libdat/Spot.h"
 #include "libtri/Domain.h"
+#include "libtri/tri.h"
 
 #include <string>
 
@@ -69,8 +70,8 @@ class IsoGeo
 	using Vec2D = std::array<double, 2u>;
 
 	// e.g. rows of transition matrix
-	dat::quantum::Splitter<long, double> theSplitterMu;
-	dat::quantum::Splitter<long, double> theSplitterNu;
+	dat::quantum::Splitter<NodeNdxType, double> theSplitterMu;
+	dat::quantum::Splitter<NodeNdxType, double> theSplitterNu;
 	Vec2D theDirA{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theDirU{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theDirV{{ dat::nullValue<double>(), dat::nullValue<double>() }};
@@ -144,8 +145,7 @@ public: // methods
 	inline
 	QuantPair
 	fracPairForIndices
-		( long const & ndxI
-		, long const & ndxJ
+		( NodeNdxPair const & nodeIJ
 		) const;
 
 	//
@@ -170,8 +170,7 @@ public: // methods
 	inline
 	dat::Spot
 	refSpotForIndices
-		( long const & ndxI
-		, long const & ndxJ
+		( NodeNdxPair const & nodeIJ
 		) const;
 
 	//

@@ -36,6 +36,7 @@
 
 #include "libdat/Area.h"
 #include "libdat/array.h"
+#include "libdat/QuantumFrac.h"
 
 
 /*! \brief Triangulation related types and values
@@ -48,8 +49,11 @@
 
 namespace tri
 {
-	//! Representation for tessellation domain locations.
-	using Vec2D = std::array<double, 2u>;
+	using NodeNdxType = dat::QuantumFrac::index_type;
+	static NodeNdxType const sNullNdx{ dat::nullValue<NodeNdxType>() };
+
+	using NodeNdxPair = std::pair<NodeNdxType, NodeNdxType>;
+	static NodeNdxPair const sNullNdxPair{ sNullNdx, sNullNdx};
 
 } // tri
 

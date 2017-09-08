@@ -76,8 +76,8 @@ IsoGeo :: IsoGeo
 		Vec2D const vbar( beta*udir + alpha*vdir);
 
 		// set members
-		theSplitterMu = dat::quantum::Splitter<long, double>(da);
-		theSplitterNu = dat::quantum::Splitter<long, double>(db);
+		theSplitterMu = dat::quantum::Splitter<NodeNdxType, double>(da);
+		theSplitterNu = dat::quantum::Splitter<NodeNdxType, double>(db);
 		theDirA = adir;
 		theDirU = udir;
 		theDirV = vdir;

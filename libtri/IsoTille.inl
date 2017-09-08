@@ -51,8 +51,8 @@ IsoTille :: triangleFor
 	dat::QuantumFrac const & muNodeFrac = mnNodeFracPair.first;
 	dat::QuantumFrac const & nuNodeFrac = mnNodeFracPair.second;
 
-	long const & ndxI = muNodeFrac.theFloor;
-	long const & ndxJ = nuNodeFrac.theFloor;
+	NodeNdxType const & ndxI = muNodeFrac.theFloor;
+	NodeNdxType const & ndxJ = nuNodeFrac.theFloor;
 	double const & muFrac = muNodeFrac.theResid;
 	double const & nuFrac = nuNodeFrac.theResid;
 
@@ -94,7 +94,7 @@ template <typename SampFunc>
 inline
 typename SampFunc::value_type
 IsoTille :: linearInterpWithCheck
-	( Vec2D const & refSpot
+	( dat::Spot const & refSpot
 	, SampFunc const & propSampFunc
 	) const
 {
@@ -110,7 +110,7 @@ template <typename SampFunc>
 inline
 typename SampFunc::value_type
 IsoTille :: linearInterpForValid
-	( Vec2D const & refSpot
+	( dat::Spot const & refSpot
 	, SampFunc const & propSampFunc
 	) const
 {

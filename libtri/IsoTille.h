@@ -112,7 +112,7 @@ public: // methods
 	inline
 	typename SampFunc::value_type
 	linearInterpWithCheck
-		( Vec2D const & refSpot //!< location relative to tile origin
+		( dat::Spot const & refSpot //!< location relative to tile origin
 		, SampFunc const & propSampFunc
 		) const;
 
@@ -121,7 +121,7 @@ public: // methods
 	inline
 	typename SampFunc::value_type
 	linearInterpForValid
-		( Vec2D const & refSpot //!< location relative to tile origin
+		( dat::Spot const & refSpot //!< location relative to tile origin
 		, SampFunc const & propSampFunc
 		) const;
 

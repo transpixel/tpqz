@@ -250,12 +250,13 @@ main
 			, size_t const & ndxJ
 			) const
 		{
+			tri::NodeNdxPair const ndxIJ{ ndxI, ndxJ };
+
 			// For this test example, generate properties "on the fly"
 			// without concern for an actual storage structure for node data
-
 			dat::Spot const zaSpot
 				( theTileGeo.refSpotForFracPair
-					( theTileGeo.fracPairForIndices(ndxI, ndxJ) )
+					( theTileGeo.fracPairForIndices(ndxIJ) )
 				);
 			double const & zenith = zaSpot[0];
 			double const & azimuth = zaSpot[1];

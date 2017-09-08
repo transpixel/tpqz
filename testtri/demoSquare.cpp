@@ -387,11 +387,10 @@ saveNodeStates
 dat::Spot
 refSpotFor
 	( tri::IsoGeo const & trigeo
-	, std::pair<long, long> const & ndxPair
+	, tri::NodeNdxPair const & ndxIJ
 	)
 {
-	tri::IsoGeo::QuantPair const fracPair
-		{ trigeo.fracPairForIndices(ndxPair.first, ndxPair.second) };
+	tri::IsoGeo::QuantPair const fracPair{ trigeo.fracPairForIndices(ndxIJ) };
 	return trigeo.refSpotForFracPair(fracPair);
 }
 

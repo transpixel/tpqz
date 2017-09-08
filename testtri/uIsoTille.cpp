@@ -306,7 +306,7 @@ tri_IsoTille_test1
 	}
 
 	// check tritille interpolation at raster locations
-	dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
+	dat::Area<double> const rngArea{ trigeo.tileAreaForDomain(xyDomain) };
 	dat::Extents gridSize{ gridHigh, gridWide };
 	math::MapSizeArea const map(gridSize, rngArea);
 	for (dat::ExtentsIterator iter{gridSize} ; iter ; ++iter)

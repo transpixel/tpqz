@@ -98,7 +98,7 @@ IsoTille :: infoString
 		oss << dat::infoString(theDomain, "theDomain");
 
 		dat::Area<double> const mnArea
-			{ theTileGeo.tileAreaForRefArea(theDomain) };
+			{ theTileGeo.tileAreaForDomain(theDomain) };
 		oss << std::endl;
 		oss << dat::infoString(mnArea, "mnArea");
 	}

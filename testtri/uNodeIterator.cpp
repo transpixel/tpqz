@@ -85,7 +85,7 @@ tri_NodeIterator_test1
 	// determine acceptable nodes
 	std::set<std::pair<long, long> > expMuNus;
 	{
-		dat::Area<double> const mnRange{ trigeo.tileAreaForRefArea(xyDomain) };
+		dat::Area<double> const mnRange{ trigeo.tileAreaForDomain(xyDomain) };
 		long const muBeg{ (long)std::floor(mnRange[0].min() / da) };
 		long const muEnd{ (long)std::ceil(mnRange[0].max() / da) };
 		long const nuBeg{ (long)std::floor(mnRange[1].min() / db) };

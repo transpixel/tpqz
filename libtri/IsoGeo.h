@@ -141,7 +141,7 @@ public: // methods
 		( dat::Spot const & tileSpot
 		) const;
 
-	//! Node index and fraction at exact node location
+	//! Cast node index pair to QuantPair with zero fraction
 	inline
 	QuantPair
 	fracPairForIndices
@@ -177,9 +177,15 @@ public: // methods
 	// General
 	//
 
-	//! Limits (half open) on mu and nu values given domain area limits
+	//! (Non-orthogonal) Tile area associated with (orthogonal) Ref area
 	dat::Area<double>
 	tileAreaForRefArea
+		( dat::Area<double> const & refArea
+		) const;
+
+	//! Limits (half open) on mu and nu values given domain area limits
+	dat::Area<double>
+	tileAreaForDomain
 		( Domain const & xyDomain
 		) const;
 

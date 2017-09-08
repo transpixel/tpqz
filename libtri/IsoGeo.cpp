@@ -114,17 +114,16 @@ IsoGeo :: isValid
 
 dat::Area<double>
 IsoGeo :: tileAreaForRefArea
-	( Domain const & xyDomain
+	( dat::Area<double> const & refArea
 	) const
 {
 	dat::Area<double> tileArea;
-	dat::Area<double> const areaXY{ xyDomain.areaBounds() };
-	if (areaXY.isValid())
+	if (refArea.isValid())
 	{
 		dat::MinMax<double> muMinMax;
 		dat::MinMax<double> nuMinMax;
 		std::array<dat::Spot, 4u> const xyCorners
-			(areaXY.extrema<dat::Spot>());
+			(refArea.extrema<dat::Spot>());
 		for (dat::Spot const & xyCorner : xyCorners)
 		{
 			dat::Spot const mnSpot(tileSpotForRefSpot(xyCorner));
@@ -135,6 +134,14 @@ IsoGeo :: tileAreaForRefArea
 		tileArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
 	}
 	return tileArea;
+}
+
+dat::Area<double>
+IsoGeo :: tileAreaForDomain
+	( Domain const & xyDomain
+	) const
+{
+	return tileAreaForRefArea(xyDomain.areaBounds());
 }
 
 double

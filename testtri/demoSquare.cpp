@@ -599,7 +599,7 @@ main
 	// check tritille interpolation at raster locations
 	timer.start("raster.interp");
 	timeInterp.start("interp");
-	dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
+	dat::Area<double> const rngArea{ trigeo.tileAreaForDomain(xyDomain) };
 	dat::Extents gridSize{ gridHigh, gridWide };
 	math::MapSizeArea const map(gridSize, rngArea);
 	for (dat::ExtentsIterator iter{gridSize} ; iter ; ++iter)
@@ -711,7 +711,7 @@ main
 		std::ofstream ofsGrid("testNodeGrid.dat");
 
 		// interpolate tritille samples at raster grid locations
-		dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
+		dat::Area<double> const rngArea{ trigeo.tileAreaForDomain(xyDomain) };
 		dat::grid<example::DataType> gridValues(gridHigh, gridWide);
 		math::MapSizeArea const map(gridValues.hwSize(), rngArea);
 		for (dat::ExtentsIterator iter{gridValues.hwSize()} ; iter ; ++iter)

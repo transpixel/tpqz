@@ -102,7 +102,12 @@ public: // methods
 	sizeValidNodes
 		() const;
 
-	//! Perform interpolation at refSpot
+	/*! Perform interpolation at refSpot
+	 *
+	 * /arg SampFunc is a functor that must be compatible with
+	 * the "PropSampFunc" argument to tri::FaceVerts::valueFrom() method.
+	 *
+	 */
 	template <typename SampFunc>
 	inline
 	typename SampFunc::value_type

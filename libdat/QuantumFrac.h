@@ -72,10 +72,11 @@ class QuantumFrac
 
 public: // data
 
+	using index_type = long;
 	using Type = double;
 
-	quantum::Splitter<long, Type> theQuant{ dat::nullValue<Type>() };
-	long theFloor{ dat::nullValue<long>() };
+	quantum::Splitter<index_type, Type> theQuant{ dat::nullValue<Type>() };
+	index_type theFloor{ dat::nullValue<index_type>() };
 	Type theResid{ dat::nullValue<Type>() };
 
 public: // methods
@@ -89,16 +90,16 @@ public: // methods
 	explicit
 	QuantumFrac
 		( Type const & value
-		, quantum::Splitter<long, Type> const & quantFunc
+		, quantum::Splitter<index_type, Type> const & quantFunc
 		);
 
 	//! Value constructor
 	inline
 	explicit
 	QuantumFrac
-		( long const & floor
+		( index_type const & floor
 		, Type const & resid
-		, quantum::Splitter<long, Type> const & quantFunc
+		, quantum::Splitter<index_type, Type> const & quantFunc
 		);
 
 	//! True if instance is valid

@@ -39,11 +39,11 @@ inline
 // explicit
 QuantumFrac :: QuantumFrac
 	( Type const & value
-	, quantum::Splitter<long, Type> const & quantFunc
+	, quantum::Splitter<index_type, Type> const & quantFunc
 	)
 	: theQuant(quantFunc)
 {
-	std::pair<long, Type> const qf{ quantFunc(value) };
+	std::pair<index_type, Type> const qf{ quantFunc(value) };
 	theFloor = qf.first;
 	theResid = qf.second;
 }
@@ -51,9 +51,9 @@ QuantumFrac :: QuantumFrac
 inline
 // explicit
 QuantumFrac :: QuantumFrac
-	( long const & floor
+	( index_type const & floor
 	, Type const & resid
-	, quantum::Splitter<long, Type> const & quantFunc
+	, quantum::Splitter<index_type, Type> const & quantFunc
 	)
 	: theQuant(quantFunc)
 	, theFloor{ floor }

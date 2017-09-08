@@ -116,5 +116,15 @@ IsoGeo :: refSpotForFracPair
 	return refSpotForTileSpot(tileSpotForFracPair(fracPair));
 }
 
+inline
+dat::Spot
+IsoGeo :: refSpotForIndices
+	( long const & ndxI
+	, long const & ndxJ
+	) const
+{
+	return refSpotForFracPair(fracPairForIndices(ndxI, ndxJ));
+}
+
 } // tri
 

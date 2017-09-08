@@ -51,6 +51,7 @@ Terminology is based on three reference frames:
 \arg Ref: The original domain in which tritille is defined.
 \arg Tile: The (skew) frame associated with "a", "u" and "v" edge directions.
 \arg Node: The quantized frame for node indices and fractional locations.
+\arg Index: The discrete (2) addressing of individual nodes
 
 Note the reference frame is orthogonal, while the Tile and Node frames are
 (in general) not. Locations in the Ref and Tile frames are associated with
@@ -158,11 +159,19 @@ public: // methods
 		( dat::Spot const & tileSpot
 		) const;
 
-	//! Domain value of (x,y) for node with indices
+	//! Domain value of (x,y) for tile location
 	inline
 	dat::Spot
 	refSpotForFracPair
 		( QuantPair const & fracPair
+		) const;
+
+	//! Domain value of (x,y) for node with indices
+	inline
+	dat::Spot
+	refSpotForIndices
+		( long const & ndxI
+		, long const & ndxJ
 		) const;
 
 	//

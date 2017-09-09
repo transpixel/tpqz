@@ -482,19 +482,15 @@ tri_IsoTille_test2
 
 		// check that returned data are within neighborhood
 		size_t errCnt{ 0u };
+		double prevDist{ 0. };
+		std::set<tri::NodeNdxPair> gotNdxPairs;
 		for (tri::IsoTille::DistNode const & gotDistNode : gotDistNodes)
 		{
 			double const & gotDist = gotDistNode.first;
 			tri::NodeNdxPair const & ndxIJ = gotDistNode.second;
-			if (refDist < gotDist)
-			{
-				oss << "Failure of returned radius test" << std::endl;
-				oss << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
-				oss << dat::infoString(gotDist, "gotDist") << std::endl;
-				oss << dat::infoString(refDist, "refDist") << std::endl;
-				++errCnt;
-			}
+			gotNdxPairs.insert(ndxIJ);
 
+			// check if node indices are in neighborhood
 			dat::Spot const gotAt(trigeo.refSpotForIndices(ndxIJ));
 			using dat::operator-;
 			dat::Spot const refDelta(gotAt - refNodeLoc);
@@ -508,6 +504,29 @@ tri_IsoTille_test2
 				oss << "refDist: " << io::sprintf(fmt, refDist) << std::endl;
 				++errCnt;
 			}
+
+			// check that radii are ordered from small to large
+			double const & currDist = gotDist;
+			if (! (prevDist <= currDist))
+			{
+				oss << "Failure of ordered distance test" << std::endl;
+				oss << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
+				oss << dat::infoString(prevDist, "prevDist") << std::endl;
+				oss << dat::infoString(currDist, "currDist") << std::endl;
+				++errCnt;
+			}
+			prevDist = currDist;
+
+			// check if returned radius is within neighborhood
+			if (refDist < gotDist)
+			{
+				oss << "Failure of returned radius test" << std::endl;
+				oss << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
+				oss << dat::infoString(gotDist, "gotDist") << std::endl;
+				oss << dat::infoString(refDist, "refDist") << std::endl;
+				++errCnt;
+			}
+
 			if (0u < errCnt)
 			{
 				break;

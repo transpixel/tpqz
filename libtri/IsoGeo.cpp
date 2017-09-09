@@ -136,6 +136,35 @@ IsoGeo :: tileAreaForRefArea
 	return tileArea;
 }
 
+dat::Area<NodeNdxType>
+IsoGeo :: ijAreaForTileArea
+	( dat::Area<double> const & tileArea
+	) const
+{
+	dat::Area<NodeNdxType> ijArea;
+	if (tileArea.isValid())
+	{
+		dat::MinMax<NodeNdxType> iMinMax;
+		dat::MinMax<NodeNdxType> jMinMax;
+		std::array<dat::Spot, 4u> const mnCorners
+			(tileArea.extrema<dat::Spot>());
+		for (dat::Spot const & mnCorner : mnCorners)
+		{
+			QuantPair const qpair{ fracPairForTileSpot(mnCorner) };
+			NodeNdxType const & ndxI = qpair.first.theFloor;
+			NodeNdxType const & ndxJ = qpair.second.theFloor;
+
+			// expand the mu,nu dimensions (independently)
+			iMinMax = iMinMax.expandedWith(ndxI);
+			jMinMax = jMinMax.expandedWith(ndxJ);
+		}
+		dat::Range<NodeNdxType> const iRange(iMinMax.min(), iMinMax.max());
+		dat::Range<NodeNdxType> const jRange(jMinMax.min(), jMinMax.max());
+		ijArea = dat::Area<NodeNdxType>{ iRange, jRange };
+	}
+	return ijArea;
+}
+
 dat::Area<double>
 IsoGeo :: tileAreaForDomain
 	( Domain const & xyDomain

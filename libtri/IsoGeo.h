@@ -189,6 +189,12 @@ public: // methods
 		( Domain const & xyDomain
 		) const;
 
+	//! "Area" of indices which are *INCLUDED* within tileArea
+	dat::Area<NodeNdxType>
+	ijAreaForTileArea
+		( dat::Area<double> const & tileArea
+		) const;
+
 	//! Descriptive information about this instance.
 	std::string
 	infoString

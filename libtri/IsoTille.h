@@ -147,6 +147,16 @@ public: // methods
 		, SampFunc const & propSampFunc
 		) const;
 
+	//! Interpolated node property via inverse-distance weighted neighbors
+	template <typename SampFunc>
+	inline
+	typename SampFunc::value_type
+	nodeValueViaInvDist
+		( NodeNdxPair const & ndxGone //!< interpolate at this node
+		, double const maxRefDist //!< using (valid) neighbors up to this far
+		, SampFunc const & propSampFunc //!< ref. tri::FaceVerts::valueFrom()
+		) const;
+
 	//! Descriptive information about this instance.
 	std::string
 	infoString

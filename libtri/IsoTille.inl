@@ -121,5 +121,55 @@ IsoTille :: linearInterpForValid
 	return triangle.valueFrom<SampFunc>(propSampFunc);
 }
 
+template <typename SampFunc>
+inline
+typename SampFunc::value_type
+IsoTille :: nodeValueViaInvDist
+	( NodeNdxPair const & ndxGone
+	, double const maxRefDist
+	, SampFunc const & propSampFunc
+	) const
+{
+	using DataType = typename SampFunc::value_type;
+	DataType samp{};
+
+	std::vector<DistNode> const nearDistNodes
+		{ nodesNearTo(ndxGone, maxRefDist) };
+
+	// computed (inverse distance) weighted mean
+	DataType sumWV{};
+	double sumW{ 0. };
+	for (tri::IsoTille::DistNode const & nearDistNode : nearDistNodes)
+	{
+		// get info for a neighbor
+		double const & dist = nearDistNode.first;
+		tri::NodeNdxPair const & ndxIJ = nearDistNode.second;
+
+		// retrieve property at neighbor
+		DataType const & value{ propSampFunc(ndxIJ.first, ndxIJ.second) };
+		if (dat::isValid(value))
+		{
+			// use inverse (Ref)distance as weight
+			double const weight{ 1. / dist};
+			if (0. == sumW)
+			{
+				sumWV = weight * value;
+				sumW = weight;
+			}
+			else
+			{
+				sumWV = sumWV + weight * value;
+				sumW = sumW + weight;
+			}
+		}
+	}
+	if (std::numeric_limits<double>::min() < sumW)
+	{
+		samp = (1./sumW) * sumWV;
+	}
+
+	return samp;
+}
+
 } // tri
 

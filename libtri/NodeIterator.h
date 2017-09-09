@@ -154,28 +154,6 @@ public: // methods
 	operator++
 		();
 
-	//! Indices into tritille near to ndxAt - IRRESPECTIVE if in domain or not
-	std::vector<NodeNdxPair>
-	ndxPairsNearTo
-		( NodeNdxPair const & ndxAt
-		, double const & maxRefDist
-		) const;
-
-	//! Utility type
-	using DistNode = std::pair<double, NodeNdxPair>;
-
-	/*! Indices for nodes with maxRefDist of ndxAt in reference frame
-	 *
-	 * Returned nodes are:
-	 * \arg associated to valid domain location
-	 * \arg returned in order of proximity of ref location to ref loc of ndxAt
-	 */
-	std::vector<DistNode>
-	nodesNearTo
-		( NodeNdxPair const & ndxAt
-		, double const & maxRefDist
-		) const;
-
 	//! Descriptive information about this instance.
 	std::string
 	infoString

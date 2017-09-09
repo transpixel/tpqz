@@ -46,6 +46,7 @@
 #include <array>
 #include <iostream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 
@@ -361,6 +362,162 @@ tri_IsoTille_test1
 	return oss.str();
 }
 
+	//! Find all nodes within radius via brute force evaluation
+	std::set<tri::NodeNdxPair>
+	nodePairsInRadius
+		( tri::IsoGeo const & trigeo
+		, tri::Domain const & domain
+		, dat::Spot const & center
+		, double const & radius
+		)
+	{
+		std::set<tri::NodeNdxPair> nodesIn;
+		for (tri::NodeIterator iter(trigeo, domain) ; iter ; ++iter)
+		{
+			tri::NodeNdxPair const ndxIJ{ iter.indexPair() };
+			dat::Spot const refIJ(trigeo.refSpotForIndices(ndxIJ));
+			if (domain.contains(refIJ))
+			{
+				using dat::operator-;
+				double const dist{ dat::magnitude(refIJ - center) };
+				if (dist <= radius)
+				{
+					nodesIn.insert(ndxIJ);
+				}
+			}
+		}
+		return nodesIn;
+	}
+
+
+//! Check proximity methods
+std::string
+tri_IsoTille_test2
+	()
+{
+	std::ostringstream oss;
+
+	// small domain area
+//#define EasyData
+#	if defined(EasyData)
+	dat::Range<double> const xRange(- 5., 15.);
+	dat::Range<double> const yRange(- 7., 13.);
+	std::array<double, 2u> const refPnt{{ 10., -2. }};
+	double const refDist{ 2.5 };
+	std::array<double, 2u> const adir{{ 1., 0. }};
+	double const deltaA{ .1 };
+	double const deltaB{ .1 };
+#	else
+	dat::Range<double> const xRange(-11., -7.);
+	dat::Range<double> const yRange(3., 5.);
+	std::array<double, 2u> const refPnt{{ -9., 4.125 }};
+	std::array<double, 2u> const adir{{ .4, .3 }};
+	double const refDist{ 1.5 };
+	double const deltaA{ .25 };
+	double const deltaB{ .40 };
+#	endif
+
+	tri::IsoGeo const trigeo(deltaA, deltaB, adir);
+	dat::Area<double> const refArea{ xRange, yRange };
+	tri::Domain const domain(refArea);
+	assert(domain.contains(refPnt));
+
+	tri::IsoTille const trinet(trigeo, domain);
+
+	tri::NodeNdxPair const ndxAt{ trigeo.indicesForRefSpot(refPnt) };
+	dat::Spot const refNodeLoc(trigeo.refSpotForIndices(ndxAt));
+	assert(domain.contains(refNodeLoc));
+
+	//
+	// check all encompassing case
+	//
+
+	{
+		constexpr double wayBig{ 1.e6 };
+
+		// determine nodes via brute force evaluation
+		std::set<tri::NodeNdxPair> const expNdxPairs
+			{ nodePairsInRadius(trigeo, domain, refNodeLoc, wayBig) };
+
+		// request "near" nodes such that all are included
+		std::vector<tri::IsoTille::DistNode> const gotDistNodes
+			{ trinet.nodesNearTo(ndxAt, wayBig) };
+
+		/*
+		std::ofstream ofsExp("test_exp.dat");
+		for (tri::NodeNdxPair const & ndxIJ : expNdxPairs)
+		{
+		ofsExp << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
+		}
+		std::ofstream ofsGot("test_got.dat");
+		for (tri::IsoTille::DistNode const & gotDistNode : gotDistNodes)
+		{
+		ofsGot << dat::infoString(gotDistNode.second, "ndxIJ") << std::endl;
+		}
+		*/
+
+		assert(! expNdxPairs.empty());
+		size_t const expNears{ expNdxPairs.size() - 1L }; // skip 'at'
+		size_t const gotNears{ gotDistNodes.size() };
+		if (! dat::nearlyEquals(gotNears, expNears))
+		{
+			oss << "Failure of full coverage test" << std::endl;
+			oss << dat::infoString(expNears, "expNears") << std::endl;
+			oss << dat::infoString(gotNears, "gotNears") << std::endl;
+		}
+	}
+
+	//
+	// Check typical case
+	//
+
+	{
+		// determine nodes via brute force evaluation
+		std::set<tri::NodeNdxPair> const expNdxPairs
+			{ nodePairsInRadius(trigeo, domain, refNodeLoc, refDist) };
+
+		// get neighbor node info
+		std::vector<tri::IsoTille::DistNode> const gotDistNodes
+			{ trinet.nodesNearTo(ndxAt, refDist) };
+
+		// check that returned data are within neighborhood
+		size_t errCnt{ 0u };
+		for (tri::IsoTille::DistNode const & gotDistNode : gotDistNodes)
+		{
+			double const & gotDist = gotDistNode.first;
+			tri::NodeNdxPair const & ndxIJ = gotDistNode.second;
+			if (refDist < gotDist)
+			{
+				oss << "Failure of returned radius test" << std::endl;
+				oss << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
+				oss << dat::infoString(gotDist, "gotDist") << std::endl;
+				oss << dat::infoString(refDist, "refDist") << std::endl;
+				++errCnt;
+			}
+
+			dat::Spot const gotAt(trigeo.refSpotForIndices(ndxIJ));
+			using dat::operator-;
+			dat::Spot const refDelta(gotAt - refNodeLoc);
+			double const chkDist{ dat::magnitude(refDelta) };
+			if (refDist < chkDist)
+			{
+				oss << "Failure of check radius test" << std::endl;
+				oss << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
+				std::string const fmt{ "%21.18f" };
+				oss << "chkDist: " << io::sprintf(fmt, chkDist) << std::endl;
+				oss << "refDist: " << io::sprintf(fmt, refDist) << std::endl;
+				++errCnt;
+			}
+			if (0u < errCnt)
+			{
+				break;
+			}
+		}
+	}
+
+	return oss.str();
+}
+
 
 }
 
@@ -376,6 +533,7 @@ main
 	// run tests
 	oss << tri_IsoTille_test0();
 	oss << tri_IsoTille_test1();
+	oss << tri_IsoTille_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

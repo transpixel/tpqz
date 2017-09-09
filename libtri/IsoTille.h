@@ -102,12 +102,39 @@ public: // methods
 	sizeValidNodes
 		() const;
 
-	//! Perform interpolation at refSpot
+	//! Indices into tritille near to ndxAt - IRRESPECTIVE if in domain or not
+	std::vector<NodeNdxPair>
+	ndxPairsNearTo
+		( NodeNdxPair const & ndxAt
+		, double const & maxRefDist
+		) const;
+
+	//! Utility type
+	using DistNode = std::pair<double, NodeNdxPair>;
+
+	/*! Indices for nodes with maxRefDist of ndxAt in reference frame
+	 *
+	 * Returned nodes are:
+	 * \arg associated to valid domain location
+	 * \arg returned in order of proximity of ref location to ref loc of ndxAt
+	 */
+	std::vector<DistNode>
+	nodesNearTo
+		( NodeNdxPair const & ndxAt
+		, double const & maxRefDist
+		) const;
+
+	/*! Perform interpolation at refSpot
+	 *
+	 * /arg SampFunc is a functor that must be compatible with
+	 * the "PropSampFunc" argument to tri::FaceVerts::valueFrom() method.
+	 *
+	 */
 	template <typename SampFunc>
 	inline
 	typename SampFunc::value_type
 	linearInterpWithCheck
-		( Vec2D const & refSpot //!< location relative to tile origin
+		( dat::Spot const & refSpot //!< location relative to tile origin
 		, SampFunc const & propSampFunc
 		) const;
 
@@ -116,7 +143,7 @@ public: // methods
 	inline
 	typename SampFunc::value_type
 	linearInterpForValid
-		( Vec2D const & refSpot //!< location relative to tile origin
+		( dat::Spot const & refSpot //!< location relative to tile origin
 		, SampFunc const & propSampFunc
 		) const;
 

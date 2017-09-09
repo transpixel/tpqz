@@ -53,8 +53,8 @@ IsoGeo :: tileSpotForFracPair
 	( QuantPair const & fracPair
 	) const
 {
-	long const & muNdx = fracPair.first.theFloor;
-	long const & nuNdx = fracPair.second.theFloor;
+	NodeNdxType const & muNdx = fracPair.first.theFloor;
+	NodeNdxType const & nuNdx = fracPair.second.theFloor;
 	return dat::Spot
 		{{ theSplitterMu.value({muNdx, 0.})
 		 , theSplitterNu.value({nuNdx, 0.})
@@ -86,14 +86,24 @@ IsoGeo :: fracPairForTileSpot
 inline
 IsoGeo::QuantPair
 IsoGeo :: fracPairForIndices
-	( long const & ndxI
-	, long const & ndxJ
+	( NodeNdxPair const & nodeIJ
 	) const
 {
+	NodeNdxType const & ndxI = nodeIJ.first;
+	NodeNdxType const & ndxJ = nodeIJ.second;
 	return
 		{ dat::QuantumFrac(double(ndxI), 0., theSplitterMu)
 		, dat::QuantumFrac(double(ndxJ), 0., theSplitterNu)
 		};
+}
+
+inline
+NodeNdxPair
+IsoGeo :: indicesForFracPair
+	( QuantPair const & fracPair
+	) const
+{
+	return { fracPair.first.theFloor, fracPair.second.theFloor };
 }
 
 inline
@@ -114,6 +124,24 @@ IsoGeo :: refSpotForFracPair
 	) const
 {
 	return refSpotForTileSpot(tileSpotForFracPair(fracPair));
+}
+
+inline
+NodeNdxPair
+IsoGeo::indicesForRefSpot
+	( dat::Spot const & refSpot
+	) const
+{
+	return indicesForFracPair(fracPairForRefSpot(refSpot));
+}
+
+inline
+dat::Spot
+IsoGeo :: refSpotForIndices
+	( NodeNdxPair const & nodeIJ
+	) const
+{
+	return refSpotForFracPair(fracPairForIndices(nodeIJ));
 }
 
 } // tri

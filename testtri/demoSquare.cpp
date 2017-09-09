@@ -387,11 +387,10 @@ saveNodeStates
 dat::Spot
 refSpotFor
 	( tri::IsoGeo const & trigeo
-	, std::pair<long, long> const & ndxPair
+	, tri::NodeNdxPair const & ndxIJ
 	)
 {
-	tri::IsoGeo::QuantPair const fracPair
-		{ trigeo.fracPairForIndices(ndxPair.first, ndxPair.second) };
+	tri::IsoGeo::QuantPair const fracPair{ trigeo.fracPairForIndices(ndxIJ) };
 	return trigeo.refSpotForFracPair(fracPair);
 }
 
@@ -600,7 +599,7 @@ main
 	// check tritille interpolation at raster locations
 	timer.start("raster.interp");
 	timeInterp.start("interp");
-	dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
+	dat::Area<double> const rngArea{ trigeo.tileAreaForDomain(xyDomain) };
 	dat::Extents gridSize{ gridHigh, gridWide };
 	math::MapSizeArea const map(gridSize, rngArea);
 	for (dat::ExtentsIterator iter{gridSize} ; iter ; ++iter)
@@ -712,7 +711,7 @@ main
 		std::ofstream ofsGrid("testNodeGrid.dat");
 
 		// interpolate tritille samples at raster grid locations
-		dat::Area<double> const rngArea{ trigeo.tileAreaForRefArea(xyDomain) };
+		dat::Area<double> const rngArea{ trigeo.tileAreaForDomain(xyDomain) };
 		dat::grid<example::DataType> gridValues(gridHigh, gridWide);
 		math::MapSizeArea const map(gridValues.hwSize(), rngArea);
 		for (dat::ExtentsIterator iter{gridValues.hwSize()} ; iter ; ++iter)

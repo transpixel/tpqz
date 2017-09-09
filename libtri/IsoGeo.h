@@ -38,6 +38,7 @@
 #include "libdat/QuantumFrac.h"
 #include "libdat/Spot.h"
 #include "libtri/Domain.h"
+#include "libtri/tri.h"
 
 #include <string>
 
@@ -51,6 +52,7 @@ Terminology is based on three reference frames:
 \arg Ref: The original domain in which tritille is defined.
 \arg Tile: The (skew) frame associated with "a", "u" and "v" edge directions.
 \arg Node: The quantized frame for node indices and fractional locations.
+\arg Index: The discrete (2) addressing of individual nodes
 
 Note the reference frame is orthogonal, while the Tile and Node frames are
 (in general) not. Locations in the Ref and Tile frames are associated with
@@ -68,8 +70,8 @@ class IsoGeo
 	using Vec2D = std::array<double, 2u>;
 
 	// e.g. rows of transition matrix
-	dat::quantum::Splitter<long, double> theSplitterMu;
-	dat::quantum::Splitter<long, double> theSplitterNu;
+	dat::quantum::Splitter<NodeNdxType, double> theSplitterMu;
+	dat::quantum::Splitter<NodeNdxType, double> theSplitterNu;
 	Vec2D theDirA{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theDirU{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	Vec2D theDirV{{ dat::nullValue<double>(), dat::nullValue<double>() }};
@@ -139,12 +141,18 @@ public: // methods
 		( dat::Spot const & tileSpot
 		) const;
 
-	//! Node index and fraction at exact node location
+	//! Cast node index pair to QuantPair with zero fraction
 	inline
 	QuantPair
 	fracPairForIndices
-		( long const & ndxI
-		, long const & ndxJ
+		( NodeNdxPair const & nodeIJ
+		) const;
+
+	//! Integral part of fracPair (after discarding fractional part).
+	inline
+	NodeNdxPair
+	indicesForFracPair
+		( QuantPair const & fracPair
 		) const;
 
 	//
@@ -158,7 +166,7 @@ public: // methods
 		( dat::Spot const & tileSpot
 		) const;
 
-	//! Domain value of (x,y) for node with indices
+	//! Domain value of (x,y) for tile location
 	inline
 	dat::Spot
 	refSpotForFracPair
@@ -166,13 +174,43 @@ public: // methods
 		) const;
 
 	//
+	// Node indices
+	//
+
+	//! Integral part of fracPair (after discarding fractional part).
+	inline
+	NodeNdxPair
+	indicesForRefSpot
+		( dat::Spot const & refSpot
+		) const;
+
+	//! Domain value of (x,y) for node with indices
+	inline
+	dat::Spot
+	refSpotForIndices
+		( NodeNdxPair const & nodeIJ
+		) const;
+
+	//
 	// General
 	//
 
-	//! Limits (half open) on mu and nu values given domain area limits
+	//! (Non-orthogonal) Tile area associated with (orthogonal) Ref area
 	dat::Area<double>
 	tileAreaForRefArea
+		( dat::Area<double> const & refArea
+		) const;
+
+	//! Limits (half open) on mu and nu values given domain area limits
+	dat::Area<double>
+	tileAreaForDomain
 		( Domain const & xyDomain
+		) const;
+
+	//! "Area" of indices which are *INCLUDED* within tileArea
+	dat::Area<NodeNdxType>
+	ijAreaForTileArea
+		( dat::Area<double> const & tileArea
 		) const;
 
 	//! Descriptive information about this instance.

@@ -34,6 +34,9 @@
 
 #include "libtri/NodeIterator.h"
 
+#include "libdat/Spot.h"
+#include "libmath/math.h"
+
 #include <sstream>
 
 
@@ -55,30 +58,28 @@ NodeIterator::IndexLimits :: IndexLimits
 	theFracPairEnd = trigeo.fracPairForTileSpot(tileSpotEnd);
 }
 
-std::pair<long, long>
+NodeIterator::NodeNdxRange
 NodeIterator::IndexLimits :: ndxBegEndI
 	() const
 {
-	std::pair<long, long> pairBegEndI
-		{ dat::nullValue<long>(), dat::nullValue<long>() };
+	NodeNdxRange pairBegEndI{ sNullNdxPair };
 
-	long const & iBeg = theFracPairBeg.first.theFloor;
-	long const iEnd{ theFracPairEnd.first.theFloor + 1 };
+	NodeNdxType const & iBeg = theFracPairBeg.first.theFloor;
+	NodeNdxType const iEnd{ theFracPairEnd.first.theFloor + 1 };
 	assert (iBeg < iEnd);
 	pairBegEndI = { iBeg, iEnd };
 
 	return pairBegEndI;
 }
 
-std::pair<long, long>
+NodeIterator::NodeNdxRange
 NodeIterator::IndexLimits :: ndxBegEndJ
 	() const
 {
-	std::pair<long, long> pairBegEndJ
-		{ dat::nullValue<long>(), dat::nullValue<long>() };
+	NodeNdxRange pairBegEndJ{ sNullNdxPair };
 
-	long const & jBeg = theFracPairBeg.second.theFloor;
-	long const jEnd{ theFracPairEnd.second.theFloor + 1 };
+	NodeNdxType const & jBeg = theFracPairBeg.second.theFloor;
+	NodeNdxType const jEnd{ theFracPairEnd.second.theFloor + 1 };
 	assert (jBeg < jEnd);
 	pairBegEndJ = { jBeg, jEnd };
 
@@ -119,7 +120,7 @@ NodeIterator :: NodeIterator
 	: theTileGeo{ trigeo }
 	, theDomain{ xyDomain }
 	, theNdxLimits
-		{ IndexLimits(trigeo, theTileGeo.tileAreaForRefArea(xyDomain)) }
+		{ IndexLimits(trigeo, theTileGeo.tileAreaForDomain(xyDomain)) }
 	, theBegEndI{ theNdxLimits.ndxBegEndI() }
 	, theBegEndJ{ theNdxLimits.ndxBegEndJ() }
 	, theAtIJ{ theBegEndI.first, theBegEndJ.first }

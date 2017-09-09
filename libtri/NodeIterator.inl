@@ -53,7 +53,7 @@ NodeIterator :: fracPair
 }
 
 inline
-std::pair<long, long>
+NodeNdxPair
 NodeIterator :: indexPair
 	() const
 {
@@ -74,7 +74,7 @@ IsoGeo::QuantPair
 NodeIterator :: fracPairAt
 	() const
 {
-	return theTileGeo.fracPairForIndices(theAtIJ.first, theAtIJ.second);
+	return theTileGeo.fracPairForIndices(theAtIJ);
 }
 
 inline
@@ -91,8 +91,8 @@ void
 NodeIterator :: advanceToNextAny
 	()
 {
-	long & ndxAtI = theAtIJ.first;
-	long & ndxAtJ = theAtIJ.second;
+	NodeNdxType & ndxAtI = theAtIJ.first;
+	NodeNdxType & ndxAtJ = theAtIJ.second;
 	++ndxAtJ;
 	if (theBegEndJ.second < ndxAtJ)
 	{
@@ -101,8 +101,8 @@ NodeIterator :: advanceToNextAny
 		if (theBegEndI.second < ndxAtI)
 		{
 			theIsActive = false;
-			ndxAtI = dat::nullValue<long>();
-			ndxAtJ = dat::nullValue<long>();
+			ndxAtI = tri::sNullNdx;
+			ndxAtJ = tri::sNullNdx;
 		}
 	}
 }

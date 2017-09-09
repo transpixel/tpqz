@@ -76,8 +76,8 @@ IsoGeo :: IsoGeo
 		Vec2D const vbar( beta*udir + alpha*vdir);
 
 		// set members
-		theSplitterMu = dat::quantum::Splitter<long, double>(da);
-		theSplitterNu = dat::quantum::Splitter<long, double>(db);
+		theSplitterMu = dat::quantum::Splitter<NodeNdxType, double>(da);
+		theSplitterNu = dat::quantum::Splitter<NodeNdxType, double>(db);
 		theDirA = adir;
 		theDirU = udir;
 		theDirV = vdir;
@@ -114,17 +114,16 @@ IsoGeo :: isValid
 
 dat::Area<double>
 IsoGeo :: tileAreaForRefArea
-	( Domain const & xyDomain
+	( dat::Area<double> const & refArea
 	) const
 {
 	dat::Area<double> tileArea;
-	dat::Area<double> const areaXY{ xyDomain.areaBounds() };
-	if (areaXY.isValid())
+	if (refArea.isValid())
 	{
 		dat::MinMax<double> muMinMax;
 		dat::MinMax<double> nuMinMax;
 		std::array<dat::Spot, 4u> const xyCorners
-			(areaXY.extrema<dat::Spot>());
+			(refArea.extrema<dat::Spot>());
 		for (dat::Spot const & xyCorner : xyCorners)
 		{
 			dat::Spot const mnSpot(tileSpotForRefSpot(xyCorner));
@@ -135,6 +134,43 @@ IsoGeo :: tileAreaForRefArea
 		tileArea = dat::Area<double>{ muMinMax.pair(), nuMinMax.pair() };
 	}
 	return tileArea;
+}
+
+dat::Area<NodeNdxType>
+IsoGeo :: ijAreaForTileArea
+	( dat::Area<double> const & tileArea
+	) const
+{
+	dat::Area<NodeNdxType> ijArea;
+	if (tileArea.isValid())
+	{
+		dat::MinMax<NodeNdxType> iMinMax;
+		dat::MinMax<NodeNdxType> jMinMax;
+		std::array<dat::Spot, 4u> const mnCorners
+			(tileArea.extrema<dat::Spot>());
+		for (dat::Spot const & mnCorner : mnCorners)
+		{
+			QuantPair const qpair{ fracPairForTileSpot(mnCorner) };
+			NodeNdxType const & ndxI = qpair.first.theFloor;
+			NodeNdxType const & ndxJ = qpair.second.theFloor;
+
+			// expand the mu,nu dimensions (independently)
+			iMinMax = iMinMax.expandedWith(ndxI);
+			jMinMax = jMinMax.expandedWith(ndxJ);
+		}
+		dat::Range<NodeNdxType> const iRange(iMinMax.min(), iMinMax.max());
+		dat::Range<NodeNdxType> const jRange(jMinMax.min(), jMinMax.max());
+		ijArea = dat::Area<NodeNdxType>{ iRange, jRange };
+	}
+	return ijArea;
+}
+
+dat::Area<double>
+IsoGeo :: tileAreaForDomain
+	( Domain const & xyDomain
+	) const
+{
+	return tileAreaForRefArea(xyDomain.areaBounds());
 }
 
 double

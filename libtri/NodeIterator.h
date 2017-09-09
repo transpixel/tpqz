@@ -57,6 +57,8 @@ class NodeIterator
 
 public: // types
 
+	using NodeNdxRange = std::pair<tri::NodeNdxType, tri::NodeNdxType>;
+
 	//! STL style [begin,end) iterator pairs for tessellation geometry.
 	struct IndexLimits
 	{
@@ -74,12 +76,12 @@ public: // types
 			);
 
 		//! Start and (one-past) end iterator for 'mu/u' direction.
-		std::pair<long, long>
+		NodeNdxRange
 		ndxBegEndI
 			() const;
 
 		//! Start and (one-past) end iterator for 'nu/v' direction.
-		std::pair<long, long>
+		NodeNdxRange
 		ndxBegEndJ
 			() const;
 
@@ -104,16 +106,13 @@ public: // data
 private: // data
 
 	//! Node indices ala STL style iterators (for mu)
-	std::pair<long, long> theBegEndI
-		{ dat::nullValue<long>(), dat::nullValue<long>() };
+	NodeNdxRange theBegEndI{ tri::sNullNdxPair };
 
 	//! Node indices ala STL style iterators (for nu)
-	std::pair<long, long> theBegEndJ
-		{ dat::nullValue<long>(), dat::nullValue<long>() };
+	NodeNdxRange theBegEndJ{ tri::sNullNdxPair };
 
 	//! Indices to currently active node (or invalid values)
-	std::pair<long, long> theAtIJ
-		{ dat::nullValue<long>(), dat::nullValue<long>() };
+	NodeNdxPair theAtIJ{ tri::sNullNdxPair };
 
 	//! True if current iterator position is valid (not yet at end)
 	bool theIsActive{ false };
@@ -145,7 +144,7 @@ public: // methods
 
 	//! Index pair associated with current (valid) iterator
 	inline
-	std::pair<long, long>
+	NodeNdxPair
 	indexPair
 		() const;
 

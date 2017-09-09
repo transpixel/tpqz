@@ -35,6 +35,7 @@
 
 #include "libdat/info.h"
 #include "libdat/validity.h"
+#include "libio/sprintf.h"
 #include "libio/stream.h"
 
 #include <algorithm>
@@ -85,7 +86,7 @@ tri_NodeIterator_test1
 	// determine acceptable nodes
 	std::set<std::pair<long, long> > expMuNus;
 	{
-		dat::Area<double> const mnRange{ trigeo.tileAreaForRefArea(xyDomain) };
+		dat::Area<double> const mnRange{ trigeo.tileAreaForDomain(xyDomain) };
 		long const muBeg{ (long)std::floor(mnRange[0].min() / da) };
 		long const muEnd{ (long)std::ceil(mnRange[0].max() / da) };
 		long const nuBeg{ (long)std::floor(mnRange[1].min() / db) };
@@ -94,8 +95,9 @@ tri_NodeIterator_test1
 		{
 			for (long ndxI{muBeg} ; ndxI <= muEnd ; ++ndxI)
 			{
+				tri::NodeNdxPair const ndxIJ{ ndxI, ndxJ };
 				tri::IsoGeo::QuantPair const fracPair
-					(trigeo.fracPairForIndices(ndxI, ndxJ));
+					(trigeo.fracPairForIndices(ndxIJ));
 				dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
 				if (xyDomain.contains(xyLoc))
 				{

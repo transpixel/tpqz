@@ -106,6 +106,15 @@ namespace example
 			return (theABC[0] + theABC[1] + theABC[2]);
 		}
 
+		bool
+		nearlyEquals
+			( DataType const & other
+			, double const & tol = math::eps
+			) const
+		{
+			return dat::nearlyEquals(theABC, other.theABC, tol);
+		}
+
 		std::string
 		infoString
 			( std::string const & title = {}
@@ -178,10 +187,17 @@ namespace example
 			, long const & keyJ
 			) const
 		{
+			return operator()(std::make_pair(keyI, keyJ));
+		}
+
+		DataType
+		operator()
+			( std::pair<long, long> const & keyIJ
+			) const
+		{
 			DataType samp;
-			KeyType const key{ keyI, keyJ };
 			std::map<KeyType, DataType>::const_iterator
-				const itFind{ theSamps.find(key) };
+				const itFind{ theSamps.find(keyIJ) };
 			if (theSamps.end() != itFind)
 			{
 				samp = itFind->second;
@@ -273,6 +289,30 @@ tri_IsoTille_test1
 
 	// generate samples at each tritille node
 	example::SamplePool const samples(example::poolOfSamples(trinet));
+
+
+	// interpolate a 'missing' node property at a node using neighbors
+	{
+		// select a node to interpolate
+		tri::NodeNdxPair const ndxGone
+			{ trigeo.indicesForRefSpot(xyArea.center()) };
+		example::DataType const expSamp{ samples(ndxGone) };
+
+		// interpolate from neighbors
+		double const smallEdge{ std::min(deltaHigh, deltaWide) };
+		double const nearDist{ (17./16.)*smallEdge }; // adjacent
+		example::DataType const gotSamp
+			{ trinet.nodeValueViaInvDist(ndxGone, nearDist, samples) };
+
+		// check if interpolated property matches expected
+		if (! gotSamp.nearlyEquals(expSamp))
+		{
+			oss << "Failure of node property interpolation test" << std::endl;
+			oss << dat::infoString(expSamp, "expSamp") << std::endl;
+			oss << dat::infoString(gotSamp, "gotSamp") << std::endl;
+		}
+
+	} // node interp
 
 	// interpolate surface value at raster grid locations
 	size_t numNull{ 0u };
@@ -489,6 +529,9 @@ tri_IsoTille_test2
 			double const & gotDist = gotDistNode.first;
 			tri::NodeNdxPair const & ndxIJ = gotDistNode.second;
 			gotNdxPairs.insert(ndxIJ);
+
+			assert(dat::isValid(gotDist));
+			assert(dat::isValid(ndxIJ));
 
 			// check if node indices are in neighborhood
 			dat::Spot const gotAt(trigeo.refSpotForIndices(ndxIJ));

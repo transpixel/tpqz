@@ -98,6 +98,15 @@ IsoGeo :: fracPairForIndices
 }
 
 inline
+NodeNdxPair
+IsoGeo :: indicesForFracPair
+	( QuantPair const & fracPair
+	) const
+{
+	return { fracPair.first.theFloor, fracPair.second.theFloor };
+}
+
+inline
 dat::Spot
 IsoGeo :: refSpotForTileSpot
 	( dat::Spot const & tileSpot
@@ -115,6 +124,15 @@ IsoGeo :: refSpotForFracPair
 	) const
 {
 	return refSpotForTileSpot(tileSpotForFracPair(fracPair));
+}
+
+inline
+NodeNdxPair
+IsoGeo::indicesForRefSpot
+	( dat::Spot const & refSpot
+	) const
+{
+	return indicesForFracPair(fracPairForRefSpot(refSpot));
 }
 
 inline

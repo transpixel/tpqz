@@ -148,6 +148,13 @@ public: // methods
 		( NodeNdxPair const & nodeIJ
 		) const;
 
+	//! Integral part of fracPair (after discarding fractional part).
+	inline
+	NodeNdxPair
+	indicesForFracPair
+		( QuantPair const & fracPair
+		) const;
+
 	//
 	// Ref locations
 	//
@@ -164,6 +171,17 @@ public: // methods
 	dat::Spot
 	refSpotForFracPair
 		( QuantPair const & fracPair
+		) const;
+
+	//
+	// Node indices
+	//
+
+	//! Integral part of fracPair (after discarding fractional part).
+	inline
+	NodeNdxPair
+	indicesForRefSpot
+		( dat::Spot const & refSpot
 		) const;
 
 	//! Domain value of (x,y) for node with indices

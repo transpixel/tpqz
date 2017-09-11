@@ -31,12 +31,16 @@
 */
 
 
+#include "libdat/Extents.h"
+#include "libdat/ExtentsIterator.h"
+#include "libdat/grid.h"
 #include "libdat/info.h"
 #include "libga/ga.h"
 #include "libga/Pose.h"
 #include "libgeo/LineSeg.h"
 #include "libgeo/sphere.h"
 #include "libio/stream.h"
+#include "libmath/MapSizeArea.h"
 #include "libtri/IsoTille.h"
 
 #include <cassert>
@@ -197,20 +201,18 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 	{
 		// --- TriTille support
 
-		using PropType = double; // radius
+		using PropType = ga::Vector;
 		using value_type = PropType;
 
 		PropType
 		operator()
-			( tri::NodeNdxType const & ndxI
-			, tri::NodeNdxType const & ndxJ
+			( tri::NodeNdxPair const & ndxIJ
 			) const
 		{
 			tri::IsoGeo const & trigeo = theTriNet.theTileGeo;
-			dat::Spot const zaLoc(trigeo.refSpotForIndices({ ndxI, ndxJ }));
+			dat::Spot const zaLoc(trigeo.refSpotForIndices(ndxIJ));
 			PairZA const zaPair{ zaLoc[0], zaLoc[1] };
-			double const radius{ theSurfModel.radMagAtZA(zaPair) };
-			return radius;
+			return theSurfModel.pointAtZA(zaPair);
 		}
 
 		// --- Application domain
@@ -229,12 +231,16 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 			{
 				tri::NodeNdxPair const ndxIJ{ iter.indexPair() };
 				dat::Spot const zaLoc(trigeo.refSpotForIndices(ndxIJ));
-				double const radius{ operator()(ndxIJ.first, ndxIJ.second) };
+				ga::Vector const pnt{ operator()(ndxIJ) };
+
+				PairZA const zaPair{ zaLoc[0], zaLoc[1] };
+				double const radius{ theSurfModel.radMagAtZA(zaPair) };
 
 				ofs
 					<< "z,a,Rad:"
 					<< " " << dat::infoString(zaLoc)
 					<< " " << dat::infoString(radius)
+					<< " " << dat::infoString(pnt, "pnt")
 					<< '\n';
 			}
 		}
@@ -260,10 +266,12 @@ main
 	// tritille to represent environment surface in cylindrical coordinates
 	dat::Range<double> const zRange{ 0., sgeo.fullDepth() };
 	dat::Range<double> const aRange{ -math::pi, math::pi };
-	tri::Domain const tridom(dat::Area<double>{ zRange, aRange });
+	dat::Area<double> const zaArea{ zRange, aRange };
+	tri::Domain const tridom(zaArea);
 
 	// construct tritille
-	double const dz{ .125 };
+//	double const dz{ .125 };
+	double const dz{ 1.   };
 	double const da{ (1./sgeo.nomRadius()) * math::twoPi };
 	tri::IsoGeo::Vec2D const zDir{{ 1., 0. }};
 	tri::IsoGeo const trigeo(dz, da, zDir);;
@@ -272,6 +280,44 @@ main
 	// ** Save iterator info
 	NodePool const triPool{ model, trinet };
 	triPool.saveNodeInfo("test_nodes.dat");
+
+// TODO - add mesh export (e.g. nodes, edges, faces, ?)
+
+	// interpolate surface on regular grid
+	constexpr size_t zHigh{ 128u };
+	constexpr size_t aWide{ 2u*zHigh };
+	dat::Extents const gridSize{ zHigh, aWide };
+	dat::grid<ga::Vector> zaGrid(gridSize);
+	std::fill(zaGrid.begin(), zaGrid.end(), ga::Vector{});
+	math::MapSizeArea const map(gridSize, zaArea);
+	for (dat::ExtentsIterator iter{gridSize} ; iter ; ++iter)
+	{
+		dat::RowCol const & gridRowCol = *iter;
+
+		// get domain location for sample raster element
+		dat::Spot const rcSpot(dat::cast::Spot(gridRowCol));
+		dat::Spot const zaSpot(map.xyAreaSpotFor(rcSpot));
+
+		// interpolate point at this location
+		ga::Vector const ipnt{ trinet.linearInterpWithCheck(zaSpot, triPool) };
+		if (dat::isValid(ipnt))
+		{
+			zaGrid(gridRowCol) = ipnt;
+		}
+	}
+
+	std::ofstream ofs("test_interp.dat");
+	for (dat::ExtentsIterator iter{zaGrid.hwSize()} ; iter ; ++iter)
+	{
+		dat::RowCol const & gridRowCol = *iter;
+
+		// interpolate point at this location
+		ga::Vector const & ipnt = zaGrid(gridRowCol);
+		if (dat::isValid(ipnt))
+		{
+			ofs << dat::infoString(ipnt) << '\n';
+		}
+	}
 
 	return 0;
 }

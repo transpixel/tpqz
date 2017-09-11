@@ -246,12 +246,9 @@ main
 		//! Evaluate (radius) property - constant over sphere
 		value_type
 		operator()
-			( size_t const & ndxI
-			, size_t const & ndxJ
+			( tri::NodeNdxPair const & ndxIJ
 			) const
 		{
-			tri::NodeNdxPair const ndxIJ{ ndxI, ndxJ };
-
 			// For this test example, generate properties "on the fly"
 			// without concern for an actual storage structure for node data
 			dat::Spot const zaSpot

@@ -128,15 +128,13 @@ namespace example
 
 		DataType
 		operator()
-			( long const & keyI
-			, long const & keyJ
+			( tri::NodeNdxPair const & keyIJ
 			) const
 		{
 			DataType sample{};
-			KeyType const key{ keyI, keyJ };
-			if (keyIsValid(key))
+			if (keyIsValid(keyIJ))
 			{
-				sample = extractSample(keyI, keyJ);
+				sample = extractSample(keyIJ.first, keyIJ.second);
 			}
 			return sample;
 		}

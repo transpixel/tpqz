@@ -57,8 +57,7 @@ struct FaceVerts
 	//! Tessellation indices and weight associated with the (i,j)-th node
 	struct Vertex
 	{
-		NodeNdxType theI{ sNullNdx };
-		NodeNdxType theJ{ sNullNdx };
+		NodeNdxPair theNdxIJ{ sNullNdxPair };
 		double theW{ dat::nullValue<double>() };
 
 		//! Descriptive information about this instance.
@@ -74,8 +73,8 @@ struct FaceVerts
 	/*! Interpolate value from a collection of properties
 	 *
 	 * PropSampFunc: Property sampling function. Must support
-	 *   PropType = PropSampFunc(NodeNdxType, NodeNdxType) const
-	 *   using value_type = PropType
+	 *   op(): PropType = PropSampFunc(NodeNdxPair) const
+	 *   have: using value_type = PropType
 	 *
 	 * Need operations for:
 	 *   op+(PropType const &, PropType const &)

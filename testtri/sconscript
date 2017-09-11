@@ -39,6 +39,7 @@ env = env.Clone() # allow module to change anything it wants
 libpaths = \
 	[ '../libtri/'
 
+	, '../libgeo/'
 	, '../libga/'
 	, '../libprob/'
 	, '../libmath/'
@@ -47,13 +48,14 @@ libpaths = \
 
 	, '../libapp/'
 #	, '../libmem/'
-#	, '../libdat/'
+	, '../libdat/'
 #	, '../libsys/'
 	]
 
 linklibs = \
 	[ 'tri'
 
+	, 'geo'
 	, 'ga'
 	, 'prob'
 	, 'math'
@@ -62,14 +64,14 @@ linklibs = \
 
 	, 'app'
 #	, 'mem'
-#	, 'dat'
+	, 'dat'
 #	, 'sys'
 	]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-#env.Program('demoCylinder.cpp')
+env.Program('demoCylinder.cpp')
 env.Program('demoSphere.cpp')
 env.Program('demoSquare.cpp')
 env.Program('uIsoTille.cpp')

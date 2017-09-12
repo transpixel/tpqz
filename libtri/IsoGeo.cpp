@@ -75,9 +75,13 @@ IsoGeo :: IsoGeo
 		Vec2D const ubar(alpha*udir +  beta*vdir);
 		Vec2D const vbar( beta*udir + alpha*vdir);
 
+		// spacing along tessellation directions
+		double const dmu{ .5 * std::hypot(da, db) };
+		double const & dnu = dmu; // the "iso" part of iso-tritille
+
 		// set members
-		theSplitterMu = dat::quantum::Splitter<NodeNdxType, double>(da);
-		theSplitterNu = dat::quantum::Splitter<NodeNdxType, double>(db);
+		theSplitterMu = dat::quantum::Splitter<NodeNdxType, double>(dmu);
+		theSplitterNu = dat::quantum::Splitter<NodeNdxType, double>(dnu);
 		theDirA = adir;
 		theDirU = udir;
 		theDirV = vdir;

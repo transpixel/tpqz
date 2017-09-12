@@ -67,7 +67,12 @@ specified with dat::Quantum values.
 
 class IsoGeo
 {
+
+public:  // types
+
 	using Vec2D = std::array<double, 2u>;
+
+private: 
 
 	// e.g. rows of transition matrix
 	dat::quantum::Splitter<NodeNdxType, double> theSplitterMu;

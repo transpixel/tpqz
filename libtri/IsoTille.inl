@@ -59,31 +59,31 @@ IsoTille :: triangleFor
 	if (muFrac < nuFrac)
 	{
 		// use triangle Tv
-		triangle.theVerts[0].theI = ndxI;
-		triangle.theVerts[0].theJ = ndxJ;
+		triangle.theVerts[0].theNdxIJ.first = ndxI;
+		triangle.theVerts[0].theNdxIJ.second = ndxJ;
 		triangle.theVerts[0].theW = 1. - nuFrac;
 
-		triangle.theVerts[1].theI = ndxI + 1u;
-		triangle.theVerts[1].theJ = ndxJ + 1u;
+		triangle.theVerts[1].theNdxIJ.first = ndxI + 1u;
+		triangle.theVerts[1].theNdxIJ.second = ndxJ + 1u;
 		triangle.theVerts[1].theW = muFrac;
 
-		triangle.theVerts[2].theI = ndxI;
-		triangle.theVerts[2].theJ = ndxJ + 1u;
+		triangle.theVerts[2].theNdxIJ.first = ndxI;
+		triangle.theVerts[2].theNdxIJ.second = ndxJ + 1u;
 		triangle.theVerts[2].theW = nuFrac - muFrac;
 	}
 	else
 	{
 		// use triangle Tu
-		triangle.theVerts[0].theI = ndxI;
-		triangle.theVerts[0].theJ = ndxJ;
+		triangle.theVerts[0].theNdxIJ.first = ndxI;
+		triangle.theVerts[0].theNdxIJ.second = ndxJ;
 		triangle.theVerts[0].theW = 1. - muFrac;
 
-		triangle.theVerts[1].theI = ndxI + 1u;
-		triangle.theVerts[1].theJ = ndxJ;
+		triangle.theVerts[1].theNdxIJ.first = ndxI + 1u;
+		triangle.theVerts[1].theNdxIJ.second = ndxJ;
 		triangle.theVerts[1].theW = muFrac - nuFrac;
 
-		triangle.theVerts[2].theI = ndxI + 1u;
-		triangle.theVerts[2].theJ = ndxJ + 1u;
+		triangle.theVerts[2].theNdxIJ.first = ndxI + 1u;
+		triangle.theVerts[2].theNdxIJ.second = ndxJ + 1u;
 		triangle.theVerts[2].theW = nuFrac;
 	}
 

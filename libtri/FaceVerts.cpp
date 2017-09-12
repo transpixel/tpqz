@@ -55,8 +55,8 @@ FaceVerts::Vertex :: infoString
 	}
 	oss
 		<< "I,J,W:"
-		<< " "<< dat::infoString(theI)
-		<< " "<< dat::infoString(theJ)
+		<< " "<< dat::infoString(theNdxIJ.first)
+		<< " "<< dat::infoString(theNdxIJ.second)
 		<< " "<< io::sprintf(fmt, theW)
 		;
 	return oss.str();

@@ -42,22 +42,18 @@ FaceVerts :: valueFrom
 	( PropSampFunc const & propGrid
 	) const
 {
-	NodeNdxType const & i1 = theVerts[0].theI;
-	NodeNdxType const & i2 = theVerts[1].theI;
-	NodeNdxType const & i3 = theVerts[2].theI;
-
-	NodeNdxType const & j1 = theVerts[0].theJ;
-	NodeNdxType const & j2 = theVerts[1].theJ;
-	NodeNdxType const & j3 = theVerts[2].theJ;
+	NodeNdxPair const & ij1 = theVerts[0].theNdxIJ;
+	NodeNdxPair const & ij2 = theVerts[1].theNdxIJ;
+	NodeNdxPair const & ij3 = theVerts[2].theNdxIJ;
 
 	double const & w1 = theVerts[0].theW;
 	double const & w2 = theVerts[1].theW;
 	double const & w3 = theVerts[2].theW;
 
 	return typename PropSampFunc::value_type
-		( w1 * propGrid(i1, j1)
-		+ w2 * propGrid(i2, j2)
-		+ w3 * propGrid(i3, j3)
+		( w1 * propGrid(ij1)
+		+ w2 * propGrid(ij2)
+		+ w3 * propGrid(ij3)
 		);
 }
 

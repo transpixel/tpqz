@@ -88,12 +88,41 @@ namespace
 			)
 		{
 			double result{ dat::nullValue<double>() };
-			if ((0. <= zeta) && (zeta < fullDepth()))
+			if (zeta < fullDepth())
 			{
-				result = {2. * fullDepth() - zeta };
-result = fullDepth();
+				static double const halfDepth{ .5 * fullDepth() };
+				if (halfDepth <= zeta)
+				{
+					result = {2. * fullDepth() - zeta };
+				}
+				else
+				{
+					result = fullDepth(); // vertical profile
+				}
 			}
 			return result;
+		}
+
+		static
+		double
+		wiggleFrac
+			( double const & azim
+			)
+		{
+			return
+				{ .50  * std::cos(azim)
+				+ .125 * std::cos(4.*(azim - .5*math::qtrPi))
+				};
+		}
+
+		static
+		double
+		wiggleRadius
+			( double const & zeta
+			, double const & azim
+			)
+		{
+			return radMag(zeta) * (1. + wiggleFrac(azim));
 		}
 
 		double
@@ -101,14 +130,29 @@ result = fullDepth();
 			( PairZA const & zaPair
 			) const
 		{
+			double rad{ dat::nullValue<double>() };
 			double const & zeta = zaPair.first;
-return radMag(zeta);
+			// return radMag(zeta); // circular section
 			double const & azim = zaPair.second;
-			double const dMag
-				{ .50  * std::cos(azim)
-				+ .125 * std::cos(4.*(azim - .5*math::qtrPi))
-				};
-			return (radMag(zeta) * (1. + dMag));
+			if ((0. <= azim) && (azim < math::halfPi))
+			{
+				double const rho0{ wiggleRadius(zeta, 0.) };
+				double const rho1{ wiggleRadius(zeta, math::halfPi) };
+				double const beta{ std::atan2(rho1, rho0) };
+				if (azim < beta)
+				{
+					rad = rho0 / std::cos(azim);
+				}
+				else
+				{
+					rad = rho1 / std::cos(math::halfPi - azim);
+				}
+			}
+			else
+			{
+				rad = wiggleRadius(zeta, azim);
+			}
+			return rad;
 		}
 
 		static
@@ -148,7 +192,7 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 		{
 		//	double const & zeta = zaPair.first;
 			double const & azim = zaPair.second;
-			ga::Pose const poseOfAzim(azim * theGeo.theDirA);
+			ga::Pose const poseOfAzim(-azim * theGeo.theDirA);
 			ga::Vector const rHat{ poseOfAzim(theGeo.theRad0) };
 			double const radMag{ theGeo.radMagAtZA(zaPair) };
 			return (radMag * rHat);
@@ -314,9 +358,9 @@ main
 	savePointCloud(model, "test_pnts.dat", numPnts);
 
 	// determine mesh spacing
-	double const numPartsAzim{ std::floor(sgeo.nomRadius()) + 1. };
-//double const numPartsAzim{ 4. };
-	double const da{ (1./numPartsAzim) * math::twoPi };
+//	double const numAzim{ 2.* (std::floor(sgeo.nomRadius()) + 1.) };
+double const numAzim{ .5* (std::floor(sgeo.nomRadius()) + 1.) };
+	double const da{ (1./numAzim) * math::twoPi };
 	double const dz{ da };
 
 	// tritille to represent environment surface in cylindrical coordinates
@@ -339,10 +383,8 @@ io::out() << dat::infoString(trigeo, "trigeo") << std::endl;
 	triPool.saveEdgeInfo
 		("test_edgesMu.dat", "test_edgesNu.dat", "test_edgesDi.dat");
 
-// TODO - add mesh export (e.g. nodes, edges, faces, ?)
-
 	// interpolate surface on regular grid
-	constexpr size_t zHigh{ 128u };
+	constexpr size_t zHigh{  64u };
 	constexpr size_t aWide{ 2u*zHigh };
 	dat::Extents const gridSize{ zHigh, aWide };
 	dat::grid<ga::Vector> zaGrid(gridSize);

@@ -13,7 +13,8 @@ set size square
 
 set xrange [ 94:112]
 set yrange [191:208]
-set zrange [299:305]
+set zrange [300:305]
+set xyplane at 300
 
 delView =  5;
 numView = 360/delView;

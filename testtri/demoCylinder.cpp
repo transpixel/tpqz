@@ -98,7 +98,7 @@ namespace
 			)
 		{
 			double result{ dat::nullValue<double>() };
-			if (zeta < fullDepth())
+			if ((0. <= zeta) && (zeta < fullDepth()))
 			{
 				static double const halfDepth{ .5 * fullDepth() };
 				if (halfDepth <= zeta)

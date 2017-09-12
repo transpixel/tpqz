@@ -427,14 +427,12 @@ namespace
 			std::ofstream ofs(fname);
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
-				tri::NodeKey const ndxIJ{ iter.indexPair() };
+				tri::NodeKey const ndxIJ{ iter.nodeKey() };
 				PropType const sample{ operator()(ndxIJ) };
 				ga::Vector const & pnt = sample.thePnt;
 
 				PairZA const zaPair{ zaPairForNodeKey(ndxIJ) };
 				double const & radius = sample.theRad;
-//				theSurfModel.pointAt(zaPair);
-//				theSurfModel.pointAt(zaPair);
 
 				ofs
 					<< "z,a,Rad:"
@@ -459,10 +457,9 @@ namespace
 			std::ofstream ofsAll(fnameAll);
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
-				using NdxPair = tri::NodeKey;
-				NdxPair const ndx0{ iter.indexPair() };
-				NdxPair const ndx1{ ndx0.first + 1L, ndx0.second };
-				NdxPair const ndx2{ ndx0.first + 1L, ndx0.second + 1L };
+				tri::NodeKey const ndx0{ iter.nodeKey() };
+				tri::NodeKey const ndx1{ ndx0.first + 1L, ndx0.second };
+				tri::NodeKey const ndx2{ ndx0.first + 1L, ndx0.second + 1L };
 
 				ga::Vector const pnt0{ operator()(ndx0).thePnt };
 				ga::Vector const pnt1{ operator()(ndx1).thePnt };

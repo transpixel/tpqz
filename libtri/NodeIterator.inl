@@ -54,7 +54,7 @@ NodeIterator :: fracPair
 
 inline
 NodeKey
-NodeIterator :: indexPair
+NodeIterator :: nodeKey
 	() const
 {
 	return { theAtIJ.first, theAtIJ.second };

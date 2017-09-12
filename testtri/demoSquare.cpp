@@ -350,7 +350,7 @@ namespace example
 		tri::IsoGeo const & trigeo = trinet.theTileGeo;
 		for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 		{
-			SampleMap::KeyType const key(iter.indexPair());
+			SampleMap::KeyType const key(iter.nodeKey());
 			dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 			ptPool->addSample(valueOnSurfaceAtXY(xyLoc), key);
 		}
@@ -370,7 +370,7 @@ saveNodeStates
 	std::ofstream ofs(fname);
 	for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 	{
-		std::pair<long, long> const ndxPair{ iter.indexPair() };
+		std::pair<long, long> const ndxPair{ iter.nodeKey() };
 		dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 
 		bool const isIn(xyDomain.contains(xyLoc));
@@ -423,7 +423,7 @@ saveNodeInterp
 	long prevI{ -10000L };
 	for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 	{
-		std::pair<long, long> const ndxPair{ iter.indexPair() };
+		std::pair<long, long> const ndxPair{ iter.nodeKey() };
 		dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 
 		example::DataType const tinValue
@@ -452,11 +452,10 @@ saveNodeInterp
 			ofsBad << oss.str() << std::endl;
 		}
 
-		using NdxPair = std::pair<long, long>;
-		NdxPair const & ndx00 = ndxPair;
-		NdxPair const ndx10{ ndx00.first + 1L, ndx00.second + 0L };
-		NdxPair const ndx11{ ndx00.first + 1L, ndx00.second + 1L };
-		NdxPair const ndx01{ ndx00.first + 0L, ndx00.second + 1L };
+		tri::NodeKey const & ndx00 = ndxPair;
+		tri::NodeKey const ndx10{ ndx00.first + 1L, ndx00.second + 0L };
+		tri::NodeKey const ndx11{ ndx00.first + 1L, ndx00.second + 1L };
+		tri::NodeKey const ndx01{ ndx00.first + 0L, ndx00.second + 1L };
 
 		dat::Spot const xy00(refSpotFor(trigeo, ndx00));
 		dat::Spot const xy10(refSpotFor(trigeo, ndx10));

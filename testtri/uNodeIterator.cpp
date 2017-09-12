@@ -84,7 +84,7 @@ tri_NodeIterator_test1
 	tri::IsoGeo const trigeo( da, db, aDir);
 
 	// determine acceptable nodes
-	std::set<std::pair<long, long> > expMuNus;
+	std::set<tri::NodeKey> expMuNus;
 	{
 		dat::Area<double> const mnRange{ trigeo.tileAreaForDomain(xyDomain) };
 		long const muBeg{ (long)std::floor(mnRange[0].min() / da) };
@@ -109,20 +109,20 @@ tri_NodeIterator_test1
 	assert(! expMuNus.empty());
 
 	// get nodes from iterator
-	std::set<std::pair<long, long> > gotMuNus;
+	std::set<tri::NodeKey> gotMuNus;
 	for (tri::NodeIterator iter(trigeo, xyDomain) ; iter ; ++iter)
 	{
-		gotMuNus.insert(iter.indexPair());
+		gotMuNus.insert(iter.nodeKey());
 	}
 
 	/*
 	std::ofstream ofsExp("test_exp.dat");
-	for (std::pair<long, long> const & expMuNu : expMuNus)
+	for (tri::NodeKey const & expMuNu : expMuNus)
 	{
 		ofsExp << dat::infoString(expMuNu, "expMuNu") << std::endl;
 	}
 	std::ofstream ofsGot("test_got.dat");
-	for (std::pair<long, long> const & gotMuNu : gotMuNus)
+	for (tri::NodeKey const & gotMuNu : gotMuNus)
 	{
 		ofsGot << dat::infoString(gotMuNu, "gotMuNu") << std::endl;
 	}
@@ -137,7 +137,7 @@ tri_NodeIterator_test1
 	}
 
 	// check for same contents
-	std::set<std::pair<long, long> > difMuNus;
+	std::set<tri::NodeKey> difMuNus;
 	std::set_difference
 		( gotMuNus.begin(), gotMuNus.end()
 		, expMuNus.begin(), expMuNus.end()
@@ -146,7 +146,7 @@ tri_NodeIterator_test1
 	if (! difMuNus.empty())
 	{
 		oss << "Failure of zero-differnce test" << std::endl;
-		for (std::pair<long, long> const & difMuNu : difMuNus)
+		for (tri::NodeKey const & difMuNu : difMuNus)
 		{
 			oss << dat::infoString(difMuNu, "difMuNu") << std::endl;
 		}

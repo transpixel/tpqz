@@ -145,7 +145,7 @@ public: // methods
 	//! Index pair associated with current (valid) iterator
 	inline
 	NodeKey
-	indexPair
+	nodeKey
 		() const;
 
 	//! Advance to next valid node (node in the domain)

@@ -252,7 +252,7 @@ namespace example
 		tri::IsoGeo const & trigeo = trinet.theTileGeo;
 		for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 		{
-			SamplePool::KeyType const key(iter.indexPair());
+			SamplePool::KeyType const key(iter.nodeKey());
 			dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 			pool.addSample(valueOnPlaneAtXY(xyLoc), key);
 		}
@@ -414,7 +414,7 @@ tri_IsoTille_test1
 		std::set<tri::NodeKey> nodesIn;
 		for (tri::NodeIterator iter(trigeo, domain) ; iter ; ++iter)
 		{
-			tri::NodeKey const ndxIJ{ iter.indexPair() };
+			tri::NodeKey const ndxIJ{ iter.nodeKey() };
 			dat::Spot const refIJ(trigeo.refSpotForNodeKey(ndxIJ));
 			if (domain.contains(refIJ))
 			{
@@ -476,7 +476,7 @@ tri_IsoTille_test2
 		constexpr double wayBig{ 1.e6 };
 
 		// determine nodes via brute force evaluation
-		std::set<tri::NodeKey> const expNdxPairs
+		std::set<tri::NodeKey> const expNodeKeys
 			{ nodePairsInRadius(trigeo, domain, refNodeLoc, wayBig) };
 
 		// request "near" nodes such that all are included
@@ -485,7 +485,7 @@ tri_IsoTille_test2
 
 		/*
 		std::ofstream ofsExp("test_exp.dat");
-		for (tri::NodeKey const & ndxIJ : expNdxPairs)
+		for (tri::NodeKey const & ndxIJ : expNodeKeys)
 		{
 		ofsExp << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
 		}
@@ -496,8 +496,8 @@ tri_IsoTille_test2
 		}
 		*/
 
-		assert(! expNdxPairs.empty());
-		size_t const expNears{ expNdxPairs.size() - 1L }; // skip 'at'
+		assert(! expNodeKeys.empty());
+		size_t const expNears{ expNodeKeys.size() - 1L }; // skip 'at'
 		size_t const gotNears{ gotDistNodes.size() };
 		if (! dat::nearlyEquals(gotNears, expNears))
 		{
@@ -513,7 +513,7 @@ tri_IsoTille_test2
 
 	{
 		// determine nodes via brute force evaluation
-		std::set<tri::NodeKey> const expNdxPairs
+		std::set<tri::NodeKey> const expNodeKeys
 			{ nodePairsInRadius(trigeo, domain, refNodeLoc, refDist) };
 
 		// get neighbor node info
@@ -523,12 +523,12 @@ tri_IsoTille_test2
 		// check that returned data are within neighborhood
 		size_t errCnt{ 0u };
 		double prevDist{ 0. };
-		std::set<tri::NodeKey> gotNdxPairs;
+		std::set<tri::NodeKey> gotNodeKeys;
 		for (tri::IsoTille::DistNode const & gotDistNode : gotDistNodes)
 		{
 			double const & gotDist = gotDistNode.first;
 			tri::NodeKey const & ndxIJ = gotDistNode.second;
-			gotNdxPairs.insert(ndxIJ);
+			gotNodeKeys.insert(ndxIJ);
 
 			assert(dat::isValid(gotDist));
 			assert(dat::isValid(ndxIJ));

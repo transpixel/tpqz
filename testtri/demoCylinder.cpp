@@ -443,6 +443,22 @@ namespace
 			}
 		}
 
+		static
+		std::string
+		edgeText
+			( ga::Vector const & pntA
+			, ga::Vector const & pntB
+			)
+		{
+			std::ostringstream oss;
+			oss
+				<< dat::infoString(pntA) << '\n'
+				<< dat::infoString(pntB) << '\n'
+				<< "\n\n";
+				;
+			return oss.str();
+		}
+
 		void
 		saveEdgeInfo
 			( std::string const & fnameMu
@@ -457,36 +473,28 @@ namespace
 			std::ofstream ofsAll(fnameAll);
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
-				tri::NodeKey const ndx0{ iter.nodeKey() };
-				tri::NodeKey const ndx1{ ndx0.first + 1L, ndx0.second };
-				tri::NodeKey const ndx2{ ndx0.first + 1L, ndx0.second + 1L };
-
-				ga::Vector const pnt0{ operator()(ndx0).thePnt };
-				ga::Vector const pnt1{ operator()(ndx1).thePnt };
-				ga::Vector const pnt2{ operator()(ndx2).thePnt };
-				if (pnt0.isValid() && pnt1.isValid() && pnt2.isValid())
+				ga::Vector const pnt0{ (*this)(iter.nodeKey()).thePnt };
+				ga::Vector const pnt1{ (*this)(iter.nextNodeMu()).thePnt };
+				ga::Vector const pnt2{ (*this)(iter.nextNodeNu()).thePnt };
+				ga::Vector const pnt3{ (*this)(iter.nextNodeDi()).thePnt };
+				if (pnt0.isValid() && pnt1.isValid())
 				{
-					ofsMu
-						<< dat::infoString(pnt0) << '\n'
-						<< dat::infoString(pnt1) << '\n'
-						<< "\n\n";
-					ofsNu
-						<< dat::infoString(pnt1) << '\n'
-						<< dat::infoString(pnt2) << '\n'
-						<< "\n\n";
-					ofsDi
-						<< dat::infoString(pnt2) << '\n'
-						<< dat::infoString(pnt0) << '\n'
-						<< "\n\n";
-
-					ofsAll
-						<< dat::infoString(pnt0) << '\n'
-						<< dat::infoString(pnt1) << '\n'
-						<< dat::infoString(pnt2) << '\n'
-						<< dat::infoString(pnt0) << '\n'
-						<< "\n\n";
+					std::string const edgeStr{ edgeText(pnt0, pnt1) };
+					ofsMu << edgeStr;
+					ofsAll << edgeStr;
 				}
-
+				if (pnt0.isValid() && pnt2.isValid())
+				{
+					std::string const edgeStr{ edgeText(pnt0, pnt2) };
+					ofsNu << edgeStr;
+					ofsAll << edgeStr;
+				}
+				if (pnt0.isValid() && pnt3.isValid())
+				{
+					std::string const edgeStr{ edgeText(pnt0, pnt3) };
+					ofsDi << edgeStr;
+					ofsAll << edgeStr;
+				}
 			}
 		}
 
@@ -510,8 +518,7 @@ main
 	savePointCloud(model, "test_pnts.dat", numPnts);
 
 	// determine mesh spacing
-	double const numAzim{ 4.* (std::floor(sgeo.nomRadius()) + 1.) };
-//double const numAzim{ .5* (std::floor(sgeo.nomRadius()) + 1.) };
+	double const numAzim{ 3.* (std::floor(sgeo.nomRadius()) + 1.) };
 	double const da{ (1./numAzim) * math::twoPi };
 	double const dz{ da };
 

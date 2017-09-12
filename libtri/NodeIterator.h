@@ -142,10 +142,28 @@ public: // methods
 	fracPair
 		() const;
 
-	//! Index pair associated with current (valid) iterator
+	//! Node associated with current (valid) iterator
 	inline
 	NodeKey
 	nodeKey
+		() const;
+
+	//! Adjacent Node in the "mu/u" direction
+	inline
+	NodeKey
+	nextNodeMu
+		() const;
+
+	//! Adjacent Node in the "nu/v" direction
+	inline
+	NodeKey
+	nextNodeNu
+		() const;
+
+	//! Adjacent Node in the diagonal slash direction direction
+	inline
+	NodeKey
+	nextNodeDi
 		() const;
 
 	//! Advance to next valid node (node in the domain)

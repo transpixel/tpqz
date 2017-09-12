@@ -61,6 +61,30 @@ NodeIterator :: nodeKey
 }
 
 inline
+NodeKey
+NodeIterator :: nextNodeMu
+	() const
+{
+	return { theAtIJ.first + 1L, theAtIJ.second };
+}
+
+inline
+NodeKey
+NodeIterator :: nextNodeNu
+	() const
+{
+	return { theAtIJ.first, theAtIJ.second + 1L };
+}
+
+inline
+NodeKey
+NodeIterator :: nextNodeDi
+	() const
+{
+	return { theAtIJ.first + 1L, theAtIJ.second + 1L};
+}
+
+inline
 NodeIterator &
 NodeIterator :: operator++
 	()

@@ -452,10 +452,10 @@ saveNodeInterp
 			ofsBad << oss.str() << std::endl;
 		}
 
-		tri::NodeKey const & ndx00 = ndxPair;
-		tri::NodeKey const ndx10{ ndx00.first + 1L, ndx00.second + 0L };
-		tri::NodeKey const ndx11{ ndx00.first + 1L, ndx00.second + 1L };
-		tri::NodeKey const ndx01{ ndx00.first + 0L, ndx00.second + 1L };
+		tri::NodeKey const ndx00{ iter.nodeKey() };
+		tri::NodeKey const ndx10{ iter.nextNodeMu() };
+		tri::NodeKey const ndx01{ iter.nextNodeNu() };
+		tri::NodeKey const ndx11{ iter.nextNodeDi() };
 
 		dat::Spot const xy00(refSpotFor(trigeo, ndx00));
 		dat::Spot const xy10(refSpotFor(trigeo, ndx10));

@@ -91,8 +91,24 @@ namespace
 			if ((0. <= zeta) && (zeta < fullDepth()))
 			{
 				result = {2. * fullDepth() - zeta };
+result = fullDepth();
 			}
 			return result;
+		}
+
+		double
+		radMagAtZA
+			( PairZA const & zaPair
+			) const
+		{
+			double const & zeta = zaPair.first;
+return radMag(zeta);
+			double const & azim = zaPair.second;
+			double const dMag
+				{ .50  * std::cos(azim)
+				+ .125 * std::cos(4.*(azim - .5*math::qtrPi))
+				};
+			return (radMag(zeta) * (1. + dMag));
 		}
 
 		static
@@ -125,20 +141,6 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 	{
 		SurfGeo theGeo;
 
-		double
-		radMagAtZA
-			( PairZA const & zaPair
-			) const
-		{
-			double const & zeta = zaPair.first;
-			double const & azim = zaPair.second;
-			double const dMag
-				{ .50  * std::cos(azim)
-				+ .125 * std::cos(4.*(azim - .5*math::qtrPi))
-				};
-			return (theGeo.radMag(zeta) * (1. + dMag));
-		}
-
 		ga::Vector
 		hPointAtZA
 			( PairZA const & zaPair
@@ -148,7 +150,7 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 			double const & azim = zaPair.second;
 			ga::Pose const poseOfAzim(azim * theGeo.theDirA);
 			ga::Vector const rHat{ poseOfAzim(theGeo.theRad0) };
-			double const radMag{ radMagAtZA(zaPair) };
+			double const radMag{ theGeo.radMagAtZA(zaPair) };
 			return (radMag * rHat);
 		}
 
@@ -204,15 +206,26 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 		using PropType = ga::Vector;
 		using value_type = PropType;
 
-		PropType
-		operator()
+		PairZA
+		zaPairForIndices
 			( tri::NodeNdxPair const & ndxIJ
 			) const
 		{
 			tri::IsoGeo const & trigeo = theTriNet.theTileGeo;
 			dat::Spot const zaLoc(trigeo.refSpotForIndices(ndxIJ));
-			PairZA const zaPair{ zaLoc[0], zaLoc[1] };
-			return theSurfModel.pointAtZA(zaPair);
+			PairZA const zaPair
+				{ zaLoc[0]
+				, math::principalAngle(zaLoc[1])
+				};
+			return zaPair;
+		}
+
+		PropType
+		operator()
+			( tri::NodeNdxPair const & ndxIJ
+			) const
+		{
+			return theSurfModel.pointAtZA(zaPairForIndices(ndxIJ));
 		}
 
 		// --- Application domain
@@ -226,22 +239,59 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 			) const
 		{
 			std::ofstream ofs(fname);
-			tri::IsoGeo const & trigeo = theTriNet.theTileGeo;
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
 				tri::NodeNdxPair const ndxIJ{ iter.indexPair() };
-				dat::Spot const zaLoc(trigeo.refSpotForIndices(ndxIJ));
 				ga::Vector const pnt{ operator()(ndxIJ) };
 
-				PairZA const zaPair{ zaLoc[0], zaLoc[1] };
-				double const radius{ theSurfModel.radMagAtZA(zaPair) };
+				PairZA const zaPair{ zaPairForIndices(ndxIJ) };
+				double const radius{ theSurfModel.theGeo.radMagAtZA(zaPair) };
 
 				ofs
 					<< "z,a,Rad:"
-					<< " " << dat::infoString(zaLoc)
+					<< " " << dat::infoString(zaPair)
 					<< " " << dat::infoString(radius)
 					<< " " << dat::infoString(pnt, "pnt")
 					<< '\n';
+			}
+		}
+
+		void
+		saveEdgeInfo
+			( std::string const & fnameMu
+			, std::string const & fnameNu
+			, std::string const & fnameDi
+			) const
+		{
+			std::ofstream ofsMu(fnameMu);
+			std::ofstream ofsNu(fnameNu);
+			std::ofstream ofsDi(fnameDi);
+			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
+			{
+				using NdxPair = tri::NodeNdxPair;
+				NdxPair const ndx0{ iter.indexPair() };
+				NdxPair const ndx1{ ndx0.first + 1L, ndx0.second };
+				NdxPair const ndx2{ ndx0.first + 1L, ndx0.second + 1L };
+
+				ga::Vector const pnt0{ operator()(ndx0) };
+				ga::Vector const pnt1{ operator()(ndx1) };
+				ga::Vector const pnt2{ operator()(ndx2) };
+				if (pnt0.isValid() && pnt1.isValid() && pnt2.isValid())
+				{
+					ofsMu
+						<< dat::infoString(pnt0) << '\n'
+						<< dat::infoString(pnt1) << '\n'
+						<< "\n\n";
+					ofsNu
+						<< dat::infoString(pnt1) << '\n'
+						<< dat::infoString(pnt2) << '\n'
+						<< "\n\n";
+					ofsDi
+						<< dat::infoString(pnt2) << '\n'
+						<< dat::infoString(pnt0) << '\n'
+						<< "\n\n";
+				}
+
 			}
 		}
 	};
@@ -263,23 +313,31 @@ main
 	constexpr size_t numPnts{ 16u * 1024u };
 	savePointCloud(model, "test_pnts.dat", numPnts);
 
+	// determine mesh spacing
+	double const numPartsAzim{ std::floor(sgeo.nomRadius()) + 1. };
+//double const numPartsAzim{ 4. };
+	double const da{ (1./numPartsAzim) * math::twoPi };
+	double const dz{ da };
+
 	// tritille to represent environment surface in cylindrical coordinates
 	dat::Range<double> const zRange{ 0., sgeo.fullDepth() };
-	dat::Range<double> const aRange{ -math::pi, math::pi };
+	double const aEdge{ math::pi + 3.*da }; // pad for azimuth wrap
+	dat::Range<double> const aRange{ -aEdge, aEdge };
 	dat::Area<double> const zaArea{ zRange, aRange };
 	tri::Domain const tridom(zaArea);
 
 	// construct tritille
-//	double const dz{ .125 };
-	double const dz{ 1.   };
-	double const da{ (1./sgeo.nomRadius()) * math::twoPi };
 	tri::IsoGeo::Vec2D const zDir{{ 1., 0. }};
 	tri::IsoGeo const trigeo(dz, da, zDir);;
 	tri::IsoTille const trinet(trigeo, tridom);
 
+io::out() << dat::infoString(trigeo, "trigeo") << std::endl;
+
 	// ** Save iterator info
 	NodePool const triPool{ model, trinet };
 	triPool.saveNodeInfo("test_nodes.dat");
+	triPool.saveEdgeInfo
+		("test_edgesMu.dat", "test_edgesNu.dat", "test_edgesDi.dat");
 
 // TODO - add mesh export (e.g. nodes, edges, faces, ?)
 

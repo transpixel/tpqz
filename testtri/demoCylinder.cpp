@@ -419,6 +419,14 @@ namespace
 		SurfModel const theSurfModel;
 		tri::IsoTille const theTriNet;
 
+		ga::Vector
+		pointAtNode
+			( tri::NodeKey const & ndxIJ
+			) const
+		{
+			return ((*this)(ndxIJ)).thePnt;
+		}
+
 		void
 		saveNodeInfo
 			( std::string const & fname
@@ -473,10 +481,10 @@ namespace
 			std::ofstream ofsAll(fnameAll);
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
-				ga::Vector const pnt0{ (*this)(iter.nodeKey()).thePnt };
-				ga::Vector const pnt1{ (*this)(iter.nextNodeMu()).thePnt };
-				ga::Vector const pnt2{ (*this)(iter.nextNodeNu()).thePnt };
-				ga::Vector const pnt3{ (*this)(iter.nextNodeDi()).thePnt };
+				ga::Vector const pnt0{ pointAtNode(iter.nodeKey()) };
+				ga::Vector const pnt1{ pointAtNode(iter.nextNodeMu()) };
+				ga::Vector const pnt2{ pointAtNode(iter.nextNodeNu()) };
+				ga::Vector const pnt3{ pointAtNode(iter.nextNodeDi()) };
 				if (pnt0.isValid() && pnt1.isValid())
 				{
 					std::string const edgeStr{ edgeText(pnt0, pnt1) };

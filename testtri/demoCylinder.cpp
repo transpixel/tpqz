@@ -52,7 +52,24 @@
 
 namespace
 {
+
+//#define UsePlane
+#define UseRadius
+
 	using PairZA = std::pair<double, double>;
+
+	//! Cast operator
+	static
+	PairZA
+	zaPairFor
+		( dat::Spot const & zaSpot
+		)
+	{
+		return PairZA
+			{ zaSpot[0]
+			, math::principalAngle(zaSpot[1])
+			};
+	}
 
 	//! A simple surface shape (an oblique cone)
 	struct SurfGeo
@@ -241,7 +258,7 @@ namespace
 	}
 
 	//! Surface model - radius as function of zLoc,Azim
-	struct SurfModel
+	class SurfModel
 	{
 		SurfGeo theGeo;
 
@@ -254,49 +271,99 @@ namespace
 		}
 
 		ga::Vector
-		hVectorAtZA
+		hDirAtZA
 			( PairZA const & zaPair
 			) const
 		{
 			double const & azim = zaPair.second;
 			ga::Pose const poseOfAzim(-azim * theGeo.theDirA);
 			ga::Vector const rHat{ poseOfAzim(theGeo.theRad0) };
-			return (radiusAtZA(zaPair) * rHat);
+			return rHat;
+		}
+
+
+		ga::Vector
+		hVectorAtZA
+			( PairZA const & zaPair
+			) const
+		{
+			return (radiusAtZA(zaPair) * hDirAtZA(zaPair));
 		}
 
 		ga::Vector
-		pointAtZA
+		axialPointAtZA
 			( PairZA const & zaPair
 			) const
 		{
 			double const & zeta = zaPair.first;
-			ga::Vector const hPnt{ hVectorAtZA(zaPair) };
 			ga::Vector const aPnt{ theGeo.theAxis.pointAtDistance(zeta) };
-			return (aPnt + hPnt);
+			return aPnt;
 		}
 
+	public:
+
+		SurfModel
+			( SurfGeo const & geo
+			)
+			: theGeo{ geo }
+		{ }
+
+		//! A pseudo-random pair of values
+		PairZA
+		randomPairZA
+			() const
+		{
+			static std::mt19937_64 rgen;
+			static std::uniform_real_distribution<double> zDistro
+				(-1., 1.25 * theGeo.fullDepth());
+			static std::uniform_real_distribution<double> aDistro
+				(-math::pi, math::pi);
+			return { zDistro(rgen), aDistro(rgen) };
+		}
+
+		//! Simulation/evaluation support
+		ga::Vector
+		idealPointAtZA
+			( PairZA const & zaPair
+			) const
+		{
+			return (axialPointAtZA(zaPair) + hVectorAtZA(zaPair));
+		}
+
+		//! Fundamental surface representation property
 		PropType
 		propertyAtZA
 			( PairZA const & zaPair
 			) const
 		{
-			return PropType(radiusAtZA(zaPair), pointAtZA(zaPair));
+			return PropType(radiusAtZA(zaPair), idealPointAtZA(zaPair));
 		}
-	};
 
-	//! A pseudo-random pair of values
-	PairZA
-	randomPairZA
-		( double const & length
-		)
-	{
-		static std::mt19937_64 rgen;
-		static std::uniform_real_distribution<double> zDistro
-			(-1., 1.25 * length);
-		static std::uniform_real_distribution<double> aDistro
-			(-math::pi, math::pi);
-		return { zDistro(rgen), aDistro(rgen) };
-	}
+		//! 3D point reconstructed from surface property
+#		if defined(UseRadius)
+		ga::Vector
+		pointFromProperty
+			( dat::Spot const & zaSpot
+			, PropType const & sample
+			) const
+		{
+			PairZA const zaPair{ zaPairFor(zaSpot) };
+			ga::Vector const hDir{ hDirAtZA(zaPair) };
+			return (axialPointAtZA(zaPair) + sample.theRad*hDir);
+		}
+#		endif
+#		if defined(UsePlane)
+		ga::Vector
+		pointFromProperty
+			( dat::Spot const & // zaSpot
+			, PropType const & sample
+			) const
+		{
+			return sample.thePnt;
+		}
+#		endif
+
+	};
 
 	void
 	savePointCloud
@@ -308,8 +375,8 @@ namespace
 		std::ofstream ofs(fname);
 		for (size_t nn{0u} ; nn < numPnts ; ++nn)
 		{
-			PairZA const za{ randomPairZA(model.theGeo.fullDepth()) };
-			ga::Vector const pnt{ model.pointAtZA(za) };
+			PairZA const za{ model.randomPairZA() };
+			ga::Vector const pnt{ model.idealPointAtZA(za) };
 			if (dat::isValid(pnt))
 			{
 				ofs << dat::infoString(pnt) << '\n';
@@ -332,11 +399,7 @@ namespace
 		{
 			tri::IsoGeo const & trigeo = theTriNet.theTileGeo;
 			dat::Spot const zaLoc(trigeo.refSpotForIndices(ndxIJ));
-			PairZA const zaPair
-				{ zaLoc[0]
-				, math::principalAngle(zaLoc[1])
-				};
-			return zaPair;
+			return zaPairFor(zaLoc);;
 		}
 
 		PropType
@@ -369,9 +432,9 @@ namespace
 				ga::Vector const & pnt = sample.thePnt;
 
 				PairZA const zaPair{ zaPairForIndices(ndxIJ) };
-				double const radChk{ theSurfModel.theGeo.radMagAtZA(zaPair) };
 				double const & radius = sample.theRad;
-				assert(dat::nearlyEquals(radius, radChk));
+//				theSurfModel.pointAt(zaPair);
+//				theSurfModel.pointAt(zaPair);
 
 				ofs
 					<< "z,a,Rad:"
@@ -387,11 +450,13 @@ namespace
 			( std::string const & fnameMu
 			, std::string const & fnameNu
 			, std::string const & fnameDi
+			, std::string const & fnameAll
 			) const
 		{
 			std::ofstream ofsMu(fnameMu);
 			std::ofstream ofsNu(fnameNu);
 			std::ofstream ofsDi(fnameDi);
+			std::ofstream ofsAll(fnameAll);
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
 				using NdxPair = tri::NodeNdxPair;
@@ -416,6 +481,13 @@ namespace
 						<< dat::infoString(pnt2) << '\n'
 						<< dat::infoString(pnt0) << '\n'
 						<< "\n\n";
+
+					ofsAll
+						<< dat::infoString(pnt0) << '\n'
+						<< dat::infoString(pnt1) << '\n'
+						<< dat::infoString(pnt2) << '\n'
+						<< dat::infoString(pnt0) << '\n'
+						<< "\n\n";
 				}
 
 			}
@@ -434,15 +506,15 @@ main
 {
 	// simulated environment
 	SurfGeo const sgeo{};
-	SurfModel const model{ sgeo };
+	SurfModel const model(sgeo);
 
 	// ** Save point cloud
 	constexpr size_t numPnts{ 16u * 1024u };
 	savePointCloud(model, "test_pnts.dat", numPnts);
 
 	// determine mesh spacing
-//	double const numAzim{ 2.* (std::floor(sgeo.nomRadius()) + 1.) };
-double const numAzim{ .5* (std::floor(sgeo.nomRadius()) + 1.) };
+	double const numAzim{ 4.* (std::floor(sgeo.nomRadius()) + 1.) };
+//double const numAzim{ .5* (std::floor(sgeo.nomRadius()) + 1.) };
 	double const da{ (1./numAzim) * math::twoPi };
 	double const dz{ da };
 
@@ -464,15 +536,17 @@ io::out() << dat::infoString(trigeo, "trigeo") << std::endl;
 	NodePool const triPool{ model, trinet };
 	triPool.saveNodeInfo("test_nodes.dat");
 	triPool.saveEdgeInfo
-		("test_edgesMu.dat", "test_edgesNu.dat", "test_edgesDi.dat");
+		("test_edgesMu.dat", "test_edgesNu.dat", "test_edgesDi.dat"
+		, "test_edgesAll.dat");
 
 	// interpolate surface on regular grid
-	constexpr size_t zHigh{  64u };
+	constexpr size_t zHigh{ 100u };
 	constexpr size_t aWide{ 2u*zHigh };
 	dat::Extents const gridSize{ zHigh, aWide };
 	dat::grid<ga::Vector> zaGrid(gridSize);
 	std::fill(zaGrid.begin(), zaGrid.end(), ga::Vector{});
 	math::MapSizeArea const map(gridSize, zaArea);
+	std::ofstream ofsGrid("test_grid.dat");
 	for (dat::ExtentsIterator iter{gridSize} ; iter ; ++iter)
 	{
 		dat::RowCol const & gridRowCol = *iter;
@@ -482,11 +556,17 @@ io::out() << dat::infoString(trigeo, "trigeo") << std::endl;
 		dat::Spot const zaSpot(map.xyAreaSpotFor(rcSpot));
 
 		// interpolate point at this location
-		ga::Vector const ipnt
-			{ trinet.linearInterpWithCheck(zaSpot, triPool).thePnt };
+		PropType const isamp
+			{ trinet.linearInterpWithCheck(zaSpot, triPool) };
+		ga::Vector const ipnt{ model.pointFromProperty(zaSpot, isamp) };
 		if (dat::isValid(ipnt))
 		{
 			zaGrid(gridRowCol) = ipnt;
+			ofsGrid
+				<< "z,a,GridPnt:"
+				<< " " << dat::infoString(zaSpot)
+				<< " " << dat::infoString(ipnt)
+				<< '\n';
 		}
 	}
 

@@ -62,14 +62,7 @@ namespace
 		ga::BiVector theAzim0{};
 		ga::Vector theRad0{};
 
-		static
-		constexpr
-		double
-		fullDepth
-			()
-		{
-			return { 5. };
-		}
+	private:
 
 		static
 		geo::LineSeg
@@ -125,6 +118,17 @@ namespace
 			return radMag(zeta) * (1. + wiggleFrac(azim));
 		}
 
+	public:
+
+		static
+		constexpr
+		double
+		fullDepth
+			()
+		{
+			return { 5. };
+		}
+
 		double
 		radMagAtZA
 			( PairZA const & zaPair
@@ -169,33 +173,95 @@ namespace
 			, theDirA{ ga::unit(ga::E123 * theAxis.direction()) }
 			, theAzim0{ ga::E31 }
 			, theRad0{ ga::unit(ga::dot(theAxis.direction(), theAzim0)) }
+		{ }
+
+	}; // SurfGeo
+
+	struct PropType
+	{
+		//! Radius in cylindrical coordinates
+		double theRad{ dat::nullValue<double>() };
+
+		//! 3D location in Cartesian frame
+		ga::Vector thePnt{};
+
+		PropType
+			() = default;
+
+		explicit
+		PropType
+			( double const & rad
+			, ga::Vector const & pnt
+			)
+			: theRad{ rad }
+			, thePnt{ pnt }
+		{ }
+
+		std::string
+		infoString
+			( std::string const & title = {}
+			) const
 		{
-
-io::out() << dat::infoString(theAxis, "theAxis") << std::endl;
-io::out() << dat::infoString(theDirA, "theDirA") << std::endl;
-io::out() << dat::infoString(theAzim0, "theAzim0") << std::endl;
-io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
-
+			std::ostringstream oss;
+			if (! title.empty())
+			{
+				oss << title << " ";
+			}
+			oss
+				<< dat::infoString(theRad, "theRad")
+				<< " " << dat::infoString(thePnt, "thePnt")
+				;
+			return oss.str();
 		}
 
-	};
+	}; // PropType
+
+	PropType
+	operator+
+		( PropType const & propA
+		, PropType const & propB
+		)
+	{
+		return PropType
+			( propA.theRad + propB.theRad
+			, propA.thePnt + propB.thePnt
+			);
+	}
+
+	PropType
+	operator*
+		( double const & scale
+		, PropType const & propB
+		)
+	{
+		return PropType
+			( scale * propB.theRad
+			, scale * propB.thePnt
+			);
+	}
 
 	//! Surface model - radius as function of zLoc,Azim
 	struct SurfModel
 	{
 		SurfGeo theGeo;
 
-		ga::Vector
-		hPointAtZA
+		double
+		radiusAtZA
 			( PairZA const & zaPair
 			) const
 		{
-		//	double const & zeta = zaPair.first;
+			return theGeo.radMagAtZA(zaPair);
+		}
+
+		ga::Vector
+		hVectorAtZA
+			( PairZA const & zaPair
+			) const
+		{
 			double const & azim = zaPair.second;
 			ga::Pose const poseOfAzim(-azim * theGeo.theDirA);
 			ga::Vector const rHat{ poseOfAzim(theGeo.theRad0) };
-			double const radMag{ theGeo.radMagAtZA(zaPair) };
-			return (radMag * rHat);
+			return (radiusAtZA(zaPair) * rHat);
 		}
 
 		ga::Vector
@@ -204,9 +270,17 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 			) const
 		{
 			double const & zeta = zaPair.first;
-			ga::Vector const hPnt{ hPointAtZA(zaPair) };
+			ga::Vector const hPnt{ hVectorAtZA(zaPair) };
 			ga::Vector const aPnt{ theGeo.theAxis.pointAtDistance(zeta) };
 			return (aPnt + hPnt);
+		}
+
+		PropType
+		propertyAtZA
+			( PairZA const & zaPair
+			) const
+		{
+			return PropType(radiusAtZA(zaPair), pointAtZA(zaPair));
 		}
 	};
 
@@ -245,9 +319,10 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 
 	struct NodePool
 	{
-		// --- TriTille support
+		//
+		// --- TriTille interaction
+		//
 
-		using PropType = ga::Vector;
 		using value_type = PropType;
 
 		PairZA
@@ -269,10 +344,14 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 			( tri::NodeNdxPair const & ndxIJ
 			) const
 		{
-			return theSurfModel.pointAtZA(zaPairForIndices(ndxIJ));
+			PropType const sample
+				{ theSurfModel.propertyAtZA(zaPairForIndices(ndxIJ)) };
+			return sample;
 		}
 
-		// --- Application domain
+		//
+		// --- Application interaction
+		//
 
 		SurfModel const theSurfModel;
 		tri::IsoTille const theTriNet;
@@ -286,10 +365,13 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
 				tri::NodeNdxPair const ndxIJ{ iter.indexPair() };
-				ga::Vector const pnt{ operator()(ndxIJ) };
+				PropType const sample{ operator()(ndxIJ) };
+				ga::Vector const & pnt = sample.thePnt;
 
 				PairZA const zaPair{ zaPairForIndices(ndxIJ) };
-				double const radius{ theSurfModel.theGeo.radMagAtZA(zaPair) };
+				double const radChk{ theSurfModel.theGeo.radMagAtZA(zaPair) };
+				double const & radius = sample.theRad;
+				assert(dat::nearlyEquals(radius, radChk));
 
 				ofs
 					<< "z,a,Rad:"
@@ -317,9 +399,9 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 				NdxPair const ndx1{ ndx0.first + 1L, ndx0.second };
 				NdxPair const ndx2{ ndx0.first + 1L, ndx0.second + 1L };
 
-				ga::Vector const pnt0{ operator()(ndx0) };
-				ga::Vector const pnt1{ operator()(ndx1) };
-				ga::Vector const pnt2{ operator()(ndx2) };
+				ga::Vector const pnt0{ operator()(ndx0).thePnt };
+				ga::Vector const pnt1{ operator()(ndx1).thePnt };
+				ga::Vector const pnt2{ operator()(ndx2).thePnt };
 				if (pnt0.isValid() && pnt1.isValid() && pnt2.isValid())
 				{
 					ofsMu
@@ -338,7 +420,8 @@ io::out() << dat::infoString(theRad0, "theRad0") << std::endl;
 
 			}
 		}
-	};
+
+	}; // NodePool
 
 }
 
@@ -399,7 +482,8 @@ io::out() << dat::infoString(trigeo, "trigeo") << std::endl;
 		dat::Spot const zaSpot(map.xyAreaSpotFor(rcSpot));
 
 		// interpolate point at this location
-		ga::Vector const ipnt{ trinet.linearInterpWithCheck(zaSpot, triPool) };
+		ga::Vector const ipnt
+			{ trinet.linearInterpWithCheck(zaSpot, triPool).thePnt };
 		if (dat::isValid(ipnt))
 		{
 			zaGrid(gridRowCol) = ipnt;

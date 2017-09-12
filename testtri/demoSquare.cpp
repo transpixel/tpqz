@@ -128,7 +128,7 @@ namespace example
 
 		DataType
 		operator()
-			( tri::NodeNdxPair const & keyIJ
+			( tri::NodeKey const & keyIJ
 			) const
 		{
 			DataType sample{};
@@ -385,10 +385,10 @@ saveNodeStates
 dat::Spot
 refSpotFor
 	( tri::IsoGeo const & trigeo
-	, tri::NodeNdxPair const & ndxIJ
+	, tri::NodeKey const & ndxIJ
 	)
 {
-	tri::IsoGeo::QuantPair const fracPair{ trigeo.fracPairForIndices(ndxIJ) };
+	tri::IsoGeo::QuantPair const fracPair{ trigeo.fracPairForNodeKey(ndxIJ) };
 	return trigeo.refSpotForFracPair(fracPair);
 }
 

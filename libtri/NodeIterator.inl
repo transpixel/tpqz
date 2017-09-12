@@ -53,7 +53,7 @@ NodeIterator :: fracPair
 }
 
 inline
-NodeNdxPair
+NodeKey
 NodeIterator :: indexPair
 	() const
 {
@@ -74,7 +74,7 @@ IsoGeo::QuantPair
 NodeIterator :: fracPairAt
 	() const
 {
-	return theTileGeo.fracPairForIndices(theAtIJ);
+	return theTileGeo.fracPairForNodeKey(theAtIJ);
 }
 
 inline

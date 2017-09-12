@@ -149,13 +149,13 @@ public: // methods
 	//! Cast node index pair to QuantPair with zero fraction
 	inline
 	QuantPair
-	fracPairForIndices
-		( NodeNdxPair const & nodeIJ
+	fracPairForNodeKey
+		( NodeKey const & nodeIJ
 		) const;
 
 	//! Integral part of fracPair (after discarding fractional part).
 	inline
-	NodeNdxPair
+	NodeKey
 	indicesForFracPair
 		( QuantPair const & fracPair
 		) const;
@@ -184,7 +184,7 @@ public: // methods
 
 	//! Integral part of fracPair (after discarding fractional part).
 	inline
-	NodeNdxPair
+	NodeKey
 	indicesForRefSpot
 		( dat::Spot const & refSpot
 		) const;
@@ -192,8 +192,8 @@ public: // methods
 	//! Domain value of (x,y) for node with indices
 	inline
 	dat::Spot
-	refSpotForIndices
-		( NodeNdxPair const & nodeIJ
+	refSpotForNodeKey
+		( NodeKey const & nodeIJ
 		) const;
 
 	//

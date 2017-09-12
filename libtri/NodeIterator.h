@@ -112,7 +112,7 @@ private: // data
 	NodeNdxRange theBegEndJ{ tri::sNullNdxPair };
 
 	//! Indices to currently active node (or invalid values)
-	NodeNdxPair theAtIJ{ tri::sNullNdxPair };
+	NodeKey theAtIJ{ tri::sNullNdxPair };
 
 	//! True if current iterator position is valid (not yet at end)
 	bool theIsActive{ false };
@@ -144,7 +144,7 @@ public: // methods
 
 	//! Index pair associated with current (valid) iterator
 	inline
-	NodeNdxPair
+	NodeKey
 	indexPair
 		() const;
 

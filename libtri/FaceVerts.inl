@@ -42,9 +42,9 @@ FaceVerts :: valueFrom
 	( PropSampFunc const & propGrid
 	) const
 {
-	NodeNdxPair const & ij1 = theVerts[0].theNdxIJ;
-	NodeNdxPair const & ij2 = theVerts[1].theNdxIJ;
-	NodeNdxPair const & ij3 = theVerts[2].theNdxIJ;
+	NodeKey const & ij1 = theVerts[0].theNdxIJ;
+	NodeKey const & ij2 = theVerts[1].theNdxIJ;
+	NodeKey const & ij3 = theVerts[2].theNdxIJ;
 
 	double const & w1 = theVerts[0].theW;
 	double const & w2 = theVerts[1].theW;

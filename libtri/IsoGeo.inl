@@ -85,8 +85,8 @@ IsoGeo :: fracPairForTileSpot
 
 inline
 IsoGeo::QuantPair
-IsoGeo :: fracPairForIndices
-	( NodeNdxPair const & nodeIJ
+IsoGeo :: fracPairForNodeKey
+	( NodeKey const & nodeIJ
 	) const
 {
 	NodeNdxType const & ndxI = nodeIJ.first;
@@ -98,7 +98,7 @@ IsoGeo :: fracPairForIndices
 }
 
 inline
-NodeNdxPair
+NodeKey
 IsoGeo :: indicesForFracPair
 	( QuantPair const & fracPair
 	) const
@@ -127,7 +127,7 @@ IsoGeo :: refSpotForFracPair
 }
 
 inline
-NodeNdxPair
+NodeKey
 IsoGeo::indicesForRefSpot
 	( dat::Spot const & refSpot
 	) const
@@ -137,11 +137,11 @@ IsoGeo::indicesForRefSpot
 
 inline
 dat::Spot
-IsoGeo :: refSpotForIndices
-	( NodeNdxPair const & nodeIJ
+IsoGeo :: refSpotForNodeKey
+	( NodeKey const & nodeIJ
 	) const
 {
-	return refSpotForFracPair(fracPairForIndices(nodeIJ));
+	return refSpotForFracPair(fracPairForNodeKey(nodeIJ));
 }
 
 } // tri

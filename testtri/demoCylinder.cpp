@@ -61,7 +61,7 @@ namespace
 	//! Cast operator
 	static
 	PairZA
-	zaPairFor
+	zaPairForSpot
 		( dat::Spot const & zaSpot
 		)
 	{
@@ -347,7 +347,7 @@ namespace
 			, PropType const & sample
 			) const
 		{
-			PairZA const zaPair{ zaPairFor(zaSpot) };
+			PairZA const zaPair{ zaPairForSpot(zaSpot) };
 			ga::Vector const hDir{ hDirAtZA(zaPair) };
 			return (axialPointAtZA(zaPair) + sample.theRad*hDir);
 		}
@@ -393,22 +393,22 @@ namespace
 		using value_type = PropType;
 
 		PairZA
-		zaPairForIndices
-			( tri::NodeNdxPair const & ndxIJ
+		zaPairForNodeKey
+			( tri::NodeKey const & ndxIJ
 			) const
 		{
 			tri::IsoGeo const & trigeo = theTriNet.theTileGeo;
-			dat::Spot const zaLoc(trigeo.refSpotForIndices(ndxIJ));
-			return zaPairFor(zaLoc);;
+			dat::Spot const zaLoc(trigeo.refSpotForNodeKey(ndxIJ));
+			return zaPairForSpot(zaLoc);;
 		}
 
 		PropType
 		operator()
-			( tri::NodeNdxPair const & ndxIJ
+			( tri::NodeKey const & ndxIJ
 			) const
 		{
 			PropType const sample
-				{ theSurfModel.propertyAtZA(zaPairForIndices(ndxIJ)) };
+				{ theSurfModel.propertyAtZA(zaPairForNodeKey(ndxIJ)) };
 			return sample;
 		}
 
@@ -427,11 +427,11 @@ namespace
 			std::ofstream ofs(fname);
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
-				tri::NodeNdxPair const ndxIJ{ iter.indexPair() };
+				tri::NodeKey const ndxIJ{ iter.indexPair() };
 				PropType const sample{ operator()(ndxIJ) };
 				ga::Vector const & pnt = sample.thePnt;
 
-				PairZA const zaPair{ zaPairForIndices(ndxIJ) };
+				PairZA const zaPair{ zaPairForNodeKey(ndxIJ) };
 				double const & radius = sample.theRad;
 //				theSurfModel.pointAt(zaPair);
 //				theSurfModel.pointAt(zaPair);
@@ -459,7 +459,7 @@ namespace
 			std::ofstream ofsAll(fnameAll);
 			for (tri::NodeIterator iter{theTriNet.begin()} ; iter ; ++iter)
 			{
-				using NdxPair = tri::NodeNdxPair;
+				using NdxPair = tri::NodeKey;
 				NdxPair const ndx0{ iter.indexPair() };
 				NdxPair const ndx1{ ndx0.first + 1L, ndx0.second };
 				NdxPair const ndx2{ ndx0.first + 1L, ndx0.second + 1L };

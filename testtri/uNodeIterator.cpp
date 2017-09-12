@@ -95,9 +95,9 @@ tri_NodeIterator_test1
 		{
 			for (long ndxI{muBeg} ; ndxI <= muEnd ; ++ndxI)
 			{
-				tri::NodeNdxPair const ndxIJ{ ndxI, ndxJ };
+				tri::NodeKey const ndxIJ{ ndxI, ndxJ };
 				tri::IsoGeo::QuantPair const fracPair
-					(trigeo.fracPairForIndices(ndxIJ));
+					(trigeo.fracPairForNodeKey(ndxIJ));
 				dat::Spot const xyLoc(trigeo.refSpotForFracPair(fracPair));
 				if (xyDomain.contains(xyLoc))
 				{

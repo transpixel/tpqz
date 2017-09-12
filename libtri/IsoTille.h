@@ -103,14 +103,14 @@ public: // methods
 		() const;
 
 	//! Indices into tritille near to ndxAt - IRRESPECTIVE if in domain or not
-	std::vector<NodeNdxPair>
+	std::vector<NodeKey>
 	ndxPairsNearTo
-		( NodeNdxPair const & ndxAt
+		( NodeKey const & ndxAt
 		, double const & maxRefDist
 		) const;
 
 	//! Utility type
-	using DistNode = std::pair<double, NodeNdxPair>;
+	using DistNode = std::pair<double, NodeKey>;
 
 	/*! Indices for nodes with maxRefDist of ndxAt in reference frame
 	 *
@@ -120,7 +120,7 @@ public: // methods
 	 */
 	std::vector<DistNode>
 	nodesNearTo
-		( NodeNdxPair const & ndxAt
+		( NodeKey const & ndxAt
 		, double const & maxRefDist
 		) const;
 
@@ -152,7 +152,7 @@ public: // methods
 	inline
 	typename SampFunc::value_type
 	nodeValueViaInvDist
-		( NodeNdxPair const & ndxGone //!< interpolate at this node
+		( NodeKey const & ndxGone //!< interpolate at this node
 		, double const maxRefDist //!< using (valid) neighbors up to this far
 		, SampFunc const & propSampFunc //!< ref. tri::FaceVerts::valueFrom()
 		) const;

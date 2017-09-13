@@ -112,7 +112,7 @@ private: // data
 	NodeNdxRange theBegEndJ{ tri::sNullNdxPair };
 
 	//! Indices to currently active node (or invalid values)
-	NodeNdxPair theAtIJ{ tri::sNullNdxPair };
+	NodeKey theAtIJ{ tri::sNullNdxPair };
 
 	//! True if current iterator position is valid (not yet at end)
 	bool theIsActive{ false };
@@ -142,10 +142,28 @@ public: // methods
 	fracPair
 		() const;
 
-	//! Index pair associated with current (valid) iterator
+	//! Node associated with current (valid) iterator
 	inline
-	NodeNdxPair
-	indexPair
+	NodeKey
+	nodeKey
+		() const;
+
+	//! Adjacent Node in the "mu/u" direction
+	inline
+	NodeKey
+	nextNodeMu
+		() const;
+
+	//! Adjacent Node in the "nu/v" direction
+	inline
+	NodeKey
+	nextNodeNu
+		() const;
+
+	//! Adjacent Node in the diagonal slash direction direction
+	inline
+	NodeKey
+	nextNodeDi
 		() const;
 
 	//! Advance to next valid node (node in the domain)

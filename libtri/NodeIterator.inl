@@ -53,11 +53,35 @@ NodeIterator :: fracPair
 }
 
 inline
-NodeNdxPair
-NodeIterator :: indexPair
+NodeKey
+NodeIterator :: nodeKey
 	() const
 {
 	return { theAtIJ.first, theAtIJ.second };
+}
+
+inline
+NodeKey
+NodeIterator :: nextNodeMu
+	() const
+{
+	return { theAtIJ.first + 1L, theAtIJ.second };
+}
+
+inline
+NodeKey
+NodeIterator :: nextNodeNu
+	() const
+{
+	return { theAtIJ.first, theAtIJ.second + 1L };
+}
+
+inline
+NodeKey
+NodeIterator :: nextNodeDi
+	() const
+{
+	return { theAtIJ.first + 1L, theAtIJ.second + 1L};
 }
 
 inline
@@ -74,7 +98,7 @@ IsoGeo::QuantPair
 NodeIterator :: fracPairAt
 	() const
 {
-	return theTileGeo.fracPairForIndices(theAtIJ);
+	return theTileGeo.fracPairForNodeKey(theAtIJ);
 }
 
 inline

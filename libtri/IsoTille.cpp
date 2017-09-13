@@ -82,16 +82,16 @@ IsoTille :: sizeValidNodes
 	return numValid;
 }
 
-std::vector<NodeNdxPair>
+std::vector<NodeKey>
 IsoTille :: ndxPairsNearTo
-	( NodeNdxPair const & ndxAt
+	( NodeKey const & ndxAt
 	, double const & maxRefDist
 	) const
 {
-	std::vector<NodeNdxPair> candNodes;
+	std::vector<NodeKey> candNodes;
 
 	// location of anchor node
-	dat::Spot const atSpot(theTileGeo.refSpotForIndices(ndxAt));
+	dat::Spot const atSpot(theTileGeo.refSpotForNodeKey(ndxAt));
 
 	// bounding box in (orthotonal) Ref frame
 	double const & dr = maxRefDist;
@@ -118,7 +118,7 @@ IsoTille :: ndxPairsNearTo
 	{
 		for (NodeNdxType ndxJ{jBeg} ; ndxJ < jEnd ; ++ndxJ)
 		{
-			candNodes.emplace_back(NodeNdxPair{ ndxI, ndxJ });
+			candNodes.emplace_back(NodeKey{ ndxI, ndxJ });
 		}
 	}
 
@@ -127,26 +127,26 @@ IsoTille :: ndxPairsNearTo
 
 std::vector<IsoTille::DistNode>
 IsoTille :: nodesNearTo
-	( NodeNdxPair const & ndxAt
+	( NodeKey const & ndxAt
 	, double const & maxRefDist
 	) const
 {
 	std::vector<DistNode> distNodes;
 
 	// get all candidate indices
-	std::vector<NodeNdxPair> const ndxIJs(ndxPairsNearTo(ndxAt, maxRefDist));
+	std::vector<NodeKey> const ndxIJs(ndxPairsNearTo(ndxAt, maxRefDist));
 
 	// location of anchor node
-	dat::Spot const atSpot(theTileGeo.refSpotForIndices(ndxAt));
+	dat::Spot const atSpot(theTileGeo.refSpotForNodeKey(ndxAt));
 
 	// find qualifying nodes and check distance
-	for (NodeNdxPair const & ndxIJ : ndxIJs)
+	for (NodeKey const & ndxIJ : ndxIJs)
 	{
 		// don't include self
 		if (ndxAt != ndxIJ)
 		{
 			// get location of neighbor ...
-			dat::Spot const refSpotIJ(theTileGeo.refSpotForIndices(ndxIJ));
+			dat::Spot const refSpotIJ(theTileGeo.refSpotForNodeKey(ndxIJ));
 
 			// check if valid within domain
 			if (theDomain.contains(refSpotIJ))

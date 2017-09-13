@@ -52,8 +52,8 @@ namespace tri
 	using NodeNdxType = dat::QuantumFrac::index_type;
 	static NodeNdxType const sNullNdx{ dat::nullValue<NodeNdxType>() };
 
-	using NodeNdxPair = std::pair<NodeNdxType, NodeNdxType>;
-	static NodeNdxPair const sNullNdxPair{ sNullNdx, sNullNdx};
+	using NodeKey = std::pair<NodeNdxType, NodeNdxType>;
+	static NodeKey const sNullNdxPair{ sNullNdx, sNullNdx};
 
 } // tri
 

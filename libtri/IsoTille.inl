@@ -125,7 +125,7 @@ template <typename SampFunc>
 inline
 typename SampFunc::value_type
 IsoTille :: nodeValueViaInvDist
-	( NodeNdxPair const & ndxGone
+	( NodeKey const & ndxGone
 	, double const maxRefDist
 	, SampFunc const & propSampFunc
 	) const
@@ -143,7 +143,7 @@ IsoTille :: nodeValueViaInvDist
 	{
 		// get info for a neighbor
 		double const & dist = nearDistNode.first;
-		tri::NodeNdxPair const & ndxIJ = nearDistNode.second;
+		tri::NodeKey const & ndxIJ = nearDistNode.second;
 
 		// retrieve property at neighbor
 		DataType const & value{ propSampFunc(ndxIJ.first, ndxIJ.second) };

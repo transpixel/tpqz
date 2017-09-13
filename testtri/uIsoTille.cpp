@@ -252,7 +252,7 @@ namespace example
 		tri::IsoGeo const & trigeo = trinet.theTileGeo;
 		for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
 		{
-			SamplePool::KeyType const key(iter.indexPair());
+			SamplePool::KeyType const key(iter.nodeKey());
 			dat::Spot const xyLoc(trigeo.refSpotForFracPair(iter.fracPair()));
 			pool.addSample(valueOnPlaneAtXY(xyLoc), key);
 		}
@@ -294,7 +294,7 @@ tri_IsoTille_test1
 	// interpolate a 'missing' node property at a node using neighbors
 	{
 		// select a node to interpolate
-		tri::NodeNdxPair const ndxGone
+		tri::NodeKey const ndxGone
 			{ trigeo.indicesForRefSpot(xyArea.center()) };
 		example::DataType const expSamp{ samples(ndxGone) };
 
@@ -403,7 +403,7 @@ tri_IsoTille_test1
 }
 
 	//! Find all nodes within radius via brute force evaluation
-	std::set<tri::NodeNdxPair>
+	std::set<tri::NodeKey>
 	nodePairsInRadius
 		( tri::IsoGeo const & trigeo
 		, tri::Domain const & domain
@@ -411,11 +411,11 @@ tri_IsoTille_test1
 		, double const & radius
 		)
 	{
-		std::set<tri::NodeNdxPair> nodesIn;
+		std::set<tri::NodeKey> nodesIn;
 		for (tri::NodeIterator iter(trigeo, domain) ; iter ; ++iter)
 		{
-			tri::NodeNdxPair const ndxIJ{ iter.indexPair() };
-			dat::Spot const refIJ(trigeo.refSpotForIndices(ndxIJ));
+			tri::NodeKey const ndxIJ{ iter.nodeKey() };
+			dat::Spot const refIJ(trigeo.refSpotForNodeKey(ndxIJ));
 			if (domain.contains(refIJ))
 			{
 				using dat::operator-;
@@ -464,8 +464,8 @@ tri_IsoTille_test2
 
 	tri::IsoTille const trinet(trigeo, domain);
 
-	tri::NodeNdxPair const ndxAt{ trigeo.indicesForRefSpot(refPnt) };
-	dat::Spot const refNodeLoc(trigeo.refSpotForIndices(ndxAt));
+	tri::NodeKey const ndxAt{ trigeo.indicesForRefSpot(refPnt) };
+	dat::Spot const refNodeLoc(trigeo.refSpotForNodeKey(ndxAt));
 	assert(domain.contains(refNodeLoc));
 
 	//
@@ -476,7 +476,7 @@ tri_IsoTille_test2
 		constexpr double wayBig{ 1.e6 };
 
 		// determine nodes via brute force evaluation
-		std::set<tri::NodeNdxPair> const expNdxPairs
+		std::set<tri::NodeKey> const expNodeKeys
 			{ nodePairsInRadius(trigeo, domain, refNodeLoc, wayBig) };
 
 		// request "near" nodes such that all are included
@@ -485,7 +485,7 @@ tri_IsoTille_test2
 
 		/*
 		std::ofstream ofsExp("test_exp.dat");
-		for (tri::NodeNdxPair const & ndxIJ : expNdxPairs)
+		for (tri::NodeKey const & ndxIJ : expNodeKeys)
 		{
 		ofsExp << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
 		}
@@ -496,8 +496,8 @@ tri_IsoTille_test2
 		}
 		*/
 
-		assert(! expNdxPairs.empty());
-		size_t const expNears{ expNdxPairs.size() - 1L }; // skip 'at'
+		assert(! expNodeKeys.empty());
+		size_t const expNears{ expNodeKeys.size() - 1L }; // skip 'at'
 		size_t const gotNears{ gotDistNodes.size() };
 		if (! dat::nearlyEquals(gotNears, expNears))
 		{
@@ -513,7 +513,7 @@ tri_IsoTille_test2
 
 	{
 		// determine nodes via brute force evaluation
-		std::set<tri::NodeNdxPair> const expNdxPairs
+		std::set<tri::NodeKey> const expNodeKeys
 			{ nodePairsInRadius(trigeo, domain, refNodeLoc, refDist) };
 
 		// get neighbor node info
@@ -523,18 +523,18 @@ tri_IsoTille_test2
 		// check that returned data are within neighborhood
 		size_t errCnt{ 0u };
 		double prevDist{ 0. };
-		std::set<tri::NodeNdxPair> gotNdxPairs;
+		std::set<tri::NodeKey> gotNodeKeys;
 		for (tri::IsoTille::DistNode const & gotDistNode : gotDistNodes)
 		{
 			double const & gotDist = gotDistNode.first;
-			tri::NodeNdxPair const & ndxIJ = gotDistNode.second;
-			gotNdxPairs.insert(ndxIJ);
+			tri::NodeKey const & ndxIJ = gotDistNode.second;
+			gotNodeKeys.insert(ndxIJ);
 
 			assert(dat::isValid(gotDist));
 			assert(dat::isValid(ndxIJ));
 
 			// check if node indices are in neighborhood
-			dat::Spot const gotAt(trigeo.refSpotForIndices(ndxIJ));
+			dat::Spot const gotAt(trigeo.refSpotForNodeKey(ndxIJ));
 			using dat::operator-;
 			dat::Spot const refDelta(gotAt - refNodeLoc);
 			double const chkDist{ dat::magnitude(refDelta) };

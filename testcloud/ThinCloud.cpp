@@ -34,11 +34,12 @@
 #include "libapp/Usage.h"
 
 #include "build/version.h"
-#include "libcloud/geo.h"
 #include "libcloud/io.h"
 #include "libcloud/PointIterator.h"
 #include "libcloud/stats.h"
 #include "libdat/Latice.h"
+#include "libga/Aligner.h"
+#include "libga/Rigid.h"
 #include "libgeo/Ray.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
@@ -50,6 +51,78 @@
 #include <fstream>
 #include <iostream>
 
+namespace testgeo
+{
+
+::geo::Ray const &
+axisInBinCloud
+	()
+{
+	// probe height is about .606
+//	constexpr double zCloudInRef{ -.765 }; // smaller: cloud to low
+	// constexpr double zCloudInRef{ -.630 }; // 
+	constexpr double zCloudInRef{ -.950 }; // 
+//	constexpr double zCloudInRef{ -.500 }; // larger: cloud to high
+//	static ga::Vector const origCloudInRef(0., 0., zCloudInRef);
+	// on screen view0:
+	// x: down
+	// y: right
+	// z: up
+	static ga::Vector const origCloudInRef(-.055, -.015, zCloudInRef);
+	static ::geo::Ray const axis(origCloudInRef, ga::e2);
+	return axis;
+}
+
+ga::Pose const &
+poseCloudWrtRef
+	()
+{
+	// cloud data axis
+	static ::geo::Ray const axisInCloud(axisInBinCloud());
+
+	// attitude -- note convention (into:cloud, from:ref)
+	// cloud : ref
+	//  e1 : -e2  (-Y)
+	//  e2 : -e3  (-Z)
+	//  e3 : +e1  (+X)
+	static ga::Vector const & cloudDown = axisInCloud.theDir;
+	static ga::Vector const & refDown = -ga::e3;
+	static ga::Vector const & cloudAzim = ga::e1;
+	static ga::Vector const & refAzim = -ga::e2;
+	// static ga::Vector const & cloudAzim = ga::e3;
+	// static ga::Vector const & refAzim =  ga::e1;
+	if (cloudAzim.nearlyEquals(cloudDown))
+	{
+		io::err() << "ERROR: cloud axis/azimth must be distinct" << std::endl;
+		assert(! "check/change clound axis pair");
+	}
+
+	static ga::Aligner::ExactFit<ga::Vector> const eFit(refDown, cloudDown);
+	static ga::Aligner::BestTry<ga::Vector> const  bTry(refAzim, cloudAzim);
+	static ga::Aligner const align(eFit, bTry);
+
+	static ga::Pose const att(align.pose());
+	return att;
+}
+
+ga::Rigid const &
+xformCloudWrtRef
+	()
+{
+	// cloud data axis
+	static ::geo::Ray const axisInCloud(axisInBinCloud());
+
+	// offset
+	static ga::Vector const orig(axisInCloud.theStart);
+
+	// attitude -- note passive convention
+	static ga::Pose const attCloudWrtRef(poseCloudWrtRef());
+
+	static ga::Rigid xform(orig, attCloudWrtRef);
+	return xform;
+}
+
+}
 
 namespace
 {
@@ -155,7 +228,7 @@ namespace
 		std::vector<ga::Vector> pntsInSta(pntsInCloud.size());
 
 		// relationship of ref frame w.r.t. cloud frame
-		static ga::Rigid const xCloudWrtRef(cloud::geo::xformCloudWrtRef());
+		static ga::Rigid const xCloudWrtRef(testgeo::xformCloudWrtRef());
 		static ga::Rigid const xRefWrtCloud(xCloudWrtRef.inverse());
 
 		// orientation of station frame w.r.t. reference frame
@@ -263,7 +336,7 @@ main
 
 		// extract sparse point collection
 		std::vector<ga::Vector> const pntsInCloud
-			(sparsePoints(fpnts, parts, radTol, cloud::geo::axisInBinCloud()));
+			(sparsePoints(fpnts, parts, radTol, testgeo::axisInBinCloud()));
 
 		//
 		// transform into "station" frame

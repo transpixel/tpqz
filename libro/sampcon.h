@@ -34,7 +34,7 @@
 */
 
 
-#include "libprob/Stats.h"
+#include "libprob/median.h"
 #include "libro/ro.h"
 
 #include <vector>
@@ -187,7 +187,7 @@ namespace sampcon
 				Iter const itBeg = it0 + 5u;
 				Iter const itEnd = gaps.end();
 				std::nth_element(it0, itBeg, itEnd);
-				median = prob::Stats::medianValue<Iter, double>(itBeg, itEnd);
+				median = prob::median::valueFromConst(itBeg, itEnd);
 			}
 			return median;
 		}

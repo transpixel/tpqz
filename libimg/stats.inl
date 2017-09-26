@@ -35,7 +35,7 @@
 #include "libdat/info.h" // for debug
 #include "libimg/sample.h"
 #include "libio/stream.h"
-#include "libprob/Stats.h"
+#include "libprob/median.h"
 
 #include <iterator>
 
@@ -372,11 +372,11 @@ medianOf
 		{
 			// compute the per channel median values
 			median = std::array<float, 3u>
-				{{ float(prob::Stats::nonConstMedianValue
+				{{ float(prob::median::valueFromConst
 						(chan0.begin(), chan0.end()))
-				 , float(prob::Stats::nonConstMedianValue
+				 , float(prob::median::valueFromConst
 						(chan1.begin(), chan1.end()))
-				 , float(prob::Stats::nonConstMedianValue
+				 , float(prob::median::valueFromConst
 						(chan2.begin(), chan2.end()))
 				}};
 		}

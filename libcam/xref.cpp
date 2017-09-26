@@ -36,7 +36,6 @@
 
 #include "libga/ga.h"
 #include "libgeo/ProbRay.h"
-#include "libgeo/RayConvergence.h"
 #include "libgeo/Ray.h"
 #include "libgeo/stats.h"
 

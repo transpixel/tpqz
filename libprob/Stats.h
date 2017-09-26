@@ -74,11 +74,13 @@ public: // methods
 		);
 
 	//! Median value for non-const inputs: NOTE: changes the input data!!
+	template <typename FwdIter, typename DataType = double>
 	inline
 	static
-	double
+	DataType
 	nonConstMedianValue
-		( std::vector<double> * const & ptVec
+		( FwdIter const & beg //!< (*it) must be convertable to double
+		, FwdIter const & end
 		);
 
 	//! Median value of collection

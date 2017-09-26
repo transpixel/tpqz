@@ -372,9 +372,12 @@ medianOf
 		{
 			// compute the per channel median values
 			median = std::array<float, 3u>
-				{{ float(prob::Stats::nonConstMedianValue(& chan0))
-				 , float(prob::Stats::nonConstMedianValue(& chan1))
-				 , float(prob::Stats::nonConstMedianValue(& chan2))
+				{{ float(prob::Stats::nonConstMedianValue
+						(chan0.begin(), chan0.end()))
+				 , float(prob::Stats::nonConstMedianValue
+						(chan1.begin(), chan1.end()))
+				 , float(prob::Stats::nonConstMedianValue
+						(chan2.begin(), chan2.end()))
 				}};
 		}
 	}

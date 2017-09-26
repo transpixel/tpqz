@@ -62,17 +62,16 @@ Stats :: meanValue
 	return mean;
 }
 
+template <typename FwdIter, typename DataType>
 inline
 // static
-double
+DataType
 Stats :: nonConstMedianValue
-	( std::vector<double> * const & ptVec
+	( FwdIter const & beg
+	, FwdIter const & end
 	)
 {
-	double median(dat::nullValue<double>());
-	std::vector<double> & tmp = *ptVec;
-	std::vector<double>::iterator const beg(tmp.begin());
-	std::vector<double>::iterator const end(tmp.end());
+	DataType median(dat::nullValue<DataType>());
 	size_t const numSamps(std::distance(beg, end));
 	if (1u == numSamps)
 	{
@@ -84,7 +83,8 @@ Stats :: nonConstMedianValue
 	{
 		// Select middle value (exact center, or just less than center)
 		ptrdiff_t const deltaMid((numSamps-1u) / 2u);
-		std::vector<double>::iterator const itMid(beg + deltaMid);
+		typename std::vector<DataType>::iterator const itMid
+			{ beg + deltaMid };
 		std::nth_element(beg, itMid, end);
 		if (1u == (numSamps % 2u)) // 3, 5, ...
 		{
@@ -94,11 +94,12 @@ Stats :: nonConstMedianValue
 		else // 2, 4, ...
 		{
 			// for even number of elements, incorporate next value
-			double const & med1 = *itMid;
-			std::vector<double>::iterator const itNext(itMid + 1);
-			std::vector<double>::iterator const itFind
-				(std::min_element(itNext, end));
-			double const med2(*itFind);
+			DataType const & med1 = *itMid;
+			typename std::vector<DataType>::iterator const itNext
+				{ itMid + 1 };
+			typename std::vector<DataType>::const_iterator const itFind
+				{ std::min_element(itNext, end) };
+			DataType const med2(*itFind);
 			median = .5 * (med1 + med2);
 		}
 	}
@@ -129,7 +130,7 @@ Stats :: medianValue
 		std::copy(beg, end, tmp.begin());
 
 		// compute median by shuffling data around
-		median = nonConstMedianValue(& tmp);
+		median = nonConstMedianValue(tmp.begin(), tmp.end());
 	}
 	return median;
 }

@@ -37,6 +37,7 @@
 #include "libdat/validity.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <vector>
 

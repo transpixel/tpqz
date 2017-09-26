@@ -73,26 +73,6 @@ public: // methods
 		, FwdIter const & end
 		);
 
-	//! Median value for non-const inputs: NOTE: changes the input data!!
-	template <typename FwdIter, typename DataType = double>
-	inline
-	static
-	DataType
-	nonConstMedianValue
-		( FwdIter const & beg //!< (*it) must have op<()
-		, FwdIter const & end
-		);
-
-	//! Median value of collection
-	template <typename FwdIter, typename DataType = double>
-	inline
-	static
-	DataType
-	medianValue
-		( FwdIter const & beg //!< (*it) must have op<()
-		, FwdIter const & end
-		);
-
 public: // methods
 
 	//! default null constructor

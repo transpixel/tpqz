@@ -26,75 +26,59 @@
 //
 //
 
+#ifndef prob_median_INCL_
+#define prob_median_INCL_
 
 /*! \file
-\brief Definitions for prob::Coordinates
+\brief Declarations for prob::median
 */
 
 
-#include "libprob/Coordinates.h"
+#include "libdat/validity.h"
 
-#include "libprob/median.h"
-#include "libprob/Stats.h"
-
-#include <sstream>
-
-
-namespace
-{
-	inline
-	double
-	medianFor
-		( std::vector<double> const & comps
-		)
-	{
-		return prob::median::valueFromConst(comps.begin(), comps.end());
-	}
-}
+#include <algorithm>
+#include <iterator>
+#include <vector>
 
 
 namespace prob
 {
 
-// explicit
-Coordinates :: Coordinates
-	( size_t const & estSize
-	)
-	: theComps{{}}
-{
-	theComps[0].reserve(estSize);
-	theComps[1].reserve(estSize);
-	theComps[2].reserve(estSize);
-}
+/*! \brief Functions related to median values.
 
-void
-Coordinates :: addPoint
-	( ga::Vector const & pnt
-	)
-{
-	if (pnt.isValid())
-	{
-		theComps[0].emplace_back(pnt[0]);
-		theComps[1].emplace_back(pnt[1]);
-		theComps[2].emplace_back(pnt[2]);
-	}
-}
+\par Example
+\dontinclude testprob/umedian.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-ga::Vector
-Coordinates :: pointAtMedians
-	() const
+namespace median
 {
-	ga::Vector pnt{};
-	double const xMed(medianFor(theComps[0]));
-	double const yMed(medianFor(theComps[1]));
-	double const zMed(medianFor(theComps[2]));
-	if (dat::isValid(xMed) && dat::isValid(yMed) && dat::isValid(zMed))
-	{
-		pnt = ga::Vector(xMed, yMed, zMed);
-	}
-	return pnt;
-}
 
+	//! Median value for non-const inputs: NOTE: changes the input data!!
+	template <typename FwdIter, typename DataType = double>
+	inline
+	DataType
+	valueFromNonConst
+		( FwdIter const & beg //!< (*it) must have op<()
+		, FwdIter const & end
+		);
+
+	//! Median value of collection - NOTE: makes COPY of data!
+	template <typename FwdIter, typename DataType = double>
+	inline
+	DataType
+	valueFromConst
+		( FwdIter const & beg //!< (*it) must have op<()
+		, FwdIter const & end
+		);
+
+} // median
 
 } // prob
+
+// Inline definitions
+#include "libprob/median.inl"
+
+#endif // prob_median_INCL_
 

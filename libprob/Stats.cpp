@@ -36,6 +36,7 @@
 
 #include "libdat/dat.h"
 #include "libdat/info.h"
+#include "libprob/median.h"
 
 #include <sstream>
 
@@ -81,7 +82,7 @@ double
 Stats :: medianValue
 	() const
 {
-	return medianValue(theSamples.begin(), theSamples.end());
+	return median::valueFromConst(theSamples.begin(), theSamples.end());
 }
 
 std::string

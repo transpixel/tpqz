@@ -58,8 +58,7 @@ valueFromNonConst
 	{
 		// Select middle value (exact center, or just less than center)
 		ptrdiff_t const deltaMid((numSamps-1u) / 2u);
-		typename std::vector<DataType>::iterator const itMid
-			{ beg + deltaMid };
+		FwdIter const itMid{ beg + deltaMid };
 		std::nth_element(beg, itMid, end);
 		if (1u == (numSamps % 2u)) // 3, 5, ...
 		{
@@ -70,10 +69,8 @@ valueFromNonConst
 		{
 			// for even number of elements, incorporate next value
 			DataType const & med1 = *itMid;
-			typename std::vector<DataType>::iterator const itNext
-				{ itMid + 1 };
-			typename std::vector<DataType>::const_iterator const itFind
-				{ std::min_element(itNext, end) };
+			FwdIter const itNext{ itMid + 1 };
+			FwdIter const itFind{ std::min_element(itNext, end) };
 			DataType const med2(*itFind);
 			median = .5 * (med1 + med2);
 		}

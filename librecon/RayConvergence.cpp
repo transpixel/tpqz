@@ -103,7 +103,7 @@ namespace
 				}
 			}
 			// use independent coordinate median as estimated robust location
-			pnt = coords.componentMedianPoint();
+			pnt = coords.pointAtMedians();
 		}
 
 		return pnt;

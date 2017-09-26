@@ -37,9 +37,12 @@ if showSconsProgress :
 env = env.Clone() # allow module to change anything it wants
 
 libpaths = \
-	[ '../libprob/'
+	[ '../librecon/'
 
+	, '../libgeo/'
 	, '../libga/'
+
+	, '../libprob/'
 	, '../libmath/'
 
 	, '../libdat/'
@@ -47,9 +50,12 @@ libpaths = \
 	]
 
 linklibs = \
-	[ 'prob'
+	[ 'recon'
 
+	, 'geo'
 	, 'ga'
+
+	, 'prob'
 	, 'math'
 
 	, 'dat'
@@ -59,17 +65,5 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-
-env.Program('uCdfForward.cpp')
-env.Program('uCdfInverse.cpp')
-env.Program('uCoordinates.cpp')
-env.Program('udistro.cpp')
-env.Program('uFrac9.cpp')
-env.Program('uhisto.cpp')
-env.Program('uHistogram.cpp')
-env.Program('uprob.cpp')
-env.Program('uRemapper.cpp')
-env.Program('uSampleStats.cpp')
-env.Program('uStats.cpp')
-
+env.Program('uRayConvergence.cpp')
 

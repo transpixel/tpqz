@@ -27,11 +27,11 @@
 //
 
 /*! \file
-\brief  This file contains unit test for geo::RayConvergence
+\brief  This file contains unit test for recon::RayConvergence
 */
 
 
-#include "libgeo/RayConvergence.h"
+#include "librecon/RayConvergence.h"
 
 #include "libdat/info.h"
 #include "libdat/validity.h"
@@ -47,11 +47,11 @@ namespace
 
 //! Check for common functions
 std::string
-geo_RayConvergence_test0
+recon_RayConvergence_test0
 	()
 {
 	std::ostringstream oss;
-	geo::RayConvergence const aNull{};
+	recon::RayConvergence const aNull{};
 	if (dat::isValid(aNull))
 	{
 		oss << "Failure of null value test" << std::endl;
@@ -62,7 +62,7 @@ geo_RayConvergence_test0
 
 //! Check basic intersection characteristics
 std::string
-geo_RayConvergence_test1
+recon_RayConvergence_test1
 	()
 {
 	std::ostringstream oss;
@@ -148,7 +148,7 @@ geo_RayConvergence_test1
 		);
 
 	// exercise class
-	geo::RayConvergence const bundle(rays);
+	recon::RayConvergence const bundle(rays);
 	ga::Vector const gotRobust(bundle.robustPoint());
 	ga::Vector const gotFit(bundle.meanNearTo(gotRobust, rejTol));
 
@@ -179,7 +179,7 @@ geo_RayConvergence_test1
 
 }
 
-//! Unit test for geo::RayConvergence
+//! Unit test for recon::RayConvergence
 int
 main
 	( int const /*argc*/
@@ -189,8 +189,8 @@ main
 	std::ostringstream oss;
 
 	// run tests
-	oss << geo_RayConvergence_test0();
-	oss << geo_RayConvergence_test1();
+	oss << recon_RayConvergence_test0();
+	oss << recon_RayConvergence_test1();
 
 	// check/report results
 	std::string const errMessages(oss.str());

@@ -26,65 +26,81 @@
 //
 //
 
-#ifndef geo_Coordinates_INCL_
-#define geo_Coordinates_INCL_
+#ifndef recon_RayConvergence_INCL_
+#define recon_RayConvergence_INCL_
 
 /*! \file
-\brief Declarations for geo::Coordinates
+\brief Declarations for recon::RayConvergence
 */
 
 
+#include "libgeo/Ray.h"
 #include "libga/ga.h"
 
-#include <array>
+#include <limits>
 #include <string>
 #include <vector>
 
 
-namespace geo
+namespace recon
 {
 
-/*! \brief Operations on independent coordinate (components).
+/*! \brief Collection of rays assumed to intersect at a common point
 
 \par Example
-\dontinclude testgeo/uCoordinates.cpp
+\dontinclude testrecon/uRayConvergence.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class Coordinates
+class RayConvergence
 {
-	std::array<std::vector<double>, 3u> theComps;
+
+	std::vector<geo::Ray> theRays{};
 
 public: // methods
 
 	//! default null constructor
-	Coordinates
+	RayConvergence
 		() = default;
 
-	//! Construct with reserved size
+	//! Value ctor
 	explicit
-	Coordinates
-		( size_t const & estSize
+	RayConvergence
+		( std::vector<geo::Ray> const & rays
 		);
 
-	//! Incorporate coordinates from pnt
-	void
-	addPoint
-		( ga::Vector const & pnt
-		);
-
-	//! Point comprised of individual coordinate medians
-	ga::Vector
-	componentMedianPoint
+	//! Check if instance is valid
+	bool
+	isValid
 		() const;
 
-}; // Coordinates
+	//! Robustly estimated intersection point
+	ga::Vector
+	robustPoint
+		( double const minAngle = { 1./8. }
+		, std::vector<double> * const & ptGapMags = nullptr
+		) const;
 
-} // geo
+	//! Intersection of rays that approach trialPoint within tolerance
+	ga::Vector
+	meanNearTo
+		( ga::Vector const & evalPoint = {} //!< if null, use robustPoint()
+		, double const & maxRejTol = std::numeric_limits<double>::max()
+		) const;
+
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // RayConvergence
+
+} // recon
 
 // Inline definitions
-// #include "libgeo/Coordinates.inl"
+// #include "librecon/RayConvergence.inl"
 
-#endif // geo_Coordinates_INCL_
+#endif // recon_RayConvergence_INCL_
 

@@ -80,7 +80,7 @@ Coordinates :: addPoint
 }
 
 ga::Vector
-Coordinates :: componentMedianPoint
+Coordinates :: pointAtMedians
 	() const
 {
 	ga::Vector pnt{};

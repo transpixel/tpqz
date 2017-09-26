@@ -79,7 +79,7 @@ public: // methods
 	static
 	DataType
 	nonConstMedianValue
-		( FwdIter const & beg //!< (*it) must be convertable to double
+		( FwdIter const & beg //!< (*it) must have op<()
 		, FwdIter const & end
 		);
 
@@ -89,7 +89,7 @@ public: // methods
 	static
 	DataType
 	medianValue
-		( FwdIter const & beg //!< (*it) must be convertable to double
+		( FwdIter const & beg //!< (*it) must have op<()
 		, FwdIter const & end
 		);
 

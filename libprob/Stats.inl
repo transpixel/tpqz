@@ -111,7 +111,7 @@ inline
 // static
 DataType
 Stats :: medianValue
-	( FwdIter const & beg //!< (*it) must be convertable to double
+	( FwdIter const & beg
 	, FwdIter const & end
 	)
 {

@@ -74,9 +74,17 @@ public: // methods
 		( ga::Vector const & pnt
 		);
 
+	//! Incorporate collection of points
+	template <typename FwdIter>
+	void
+	addPoints
+		( FwdIter const & beg
+		, FwdIter const & end
+		);
+
 	//! Point comprised of individual coordinate medians
 	ga::Vector
-	componentMedianPoint
+	pointAtMedians
 		() const;
 
 }; // Coordinates
@@ -84,7 +92,7 @@ public: // methods
 } // prob
 
 // Inline definitions
-// #include "libprob/Coordinates.inl"
+#include "libprob/Coordinates.inl"
 
 #endif // prob_Coordinates_INCL_
 

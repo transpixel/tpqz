@@ -26,92 +26,51 @@
 //
 //
 
-#ifndef prob_Stats_INCL_
-#define prob_Stats_INCL_
+#ifndef prob_mean_INCL_
+#define prob_mean_INCL_
 
 /*! \file
-\brief Declarations for prob::Stats
+\brief Declarations for prob::mean
 */
 
 
-#include "libdat/MinMax.h"
+#include "libdat/validity.h"
 
-#include <deque>
-#include <string>
-#include <vector>
+#include <algorithm>
+#include <iterator>
 
 
 namespace prob
 {
 
-/*! \brief Support for basic numeric statistics.
+/*! \brief Functions related to mean value.
 
 \par Example
-\dontinclude testprob/uStats.cpp
+\dontinclude testprob/umean.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class Stats
+namespace mean
 {
-	// simple implementation -- TODO add running stats if many samples
-	std::deque<double> theSamples;
-
-public: // data
-
-	dat::MinMax<double> theMinMax;
-
-public: // methods
-
-	//! default null constructor
-	Stats
-		();
-
-	//! Construct direct from collection of data
-	template <typename FwdIter>
+	//! (Arithemetic) Average value of collection
+	template <typename FwdIter, typename DataType = double>
 	inline
-	Stats
+	DataType
+	arithmetic
 		( FwdIter const & beg //!< (*it) must be convertable to double
 		, FwdIter const & end
 		);
 
-	// copy constructor -- compiler provided
-	// assignment operator -- compiler provided
-	// destructor -- compiler provided
+	// geometric
+	// harmonic
 
-	//! Check if instance is valid
-	bool
-	isValid
-		() const;
+} // mean
 
-	//! Incorporate sample into statistics
-	void
-	add
-		( double const & sample
-		);
-
-	//! Mean value of current sample content
-	double
-	mean
-		() const;
-
-	//! Value at middle of collection (expensive! - O(N*ln(N))
-	double
-	medianValue
-		() const;
-
-	//! Descriptive information about this instance.
-	std::string
-	infoString
-		( std::string const & title = std::string()
-		, std::string const & fmt = "%12.6f"
-		) const;
-};
-
-}
+} // prob
 
 // Inline definitions
-#include "libprob/Stats.inl"
+#include "libprob/mean.inl"
 
-#endif // prob_Stats_INCL_
+#endif // prob_mean_INCL_
 

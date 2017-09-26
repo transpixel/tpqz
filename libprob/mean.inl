@@ -28,36 +28,36 @@
 
 
 /*! \file
-\brief Inline definitions for prob::Stats
+\brief Inline definitions for prob::mean
 */
-
-
-#include "libdat/dat.h"
-
-#include <cstddef>
-#include <iterator>
 
 
 namespace prob
 {
-// ======================================================================
+namespace mean
+{
 
-template <typename FwdIter>
+template <typename FwdIter, typename DataType>
 inline
-Stats :: Stats
+DataType
+arithmetic
 	( FwdIter const & beg
 	, FwdIter const & end
 	)
-	: theSamples()
 {
-	FwdIter itIn(beg);
-	while (end != itIn)
+	DataType mean(dat::nullValue<DataType>());
+	if (beg != end)
 	{
-		theSamples.push_back((double)*itIn++);
-
+		DataType const sum
+			(std::accumulate(beg, end, static_cast<DataType>(0)));
+		size_t const numSamps(std::distance(beg, end));
+		mean = (1./(double)numSamps) * sum;
 	}
+	return mean;
 }
 
-// ======================================================================
-}
+
+} // mean
+
+} // prob
 

@@ -37,7 +37,7 @@
 #include "libgeo/intersect.h"
 #include "libgeo/stats.h"
 #include "libmath/math.h"
-#include "libprob/Coordinates.h"
+#include "librecon/Coordinates.h"
 
 #include <cmath>
 #include <iterator>
@@ -71,7 +71,7 @@ namespace
 
 			// brute force combinatorial intersection
 			size_t const numCombo{ (math::sq(numRays) - numRays)/2u };
-			prob::Coordinates coords(2u*numCombo);
+			recon::Coordinates coords(2u*numCombo);
 			for (FwdIter it1{rayBeg} ; rayEnd != it1 ; ++it1)
 			{
 				geo::Ray const & ray1 = *it1;

@@ -65,5 +65,6 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('uCoordinates.cpp')
 env.Program('uRayConvergence.cpp')
 

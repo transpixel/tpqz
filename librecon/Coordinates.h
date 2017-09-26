@@ -26,75 +26,73 @@
 //
 //
 
+#ifndef recon_Coordinates_INCL_
+#define recon_Coordinates_INCL_
 
 /*! \file
-\brief Definitions for prob::Coordinates
+\brief Declarations for recon::Coordinates
 */
 
 
-#include "libprob/Coordinates.h"
+#include "libga/ga.h"
 
-#include "libprob/median.h"
-#include "libprob/Stats.h"
-
-#include <sstream>
-
-
-namespace
-{
-	inline
-	double
-	medianFor
-		( std::vector<double> const & comps
-		)
-	{
-		return prob::median::valueFromConst(comps.begin(), comps.end());
-	}
-}
+#include <array>
+#include <string>
+#include <vector>
 
 
-namespace prob
+namespace recon
 {
 
-// explicit
-Coordinates :: Coordinates
-	( size_t const & estSize
-	)
-	: theComps{{}}
+/*! \brief Operations on independent coordinate (components).
+
+\par Example
+\dontinclude testrecon/uCoordinates.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+class Coordinates
 {
-	theComps[0].reserve(estSize);
-	theComps[1].reserve(estSize);
-	theComps[2].reserve(estSize);
-}
+	std::array<std::vector<double>, 3u> theComps;
 
-void
-Coordinates :: addPoint
-	( ga::Vector const & pnt
-	)
-{
-	if (pnt.isValid())
-	{
-		theComps[0].emplace_back(pnt[0]);
-		theComps[1].emplace_back(pnt[1]);
-		theComps[2].emplace_back(pnt[2]);
-	}
-}
+public: // methods
 
-ga::Vector
-Coordinates :: pointAtMedians
-	() const
-{
-	ga::Vector pnt{};
-	double const xMed(medianFor(theComps[0]));
-	double const yMed(medianFor(theComps[1]));
-	double const zMed(medianFor(theComps[2]));
-	if (dat::isValid(xMed) && dat::isValid(yMed) && dat::isValid(zMed))
-	{
-		pnt = ga::Vector(xMed, yMed, zMed);
-	}
-	return pnt;
-}
+	//! default null constructor
+	Coordinates
+		() = default;
 
+	//! Construct with reserved size
+	explicit
+	Coordinates
+		( size_t const & estSize
+		);
 
-} // prob
+	//! Incorporate coordinates from pnt
+	void
+	addPoint
+		( ga::Vector const & pnt
+		);
+
+	//! Incorporate collection of points
+	template <typename FwdIter>
+	void
+	addPoints
+		( FwdIter const & beg
+		, FwdIter const & end
+		);
+
+	//! Point comprised of individual coordinate medians
+	ga::Vector
+	pointAtMedians
+		() const;
+
+}; // Coordinates
+
+} // recon
+
+// Inline definitions
+#include "librecon/Coordinates.inl"
+
+#endif // recon_Coordinates_INCL_
 

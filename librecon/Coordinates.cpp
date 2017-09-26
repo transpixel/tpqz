@@ -28,33 +28,72 @@
 
 
 /*! \file
-\brief Inline definitions for prob::Coordinates
+\brief Definitions for recon::Coordinates
 */
 
 
+#include "librecon/Coordinates.h"
 
-namespace prob
+#include "libprob/median.h"
+
+#include <sstream>
+
+
+namespace
 {
-
-template <typename FwdIter>
-void
-Coordinates :: addPoints
-	( FwdIter const & beg
-	, FwdIter const & end
-	)
-{
-	// update reserved size
-	size_t const moreSize{ (size_t)std::distance(beg, end) };
-	size_t const nextSize{ theComps[0].size() + moreSize };
-	theComps[0].reserve(nextSize);
-	theComps[1].reserve(nextSize);
-	theComps[2].reserve(nextSize);
-
-	for (FwdIter iter{beg} ; end != iter ; ++iter)
+	inline
+	double
+	medianFor
+		( std::vector<double> const & comps
+		)
 	{
-		addPoint(*iter);
+		return prob::median::valueFromConst(comps.begin(), comps.end());
 	}
 }
 
-} // prob
+
+namespace recon
+{
+
+// explicit
+Coordinates :: Coordinates
+	( size_t const & estSize
+	)
+	: theComps{{}}
+{
+	theComps[0].reserve(estSize);
+	theComps[1].reserve(estSize);
+	theComps[2].reserve(estSize);
+}
+
+void
+Coordinates :: addPoint
+	( ga::Vector const & pnt
+	)
+{
+	if (pnt.isValid())
+	{
+		theComps[0].emplace_back(pnt[0]);
+		theComps[1].emplace_back(pnt[1]);
+		theComps[2].emplace_back(pnt[2]);
+	}
+}
+
+ga::Vector
+Coordinates :: pointAtMedians
+	() const
+{
+	ga::Vector pnt{};
+	double const xMed(medianFor(theComps[0]));
+	double const yMed(medianFor(theComps[1]));
+	double const zMed(medianFor(theComps[2]));
+	if (dat::isValid(xMed) && dat::isValid(yMed) && dat::isValid(zMed))
+	{
+		pnt = ga::Vector(xMed, yMed, zMed);
+	}
+	return pnt;
+}
+
+
+} // recon
 

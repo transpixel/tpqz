@@ -27,11 +27,11 @@
 //
 
 /*! \file
-\brief  This file contains unit test for prob::Coordinates
+\brief  This file contains unit test for recon::Coordinates
 */
 
 
-#include "libprob/Coordinates.h"
+#include "librecon/Coordinates.h"
 
 #include "libdat/info.h"
 #include "libdat/validity.h"
@@ -47,12 +47,12 @@ namespace
 
 //! Check for common functions
 std::string
-prob_Coordinates_test0
+recon_Coordinates_test0
 	()
 {
 	std::ostringstream oss;
 	/*
-	prob::Coordinates const aNull(dat::nullValue<prob::Coordinates>());
+	recon::Coordinates const aNull(dat::nullValue<recon::Coordinates>());
 	if (dat::isValid(aNull))
 	{
 		oss << "Failure of null value test" << std::endl;
@@ -64,7 +64,7 @@ prob_Coordinates_test0
 
 //! Check median operation
 std::string
-prob_Coordinates_test1
+recon_Coordinates_test1
 	()
 {
 	std::ostringstream oss;
@@ -78,7 +78,7 @@ prob_Coordinates_test1
 		};
 	ga::Vector const expMed(3., 3., 3.);
 
-	prob::Coordinates coords;
+	recon::Coordinates coords;
 	coords.addPoints(pnts.begin(), pnts.end());
 
 	ga::Vector const gotMed{ coords.pointAtMedians() };
@@ -97,7 +97,7 @@ prob_Coordinates_test1
 
 }
 
-//! Unit test for prob::Coordinates
+//! Unit test for recon::Coordinates
 int
 main
 	( int const /*argc*/
@@ -107,8 +107,8 @@ main
 	std::ostringstream oss;
 
 	// run tests
-	oss << prob_Coordinates_test0();
-	oss << prob_Coordinates_test1();
+	oss << recon_Coordinates_test0();
+	oss << recon_Coordinates_test1();
 
 	// check/report results
 	std::string const errMessages(oss.str());

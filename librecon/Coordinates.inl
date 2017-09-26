@@ -26,73 +26,35 @@
 //
 //
 
-#ifndef prob_Coordinates_INCL_
-#define prob_Coordinates_INCL_
 
 /*! \file
-\brief Declarations for prob::Coordinates
+\brief Inline definitions for recon::Coordinates
 */
 
 
-#include "libga/ga.h"
 
-#include <array>
-#include <string>
-#include <vector>
-
-
-namespace prob
+namespace recon
 {
 
-/*! \brief Operations on independent coordinate (components).
-
-\par Example
-\dontinclude testprob/uCoordinates.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
-
-class Coordinates
+template <typename FwdIter>
+void
+Coordinates :: addPoints
+	( FwdIter const & beg
+	, FwdIter const & end
+	)
 {
-	std::array<std::vector<double>, 3u> theComps;
+	// update reserved size
+	size_t const moreSize{ (size_t)std::distance(beg, end) };
+	size_t const nextSize{ theComps[0].size() + moreSize };
+	theComps[0].reserve(nextSize);
+	theComps[1].reserve(nextSize);
+	theComps[2].reserve(nextSize);
 
-public: // methods
+	for (FwdIter iter{beg} ; end != iter ; ++iter)
+	{
+		addPoint(*iter);
+	}
+}
 
-	//! default null constructor
-	Coordinates
-		() = default;
-
-	//! Construct with reserved size
-	explicit
-	Coordinates
-		( size_t const & estSize
-		);
-
-	//! Incorporate coordinates from pnt
-	void
-	addPoint
-		( ga::Vector const & pnt
-		);
-
-	//! Incorporate collection of points
-	template <typename FwdIter>
-	void
-	addPoints
-		( FwdIter const & beg
-		, FwdIter const & end
-		);
-
-	//! Point comprised of individual coordinate medians
-	ga::Vector
-	pointAtMedians
-		() const;
-
-}; // Coordinates
-
-} // prob
-
-// Inline definitions
-#include "libprob/Coordinates.inl"
-
-#endif // prob_Coordinates_INCL_
+} // recon
 

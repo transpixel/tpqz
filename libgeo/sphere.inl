@@ -41,19 +41,19 @@ namespace sphere
 inline
 double
 azimuthOf
-	( ga::Vector const & cubedir
+	( ga::Vector const & dir
 	)
 {
-	return math::atan2(cubedir[1], cubedir[0]);
+	return math::atan2(dir[1], dir[0]);
 }
 
 inline
 double
 zenithOf
-	( ga::Vector const & cubedir
+	( ga::Vector const & dir
 	)
 {
-	return std::acos(cubedir[2]);
+	return std::acos(dir[2]);
 }
 
 inline

@@ -53,18 +53,18 @@ namespace geo
 
 namespace sphere
 {
-	//! Azimuth of cubedir
+	//! Azimuth of dir
 	inline
 	double
 	azimuthOf
-		( ga::Vector const & cubedir
+		( ga::Vector const & dir
 		);
 
-	//! Zenith angle of cubedir
+	//! Zenith angle of dir
 	inline
 	double
 	zenithOf
-		( ga::Vector const & cubedir
+		( ga::Vector const & dir
 		);
 
 	//! Direction from polar coordinates

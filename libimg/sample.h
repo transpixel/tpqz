@@ -102,7 +102,7 @@ namespace sample
 		, dat::RowCol const & cornerBR //!< *Ex*clusive
 		);
 
-	//! Extract samples from regions of image that overlap in cubemap
+	//! Extract samples from outer border region of grid
 	template <typename PixType>
 	inline
 	std::vector<PixType>

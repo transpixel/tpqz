@@ -74,7 +74,7 @@ struct EigenWrapper
 		( Eigen::Matrix<double, DimRow, DimCol> const & emat
 		);
 
-	//! Value construct row vector with initializer-list syntax
+	//! Value construct column (Nx1) vector with initializer-list syntax
 	inline
 	explicit
 	EigenWrapper

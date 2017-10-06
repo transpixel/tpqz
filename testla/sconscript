@@ -57,6 +57,6 @@ env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('uEigenWrapper.cpp')
+env.Program('ueigen.cpp')
 
 

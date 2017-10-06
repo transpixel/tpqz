@@ -96,34 +96,20 @@ la_eigen_test1
 	constexpr size_t high{ 5u };
 	constexpr size_t wide{ 7u };
 
+	// grid as source for Eigen library operations
 	dat::grid<ElemType> const expGrid{ rcGrid<ElemType>(high, wide, 10.) };
 
-	/*
-	// cast to fixed size eigen matrix
-	using EMatrixFixed = typename Eigen::Matrix
-		<ElemType, (int)high, (int)wide, Eigen::RowMajor>;
-	Eigen::Map<EMatrixFixed const> const gotFix(expGrid.begin(), high, wide);
-	io::out() << "gotFix:\n" << gotFix << std::endl;
-	*/
-
-	/*
-	// cast to dynamic size eigen matrix
-	using EMatrixDyna = typename Eigen::Matrix
-		<ElemType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-	Eigen::Map<EMatrixDyna const> const gotDyn
-		(expGrid.begin(), expGrid.high(), expGrid.wide());
-	io::out() << "gotDyn:\n" << gotDyn << std::endl;
-	*/
-
-	// cast to Eigen readonly interpretation
-	la::eigen::ConstMap<ElemType> const gotEM{ la::eigen::withGrid(expGrid) };;
-
-	// cast to Eigen writeable interpretation
+	// grid as sink for Eigen library operations
 	dat::grid<ElemType> gotGrid(expGrid.hwSize()); // NOTE! Must allocate here
 	std::fill(gotGrid.begin(), gotGrid.end(), dat::nullValue<ElemType>());
+
+	// access source via Eigen readonly operations
+	la::eigen::ConstMap<ElemType> const gotEM{ la::eigen::withGrid(expGrid) };;
+
+	// access sink via Eigen write operations
 	la::eigen::WriteMap<ElemType> putEM{ la::eigen::withGrid(&gotGrid) };
 
-	// perform eigen library operation
+	// perform eigen library manipulations
 	putEM = gotEM;
 
 	// check if operations succeeded

@@ -36,6 +36,10 @@ if showSconsProgress :
 
 env = env.Clone() # allow module to change anything it wants
 
+cpppaths = \
+	[ '/usr/include/eigen3/Eigen/'
+	]
+
 libpaths = \
 	[ '../libga/'
 
@@ -48,9 +52,11 @@ linklibs = \
 	, 'io'
 	]
 
+env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('demoFitRigid.cpp')
 env.Program('uAligner.cpp')
 env.Program('uconstructs.cpp')
 env.Program('uderivative.cpp')

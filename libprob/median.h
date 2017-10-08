@@ -26,52 +26,60 @@
 //
 //
 
-#ifndef cloud_geo_INCL_
-#define cloud_geo_INCL_
+#ifndef prob_median_INCL_
+#define prob_median_INCL_
 
 /*! \file
-\brief Declarations for cloud::geo
+\brief Declarations for prob::median
 */
 
 
-#include "libga/Rigid.h"
-#include "libgeo/Ray.h"
+#include "libdat/validity.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <vector>
 
 
-namespace cloud
+namespace prob
 {
 
-/*! \brief Functions relating to cloud geometry
+/*! \brief Functions related to median values.
 
 \par Example
-\dontinclude testcloud/ugeo.cpp
+\dontinclude testprob/umedian.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-namespace geo
+namespace median
 {
-	//! Nominal probe motion axis in binary cloud frame
-	::geo::Ray const &
-	axisInBinCloud
-		();
 
-	//! Attitude of cloud .bin file frame w.r.t. reference frame
-	ga::Pose const &
-	poseCloudWrtRef
-		();
+	//! Median value for non-const inputs: NOTE: changes the input data!!
+	template <typename FwdIter, typename DataType = double>
+	inline
+	DataType
+	valueFromNonConst
+		( FwdIter const & beg //!< (*it) must have op<()
+		, FwdIter const & end
+		);
 
-	//! Orientation of cloud .bin file frame w.r.t. reference frame
-	ga::Rigid const &
-	xformCloudWrtRef
-		();
+	//! Median value of collection - NOTE: makes COPY of data!
+	template <typename FwdIter, typename DataType = double>
+	inline
+	DataType
+	valueFromConst
+		( FwdIter const & beg //!< (*it) must have op<()
+		, FwdIter const & end
+		);
 
-}
+} // median
 
-}
+} // prob
 
 // Inline definitions
-// #include "libcloud/geo.inl"
+#include "libprob/median.inl"
 
-#endif // cloud_geo_INCL_
+#endif // prob_median_INCL_
 

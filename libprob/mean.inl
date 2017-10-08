@@ -28,72 +28,36 @@
 
 
 /*! \file
-\brief Definitions for geo::Coordinates
+\brief Inline definitions for prob::mean
 */
 
 
-#include "libgeo/Coordinates.h"
-
-#include "libprob/Stats.h"
-
-#include <sstream>
-
-
-namespace
+namespace prob
 {
-	inline
-	double
-	medianFor
-		( std::vector<double> const & comps
-		)
-	{
-		return prob::Stats::medianValue(comps.begin(), comps.end());
-	}
-}
-
-
-namespace geo
+namespace mean
 {
 
-// explicit
-Coordinates :: Coordinates
-	( size_t const & estSize
-	)
-	: theComps{{}}
-{
-	theComps[0].reserve(estSize);
-	theComps[1].reserve(estSize);
-	theComps[2].reserve(estSize);
-}
-
-void
-Coordinates :: addPoint
-	( ga::Vector const & pnt
+template <typename FwdIter, typename DataType>
+inline
+DataType
+arithmetic
+	( FwdIter const & beg
+	, FwdIter const & end
 	)
 {
-	if (pnt.isValid())
+	DataType mean(dat::nullValue<DataType>());
+	if (beg != end)
 	{
-		theComps[0].emplace_back(pnt[0]);
-		theComps[1].emplace_back(pnt[1]);
-		theComps[2].emplace_back(pnt[2]);
+		DataType const sum
+			(std::accumulate(beg, end, static_cast<DataType>(0)));
+		size_t const numSamps(std::distance(beg, end));
+		mean = (1./(double)numSamps) * sum;
 	}
-}
-
-ga::Vector
-Coordinates :: componentMedianPoint
-	() const
-{
-	ga::Vector pnt{};
-	double const xMed(medianFor(theComps[0]));
-	double const yMed(medianFor(theComps[1]));
-	double const zMed(medianFor(theComps[2]));
-	if (dat::isValid(xMed) && dat::isValid(yMed) && dat::isValid(zMed))
-	{
-		pnt = ga::Vector(xMed, yMed, zMed);
-	}
-	return pnt;
+	return mean;
 }
 
 
-} // geo
+} // mean
+
+} // prob
 

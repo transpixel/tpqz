@@ -55,13 +55,13 @@ namespace cloud
 
 namespace convert
 {
-	//! Convert point information to display grid
+	//! Convert point information to display grid via outFromPoint transform
 	template <typename OutType, typename OutFunc>
 	dat::grid<OutType>
 	gridVisualization
 		( dat::grid<NdxType> const & ndxGrid
-		, std::vector<cloud::FixedPoint> const & fpntsInCube
-		, OutFunc const & outFromPoint //!< OutType(ga::Vector)
+		, std::vector<cloud::FixedPoint> const & fpnts
+		, OutFunc const & outFromPoint //!< OutType::op()(ga::Vector)
 		, OutType const & backValue = {}
 		)
 	{
@@ -80,7 +80,7 @@ namespace convert
 			if (dat::isValid(ndx))
 			{
 				// hack data relative to test22 run
-				ga::Vector const point(cloud::cast::Vector(fpntsInCube[ndx]));
+				ga::Vector const point(cloud::cast::Vector(fpnts[ndx]));
 
 				outVal = outFromPoint(point);
 

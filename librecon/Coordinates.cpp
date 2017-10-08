@@ -26,61 +26,74 @@
 //
 //
 
-#ifndef geo_sphere_INCL_
-#define geo_sphere_INCL_
 
 /*! \file
-\brief Declarations for geo::sphere
+\brief Definitions for recon::Coordinates
 */
 
 
-#include "libga/ga.h"
-#include "libmath/math.h"
+#include "librecon/Coordinates.h"
 
-#include <cmath>
+#include "libprob/median.h"
+
+#include <sstream>
 
 
-namespace geo
+namespace
 {
-
-/*! \brief Functions relevant to operations involving a sphere.
-
-\par Example
-\dontinclude testgeo/usphere.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
-
-namespace sphere
-{
-	//! Azimuth of dir
 	inline
 	double
-	azimuthOf
-		( ga::Vector const & dir
-		);
-
-	//! Zenith angle of dir
-	inline
-	double
-	zenithOf
-		( ga::Vector const & dir
-		);
-
-	//! Direction from polar coordinates
-	inline
-	ga::Vector
-	directionFromAZ
-		( double const & azim
-		, double const & zenith
-		);
-
+	medianFor
+		( std::vector<double> const & comps
+		)
+	{
+		return prob::median::valueFromConst(comps.begin(), comps.end());
+	}
 }
 
+
+namespace recon
+{
+
+// explicit
+Coordinates :: Coordinates
+	( size_t const & estSize
+	)
+	: theComps{{}}
+{
+	theComps[0].reserve(estSize);
+	theComps[1].reserve(estSize);
+	theComps[2].reserve(estSize);
 }
 
-// Inline definitions
-#include "libgeo/sphere.inl"
+void
+Coordinates :: addPoint
+	( ga::Vector const & pnt
+	)
+{
+	if (pnt.isValid())
+	{
+		theComps[0].emplace_back(pnt[0]);
+		theComps[1].emplace_back(pnt[1]);
+		theComps[2].emplace_back(pnt[2]);
+	}
+}
 
-#endif // geo_sphere_INCL_
+ga::Vector
+Coordinates :: pointAtMedians
+	() const
+{
+	ga::Vector pnt{};
+	double const xMed(medianFor(theComps[0]));
+	double const yMed(medianFor(theComps[1]));
+	double const zMed(medianFor(theComps[2]));
+	if (dat::isValid(xMed) && dat::isValid(yMed) && dat::isValid(zMed))
+	{
+		pnt = ga::Vector(xMed, yMed, zMed);
+	}
+	return pnt;
+}
+
+
+} // recon
 

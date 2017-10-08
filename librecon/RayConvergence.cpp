@@ -28,16 +28,16 @@
 
 
 /*! \file
-\brief Definitions for geo::RayConvergence
+\brief Definitions for recon::RayConvergence
 */
 
 
-#include "libgeo/RayConvergence.h"
+#include "librecon/RayConvergence.h"
 
-#include "libgeo/Coordinates.h"
 #include "libgeo/intersect.h"
 #include "libgeo/stats.h"
 #include "libmath/math.h"
+#include "librecon/Coordinates.h"
 
 #include <cmath>
 #include <iterator>
@@ -71,7 +71,7 @@ namespace
 
 			// brute force combinatorial intersection
 			size_t const numCombo{ (math::sq(numRays) - numRays)/2u };
-			geo::Coordinates coords(2u*numCombo);
+			recon::Coordinates coords(2u*numCombo);
 			for (FwdIter it1{rayBeg} ; rayEnd != it1 ; ++it1)
 			{
 				geo::Ray const & ray1 = *it1;
@@ -103,7 +103,7 @@ namespace
 				}
 			}
 			// use independent coordinate median as estimated robust location
-			pnt = coords.componentMedianPoint();
+			pnt = coords.pointAtMedians();
 		}
 
 		return pnt;
@@ -158,7 +158,7 @@ namespace
 }
 
 
-namespace geo
+namespace recon
 {
 
 // explicit
@@ -242,5 +242,5 @@ RayConvergence :: infoString
 }
 
 
-} // geo
+} // recon
 

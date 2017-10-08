@@ -88,7 +88,7 @@ public: // methods
 		return (theEnd != theIter);
 	}
 
-	//! RowCol expression of current iterator value
+	//! Expanded vector expression of fixed point at current iterator position
 	inline
 	ga::Vector
 	vectorPoint

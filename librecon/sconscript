@@ -35,40 +35,5 @@ if showSconsProgress :
 	print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
 
 env = env.Clone() # allow module to change anything it wants
-
-libpaths = \
-	[ '../libprob/'
-
-	, '../libga/'
-	, '../libmath/'
-
-	, '../libdat/'
-	, '../libio/'
-	]
-
-linklibs = \
-	[ 'prob'
-
-	, 'ga'
-	, 'math'
-
-	, 'dat'
-	, 'io'
-	]
-
-env.Append(LIBS=linklibs)
-env.Append(LIBPATH=libpaths)
-
-
-env.Program('uCdfForward.cpp')
-env.Program('uCdfInverse.cpp')
-env.Program('udistro.cpp')
-env.Program('uFrac9.cpp')
-env.Program('uhisto.cpp')
-env.Program('uHistogram.cpp')
-env.Program('uprob.cpp')
-env.Program('uRemapper.cpp')
-env.Program('uSampleStats.cpp')
-env.Program('uStats.cpp')
-
+env.StaticLibrary (modname, Glob('*.cpp'))
 

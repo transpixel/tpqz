@@ -26,65 +26,51 @@
 //
 //
 
-#ifndef prob_Coordinates_INCL_
-#define prob_Coordinates_INCL_
+#ifndef prob_mean_INCL_
+#define prob_mean_INCL_
 
 /*! \file
-\brief Declarations for prob::Coordinates
+\brief Declarations for prob::mean
 */
 
 
-#include "libga/ga.h"
+#include "libdat/validity.h"
 
-#include <array>
-#include <string>
-#include <vector>
+#include <algorithm>
+#include <iterator>
 
 
 namespace prob
 {
 
-/*! \brief Operations on independent coordinate (components).
+/*! \brief Functions related to mean value.
 
 \par Example
-\dontinclude testprob/uCoordinates.cpp
+\dontinclude testprob/umean.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class Coordinates
+namespace mean
 {
-	std::array<std::vector<double>, 3u> theComps;
-
-public: // methods
-
-	//! default null constructor
-	Coordinates
-		() = default;
-
-	//! Construct with reserved size
-	explicit
-	Coordinates
-		( size_t const & estSize
+	//! (Arithemetic) Average value of collection
+	template <typename FwdIter, typename DataType = double>
+	inline
+	DataType
+	arithmetic
+		( FwdIter const & beg //!< (*it) must be convertable to double
+		, FwdIter const & end
 		);
 
-	//! Incorporate coordinates from pnt
-	void
-	addPoint
-		( ga::Vector const & pnt
-		);
+	// geometric
+	// harmonic
 
-	//! Point comprised of individual coordinate medians
-	ga::Vector
-	componentMedianPoint
-		() const;
-
-}; // Coordinates
+} // mean
 
 } // prob
 
 // Inline definitions
-// #include "libprob/Coordinates.inl"
+#include "libprob/mean.inl"
 
-#endif // prob_Coordinates_INCL_
+#endif // prob_mean_INCL_
 

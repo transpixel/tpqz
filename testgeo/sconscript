@@ -73,7 +73,6 @@ env.Program('uio.cpp')
 env.Program('uLineSeg.cpp')
 env.Program('uPlane.cpp')
 env.Program('uProbRay.cpp')
-env.Program('uRayConvergence.cpp')
 env.Program('uRay.cpp')
 env.Program('ustats.cpp')
 

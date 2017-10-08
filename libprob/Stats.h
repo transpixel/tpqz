@@ -63,36 +63,6 @@ public: // data
 
 public: // methods
 
-	//! (Arithemetic) Average value of collection
-	template <typename FwdIter, typename DataType = double>
-	inline
-	static
-	DataType
-	meanValue
-		( FwdIter const & beg //!< (*it) must be convertable to double
-		, FwdIter const & end
-		);
-
-	//! Median value for non-const inputs: NOTE: changes the input data!!
-	inline
-	static
-	double
-	nonConstMedianValue
-		( std::vector<double> * const & ptVec
-		);
-
-	//! Median value of collection
-	template <typename FwdIter, typename DataType = double>
-	inline
-	static
-	DataType
-	medianValue
-		( FwdIter const & beg //!< (*it) must be convertable to double
-		, FwdIter const & end
-		);
-
-public: // methods
-
 	//! default null constructor
 	Stats
 		();

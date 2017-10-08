@@ -26,81 +26,73 @@
 //
 //
 
-#ifndef geo_RayConvergence_INCL_
-#define geo_RayConvergence_INCL_
+#ifndef recon_Coordinates_INCL_
+#define recon_Coordinates_INCL_
 
 /*! \file
-\brief Declarations for geo::RayConvergence
+\brief Declarations for recon::Coordinates
 */
 
 
-#include "libgeo/Ray.h"
 #include "libga/ga.h"
 
-#include <limits>
+#include <array>
 #include <string>
 #include <vector>
 
 
-namespace geo
+namespace recon
 {
 
-/*! \brief Collection of rays assumed to intersect at a common point
+/*! \brief Operations on independent coordinate (components).
 
 \par Example
-\dontinclude testgeo/uRayConvergence.cpp
+\dontinclude testrecon/uCoordinates.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class RayConvergence
+class Coordinates
 {
-
-	std::vector<geo::Ray> theRays{};
+	std::array<std::vector<double>, 3u> theComps;
 
 public: // methods
 
 	//! default null constructor
-	RayConvergence
+	Coordinates
 		() = default;
 
-	//! Value ctor
+	//! Construct with reserved size
 	explicit
-	RayConvergence
-		( std::vector<geo::Ray> const & rays
+	Coordinates
+		( size_t const & estSize
 		);
 
-	//! Check if instance is valid
-	bool
-	isValid
+	//! Incorporate coordinates from pnt
+	void
+	addPoint
+		( ga::Vector const & pnt
+		);
+
+	//! Incorporate collection of points
+	template <typename FwdIter>
+	void
+	addPoints
+		( FwdIter const & beg
+		, FwdIter const & end
+		);
+
+	//! Point comprised of individual coordinate medians
+	ga::Vector
+	pointAtMedians
 		() const;
 
-	//! Robustly estimated intersection point
-	ga::Vector
-	robustPoint
-		( double const minAngle = { 1./8. }
-		, std::vector<double> * const & ptGapMags = nullptr
-		) const;
+}; // Coordinates
 
-	//! Intersection of rays that approach trialPoint within tolerance
-	ga::Vector
-	meanNearTo
-		( ga::Vector const & evalPoint = {} //!< if null, use robustPoint()
-		, double const & maxRejTol = std::numeric_limits<double>::max()
-		) const;
-
-	//! Descriptive information about this instance.
-	std::string
-	infoString
-		( std::string const & title = std::string()
-		) const;
-
-}; // RayConvergence
-
-} // geo
+} // recon
 
 // Inline definitions
-// #include "libgeo/RayConvergence.inl"
+#include "librecon/Coordinates.inl"
 
-#endif // geo_RayConvergence_INCL_
+#endif // recon_Coordinates_INCL_
 

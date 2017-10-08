@@ -54,16 +54,16 @@ namespace eigen
 {
 	//! Dynamically allocated eigen matrix
 	template <typename ElemType>
-		using EMatDynaRowMajor = typename Eigen::Matrix
+		using Matrix_t = typename Eigen::Matrix
 			<ElemType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
 	//! Behaves like Eigen::Matrix with readonly data content
 	template <typename ElemType>
-		using ConstMap = Eigen::Map<EMatDynaRowMajor<ElemType> const>;
+		using ConstMap = Eigen::Map<Matrix_t<ElemType> const>;
 
 	//! Behaves like Eigen::Matrix with writeable data content
 	template <typename ElemType>
-		using WriteMap = Eigen::Map<EMatDynaRowMajor<ElemType> >;
+		using WriteMap = Eigen::Map<Matrix_t<ElemType> >;
 
 
 	/*! Eigen::Matrix compatible readonly access to grid

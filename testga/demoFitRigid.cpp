@@ -107,9 +107,9 @@ namespace
 		)
 	{
 		static std::vector<ga::Vector> const xlocs
-			{ ga::Vector(  10.,  0.,   0.)
-			, ga::Vector(   0., 10.,   0.)
-			, ga::Vector(   0.,  0.,  10.)
+			{ ga::Vector( 10.,   0.,   0.)
+			, ga::Vector(  0.,  10.,   0.)
+			, ga::Vector(  0.,   0.,  10.)
 			};
 		std::vector<ga::Vector> ylocs;
 		ylocs.reserve(xlocs.size());
@@ -253,21 +253,25 @@ namespace
 		size_t const numDim{ matA.high() };
 		assert(numDim == matA.wide());
 
+		constexpr bool debug{ false };
+		constexpr bool checkKernel{ true };
+
 		la::eigen::ConstMap<double> const eA{ la::eigen::withGrid(matA) };
 		Eigen::EigenSolver<la::eigen::Matrix_t<double> > solver(eA);
 
-		/*
-		io::out()
-			<< "evals:"
-			<< "  nrows: " << solver.eigenvalues().rows()
-			<< "  ncols: " << solver.eigenvalues().cols()
-			<< std::endl;
-		io::out()
-			<< "evecs:"
-			<< "  nrows: " << solver.eigenvectors().rows()
-			<< "  ncols: " << solver.eigenvectors().cols()
-			<< std::endl;
-		*/
+		if (debug)
+		{
+			io::out()
+				<< "evals:"
+				<< "  nrows: " << solver.eigenvalues().rows()
+				<< "  ncols: " << solver.eigenvalues().cols()
+				<< std::endl;
+			io::out()
+				<< "evecs:"
+				<< "  nrows: " << solver.eigenvectors().rows()
+				<< "  ncols: " << solver.eigenvectors().cols()
+				<< std::endl;
+		}
 
 		std::vector<std::pair<double, size_t> > magNdxs;
 		magNdxs.reserve(numDim);
@@ -277,28 +281,37 @@ namespace
 			double const mag{ std::abs(eval) };
 			magNdxs.emplace_back(std::make_pair(mag, kk));
 
-			/*
-			io::out() << "eval: " << eval;
-			io::out() << "   evec: ";
-			for (size_t jj{0u} ; jj < (size_t)eA.cols() ; ++jj)
+			if (debug)
 			{
-				std::complex<double> const & foo = solver.eigenvectors()(jj,kk);
-				io::out() << "   " << foo;
+				io::out() << "eval: " << eval;
+				io::out() << "   evec: ";
+				for (size_t jj{0u} ; jj < (size_t)eA.cols() ; ++jj)
+				{
+					std::complex<double> const & foo
+						= solver.eigenvectors()(jj,kk);
+					io::out() << "   " << foo;
+				}
+				io::out() << std::endl;
 			}
-			io::out() << std::endl;
-			*/
 		}
 
 		// TODO - can be replaced with linear complexity algorithm
 		std::sort(magNdxs.begin(), magNdxs.end());
-		assert(1u < magNdxs.size());
-		double const & mag0 = magNdxs[0].first;
-		double const & mag1 = magNdxs[1].first;
-		double const & magN = magNdxs[numDim - 1u].first;
 
-		constexpr double pad{ 1024. };
-		double const tol{ magN * pad * std::numeric_limits<double>::epsilon() };
-		if ((mag0 < tol) && (tol < mag1))
+		bool cleanKernel{ true };
+		if (checkKernel)
+		{
+			assert(1u < magNdxs.size());
+			double const & mag0 = magNdxs[0].first;
+			double const & mag1 = magNdxs[1].first;
+			double const & magN = magNdxs[numDim - 1u].first;
+
+			constexpr double pad{ 1024. };
+			double const tol
+				{ magN * pad * std::numeric_limits<double>::epsilon() };
+			cleanKernel = ((mag0 < tol) && (tol < mag1));
+		}
+		if (cleanKernel)
 		{
 			size_t const & minNdx = magNdxs[0].second;
 			soln.resize(numDim);
@@ -306,7 +319,10 @@ namespace
 			{
 				soln[kk] = solver.eigenvectors().col(minNdx)(kk,0).real();
 			}
-			// io::out() << infoString(soln, "soln") << '\n';
+			if (debug)
+			{
+				io::out() << infoString(soln, "soln") << '\n';
+			}
 		}
 		else
 		{
@@ -471,6 +487,7 @@ main
 		ga::Rigid const gotRigid(gotVec, ga::Pose(gotRot.thePhysA));
 
 		// display results
+		io::out() << std::endl;
 		io::out() << dat::infoString(expRot, "expRot") << std::endl;
 		io::out() << dat::infoString(gotRot, "gotRot") << std::endl;
 

@@ -48,20 +48,23 @@
 
 namespace ro
 {
-
-/*! Parameters for symmetric orientation
+/*! \brief Parameters for symmetric orientation.
  *
  * NOTE: Function model is (ref RO.lyx)
  *
- *   Phi: p1*E23 + p2*E31 - a3*E12
- * Theta: t1*E23 + t2*E31 + a3*E12   // alpha3 == -theta[2]
+ * \arg   Phi: Phi1*E23 + Phi2*E31 - Alpha3*E12
+ * \arg Theta: Theta1*E23 + Theta2*E31 + Alpha3*E12
+ *
+ * Where alpha3 is the shared value, i.e. (alpha3 == Theta3 == -Phi3)
  *    
- *    f(phi,theta) = < B * (epG * u * enG) * (epH * v * enH) >
- *    where
- *    epG = exp(-.5*Phi)
- *    epH = exp(-.5*Theta)
- *    enG = epG.reverse()
- *    enH = epH.reverse()
+ * The function model is:
+ * - f(phi,theta) = B * (epG * u * enG) * (epH * v * enH) = 0
+ *
+ * Where:
+ * - epG = exp(-.5*Phi)
+ * - epH = exp(-.5*Theta)
+ * - enG = epG.reverse()
+ * - enH = epH.reverse()
  *
 */
 
@@ -73,7 +76,7 @@ struct ArgsBaseZ
 		{{ dat::nullValue<double>(), dat::nullValue<double>() }};
 	double theAlpha3{ dat::nullValue<double>() };
 
-	//! shorter name for math::principalAngle()
+	//! Shorter name for math::principalAngle()
 	inline
 	static
 	double
@@ -84,9 +87,16 @@ struct ArgsBaseZ
 		return math::principalAngle(angle);
 	}
 
+	//! Create a invalid instance
 	ArgsBaseZ
 		() = default;
 
+	/*! \brief Construct from independent station angles.
+	 *
+	 * Note that the arguments overspecify the problem. The resulting
+	 * "Alpha3" parameter is set to the average magnitude of the provided
+	 * +theta[2] and -phi[2] values.
+	 */
 	explicit
 	ArgsBaseZ
 		( ga::BiVector const & phi
@@ -112,6 +122,7 @@ struct ArgsBaseZ
 		assert(dat::nearlyEquals(sumA3, 0., fuzzyTol));
 	}
 
+	//! Direct value construction.
 	explicit
 	ArgsBaseZ
 		( std::array<double, 5u> const & pptta

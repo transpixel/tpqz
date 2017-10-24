@@ -40,8 +40,11 @@
 namespace img
 {
 
-//! Pixel type definitions
+//
+// Pixel type definitions
+//
 
+//! Classic unsigned 8-bit pixel value
 class UPix8
 {
 	std::array<uint8_t, 3> theChans;
@@ -100,7 +103,7 @@ public: // methods
 		) const;
 };
 
-
+//! Floating point pixel value -- using img::fpix_t
 class FPix
 {
 	std::array<fpix_t, 3> theChans;

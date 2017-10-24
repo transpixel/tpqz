@@ -87,10 +87,12 @@ ga_Rigid_test1
 	{
 		using namespace ga;
 
+		//! [ExampleCode]
 		Vector const station(-7., 5., 11.);
 		BiVector const pAngle(.625*math::pi * unit(BiVector(17., -19., 23.)));
 		Rigid const xForward(station, Pose(pAngle));
 		Rigid const xInverse(xForward.inverse());
+		//! [ExampleCode]
 
 		Spinor const spinR(exp(.5 * pAngle));
 		Vector const vecFrom(-17., 27., 5.);

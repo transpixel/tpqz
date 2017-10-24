@@ -41,6 +41,7 @@
 namespace sen
 {
 
+//! Namespace for sensing colors (radiometric characteristics)
 namespace color
 {
 	//! Functor for color sensing
@@ -55,6 +56,7 @@ namespace color
 	};
 }
 
+//! Namespace for sensing distance to target ("ranging")
 namespace range
 {
 	//! Functor for range sensing
@@ -69,6 +71,7 @@ namespace range
 	};
 }
 
+//! Namespace for sensing spatial locations.
 namespace point
 {
 	//! Functor for range sensing

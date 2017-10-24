@@ -37,7 +37,7 @@
 
 namespace ga
 {
-	//! Functions for internal library use -- not part of public interface
+	//! Private utilities for ga::operators implementations
 	namespace priv
 	{
 		//! Sum of corresponding components

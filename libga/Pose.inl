@@ -34,6 +34,7 @@ namespace ga
 {
 //======================================================================
 
+//! Private utilities for ga::Pose implementations
 namespace priv
 {
 	inline

@@ -49,6 +49,7 @@ namespace sample
 {
 //======================================================================
 
+//! Private utilities for img::sample implementations
 namespace priv
 {
 	//! Range clipped to be within bounds

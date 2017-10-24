@@ -88,6 +88,7 @@ CircleTab<Value> :: CircleTab
 {
 }
 
+//! Private utilities for math::CircleTab implementations
 namespace priv
 {
 	//! True if p1.first < p2.first

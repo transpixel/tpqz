@@ -41,7 +41,7 @@
 namespace sys
 {
 
-// A thread-safe finite resource counter
+//! A thread-safe finite resource counter.
 class Utilization
 {
 	std::mutex theMutex{};

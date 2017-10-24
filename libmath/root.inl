@@ -37,6 +37,7 @@ namespace math
 namespace root
 {
 
+//! Private utilities for math::root implementations
 namespace priv
 {
 	// true if one is negative and the other positive

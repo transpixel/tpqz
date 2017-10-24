@@ -47,7 +47,7 @@
 
 \par General Concept:
 
-Extends standar library operations with useful special case capabilities.
+Extends standard library operations with useful special case capabilities.
 
 \par Special Notes:
 
@@ -62,10 +62,10 @@ Extends standar library operations with useful special case capabilities.
 */
 namespace math
 {
-	// factor to allow for numeric round-off
+	//! Factor to allow for numeric round-off
 	constexpr double eps(256.*std::numeric_limits<double>::epsilon());
 
-	/*! Separation (aka distance, magnitude) between two values.
+	/*! \brief Separation (aka distance, magnitude) between two values.
 	 *
 	 * NOTE: if separation is too large to represent in type
 	 *       the return type is nullValue<SType>().

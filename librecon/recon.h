@@ -26,71 +26,26 @@
 //
 //
 
-#ifndef sen_funcSenseOp_INCL_
-#define sen_funcSenseOp_INCL_
+#ifndef recon_recon_INCL_
+#define recon_recon_INCL_
 
 /*! \file
-\brief Declarations for sen::funcSenseOp
+\brief Declarations for recon::recon
 */
 
 
-#include "libmodel/atom.h"
-#include "libmodel/Part.h"
-
-
-namespace sen
+/*! \brief Functions and classes for reconstruction operations.
+ *
+ * Includes various "robust" reconstruction methods that require support
+ * from a wide variety of other library/capabilities.
+ *
+ */
+namespace recon
 {
-
-//! Namespace for sensing colors (radiometric characteristics)
-namespace color
-{
-	//! Functor for color sensing
-	struct SenseOp
-	{
-		inline
-		model::atom::Color
-		operator()
-			( model::Part const & partInSen
-			, geo::Ray const & rayInSen
-			) const;
-	};
-}
-
-//! Namespace for sensing distance to target ("ranging")
-namespace range
-{
-	//! Functor for range sensing
-	struct SenseOp
-	{
-		inline
-		model::atom::Range
-		operator()
-			( model::Part const & partInSen
-			, geo::Ray const & rayInSen
-			) const;
-	};
-}
-
-//! Namespace for sensing spatial locations.
-namespace point
-{
-	//! Functor for range sensing
-	struct SenseOp
-	{
-		inline
-		model::atom::Point
-		operator()
-			( model::Part const & partInSen
-			, geo::Ray const & rayInSen
-			) const;
-	};
-}
-
-
-}
+} // recon
 
 // Inline definitions
-#include "libsen/funcSenseOp.inl"
+// #include "librecon/recon.inl"
 
-#endif // sen_funcSenseOp_INCL_
+#endif // recon_recon_INCL_
 

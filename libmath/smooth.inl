@@ -43,6 +43,7 @@ namespace smooth
 {
 //======================================================================
 
+//! Private utilities for math::smooth implementations
 namespace priv
 {
 	//! Weight values for a triangle shaped window

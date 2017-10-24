@@ -43,12 +43,10 @@
 namespace ga
 {
 
-/*! \brief Classic rigid body transformation (offset and attitude)
+/*! \brief Classic rigid body transformation (offset and attitude).
 
 \par Example
-\dontinclude testga/uRigid.cpp
-\skip ExampleStart
-\until ExampleEnd
+\snippet testga/uRigid.cpp ExampleCode
 */
 
 class Rigid

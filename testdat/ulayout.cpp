@@ -62,6 +62,7 @@ dat_layout_test0
 	return oss.str();
 }
 
+//! Test-case namespace.
 namespace center
 {
 	//! Test that expected values are as expected

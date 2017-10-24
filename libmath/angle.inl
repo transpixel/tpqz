@@ -198,6 +198,7 @@ angleFraction
 	return frac;
 }
 
+//! Private utilities for math::angle implementations
 namespace priv
 {
 	using Vec2 = std::array<double, 2u>;

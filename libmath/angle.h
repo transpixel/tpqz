@@ -119,7 +119,7 @@ namespace math
 		, double const sinx
 		);
 
-	/*! Angles represent the same rotation within tolerance.
+	/*! \brief Angles represent the same rotation within tolerance.
 	 *
 	 * Comparison ignores both phase wrap and phase discontinuity.
 	 */
@@ -131,7 +131,7 @@ namespace math
 		, double const cordTol //!< [unit] cord-length on unit circle
 		);
 
-	/*! Fraction of rotation beg/end interval from angleBeg to angleAt
+	/*! \brief Fraction of rotation beg/end interval from angleBeg to angleAt.
 	 *
 	 * Note: the angles are adjusted (by 2*pi increments) until the
 	 *       adjusted values satisfy the relationship

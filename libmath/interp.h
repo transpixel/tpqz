@@ -54,7 +54,6 @@ namespace math
 \skip ExampleStart
 \until ExampleEnd
 */
-
 namespace interp
 {
 	//! Weighted combination of two values

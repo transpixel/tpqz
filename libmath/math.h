@@ -47,7 +47,7 @@
 
 \par General Concept:
 
-Extends standar library operations with useful special case capabilities.
+Extends standard library operations with useful special case capabilities.
 
 \par Special Notes:
 

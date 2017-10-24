@@ -43,13 +43,8 @@
 #include <utility>
 
 
-/*! \brief Functions supporting interpolation of values.
+// Functions supporting interpolation of values.
 
-\par Example
-\dontinclude testmath/uangle.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
 namespace math
 {
 	//! Value of -i*ln(-1)

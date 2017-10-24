@@ -36,6 +36,7 @@ namespace ga
 //======================================================================
 	// Useful constructions using geometric algebra and algorithms.
 
+//! Private utilities for ga::constructs implementations
 namespace priv
 {
 	inline

@@ -44,6 +44,7 @@
 namespace dat
 {
 
+//! Private utilities for dat::info implementations
 namespace priv
 {
 	//! Configure stream for floating point output

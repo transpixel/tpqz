@@ -42,6 +42,7 @@ namespace dat
 namespace io
 {
 
+//! Private utilities for dat::io implementations
 namespace priv
 {
 	//! Number of bytes to expect for binary I/O

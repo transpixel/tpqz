@@ -48,6 +48,7 @@ namespace trans
 //======================================================================
 
 
+//! Private utilities for trans::RangeMap implementations
 namespace priv
 {
 	static std::function<double(double const &)> const nullMapper

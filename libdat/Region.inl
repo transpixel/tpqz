@@ -43,6 +43,7 @@ namespace dat
 {
 //======================================================================
 
+//! Private utilities for dat::Region implementations
 namespace priv
 {
 	//! Cast pairs to dat::Range instances

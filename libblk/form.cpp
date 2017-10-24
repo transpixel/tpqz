@@ -52,6 +52,7 @@ namespace blk
 namespace form
 {
 
+//! Private utilities for blk::form implementations
 namespace priv
 {
 	struct Node

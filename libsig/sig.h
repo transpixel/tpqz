@@ -55,7 +55,7 @@ Terminology for this module includes:
 \par Positions
 
 \arg _Location_: dat::RowCol: identify Elem in Full - classic (row,col) indexing
-\arg _Spot: dat::Spot: Location within 2D signal with sub-Elem precision.
+\arg _Spot_: dat::Spot: Location within 2D signal with sub-Elem precision.
 
 \par Regions
 

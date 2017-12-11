@@ -77,6 +77,7 @@ math_CircleTab_test1a
 	return oss.str();
 }
 
+	/*
 	std::string
 	afString
 		( double const & angle
@@ -84,13 +85,14 @@ math_CircleTab_test1a
 		)
 	{
 		std::ostringstream oss;
-//		oss << std::fixed << std::setprecision(3);
+	//	oss << std::fixed << std::setprecision(3);
 		oss
 			<< " " << std::setw(10) << angle
 			<< " " << std::setw(10) << func(angle)
 			;
 		return oss.str();
 	}
+	*/
 
 
 //! Check management of angle phase wrap

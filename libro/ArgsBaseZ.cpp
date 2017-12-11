@@ -282,6 +282,8 @@ namespace
 		}
 	};
 
+// #define EnableDebug
+#	if defined EnableDebug
 	// for debugging
 	//! Save a collection of values to data file
 	void
@@ -305,6 +307,7 @@ namespace
 				<< std::endl;
 		}
 	}
+#	endif
 
 	//! Return the kappa value with smallest kappa-deviation RMS value
 	double
@@ -398,7 +401,9 @@ ArgsBaseZ :: from
 		// configure merit function for evaluating anti-symmetric quality
 		KappaMetric const meritFunc
 			{ KappaMetric::from(roPairInRef, bHat) };
-		// saveMeritValues(meritFunc);
+#		if defined EnableDebug
+		saveMeritValues(meritFunc);
+#		endif
 
 		// find free parameter (kappa) value for which satisfies merit func
 		std::vector<Bracket> const brackets{ rootBrackets(meritFunc) };

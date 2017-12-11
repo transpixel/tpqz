@@ -105,19 +105,6 @@ PairBaseZ :: parmRMS
 		);
 }
 
-namespace // move somewhere?
-{
-	double
-	scalarTripleProduct
-		( ga::Vector const & aa
-		, ga::Vector const & bb
-		, ga::Vector const & cc
-		)
-	{
-		return ga::dot(aa, ga::cross(bb, cc)).theValue;
-	}
-}
-
 std::array<double, 5u>
 PairBaseZ :: parmValues
 	() const

@@ -442,6 +442,7 @@ sig_filter_test2
 	return oss.str();
 }
 
+	/*
 	//! grid with bias removed
 	dat::grid<double>
 	unbiasedFrom
@@ -460,6 +461,7 @@ sig_filter_test2
 		*ptBias = bias;
 		return unbiased;
 	}
+	*/
 
 //! Check SSD bias compensation
 std::string

@@ -64,6 +64,7 @@ geo_ProbRay_test0
 	return oss.str();
 }
 
+	/*
 	geo::Ray
 	someRay
 		()
@@ -73,6 +74,7 @@ geo_ProbRay_test0
 		geo::Ray const ray(start, dir);
 		return ray;
 	}
+	*/
 
 	math::Partition
 	somePart
@@ -85,6 +87,8 @@ geo_ProbRay_test0
 		return part;
 	}
 
+//#define EnableDebugInfo
+#	if defined EnableDebugInfo
 	void
 	saveDistProbs
 		( geo::ProbRay const & probRay
@@ -106,6 +110,7 @@ geo_ProbRay_test0
 				<< std::endl;
 		}
 	}
+#	endif
 
 
 //! Check fundamental ray operations std::string
@@ -147,7 +152,9 @@ geo_ProbRay_test1
 	}
 
 	// save to file e.g. for debugging
-	// saveDistProbs(probRay, "prob.dat");
+#	if defined EnableDebugInfo
+	saveDistProbs(probRay, "prob.dat");
+#	endif
 
 	return oss.str();
 }
@@ -260,7 +267,9 @@ geo_ProbRay_test3
 	}
 
 	// save to file e.g. for debugging
-	// saveDistProbs(probRay, "prob.dat");
+#	if defined EnableDebugInfo
+	saveDistProbs(probRay, "prob.dat");
+#	endif
 
 	return oss.str();
 }
@@ -325,7 +334,9 @@ geo_ProbRay_test4
 	}
 
 	// save to file e.g. for debugging
-	// saveDistProbs(probRay, "prob.dat");
+#	if defined EnableDebugInfo
+	saveDistProbs(probRay, "prob.dat");
+#	endif
 
 	return oss.str();
 }

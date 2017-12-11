@@ -60,6 +60,7 @@ prob_CdfForward_test0
 	return oss.str();
 }
 
+#	if defined HasBeenFixed
 //! Check general functions
 std::string
 prob_CdfForward_test1
@@ -118,8 +119,10 @@ prob_CdfForward_test1
 
 	return oss.str();
 }
+#	endif
 
 
+#	if defined HasBeenFixed
 //! Check cdf operations
 std::string
 prob_CdfForward_test2
@@ -150,6 +153,7 @@ prob_CdfForward_test2
 
 	return oss.str();
 }
+#	endif
 
 //! Check construction with empty data
 std::string
@@ -247,10 +251,12 @@ main
 	std::ostringstream oss;
 
 	// run tests
-//	oss << prob_CdfForward_test0();
-//	oss << prob_CdfForward_test1();
-//	oss << prob_CdfForward_test2();
-//	oss << prob_CdfForward_test3();
+	oss << prob_CdfForward_test0();
+#	if defined HasBeenFixed
+	oss << prob_CdfForward_test1(); // * needs resolution
+	oss << prob_CdfForward_test2(); // * needs resolution
+#	endif
+	oss << prob_CdfForward_test3();
 	oss << prob_CdfForward_test4();
 
 	// check/report results

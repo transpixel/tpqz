@@ -32,22 +32,22 @@ Import('modname')
 
 Import('showSconsProgress')
 if showSconsProgress :
-	print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
+ print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
 
 env = env.Clone() # allow module to change anything it wants
 
 libpaths = \
-	[ '../libmem/'
+ [ '../libmem/'
 
-	, '../libio/'
+ , '../libio/'
 
-	]
+ ]
 
 linklibs = \
-	[ 'mem'
+ [ 'mem'
 
-	, 'io'
-	]
+ , 'io'
+ ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)

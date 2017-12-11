@@ -32,41 +32,41 @@ Import('modname')
 
 Import('showSconsProgress')
 if showSconsProgress :
-	print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
+ print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
 
 env = env.Clone() # allow module to change anything it wants
 
 libpaths = \
-	[ '../libtri/'
+ [ '../libtri/'
 
-	, '../libgeo/'
-	, '../libga/'
-	, '../libprob/'
-	, '../libmath/'
+ , '../libgeo/'
+ , '../libga/'
+ , '../libprob/'
+ , '../libmath/'
 
-	, '../libio/'
+ , '../libio/'
 
-	, '../libapp/'
-#	, '../libmem/'
-	, '../libdat/'
-#	, '../libsys/'
-	]
+ , '../libapp/'
+# , '../libmem/'
+ , '../libdat/'
+# , '../libsys/'
+ ]
 
 linklibs = \
-	[ 'tri'
+ [ 'tri'
 
-	, 'geo'
-	, 'ga'
-	, 'prob'
-	, 'math'
+ , 'geo'
+ , 'ga'
+ , 'prob'
+ , 'math'
 
-	, 'io'
+ , 'io'
 
-	, 'app'
-#	, 'mem'
-	, 'dat'
-#	, 'sys'
-	]
+ , 'app'
+# , 'mem'
+ , 'dat'
+# , 'sys'
+ ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)

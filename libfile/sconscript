@@ -33,13 +33,13 @@ Import('modname')
 
 Import('showSconsProgress')
 if showSconsProgress :
-	print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
+ print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
 
 env = env.Clone() # allow module to change anything it wants
 
 cpppaths = \
-	[ '/usr/include/boost/'
-	]
+ [ '/usr/include/boost/'
+ ]
 
 env.Append(CPPPATH=cpppaths)
 

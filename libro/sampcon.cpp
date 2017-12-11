@@ -320,6 +320,7 @@ namespace
 		}
 	};
 
+	/*
 	//! True if value is in array
 	bool
 	contains
@@ -338,6 +339,7 @@ namespace
 		}
 		return found;
 	}
+	*/
 
 	//! RMS gap value computed using ALL measurements - true if ptSoln modified
 	bool

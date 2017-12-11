@@ -430,6 +430,7 @@ roPairPerturbations
 		}
 	};
 
+#	if defined(SaveData)
 	void
 	updateTracking
 		( dat::grid<TrackStat> * const & ptGrid
@@ -439,7 +440,9 @@ roPairPerturbations
 	{
 		(*ptGrid)(rowcol)(value);
 	}
+#	endif
 
+#	if defined(SaveData)
 	void
 	saveTracking
 		( dat::grid<TrackStat> const & grid
@@ -471,6 +474,7 @@ roPairPerturbations
 			}
 		}
 	}
+#	endif
 
 	//! emperically determined tolerance for 45-deg maxTweak
 	double

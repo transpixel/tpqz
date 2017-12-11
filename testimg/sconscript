@@ -32,33 +32,33 @@ Import('modname')
 
 Import('showSconsProgress')
 if showSconsProgress :
-	print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
+ print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
 
 env = env.Clone() # allow module to change anything it wants
 
 cpppaths = \
-	[ '/usr/include/opencv2/'
-	]
+ [ '/usr/include/opencv2/'
+ ]
 
 libpaths = \
-	[ '../libimg/'
-	, '../libprob/'
-	, '../libio/'
-	, '../libmath/'
-	, '../libdat/'
-	]
+ [ '../libimg/'
+ , '../libprob/'
+ , '../libio/'
+ , '../libmath/'
+ , '../libdat/'
+ ]
 
 linklibs = \
-	[ 'img'
-	, 'prob'
-	, 'io'
-	, 'math'
-	, 'dat'
+ [ 'img'
+ , 'prob'
+ , 'io'
+ , 'math'
+ , 'dat'
 
-	, 'opencv_highgui'
-	, 'opencv_imgproc'
-	, 'opencv_core'
-	]
+ , 'opencv_highgui'
+ , 'opencv_imgproc'
+ , 'opencv_core'
+ ]
 
 env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)

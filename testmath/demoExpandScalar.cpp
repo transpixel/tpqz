@@ -127,6 +127,7 @@ namespace
 	}
 	*/
 
+	/*
 	bool
 	isValidMag
 		( double const & value
@@ -139,6 +140,7 @@ namespace
 		}
 		return isPos;
 	}
+	*/
 
 	/* --- Decision w/o involving other values
 	bool

@@ -68,6 +68,7 @@ ro_sampcon_test0
 	return oss.str();
 }
 
+	/*
 	//! Save directions as rays in model space
 	void
 	savePntDeltas
@@ -97,7 +98,9 @@ ro_sampcon_test0
 			}
 		}
 	}
+	*/
 
+	/*
 	void
 	savePoints
 		( std::ostream & oss
@@ -117,7 +120,9 @@ ro_sampcon_test0
 			}
 		}
 	}
+	*/
 
+	/*
 	//! Save directions as rays in model space
 	void
 	saveModelRays
@@ -139,7 +144,9 @@ ro_sampcon_test0
 			savePoints(ofs, uvPntPairs);
 		}
 	}
+	*/
 
+	/*
 	//! Save directions as rays in model space
 	void
 	saveModelRaysIn0
@@ -152,7 +159,9 @@ ro_sampcon_test0
 		ga::Rigid const ori2{ anRO.rigid2w0() };
 		saveModelRays(uvPairs, ori1, ori2, name);
 	}
+	*/
 
+	/*
 	//! Save directions as rays in model space
 	void
 	saveModelRaysIn1
@@ -165,6 +174,7 @@ ro_sampcon_test0
 		ga::Rigid const ori2{ anRO.rigid2w1() };
 		saveModelRays(uvPairs, ori1, ori2, name);
 	}
+	*/
 
 	//! Short named-function to create unit vector
 	ga::Vector

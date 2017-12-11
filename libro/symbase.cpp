@@ -201,6 +201,7 @@ namespace symbase
 			return attPair;
 		}
 
+		/*
 		std::string
 		bivInfoString
 			( std::pair<ga::Pose, ga::Pose> const & attPair
@@ -217,6 +218,7 @@ namespace symbase
 				;
 			return oss.str();
 		}
+		*/
 			
 		//! Orientation pair in symmetric base frame
 		std::pair<ga::Rigid, ga::Rigid>

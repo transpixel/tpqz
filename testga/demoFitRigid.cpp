@@ -61,6 +61,7 @@ namespace
 		return pairs.first.size();
 	}
 
+	/*
 	std::string
 	infoString
 		( PairOfSet const & pairPnts
@@ -82,6 +83,7 @@ namespace
 
 		return oss.str();
 	}
+	*/
 
 	std::string
 	infoString

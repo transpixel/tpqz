@@ -141,6 +141,7 @@ sig_match_test0
 		return oss.str();
 	}
 
+#	if defined HasBeenFixed
 	bool
 	isWhatever
 		( double const & val
@@ -148,7 +149,9 @@ sig_match_test0
 	{
 		return dat::nearlyEquals(val, static_cast<double>(sWhatever));
 	}
+#	endif
 
+	/*
 	bool
 	isPartnull
 		( double const & val
@@ -156,7 +159,9 @@ sig_match_test0
 	{
 		return dat::nearlyEquals(val, static_cast<double>(sPartnull));
 	}
+	*/
 
+#	if defined HasBeenFixed
 	int
 	compare
 		( double const & exp
@@ -170,7 +175,9 @@ sig_match_test0
 		}
 		return same;
 	}
+#	endif
 
+#	if defined HasBeenFixed
 	dat::grid<int>
 	scoreDiff
 		( dat::grid<double> const & gridExp
@@ -210,8 +217,10 @@ sig_match_test0
 		}
 		return sameGrid;
 	}
+#	endif
 
 
+#	if defined HasBeenFixed
 //! Check check scoring grid computations
 std::string
 sig_match_test1
@@ -326,6 +335,7 @@ io::out() << infoString<double>(gotScoreMax, "gotScoreMax") << '\n';
 oss << "Failure: implement this test!" << std::endl;
 	return oss.str();
 }
+#	endif
 
 
 }
@@ -341,7 +351,9 @@ main
 
 	// run tests
 	oss << sig_match_test0();
-//	oss << sig_match_test1();
+#	if defined HasBeenFixed
+	oss << sig_match_test1();
+#	endif
 
 	// check/report results
 	std::string const errMessages(oss.str());

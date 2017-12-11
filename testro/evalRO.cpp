@@ -46,6 +46,7 @@
 
 namespace
 {
+	/*
 	std::string
 	infoString
 		( std::vector<ga::Vector> const & vecs
@@ -60,6 +61,7 @@ namespace
 		}
 		return oss.str();
 	}
+	*/
 
 	ga::BiVector
 	spinAngleFrom

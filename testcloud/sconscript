@@ -32,7 +32,7 @@ Import('modname')
 
 Import('showSconsProgress')
 if showSconsProgress :
-	print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
+ print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
 
 env = env.Clone() # allow module to change anything it wants
 
@@ -42,37 +42,37 @@ cpppaths = ''
 #	]
 
 libpaths = \
-    [ '../libcloud/'
+ [ '../libcloud/'
 
-    , '../libimg/'
-    , '../libgeo/'
-    , '../libga/'
-    , '../libmath/'
+ , '../libimg/'
+ , '../libgeo/'
+ , '../libga/'
+ , '../libmath/'
 
-    , '../libapp/'
-    , '../libio/'
-    , '../libdat/'
-    ]
+ , '../libapp/'
+ , '../libio/'
+ , '../libdat/'
+ ]
 
 linklibs = \
-    [ 'cloud'
+ [ 'cloud'
 
-    , 'img'
-    , 'geo'
-    , 'ga'
-    , 'math'
+ , 'img'
+ , 'geo'
+ , 'ga'
+ , 'math'
 
-    , 'app'
-    , 'io'
-    , 'dat'
+ , 'app'
+ , 'io'
+ , 'dat'
 
-    , 'opencv_highgui'
-    , 'opencv_imgproc'
-    , 'opencv_core'
+ , 'opencv_highgui'
+ , 'opencv_imgproc'
+ , 'opencv_core'
 
-#    , 'libboost_filesystem'
-#    , 'libboost_system'
-    ]
+# , 'libboost_filesystem'
+# , 'libboost_system'
+  ]
 
 
 env.Append(CPPPATH=cpppaths)

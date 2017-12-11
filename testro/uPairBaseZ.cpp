@@ -359,6 +359,7 @@ ro_PairBaseZ_test2
 	return oss.str();
 }
 
+	/*
 	//! Generate a spectrum of corresponding direction pairs
 	std::vector<ro::PairUV>
 	simPairUVs
@@ -382,7 +383,9 @@ ro_PairBaseZ_test2
 		}
 		return uvPairs;
 	}
+	*/
 
+	/*
 	// True if RO agrees with all uvPairs
 	bool
 	checkTriple
@@ -402,6 +405,7 @@ ro_PairBaseZ_test2
 		}
 		return okay;
 	}
+	*/
 
 //! Check multiple solutions
 std::string

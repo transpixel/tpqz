@@ -191,6 +191,11 @@ else :
   , CPPFLAGS = OptionCppFlags
   )
 
+# Note: Import TERM for gcc color reporting
+#       If using colorgcc: apparently also need PATH and HOME per:
+#       https://bitbucket.org/scons/scons/wiki/ColorGcc
+env['ENV']['TERM'] = os.environ['TERM']
+
 # configure common default build vars
 env.Append(CPPPATH = incPath)
 env.Append(LIBPATH = libpaths)

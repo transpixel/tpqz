@@ -43,6 +43,7 @@ cpppaths = \
 libpaths = \
  [ '../libsig/'
  , '../libimg/'
+ , '../libprob/'
  , '../libmath/'
  , '../libio/'
  , '../libapp/'
@@ -53,6 +54,7 @@ libpaths = \
 linklibs = \
  [ 'sig'
  , 'img'
+ , 'prob'
  , 'math'
  , 'io'
  , 'app'
@@ -68,6 +70,7 @@ env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('demoProbMax.cpp')
 env.Program('uFilterContext.cpp')
 env.Program('ufilter.cpp')
 env.Program('umatch.cpp')

@@ -59,50 +59,92 @@ sig_Peak_test0
 	return oss.str();
 }
 
-//! Check finding for a simple, well-defined peak
+//! Check degenerate cases
 std::string
-sig_Peak_test1
+sig_Peak_test1a
 	()
 {
 	std::ostringstream oss;
 
 	// check stress case - constant data
-	{
-		dat::grid<double> grid(17u, 19u);
-		std::fill(grid.begin(), grid.end(), -3.);
-		sig::Peak const gotPeak(sig::Peak::fromGrid(grid));
+	dat::grid<double> grid(17u, 19u);
+	std::fill(grid.begin(), grid.end(), -3.);
+	sig::Peak const gotPeak(sig::Peak::fromGrid(grid));
 
-		// should have zero quality
-		if (0. < gotPeak.prominenceRank())
-		{
-			oss << "Failure of (non)peak for flat data test" << std::endl;
-		}
+	// should have zero quality
+	if (0. < gotPeak.prominenceRank())
+	{
+		oss << "Failure of (non)peak for flat data test" << std::endl;
 	}
 
+	return oss.str();
+}
+
+//! Check finding for a simple, well-defined peak
+std::string
+sig_Peak_test1b
+	()
+{
+	std::ostringstream oss;
+
+	dat::grid<double> grid(50u, 60u);
+	std::fill(grid.begin(), grid.end(), 1.);
+	dat::RowCol const expPeakRC{{ 17u, 23u }};
+	grid(expPeakRC) = 2.;
+
+	dat::Spot const expPeakSpot
+		{{ double(expPeakRC[0]), double(expPeakRC[1]) }};
+	sig::Peak const gotPeak(sig::Peak::fromGrid(grid));
+
+	if (! (0. < gotPeak.prominenceRank()))
 	{
-		dat::grid<double> grid(50u, 60u);
-		std::fill(grid.begin(), grid.end(), 1.);
-		dat::RowCol const expPeakRC{{ 17u, 23u }};
-		grid(expPeakRC) = 2.;
+		oss << "Failure of delta-spike prominenceRank test" << std::endl;
+		oss << dat::infoString(gotPeak, "gotPeak") << std::endl;
+	}
 
-		dat::Spot const expPeakSpot
-			{{ double(expPeakRC[0]), double(expPeakRC[1]) }};
-		sig::Peak const gotPeak(sig::Peak::fromGrid(grid));
+	dat::Spot const gotPeakSpot(sig::Peak::fitSpotFor(grid, gotPeak));
+	if (! dat::nearlyEquals(gotPeakSpot, expPeakSpot))
+	{
+		oss << "Failure of delta-spike test" << std::endl;
+		oss << dat::infoString(expPeakSpot, "expPeakSpot") << std::endl;
+		oss << dat::infoString(gotPeakSpot, "gotPeakSpot") << std::endl;
+	}
 
-		if (! (0. < gotPeak.prominenceRank()))
-		{
-			oss << "Failure of delta-spike prominenceRank test" << std::endl;
-			oss << dat::infoString(gotPeak, "gotPeak") << std::endl;
-		}
+	return oss.str();
+}
 
-		dat::Spot const gotPeakSpot(sig::Peak::fitSpotFor(grid, gotPeak));
-		if (! dat::nearlyEquals(gotPeakSpot, expPeakSpot))
-		{
-			oss << "Failure of delta-spike test" << std::endl;
-			oss << dat::infoString(expPeakSpot, "expPeakSpot") << std::endl;
-			oss << dat::infoString(gotPeakSpot, "gotPeakSpot") << std::endl;
-		}
 
+//! Check peak at edge
+std::string
+sig_Peak_test2
+	()
+{
+	std::ostringstream oss;
+
+	// generate data
+	dat::grid<double> grid(50u, 60u);
+	std::iota(grid.begin(), grid.end(), 0.);
+	dat::RowCol const expPeakRC{{ grid.high()-1u, grid.wide()-1u }};
+
+	// find initial peak
+	constexpr size_t useRadius{ 10u };
+	sig::Peak const gotPeak(sig::Peak::fromGrid(grid, useRadius));
+	dat::RowCol const & gotPeakRC = gotPeak.theBestRowCol;
+	if (! dat::nearlyEquals(gotPeakRC, expPeakRC))
+	{
+		oss << "Failuire of corner-peak RC test" << std::endl;
+		oss << dat::infoString(expPeakRC, "expPeakRC") << std::endl;
+		oss << dat::infoString(gotPeakRC, "gotPeakRC") << std::endl;
+	}
+
+	dat::Spot const expPeakSpot(dat::cast::Spot(expPeakRC));
+	dat::Spot const gotPeakSpot{ sig::Peak::fitSpotFor(grid, gotPeak) };
+	double const spotTol{ 15./16. };
+	if (! dat::nearlyEquals(gotPeakSpot, expPeakSpot, spotTol))
+	{
+		oss << "Failuire of corner-peak fit-spot test" << std::endl;
+		oss << dat::infoString(expPeakSpot, "expPeakSpot") << std::endl;
+		oss << dat::infoString(gotPeakSpot, "gotPeakSpot") << std::endl;
 	}
 
 	return oss.str();
@@ -122,7 +164,9 @@ main
 
 	// run tests
 	oss << sig_Peak_test0();
-	oss << sig_Peak_test1();
+	oss << sig_Peak_test1a();
+	oss << sig_Peak_test1b();
+	oss << sig_Peak_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

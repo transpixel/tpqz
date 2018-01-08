@@ -46,10 +46,22 @@ namespace sig
 
 namespace
 {
+	//! Cast of 'floor' value for positive number
+	inline
+	size_t
+	ndxFor
+		( double const & dval
+		)
+	{
+		assert(! (dval < 0.));
+		return static_cast<size_t>(std::floor(dval));
+	}
+
 	//! Collection of row/col values within minRadius of centerSpot
 	std::vector<dat::RowCol>
 	nearbyRowCols
 		( dat::Spot const & centerSpot
+		, dat::Extents const & hwDomain
 		, double const & minRadius
 		)
 	{
@@ -59,12 +71,24 @@ namespace
 		using dat::operator-;
 		using dat::operator+;
 		dat::Spot const delta{{ minRadius, minRadius }};
+		constexpr dat::Spot const oneElem{{ 1., 1. }};
 		dat::Spot const spotUL(centerSpot - delta);
-		dat::Spot const spotBR(centerSpot + delta);
-		size_t const rowBeg{ size_t(std::floor(spotUL[0])) };
-		size_t const colBeg{ size_t(std::floor(spotUL[1])) };
-		size_t const rowEnd{ size_t(std::ceil(spotBR[0])) };
-		size_t const colEnd{ size_t(std::ceil(spotBR[1])) };
+		dat::Spot const spotBR(centerSpot + delta + oneElem);
+
+		size_t const rowBeg{ ndxFor(std::max(spotUL[0], 0.)) };
+		size_t const colBeg{ ndxFor(std::max(spotUL[1], 0.)) };
+		size_t const rowEnd{ std::min(ndxFor(spotBR[0]), hwDomain.high()) };
+		size_t const colEnd{ std::min(ndxFor(spotBR[1]), hwDomain.wide()) };
+
+		/*
+		dat::RowCol const rcBeg{{ rowBeg, colBeg }};
+		dat::RowCol const rcEnd{{ rowEnd, colEnd }};
+		io::out() << "nearbyRowCols" << std::endl;
+		io::out() << dat::infoString(hwDomain, "hwDomain") << std::endl;
+		io::out() << dat::infoString(centerSpot, "centerSpot") << std::endl;
+		io::out() << dat::infoString(rcBeg, "rcBeg") << std::endl;
+		io::out() << dat::infoString(rcEnd, "rcEnd") << std::endl;
+		*/
 
 		rowcols.reserve((rowEnd-rowBeg) * (colEnd-colBeg));
 
@@ -280,7 +304,7 @@ Peak :: fromGrid
 		// get locations near to center
 		dat::Spot const bestSpot(dat::cast::Spot(rcBest));
 		std::vector<dat::RowCol> const hoodRCs
-			(nearbyRowCols(bestSpot, usePeakRadius));
+			(nearbyRowCols(bestSpot, scoreGrid.hwSize(), usePeakRadius));
 
 		// extract neighbors ordered by rank 
 		tmp.theHoodRadius = usePeakRadius;
@@ -332,7 +356,7 @@ namespace
 
 		// get locations near to center
 		std::vector<dat::RowCol> const rowcols
-			(nearbyRowCols(centerSpot, usePeakRadius));
+			(nearbyRowCols(centerSpot, scoreGrid.hwSize(), usePeakRadius));
 
 		// accumulate score-weighted sums of nearby locations
 		double sumRowW{ 0. };

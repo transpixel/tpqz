@@ -54,7 +54,8 @@ namespace sample
 		( dat::RowCol const & rowcol
 		, dat::Extents const & bounds
 		, size_t const & deltaNeg
-		, size_t const & deltaPos = dat::nullValue<size_t>() //! use pos+1
+		, size_t const & deltaPos = dat::nullValue<size_t>()
+			//!< if null, then use neg+1
 		);
 
 	//! Collection of areaAround() instances
@@ -64,7 +65,8 @@ namespace sample
 		( std::vector<dat::RowCol> const & rowcols
 		, dat::Extents const & bounds
 		, size_t const & deltaNeg
-		, size_t const & deltaPos = dat::nullValue<size_t>() //! use pos+1
+		, size_t const & deltaPos = dat::nullValue<size_t>()
+			//!< if null, then use neg+1
 		);
 
 	//! Cumulative area of all sample areas

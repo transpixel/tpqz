@@ -58,7 +58,7 @@ namespace priv
 	boundedRange
 		( size_t const & center
 		, size_t const & deltaNeg
-		, size_t const & deltaPos
+		, size_t const & deltaPos //!< if null, use neg+1
 		, size_t const & maxValue
 		)
 	{
@@ -67,7 +67,13 @@ namespace priv
 		{
 			min = center - deltaNeg;
 		}
-		size_t const max{ std::min(maxValue, center+deltaPos) };
+		// interpret default argument
+		size_t dPos{ deltaPos };
+		if (! dat::isValid(dPos))
+		{
+			dPos = deltaNeg + 1u;
+		}
+		size_t const max{ std::min(maxValue, center+dPos) };
 		return dat::Range<size_t>{ min, max };
 	}
 }
@@ -107,17 +113,9 @@ areasAround
 {
 	std::vector<dat::Area<size_t> > areas;
 	areas.reserve(rowcols.size());
-
-	// interpret default argument
-	size_t dPos{ deltaPos };
-	if (! dat::isValid(dPos))
-	{
-		dPos = deltaNeg + 1u;
-	}
-
 	for (dat::RowCol const & rowcol : rowcols)
 	{
-		areas.emplace_back(areaAround(rowcol, bounds, deltaNeg, dPos));
+		areas.emplace_back(areaAround(rowcol, bounds, deltaNeg, deltaPos));
 	}
 	return areas;
 }

@@ -170,13 +170,33 @@ public: // methods
 	//! Value after removal of offset
 	std::array<UType, 2u>
 	operator()
-		( std::array<SType, 2u> const & inArray
+		( SType const & inVal0
+		, SType const & inVal1
 		) const
 	{
 		return
-			{{ theUSO[0](inArray[0])
-			 , theUSO[1](inArray[1])
+			{{ theUSO[0](inVal0)
+			 , theUSO[1](inVal1)
 			}};
+	}
+
+
+	//! Value after removal of offset
+	std::array<UType, 2u>
+	operator()
+		( std::array<SType, 2u> const & inArray
+		) const
+	{
+		return operator()(inArray[0], inArray[1]);
+	}
+
+	//! Value after removal of offset
+	std::array<UType, 2u>
+	operator()
+		( std::pair<SType, SType> const & inPair
+		) const
+	{
+		return operator()(inPair.first, inPair.second);
 	}
 
 	//! Descriptive information about this instance.

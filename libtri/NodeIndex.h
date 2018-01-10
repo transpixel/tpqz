@@ -26,11 +26,11 @@
 //
 //
 
-#ifndef tri_NodeCache_INCL_
-#define tri_NodeCache_INCL_
+#ifndef tri_NodeIndex_INCL_
+#define tri_NodeIndex_INCL_
 
 /*! \file
-\brief Declarations for tri::NodeCache
+\brief Declarations for tri::NodeIndex
 */
 
 
@@ -47,23 +47,23 @@ namespace tri
 /*! \brief Remap tritille (I,J) NodeKeys to scalar index
 
 \par Example
-\dontinclude testtri/uNodeCache.cpp
+\dontinclude testtri/uNodeIndex.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class NodeCache
+class NodeIndex
 {
 
 public: // methods
 
 	//! default null constructor
-	NodeCache
+	NodeIndex
 		() = default;
 
 	//! Allocate enough space for all notes in active domain.
 	explicit
-	NodeCache
+	NodeIndex
 		( tri::IsoTille const & // trinet
 		)
 	{
@@ -118,12 +118,12 @@ public: // methods
 		return oss.str();
 	}
 
-}; // NodeCache
+}; // NodeIndex
 
 } // tri
 
 // Inline definitions
-// #include "libtri/NodeCache.inl"
+// #include "libtri/NodeIndex.inl"
 
-#endif // tri_NodeCache_INCL_
+#endif // tri_NodeIndex_INCL_
 

@@ -27,11 +27,11 @@
 //
 
 /*! \file
-\brief  This file contains unit test for tri::NodeCache
+\brief  This file contains unit test for tri::NodeIndex
 */
 
 
-#include "libtri/NodeCache.h"
+#include "libtri/NodeIndex.h"
 
 #include "libtri/IsoTille.h"
 
@@ -51,11 +51,11 @@ namespace
 
 //! Check for common functions
 std::string
-tri_NodeCache_test0
+tri_NodeIndex_test0
 	()
 {
 	std::ostringstream oss;
-	tri::NodeCache const aNull{};
+	tri::NodeIndex const aNull{};
 	if (dat::isValid(aNull))
 	{
 		oss << "Failure of null value test" << std::endl;
@@ -66,7 +66,7 @@ tri_NodeCache_test0
 
 //! Check simple cache
 std::string
-tri_NodeCache_test1
+tri_NodeIndex_test1
 	()
 {
 	std::ostringstream oss;
@@ -80,7 +80,7 @@ tri_NodeCache_test1
 		{ tri::IsoTille::genericTille(xRange, yRange, xDelta, yDelta) };
 
 	// create cache
-	tri::NodeCache cache(trinet);
+	tri::NodeIndex cache(trinet);
 	size_t const numNodes{ cache.size() };
 	if (! (0u < numNodes))
 	{
@@ -134,7 +134,7 @@ tri_NodeCache_test1
 
 }
 
-//! Unit test for tri::NodeCache
+//! Unit test for tri::NodeIndex
 int
 main
 	( int const /*argc*/
@@ -144,8 +144,8 @@ main
 	std::ostringstream oss;
 
 	// run tests
-	oss << tri_NodeCache_test0();
-	oss << tri_NodeCache_test1();
+	oss << tri_NodeIndex_test0();
+	oss << tri_NodeIndex_test1();
 
 	// check/report results
 	std::string const errMessages(oss.str());

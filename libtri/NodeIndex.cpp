@@ -26,79 +26,70 @@
 //
 //
 
-#ifndef tri_NodeIndex_INCL_
-#define tri_NodeIndex_INCL_
 
 /*! \file
-\brief Declarations for tri::NodeIndex
+\brief Definitions for tri::NodeIndex
 */
 
 
-#include "libdat/Offset2D.h"
-#include "libtri/IsoTille.h"
+#include "libtri/NodeIndex.h"
 
-#include <string>
+#include <sstream>
+
+#include "libio/stream.h" // TODO
 
 
 namespace tri
 {
 
-/*! \brief Remap tritille (I,J) NodeKeys to scalar index
-
-\par Example
-\dontinclude testtri/uNodeIndex.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
-
-class NodeIndex
+// explicit
+NodeIndex :: NodeIndex
+	( tri::IsoTille const & trinet
+	)
 {
-	dat::Offset2D<size_t, long> theOffset2D{};
+	// determine extents of trinet node keys
+	tri::IsoGeo const & trigeo = trinet.theTileGeo;
+	dat::Area<NodeNdxType> const ijArea
+		{ trigeo.ijAreaForTileArea
+			( trigeo.tileAreaForRefArea(trinet.theDomain.areaBounds())
+			)
+		};
+	io::out() << dat::infoString(ijArea, "ijArea") << std::endl;
+}
 
-public: // methods
+bool
+NodeIndex :: isValid
+	() const
+{
+	return false;
+}
 
-	//! default null constructor
-	NodeIndex
-		() = default;
+size_t
+NodeIndex :: size
+	() const
+{
+	return {}; // TODO
+}
 
-	//! Allocate enough space for all notes in active domain.
-	explicit
-	NodeIndex
-		( tri::IsoTille const & trinet
-		);
-
-	//! True if instance is valid
-	bool
-	isValid
-		() const;
-
-	//! Size for collection to be addressed by indexForNodeKey() values
-	size_t
-	size
-		() const;
-
-	//! Index(offset) into an assumed external container
-	inline
-	size_t
-	indexForNodeKey
-		( NodeKey const & // keyIJ
-		) const
+std::string
+NodeIndex :: infoString
+	( std::string const & title
+	) const
+{
+	std::ostringstream oss;
+	if (! title.empty())
 	{
-		return {};
+		oss << title << std::endl;
 	}
-
-	//! Descriptive information about this instance.
-	std::string
-	infoString
-		( std::string const & title = std::string()
-		) const;
-
-}; // NodeIndex
+	if (isValid())
+	{
+	}
+	else
+	{
+		oss << " <null>";
+	}
+	return oss.str();
+}
 
 } // tri
-
-// Inline definitions
-// #include "libtri/NodeIndex.inl"
-
-#endif // tri_NodeIndex_INCL_
 

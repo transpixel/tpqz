@@ -44,6 +44,22 @@
 namespace tri
 {
 
+// static
+IsoTille
+IsoTille :: genericTille
+	( dat::Range<double> const & xRange
+	, dat::Range<double> const & yRange
+	, double const & xDelta
+	, double const & yDelta
+	)
+{
+	dat::Area<double> xyArea{ xRange, yRange };
+	Domain const xyDomain{ xyArea };
+	IsoGeo::Vec2D const xDir{{ 1., 0. }};
+	IsoGeo const trigeo(xDelta, yDelta, xDir);
+	return IsoTille(trigeo, xyDomain);
+}
+
 // explicit
 IsoTille :: IsoTille
 	( tri::IsoGeo const & geometry

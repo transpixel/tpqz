@@ -81,47 +81,53 @@ tri_NodeCache_test1
 
 	// create cache
 	tri::NodeCache cache(trinet);
+	size_t const numNodes{ cache.size() };
+	if (! (0u < numNodes))
+	{
+		oss << "Failure of size test" << std::endl;
+	}
 
 	using NodeValue = float;
-	std::map<tri::NodeKey, NodeValue> valueMap;
 
-	// fill storage
-	size_t const numNodes{ cache.size() };
+	// allocate data store
+	std::vector<NodeValue> nodeItems(numNodes);
+	NodeValue const nullItem{ dat::nullValue<NodeValue>() };
+	std::fill(nodeItems.begin(), nodeItems.end(), nullItem);
+
+	// use map lookup to check
+	std::map<tri::NodeKey, NodeValue> keyItemMap;
+
+	// fill storage using cache index lookup
 	NodeValue value{ 0.f };
 	for (size_t nn{0u} ; nn < numNodes ; ++nn)
 	{
 		for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
 		{
 			tri::NodeKey const keyIJ{ iter.nodeKey() };
-			cache.setValue(keyIJ, value);
-			valueMap[keyIJ] = value;
+			nodeItems[cache.indexForNodeKey(keyIJ)] = value;
+			keyItemMap[keyIJ] = value;
 			value += 1.f;
 		}
 	}
 
-	// retrieve
+	// check if all storage nodes have been set and are correct
 	size_t errCount{ 0u };
-	for (size_t nn{0u} ; nn < numNodes ; ++nn)
+	for (NodeValue const & nodeItem : nodeItems)
 	{
-		for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
+		if (! dat::isValid(nodeItem))
 		{
-			tri::NodeKey const keyIJ{ iter.nodeKey() };
-			NodeValue const & gotValue = cache.valueAt(keyIJ);
-			std::map<tri::NodeKey, NodeValue>::const_iterator
-				const itFind{ valueMap.find(keyIJ) };
-			assert(valueMap.end() != itFind);
-			NodeValue const expValue{ itFind->second };
-			if (! (gotValue == expValue))
-			{
-				++errCount;
-			}
+		//	oss << "Failure of nodeItem validity test" << std::endl;
+		//	oss << dat::infoString(nodeItem, "nodeItem") << std::endl;
+			++errCount;
 		}
 	}
 
-	io::out() << dat::infoString(trinet, "trinet") << std::endl;
-	io::out() << dat::infoString(errCount, "errCount") << std::endl;
+	if (! (0u == errCount))
+	{
+		oss << "Failure of nodeItem validity test: errCount ="
+			<< " " << errCount << std::endl;
+	}
 
-oss << "Failure: implement this test!" << std::endl;
 	return oss.str();
 }
 

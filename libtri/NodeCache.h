@@ -43,9 +43,8 @@
 
 namespace tri
 {
-	constexpr float sValue{}; // TODO
 
-/*! \brief Data store compatible with tri::IsoTille use.
+/*! \brief Remap tritille (I,J) NodeKeys to scalar index
 
 \par Example
 \dontinclude testtri/uNodeCache.cpp
@@ -89,22 +88,12 @@ public: // methods
 		return {}; // TODO
 	}
 
-using ValueType = float;
-
-	void
-	setValue
+	size_t
+	indexForNodeKey
 		( NodeKey const & // keyIJ
-		, ValueType const & // value
-		)
+		) const
 	{
-	}
-
-	ValueType const &
-	valueAt
-		( NodeKey const & // keyIJ
-		)
-	{
-		return sValue;
+		return {};
 	}
 
 	//! Descriptive information about this instance.

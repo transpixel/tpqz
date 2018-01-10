@@ -35,6 +35,7 @@
 
 
 #include "libdat/Offset2D.h"
+#include "libdat/grid.h" // NOTE: wastes ~2x index storage, but fast
 #include "libtri/IsoTille.h"
 
 #include <string>
@@ -53,7 +54,16 @@ namespace tri
 
 class NodeIndex
 {
-	dat::Offset2D<size_t, long> theOffset2D{};
+
+public:
+
+using NdxType = uint16_t;
+
+private:
+
+	dat::Offset2D<size_t, long> theRowColMap{};
+	dat::grid<NdxType> theNdxGrid;
+	size_t theSize{ dat::nullValue<size_t>() };
 
 public: // methods
 
@@ -81,10 +91,12 @@ public: // methods
 	inline
 	size_t
 	indexForNodeKey
-		( NodeKey const & // keyIJ
+		( NodeKey const & keyIJ
 		) const
 	{
-		return {};
+		NdxType const & ndx = theNdxGrid(theRowColMap(keyIJ));
+		assert(ndx < theSize);
+		return ndx;
 	}
 
 	//! Descriptive information about this instance.

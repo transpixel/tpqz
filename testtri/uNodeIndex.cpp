@@ -35,6 +35,7 @@
 
 #include "libtri/IsoTille.h"
 
+#include "libapp/Timer.h"
 #include "libdat/info.h"
 #include "libdat/validity.h"
 #include "libio/stream.h"
@@ -71,44 +72,45 @@ tri_NodeIndex_test1
 {
 	std::ostringstream oss;
 
+	app::Timer timer;
+
 	// create a generic tritille
-	dat::Range<double> const xRange{  -7., -3. };
+	dat::Range<double> const xRange{  -7.,  3. };
 	dat::Range<double> const yRange{ -15., 37. };
-	double const xDelta{ 2. };
-	double const yDelta{ 7. };
+	double const xDelta{ 1./17. };
+	double const yDelta{ 1./19. };
 	tri::IsoTille const trinet
 		{ tri::IsoTille::genericTille(xRange, yRange, xDelta, yDelta) };
 
 	// create cache
+	timer.start("ctor");
 	tri::NodeIndex cache(trinet);
 	size_t const numNodes{ cache.size() };
 	if (! (0u < numNodes))
 	{
 		oss << "Failure of size test" << std::endl;
 	}
+	timer.stop();
 
 	using NodeValue = float;
 
 	// allocate data store
+	timer.start("test.fill");
 	std::vector<NodeValue> nodeItems(numNodes);
 	NodeValue const nullItem{ dat::nullValue<NodeValue>() };
 	std::fill(nodeItems.begin(), nodeItems.end(), nullItem);
-
-	// use map lookup to check
-	std::map<tri::NodeKey, NodeValue> keyItemMap;
+	timer.stop();
 
 	// fill storage using cache index lookup
+	timer.start("test.set");
 	NodeValue value{ 0.f };
-	for (size_t nn{0u} ; nn < numNodes ; ++nn)
+	for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
 	{
-		for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
-		{
-			tri::NodeKey const keyIJ{ iter.nodeKey() };
-			nodeItems[cache.indexForNodeKey(keyIJ)] = value;
-			keyItemMap[keyIJ] = value;
-			value += 1.f;
-		}
+		tri::NodeKey const keyIJ{ iter.nodeKey() };
+		nodeItems[cache.indexForNodeKey(keyIJ)] = value;
+		value += 1.f;
 	}
+	timer.stop();
 
 	// check if all storage nodes have been set and are correct
 	size_t errCount{ 0u };
@@ -127,6 +129,8 @@ tri_NodeIndex_test1
 		oss << "Failure of nodeItem validity test: errCount ="
 			<< " " << errCount << std::endl;
 	}
+
+io::out() << dat::infoString(timer, "timer") << std::endl;
 
 	return oss.str();
 }

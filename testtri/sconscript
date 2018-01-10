@@ -75,5 +75,6 @@ env.Program('demoCylinder.cpp')
 env.Program('demoSphere.cpp')
 env.Program('demoSquare.cpp')
 env.Program('uIsoTille.cpp')
+env.Program('uNodeIndex.cpp')
 env.Program('uNodeIterator.cpp')
 

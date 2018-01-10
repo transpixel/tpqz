@@ -74,6 +74,16 @@ public: // static methods
 		, IsoGeo const & tileGeo
 		);
 
+	//! Construct a generic tilling
+	static
+	IsoTille
+	genericTille
+		( dat::Range<double> const & xRange
+		, dat::Range<double> const & yRange
+		, double const & xDelta
+		, double const & yDelta
+		);
+
 public: // methods
 
 	//! default null constructor

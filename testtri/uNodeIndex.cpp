@@ -35,7 +35,6 @@
 
 #include "libtri/IsoTille.h"
 
-#include "libapp/Timer.h"
 #include "libdat/info.h"
 #include "libdat/validity.h"
 #include "libio/stream.h"
@@ -72,8 +71,6 @@ tri_NodeIndex_test1
 {
 	std::ostringstream oss;
 
-	app::Timer timer;
-
 	// create a generic tritille
 	dat::Range<double> const xRange{  -7.,  3. };
 	dat::Range<double> const yRange{ -15., 37. };
@@ -83,34 +80,36 @@ tri_NodeIndex_test1
 		{ tri::IsoTille::genericTille(xRange, yRange, xDelta, yDelta) };
 
 	// create cache
-	timer.start("ctor");
 	tri::NodeIndex cache(trinet);
 	size_t const numNodes{ cache.size() };
 	if (! (0u < numNodes))
 	{
 		oss << "Failure of size test" << std::endl;
 	}
-	timer.stop();
 
 	using NodeValue = float;
 
 	// allocate data store
-	timer.start("test.fill");
 	std::vector<NodeValue> nodeItems(numNodes);
 	NodeValue const nullItem{ dat::nullValue<NodeValue>() };
 	std::fill(nodeItems.begin(), nodeItems.end(), nullItem);
-	timer.stop();
 
 	// fill storage using cache index lookup
-	timer.start("test.set");
 	NodeValue value{ 0.f };
 	for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
 	{
 		tri::NodeKey const keyIJ{ iter.nodeKey() };
-		nodeItems[cache.indexForNodeKey(keyIJ)] = value;
+		tri::NodeIndex::index_type const ndx{ cache.indexForNodeKey(keyIJ) };
+		if (! (ndx < numNodes))
+		{
+			oss << "Failure of node index size test" << std::endl;
+			oss << dat::infoString(ndx, "ndx") << std::endl;
+			oss << dat::infoString(numNodes, "numNodes") << std::endl;
+			break;
+		}
+		nodeItems[ndx] = value;
 		value += 1.f;
 	}
-	timer.stop();
 
 	// check if all storage nodes have been set and are correct
 	size_t errCount{ 0u };
@@ -124,13 +123,12 @@ tri_NodeIndex_test1
 		}
 	}
 
+	// check if any of the indices are invalid
 	if (! (0u == errCount))
 	{
 		oss << "Failure of nodeItem validity test: errCount ="
 			<< " " << errCount << std::endl;
 	}
-
-io::out() << dat::infoString(timer, "timer") << std::endl;
 
 	return oss.str();
 }

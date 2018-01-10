@@ -81,7 +81,7 @@ namespace
 	size_t
 	sizeFor
 		( tri::IsoTille const & trinet
-		, dat::grid<tri::NodeIndex::NdxType> * const & ptNdxGrid
+		, dat::grid<tri::NodeIndex::index_type> * const & ptNdxGrid
 		, dat::Offset2D<size_t, long> const & offMap
 		)
 	{
@@ -89,7 +89,7 @@ namespace
 		assert(ptNdxGrid->isValid());
 		std::fill
 			( ptNdxGrid->begin(), ptNdxGrid->end()
-			, dat::nullValue<tri::NodeIndex::NdxType>()
+			, dat::nullValue<tri::NodeIndex::index_type>()
 			);
 		size_t count{ 0u };
 		for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)

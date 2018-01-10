@@ -55,14 +55,14 @@ namespace tri
 class NodeIndex
 {
 
-public:
+public: // data types
 
-using NdxType = uint16_t;
+	using index_type = size_t;
 
 private:
 
 	dat::Offset2D<size_t, long> theRowColMap{};
-	dat::grid<NdxType> theNdxGrid;
+	dat::grid<index_type> theNdxGrid;
 	size_t theSize{ dat::nullValue<size_t>() };
 
 public: // methods
@@ -89,12 +89,12 @@ public: // methods
 
 	//! Index(offset) into an assumed external container
 	inline
-	size_t
+	index_type
 	indexForNodeKey
 		( NodeKey const & keyIJ
 		) const
 	{
-		NdxType const & ndx = theNdxGrid(theRowColMap(keyIJ));
+		index_type const & ndx = theNdxGrid(theRowColMap(keyIJ));
 		assert(ndx < theSize);
 		return ndx;
 	}

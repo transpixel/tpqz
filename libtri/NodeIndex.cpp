@@ -161,6 +161,13 @@ NodeIndex :: infoString
 	}
 	if (isValid())
 	{
+		oss << dat::infoString(theNdxGrid, "theNdxGrid");
+
+		oss << std::endl;
+		oss << dat::infoString(theRowColMap, "theRowColMap");
+
+		oss << std::endl;
+		oss << dat::infoString(theSize, "theSize");
 	}
 	else
 	{

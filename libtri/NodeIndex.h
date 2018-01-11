@@ -94,8 +94,12 @@ public: // methods
 		( NodeKey const & keyIJ
 		) const
 	{
-		index_type const & ndx = theNdxGrid(theRowColMap(keyIJ));
-		assert(ndx < theSize);
+		index_type ndx{ dat::nullValue<index_type>() };
+		dat::RowCol const rcNdxGrid(theRowColMap(keyIJ));
+		if (dat::isValid(rcNdxGrid))
+		{
+			ndx = theNdxGrid(rcNdxGrid);
+		}
 		return ndx;
 	}
 

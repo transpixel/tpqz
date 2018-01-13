@@ -99,7 +99,7 @@ IsoTille :: sizeValidNodes
 }
 
 std::vector<NodeKey>
-IsoTille :: ndxPairsNearTo
+IsoTille :: nodeKeysNearTo
 	( NodeKey const & ndxAt
 	, double const & maxRefDist
 	) const
@@ -141,16 +141,16 @@ IsoTille :: ndxPairsNearTo
 	return candNodes;
 }
 
-std::vector<IsoTille::DistNode>
-IsoTille :: nodesNearTo
+std::vector<IsoTille::DistKeyPair>
+IsoTille :: distKeysNearTo
 	( NodeKey const & ndxAt
 	, double const & maxRefDist
 	) const
 {
-	std::vector<DistNode> distNodes;
+	std::vector<DistKeyPair> distNodes;
 
 	// get all candidate indices
-	std::vector<NodeKey> const ndxIJs(ndxPairsNearTo(ndxAt, maxRefDist));
+	std::vector<NodeKey> const ndxIJs(nodeKeysNearTo(ndxAt, maxRefDist));
 
 	// location of anchor node
 	dat::Spot const atSpot(theTileGeo.refSpotForNodeKey(ndxAt));
@@ -174,7 +174,7 @@ IsoTille :: nodesNearTo
 				// check if sufficiently "nearby"
 				if (! (maxRefDist < nodeDist))
 				{
-					distNodes.emplace_back(DistNode{ nodeDist, ndxIJ });
+					distNodes.emplace_back(DistKeyPair{ nodeDist, ndxIJ });
 				}
 			}
 		}

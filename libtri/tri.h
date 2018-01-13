@@ -55,6 +55,26 @@ namespace tri
 	using NodeKey = std::pair<NodeNdxType, NodeNdxType>;
 	static NodeKey const sNullNdxPair{ sNullNdx, sNullNdx};
 
+	//! First member of key - index in Mu direction
+	inline
+	NodeNdxType const &
+	ndxI
+		( NodeKey const & keyIJ
+		)
+	{
+		return keyIJ.first;
+	}
+
+	//! Second member of key - index in Nu direction
+	inline
+	NodeNdxType const &
+	ndxJ
+		( NodeKey const & keyIJ
+		)
+	{
+		return keyIJ.second;
+	}
+
 } // tri
 
 // Inline definitions

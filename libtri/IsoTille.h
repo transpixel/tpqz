@@ -112,25 +112,32 @@ public: // methods
 	sizeValidNodes
 		() const;
 
-	//! Indices into tritille near to ndxAt - IRRESPECTIVE if in domain or not
+	//! True if keyIJ node has location within active domain
+	inline
+	bool
+	contains
+		( NodeKey const & keyIJ
+		) const;
+
+	//! Indices into tritille near to keyIJ - IRRESPECTIVE if in domain or not
 	std::vector<NodeKey>
-	ndxPairsNearTo
-		( NodeKey const & ndxAt
+	nodeKeysNearTo
+		( NodeKey const & keyIJ
 		, double const & maxRefDist
 		) const;
 
 	//! Utility type
-	using DistNode = std::pair<double, NodeKey>;
+	using DistKeyPair = std::pair<double, NodeKey>;
 
-	/*! Indices for nodes with maxRefDist of ndxAt in reference frame
+	/*! Indices for nodes with maxRefDist of keyIJ in reference frame
 	 *
 	 * Returned nodes are:
 	 * \arg associated to valid domain location
-	 * \arg returned in order of proximity of ref location to ref loc of ndxAt
+	 * \arg returned in order of proximity of ref location to ref loc of keyIJ
 	 */
-	std::vector<DistNode>
-	nodesNearTo
-		( NodeKey const & ndxAt
+	std::vector<DistKeyPair>
+	distKeysNearTo
+		( NodeKey const & keyIJ
 		, double const & maxRefDist
 		) const;
 

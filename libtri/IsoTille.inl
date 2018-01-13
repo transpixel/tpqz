@@ -90,6 +90,16 @@ IsoTille :: triangleFor
 	return triangle;
 }
 
+inline
+bool
+IsoTille :: contains
+	( NodeKey const & keyIJ
+	) const
+{
+	dat::Spot const xyLoc(theTileGeo.refSpotForNodeKey(keyIJ));
+	return theDomain.contains(xyLoc);
+}
+
 template <typename SampFunc>
 inline
 typename SampFunc::value_type
@@ -133,17 +143,17 @@ IsoTille :: nodeValueViaInvDist
 	using DataType = typename SampFunc::value_type;
 	DataType samp{};
 
-	std::vector<DistNode> const nearDistNodes
-		{ nodesNearTo(ndxGone, maxRefDist) };
+	std::vector<DistKeyPair> const nearDistKeyPairs
+		{ distKeysNearTo(ndxGone, maxRefDist) };
 
 	// computed (inverse distance) weighted mean
 	DataType sumWV{};
 	double sumW{ 0. };
-	for (tri::IsoTille::DistNode const & nearDistNode : nearDistNodes)
+	for (tri::IsoTille::DistKeyPair const & nearDistKeyPair : nearDistKeyPairs)
 	{
 		// get info for a neighbor
-		double const & dist = nearDistNode.first;
-		tri::NodeKey const & ndxIJ = nearDistNode.second;
+		double const & dist = nearDistKeyPair.first;
+		tri::NodeKey const & ndxIJ = nearDistKeyPair.second;
 
 		// retrieve property at neighbor
 		DataType const & value{ propSampFunc(ndxIJ.first, ndxIJ.second) };

@@ -81,7 +81,31 @@ NodeKey
 NodeIterator :: nextNodeDi
 	() const
 {
-	return { theAtIJ.first + 1L, theAtIJ.second + 1L};
+	return { theAtIJ.first + 1L, theAtIJ.second + 1L };
+}
+
+inline
+NodeKey
+NodeIterator :: prevNodeMu
+	() const
+{
+	return { theAtIJ.first - 1L, theAtIJ.second };
+}
+
+inline
+NodeKey
+NodeIterator :: prevNodeNu
+	() const
+{
+	return { theAtIJ.first, theAtIJ.second - 1L };
+}
+
+inline
+NodeKey
+NodeIterator :: prevNodeDi
+	() const
+{
+	return { theAtIJ.first - 1L, theAtIJ.second - 1L };
 }
 
 inline

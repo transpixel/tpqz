@@ -37,6 +37,7 @@
 #include "libdat/validity.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libtri/IsoTille.h"
 
 #include <algorithm>
 #include <fstream>
@@ -155,6 +156,67 @@ tri_NodeIterator_test1
 	return oss.str();
 }
 
+//! Check neighbor access within full tritille
+std::string
+tri_NodeIterator_test2
+	()
+{
+	std::ostringstream oss;
+
+	dat::Range<double> const xRange{ -10.,  0. };
+	dat::Range<double> const yRange{   0., 10. };
+	double const xDelta{ 1. };
+	double const yDelta{ 2. };
+	tri::IsoTille const trinet
+		{ tri::IsoTille::genericTille(xRange, yRange, xDelta, yDelta) };
+
+	for (tri::NodeIterator iter{trinet.begin()} ; iter ; ++iter)
+	{
+		tri::NodeKey const keyIJ{ iter.nodeKey() };
+		if (! trinet.contains(keyIJ))
+		{
+			oss << "Failure of node iterator in domain test" << std::endl;
+			break;
+		}
+
+		// get neighboring nodes
+		tri::NodeKey const keyPosMu{ iter.nextNodeMu() };
+		tri::NodeKey const keyNegMu{ iter.prevNodeMu() };
+		tri::NodeKey const keyPosNu{ iter.nextNodeNu() };
+		tri::NodeKey const keyNegNu{ iter.prevNodeNu() };
+		tri::NodeKey const keyPosDi{ iter.nextNodeDi() };
+		tri::NodeKey const keyNegDi{ iter.prevNodeDi() };
+
+		// confirm previous and next offsets are consistent
+		using tri::ndxI;
+		using tri::ndxJ;
+
+		// for Mu/ndxI
+		if (! dat::nearlyEquals((ndxI(keyNegMu) + 2L), ndxI(keyPosMu)))
+		{
+			oss << "Failure of prev/next test for MuI" << std::endl;
+		}
+
+		// for Nu/ndxJ
+		if (! dat::nearlyEquals((ndxJ(keyNegNu) + 2L), ndxJ(keyPosNu)))
+		{
+			oss << "Failure of prev/next test for NuJ" << std::endl;
+		}
+
+		// for diagonal
+		if (! dat::nearlyEquals((ndxI(keyNegDi) + 2L), ndxI(keyPosDi)))
+		{
+			oss << "Failure of prev/next test for DiI" << std::endl;
+		}
+		if (! dat::nearlyEquals((ndxJ(keyNegDi) + 2L), ndxJ(keyPosDi)))
+		{
+			oss << "Failure of prev/next test for DiJ" << std::endl;
+		}
+	}
+
+	return oss.str();
+}
+
 
 }
 
@@ -170,6 +232,7 @@ main
 	// run tests
 	oss << tri_NodeIterator_test0();
 	oss << tri_NodeIterator_test1();
+	oss << tri_NodeIterator_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

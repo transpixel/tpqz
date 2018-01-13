@@ -166,6 +166,24 @@ public: // methods
 	nextNodeDi
 		() const;
 
+	//! Adjacent Node in the "mu/u" direction
+	inline
+	NodeKey
+	prevNodeMu
+		() const;
+
+	//! Adjacent Node in the "nu/v" direction
+	inline
+	NodeKey
+	prevNodeNu
+		() const;
+
+	//! Adjacent Node in the diagonal slash direction direction
+	inline
+	NodeKey
+	prevNodeDi
+		() const;
+
 	//! Advance to next valid node (node in the domain)
 	inline
 	NodeIterator &

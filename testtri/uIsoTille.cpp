@@ -480,8 +480,8 @@ tri_IsoTille_test2
 			{ nodePairsInRadius(trigeo, domain, refNodeLoc, wayBig) };
 
 		// request "near" nodes such that all are included
-		std::vector<tri::IsoTille::DistNode> const gotDistNodes
-			{ trinet.nodesNearTo(ndxAt, wayBig) };
+		std::vector<tri::IsoTille::DistKeyPair> const gotDistKeyPairs
+			{ trinet.distKeysNearTo(ndxAt, wayBig) };
 
 		/*
 		std::ofstream ofsExp("test_exp.dat");
@@ -490,15 +490,16 @@ tri_IsoTille_test2
 		ofsExp << dat::infoString(ndxIJ, "ndxIJ") << std::endl;
 		}
 		std::ofstream ofsGot("test_got.dat");
-		for (tri::IsoTille::DistNode const & gotDistNode : gotDistNodes)
+		for (tri::IsoTille::DistKeyPair
+			const & gotDistKeyPair : gotDistKeyPairs)
 		{
-		ofsGot << dat::infoString(gotDistNode.second, "ndxIJ") << std::endl;
+		ofsGot << dat::infoString(gotDistKeyPair.second, "ndxIJ") << std::endl;
 		}
 		*/
 
 		assert(! expNodeKeys.empty());
 		size_t const expNears{ expNodeKeys.size() - 1L }; // skip 'at'
-		size_t const gotNears{ gotDistNodes.size() };
+		size_t const gotNears{ gotDistKeyPairs.size() };
 		if (! dat::nearlyEquals(gotNears, expNears))
 		{
 			oss << "Failure of full coverage test" << std::endl;
@@ -517,17 +518,18 @@ tri_IsoTille_test2
 			{ nodePairsInRadius(trigeo, domain, refNodeLoc, refDist) };
 
 		// get neighbor node info
-		std::vector<tri::IsoTille::DistNode> const gotDistNodes
-			{ trinet.nodesNearTo(ndxAt, refDist) };
+		std::vector<tri::IsoTille::DistKeyPair> const gotDistKeyPairs
+			{ trinet.distKeysNearTo(ndxAt, refDist) };
 
 		// check that returned data are within neighborhood
 		size_t errCnt{ 0u };
 		double prevDist{ 0. };
 		std::set<tri::NodeKey> gotNodeKeys;
-		for (tri::IsoTille::DistNode const & gotDistNode : gotDistNodes)
+		for (tri::IsoTille::DistKeyPair
+			const & gotDistKeyPair : gotDistKeyPairs)
 		{
-			double const & gotDist = gotDistNode.first;
-			tri::NodeKey const & ndxIJ = gotDistNode.second;
+			double const & gotDist = gotDistKeyPair.first;
+			tri::NodeKey const & ndxIJ = gotDistKeyPair.second;
 			gotNodeKeys.insert(ndxIJ);
 
 			assert(dat::isValid(gotDist));

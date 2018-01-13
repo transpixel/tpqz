@@ -117,6 +117,56 @@ private: // data
 	//! True if current iterator position is valid (not yet at end)
 	bool theIsActive{ false };
 
+public: // static methods
+
+	//! Adjacent Node in the "mu/u" direction
+	inline
+	static
+	NodeKey
+	nextNodeMu
+		( NodeKey const & keyIJ
+		);
+
+	//! Adjacent Node in the "nu/v" direction
+	inline
+	static
+	NodeKey
+	nextNodeNu
+		( NodeKey const & keyIJ
+		);
+
+	//! Adjacent Node in the diagonal slash direction direction
+	inline
+	static
+	NodeKey
+	nextNodeDi
+		( NodeKey const & keyIJ
+		);
+
+	//! Adjacent Node in the "mu/u" direction
+	inline
+	static
+	NodeKey
+	prevNodeMu
+		( NodeKey const & keyIJ
+		);
+
+	//! Adjacent Node in the "nu/v" direction
+	inline
+	static
+	NodeKey
+	prevNodeNu
+		( NodeKey const & keyIJ
+		);
+
+	//! Adjacent Node in the diagonal slash direction direction
+	inline
+	static
+	NodeKey
+	prevNodeDi
+		( NodeKey const & keyIJ
+		);
+
 public: // methods
 
 	//! default null constructor

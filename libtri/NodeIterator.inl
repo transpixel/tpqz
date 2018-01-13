@@ -37,6 +37,65 @@ namespace tri
 {
 
 inline
+// static
+NodeKey
+NodeIterator :: nextNodeMu
+	( NodeKey const & keyIJ
+	)
+{
+	return { keyIJ.first + 1L, keyIJ.second };
+}
+
+inline
+// static
+NodeKey
+NodeIterator :: nextNodeNu
+	( NodeKey const & keyIJ
+	)
+{
+	return { keyIJ.first, keyIJ.second + 1L };
+}
+
+inline
+// static
+NodeKey
+NodeIterator :: nextNodeDi
+	( NodeKey const & keyIJ
+	)
+{
+	return { keyIJ.first + 1L, keyIJ.second + 1L };
+}
+
+inline
+// static
+NodeKey
+NodeIterator :: prevNodeMu
+	( NodeKey const & keyIJ
+	)
+{
+	return { keyIJ.first - 1L, keyIJ.second };
+}
+
+inline
+// static
+NodeKey
+NodeIterator :: prevNodeNu
+	( NodeKey const & keyIJ
+	)
+{
+	return { keyIJ.first, keyIJ.second - 1L };
+}
+
+// static
+NodeKey
+NodeIterator :: prevNodeDi
+	( NodeKey const & keyIJ
+	)
+{
+	return { keyIJ.first - 1L, keyIJ.second - 1L };
+}
+
+inline
 // explicit
 NodeIterator :: operator bool
 	() const
@@ -65,7 +124,7 @@ NodeKey
 NodeIterator :: nextNodeMu
 	() const
 {
-	return { theAtIJ.first + 1L, theAtIJ.second };
+	return nextNodeMu(theAtIJ);
 }
 
 inline
@@ -73,7 +132,7 @@ NodeKey
 NodeIterator :: nextNodeNu
 	() const
 {
-	return { theAtIJ.first, theAtIJ.second + 1L };
+	return nextNodeNu(theAtIJ);
 }
 
 inline
@@ -81,7 +140,7 @@ NodeKey
 NodeIterator :: nextNodeDi
 	() const
 {
-	return { theAtIJ.first + 1L, theAtIJ.second + 1L };
+	return nextNodeDi(theAtIJ);
 }
 
 inline
@@ -89,7 +148,7 @@ NodeKey
 NodeIterator :: prevNodeMu
 	() const
 {
-	return { theAtIJ.first - 1L, theAtIJ.second };
+	return prevNodeMu(theAtIJ);
 }
 
 inline
@@ -97,7 +156,7 @@ NodeKey
 NodeIterator :: prevNodeNu
 	() const
 {
-	return { theAtIJ.first, theAtIJ.second - 1L };
+	return prevNodeNu(theAtIJ);
 }
 
 inline
@@ -105,7 +164,7 @@ NodeKey
 NodeIterator :: prevNodeDi
 	() const
 {
-	return { theAtIJ.first - 1L, theAtIJ.second - 1L };
+	return prevNodeDi(theAtIJ);
 }
 
 inline

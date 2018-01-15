@@ -38,6 +38,7 @@
 #include "libdat/grid.h" // NOTE: wastes ~2x index storage, but fast
 #include "libtri/IsoTille.h"
 
+#include <cassert>
 #include <string>
 
 
@@ -95,10 +96,14 @@ public: // methods
 		) const
 	{
 		index_type ndx{ dat::nullValue<index_type>() };
+		assert(isValid());
 		dat::RowCol const rcNdxGrid(theRowColMap(keyIJ));
 		if (dat::isValid(rcNdxGrid))
 		{
-			ndx = theNdxGrid(rcNdxGrid);
+			if (theNdxGrid.hwSize().includes(rcNdxGrid))
+			{
+				ndx = theNdxGrid(rcNdxGrid);
+			}
 		}
 		return ndx;
 	}

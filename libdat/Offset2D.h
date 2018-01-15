@@ -174,10 +174,20 @@ public: // methods
 		, SType const & inVal1
 		) const
 	{
-		return
-			{{ theUSO[0](inVal0)
-			 , theUSO[1](inVal1)
+		std::array<UType, 2u> result
+			{{ dat::nullValue<UType>()
+			 , dat::nullValue<UType>()
 			}};
+		if (isValid() && dat::isValid(inVal0) && dat::isValid(inVal1))
+		{
+			UType const outVal0{ theUSO[0](inVal0) };
+			UType const outVal1{ theUSO[1](inVal1) };
+			if (dat::isValid(outVal0) && dat::isValid(outVal1))
+			{
+				result = std::array<UType, 2u>{{ outVal0, outVal1 }};
+			}
+		}
+		return result;
 	}
 
 

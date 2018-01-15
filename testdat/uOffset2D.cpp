@@ -53,6 +53,9 @@ std::string
 dat_Offset2D_test0
 	()
 {
+//	using UType = uint16_t;
+//	using SType = int16_t;
+
 	std::ostringstream oss;
 	dat::Offset2D<uint16_t, int16_t> const aNull{};
 	if (dat::isValid(aNull))
@@ -60,6 +63,42 @@ dat_Offset2D_test0
 		oss << "Failure of null value test" << std::endl;
 		oss << "infoString: " << dat::infoString(aNull) << std::endl;
 	}
+
+	std::array<int16_t, 2u> const inBad
+		{{ dat::nullValue<int16_t>(), dat::nullValue<int16_t>() }};
+	std::array<int16_t, 2u> const inOkay{{ 4, 5 }};
+
+	// operations with a null instance on bad data
+	std::array<uint16_t, 2u> const outNullBad(aNull(inBad));
+	if (dat::isValid(outNullBad))
+	{
+		oss << "Failure of null/bad data test" << std::endl;
+	}
+
+	// operations with a null instance on good data
+	std::array<uint16_t, 2u> const outNullOkay(aNull(inOkay));
+	if (dat::isValid(outNullOkay))
+	{
+		oss << "Failure of null/okay data test" << std::endl;
+	}
+
+	dat::Offset2D<uint16_t, int16_t> const aGood
+		{{ int16_t(inOkay[0] - 1), int16_t(inOkay[1] - 1) }};
+
+	// operations with a good instance on bad data
+	std::array<uint16_t, 2u> const outGoodBad(aGood(inBad));
+	if (dat::isValid(outGoodBad))
+	{
+		oss << "Failure of null/bad data test" << std::endl;
+	}
+
+	// operations with a good instance on good data
+	std::array<uint16_t, 2u> const outGoodOkay(aGood(inOkay));
+	if (! dat::isValid(outGoodOkay))
+	{
+		oss << "Failure of good/okay data test" << std::endl;
+	}
+
 	return oss.str();
 }
 

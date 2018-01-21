@@ -494,7 +494,7 @@ XRefBase<DatType> :: infoStringPntMajor
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << infoString(title) << std::endl;
+		oss << infoString(title);
 	}
 	size_t const numPnts{ pntCapacity() };
 	for (size_t pntNdx{0u} ; pntNdx < numPnts ; ++pntNdx)
@@ -535,7 +535,7 @@ XRefBase<DatType> :: infoStringAcqMajor
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << infoString(title) << std::endl;
+		oss << infoString(title);
 	}
 	size_t const numAcqs{ acqCapacity() };
 	for (size_t acqNdx{0u} ; acqNdx < numAcqs ; ++acqNdx)

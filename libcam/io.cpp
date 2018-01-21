@@ -36,9 +36,12 @@
 
 #include "libdat/info.h"
 #include "libio/sprintf.h"
+#include "libio/stream.h"
+#include "libio/string.h"
 
 #include <cassert>
 #include <fstream>
+#include <sstream>
 
 
 namespace cam
@@ -46,6 +49,115 @@ namespace cam
 namespace io
 {
 
+PntName
+pntNameForNdx
+	( cam::PntNdx const & pntNdx
+	, std::string const & ndxFmt
+	)
+{
+	std::string const prefix{ "pnt_" };
+	std::string const name{ prefix + ::io::sprintf(ndxFmt, pntNdx) };
+	return name;
+}
+
+std::vector<MeaInfo>
+loadFromAsciiTrifecta
+	( std::istream & istrm
+	)
+{
+	std::vector<MeaInfo> meaInfos;
+
+	std::string line;
+	std::string record;
+	while (istrm && (! istrm.eof()))
+	{
+		std::getline(istrm, line);
+		record = ::io::string::before(line, "#");
+		if (! record.empty())
+		{
+			std::istringstream iss(record);
+			PntName name{};
+			dat::Spot spot{{}};
+			iss >> name >> spot[0] >> spot[1];
+			if ((! name.empty()) && (dat::isValid(spot)))
+			{
+				meaInfos.emplace_back(MeaInfo{ name, spot });
+			}
+		}
+	}
+
+	return meaInfos;
+}
+
+bool
+insertIntoTable
+	( cam::XRefSpots * const & ptSpotTab
+	, std::vector<MeaInfo> const & meaInfos
+	, AcqNdx const & acqNdx
+	, std::map<PntName, PntNdx> const & pntNameNdxMap
+	)
+{
+	bool okay{ false };
+	if (ptSpotTab && (! meaInfos.empty()))
+	{
+		if (acqNdx < ptSpotTab->acqCapacity())
+		{
+			bool hitErr{ false };
+			for (MeaInfo const & meaInfo : meaInfos)
+			{
+				PntName const & pntName = meaInfo.thePntName;
+				std::map<PntName, PntNdx>::const_iterator const itFind
+					{ pntNameNdxMap.find(pntName) };
+				if (pntNameNdxMap.end() != itFind)
+				{
+					size_t const & pntNdx = itFind->second;
+					if (pntNdx < ptSpotTab->pntCapacity())
+					{
+						(*ptSpotTab)(pntNdx, acqNdx) = meaInfo.theSpot;
+					}
+				}
+				else
+				{
+					hitErr = true;
+				}
+			}
+			okay = (! hitErr);
+		}
+	}
+	return okay;
+}
+
+bool
+saveToAsciiTrifecta
+	( cam::XRefSpots const & spotTab
+	, std::ostream & ostrm
+	, cam::AcqNdx const & acqNdx
+	)
+{
+	bool okay{ false };
+	if (spotTab.isValid())
+	{
+		std::vector<cam::PntNdx> const pntNdxs{ spotTab.pntIndicesFor(acqNdx) };
+		if(! pntNdxs.empty())
+		{
+			for (cam::PntNdx const & pntNdx : pntNdxs)
+			{
+				dat::Spot const & spot = spotTab(pntNdx, acqNdx);
+				if (dat::isValid(spot))
+				{
+					std::string const pntName{ pntNameForNdx(pntNdx) };
+					ostrm
+						<< dat::infoString(pntName)
+						<< " " << dat::infoString(spot)
+						<< " " << " 1. 0. 0. 1." // fake covar
+						<< '\n';
+				}
+			}
+			okay = (! ostrm.fail());
+		}
+	}
+	return okay;
+}
 
 bool
 saveToAsciiTrifecta
@@ -56,30 +168,16 @@ saveToAsciiTrifecta
 	bool okay{ false };
 	assert(acqnames.size() == spotTab.acqCapacity());
 	size_t const numAcqs{ spotTab.acqCapacity() };
-	for (size_t acqNdx{0u} ; acqNdx < numAcqs ; ++acqNdx)
+	for (AcqNdx acqNdx{0u} ; acqNdx < numAcqs ; ++acqNdx)
 	{
 		std::string const & acqname = acqnames[acqNdx];
 		std::string const acqpath{ acqname + ".meapoint" };
 
-		std::vector<cam::PntNdx> const pntNdxs{ spotTab.pntIndicesFor(acqNdx) };
-		if(! pntNdxs.empty())
+		std::ofstream ofsAcq(acqpath);
+		okay = saveToAsciiTrifecta(spotTab, ofsAcq, acqNdx);
+		if (! okay)
 		{
-			std::ofstream ofsAcq(acqpath);
-			for (cam::PntNdx const & pntNdx : pntNdxs)
-			{
-				dat::Spot const & spot = spotTab(pntNdx, acqNdx);
-				if (dat::isValid(spot))
-				{
-					std::string const pntKey
-						("pnt_" + ::io::sprintf("%03d",pntNdx));
-					ofsAcq
-						<< dat::infoString(pntKey)
-						<< " " << dat::infoString(spot)
-						<< " " << " 1. 0. 0. 1." // fake covar
-						<< '\n';
-				}
-			}
-			okay = (! ofsAcq.fail());
+			break;
 		}
 	}
 	return okay;

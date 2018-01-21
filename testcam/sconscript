@@ -39,6 +39,7 @@ env = env.Clone() # allow module to change anything it wants
 libpaths = \
  [ '../libcam/'
 
+ , '../libgeo/'
  , '../libga/'
  , '../libdat/'
  , '../libio/'
@@ -47,6 +48,7 @@ libpaths = \
 linklibs = \
  [ 'cam'
 
+ , 'geo'
  , 'ga'
  , 'dat'
  , 'io'
@@ -56,6 +58,7 @@ env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
 env.Program('uCamera.cpp')
+env.Program('uio.cpp')
 env.Program('uPinHole.cpp')
 env.Program('uXRefSpots.cpp')
 

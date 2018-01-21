@@ -99,6 +99,7 @@ namespace dat
 		, EnableIf
 			< dat::has::null<CType, CType()> >...
 		>
+	inline
 	CType
 	nullValue
 		()
@@ -111,7 +112,7 @@ namespace dat
 	//
 
 	template <typename FType, EnableIf< std::is_floating_point<FType> >...>
-	constexpr
+	constexpr //inline
 	FType
 	nullValue
 		()
@@ -120,7 +121,7 @@ namespace dat
 	}
 
 	template <typename IType, EnableIf< std::is_integral<IType> >...>
-	constexpr
+	constexpr //inline
 	IType
 	nullValue
 		()
@@ -130,7 +131,7 @@ namespace dat
 	}
 
 	template <typename FType, EnableIf< std::is_same<FType, f16_t> >...>
-	constexpr
+	constexpr //inline
 	FType
 	nullValue
 		()
@@ -139,7 +140,7 @@ namespace dat
 	}
 
 	template <typename AType, EnableIf< std::is_same<AType, RowCol> >...>
-	inline
+	constexpr //inline
 	AType
 	nullValue
 		()
@@ -148,7 +149,7 @@ namespace dat
 	}
 
 	template <typename AType, EnableIf< std::is_same<AType, Spot> >...>
-	inline
+	constexpr //inline
 	AType
 	nullValue
 		()
@@ -165,7 +166,7 @@ namespace dat
 
 	//! Simple functor returning null value
 	template <typename OutType, typename InType>
-	constexpr
+	constexpr //inline
 	std::function<OutType(InType const &)>
 	nullFunc
 		()
@@ -174,7 +175,7 @@ namespace dat
 	}
 
 	//! Always true - (for compatibliity with other templates)
-	constexpr
+	constexpr //inline
 	bool
 	isValid
 		( bool const & // value
@@ -274,6 +275,7 @@ namespace dat
 		, EnableIf
 			< dat::has::isValid<CType, bool()> >...
 		>
+	inline
 	bool
 	isValid
 		( CType const & arg

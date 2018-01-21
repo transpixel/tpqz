@@ -48,12 +48,14 @@ namespace dat
 
 	//! An array with first element nullValue
 	template <typename Type, size_t Dim>
+	constexpr
 	std::array<Type, Dim>
 	nullValue
 		();
 
 	//! An array of AType with first element null
 	template <typename AType>
+	constexpr
 	AType
 	nullArray
 		();

@@ -169,6 +169,18 @@ public: // methods
 	begin
 		() const;
 
+	//! Write/Read access to table items.
+	typename dat::grid<DatType>::iterator
+	inline
+	beginTable
+		();
+
+	//! Write/Read access to table items.
+	typename dat::grid<DatType>::iterator
+	inline
+	endTable
+		();
+
 	//! Capacity for number of points stored
 	inline
 	size_t

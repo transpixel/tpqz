@@ -178,6 +178,24 @@ XRefBase<DatType> :: begin
 }
 
 template <typename DatType>
+typename dat::grid<DatType>::iterator
+inline
+XRefBase<DatType> :: beginTable
+	()
+{
+	return theItemGrid.begin();
+}
+
+template <typename DatType>
+typename dat::grid<DatType>::iterator
+inline
+XRefBase<DatType> :: endTable
+	()
+{
+	return theItemGrid.end();
+}
+
+template <typename DatType>
 inline
 size_t
 XRefBase<DatType> :: pntCapacity

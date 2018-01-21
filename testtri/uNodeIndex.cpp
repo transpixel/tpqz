@@ -94,7 +94,6 @@ tri_NodeIndex_test1
 	NodeValue const nullItem{ dat::nullValue<NodeValue>() };
 	std::fill(nodeItems.begin(), nodeItems.end(), nullItem);
 
-/*
 	// fill storage using cache index lookup
 	NodeValue value{ 0.f };
 	for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
@@ -130,7 +129,6 @@ tri_NodeIndex_test1
 		oss << "Failure of nodeItem validity test: errCount ="
 			<< " " << errCount << std::endl;
 	}
-*/
 
 	tri::NodeKey const badKeyIJ{ 12345678L,  -654321L };
 	tri::NodeIndex::index_type const badNdx{ cache.indexForNodeKey(badKeyIJ) };

@@ -62,6 +62,15 @@ private:
 	std::set<AcqName> theAcqNames;
 	std::vector<MeaGroupOneAcq> theMeaGroups;
 
+public: // static methods
+
+	//! Measurement data in table form from all measurement files
+	static
+	XRefSpots
+	spotTableFor
+		( std::vector<std::string> const & meapaths
+		);
+
 public: // methods
 
 	//! default null constructor

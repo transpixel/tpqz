@@ -71,6 +71,15 @@ namespace
 namespace cam
 {
 
+// static
+XRefSpots
+Loader :: spotTableFor
+	( std::vector<std::string> const & meapaths
+	)
+{
+	return Loader(meapaths).spotTable();
+}
+
 // explicit
 Loader :: Loader
 	( std::vector<std::string> const & meapaths

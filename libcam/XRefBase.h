@@ -169,6 +169,18 @@ public: // methods
 	begin
 		() const;
 
+	//! Read-Only access to table items.
+	typename dat::grid<DatType>::const_iterator
+	inline
+	beginTable
+		() const;
+
+	//! Read-Only access to table items.
+	typename dat::grid<DatType>::const_iterator
+	inline
+	endTable
+		() const;
+
 	//! Write/Read access to table items.
 	typename dat::grid<DatType>::iterator
 	inline

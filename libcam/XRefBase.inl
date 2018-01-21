@@ -178,6 +178,24 @@ XRefBase<DatType> :: begin
 }
 
 template <typename DatType>
+typename dat::grid<DatType>::const_iterator
+inline
+XRefBase<DatType> :: beginTable
+	() const
+{
+	return theItemGrid.begin();
+}
+
+template <typename DatType>
+typename dat::grid<DatType>::const_iterator
+inline
+XRefBase<DatType> :: endTable
+	() const
+{
+	return theItemGrid.end();
+}
+
+template <typename DatType>
 typename dat::grid<DatType>::iterator
 inline
 XRefBase<DatType> :: beginTable

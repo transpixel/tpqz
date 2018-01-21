@@ -94,7 +94,7 @@ cam_io_test1
 	constexpr cam::PntNdx const pntNdxC{  7u };
 	constexpr cam::PntNdx const pntNdxD{ 13u };
 	constexpr cam::PntNdx const pntNdxE{ 14u };
-	std::map<cam::io::PntName, cam::PntNdx> const pntNameNdxMap
+	std::map<cam::PntName, cam::PntNdx> const pntNameNdxMap
 		{ { cam::io::pntNameForNdx(pntNdxA), pntNdxA }
 		, { cam::io::pntNameForNdx(pntNdxB), pntNdxB }
 		, { cam::io::pntNameForNdx(pntNdxC), pntNdxC }
@@ -129,7 +129,7 @@ cam_io_test1
 
 		// load stream and check reader
 		std::istringstream issTab(ossTab.str());
-		std::vector<cam::io::MeaInfo> const meaInfos
+		cam::MeaGroupOneAcq const meaInfos
 			{ cam::io::loadFromAsciiTrifecta(issTab) };
 		size_t const gotSize{ meaInfos.size() };
 		if (! dat::nearlyEquals(gotSize, expSize))

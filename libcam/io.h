@@ -40,6 +40,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -57,21 +58,12 @@ namespace cam
 
 namespace io
 {
-	using PntName = std::string;
-
 	//! Name used by save*() functions in association with point index
 	PntName
 	pntNameForNdx
 		( cam::PntNdx const & pntNdx
 		, std::string const & ndxFmt = { "%05d" }
 		);
-
-	//! (Image) measurement information
-	struct MeaInfo
-	{
-		PntName const thePntName;
-		dat::Spot const theSpot;
-	};
 
 	/*! \brief Load measurements data from ascii file (trifecta convention).
 	 *
@@ -81,16 +73,17 @@ namespace io
 	 * Note: Covariance values are currently ignored
 	 *
 	 */
-	std::vector<MeaInfo>
+	MeaGroupOneAcq
 	loadFromAsciiTrifecta
 		( std::istream & istrm
+		, std::set<PntName> * const ptNames = { nullptr }
 		);
 
 	//! Insert mea into table col(acqNdx), using map for pntNdx lookup
 	bool
 	insertIntoTable
 		( cam::XRefSpots * const & ptSpotTab
-		, std::vector<MeaInfo> const & meaInfos
+		, MeaGroupOneAcq const & meaInfos
 		, AcqNdx const & acqNdx
 		, std::map<PntName, PntNdx> const & pntNameNdxMap
 		);

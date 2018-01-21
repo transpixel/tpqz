@@ -26,62 +26,87 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
+#ifndef cam_Loader_INCL_
+#define cam_Loader_INCL_
 
 /*! \file
-\brief Declarations for namespace cam
+\brief Declarations for cam::Loader
 */
 
 
-#include "libdat/Spot.h"
+#include "libcam/cam.h"
+#include "libcam/XRefSpots.h"
 
 #include <string>
-#include <vector>
+#include <set>
+#include <map>
 
 
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
-
-
-*/
 namespace cam
 {
 
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
+/*! \brief Loader object for reading image measurements
 
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
+\par Example
+\dontinclude testcam/uLoader.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-	//! Descriptive point name/key
-	using PntName = std::string;
+class Loader
+{
 
-	//! Descriptive acquisition name/key
-	using AcqName = std::string;
+private:
 
-	//! Image measurement for a single object space point
-	struct MeaForOnePnt
-	{
-		std::string const thePntName;
-		dat::Spot const theSpot;
-		// Uncertainty - e.g. Covar matrix info
-	};
+	std::set<PntName> thePntNames;
+	std::set<AcqName> theAcqNames;
+	std::vector<MeaGroupOneAcq> theMeaGroups;
 
-	//! All image measurements associated with a single acquisition
-	using MeaGroupOneAcq = std::vector<MeaForOnePnt>;
+public: // methods
+
+	//! default null constructor
+	Loader
+		() = default;
+
+	//! Attached to spot table
+	explicit
+	Loader
+		( std::vector<std::string> const & meapaths
+		);
+
+	//! Name to index lookup
+	std::map<PntName, PntNdx>
+	pntNameNdxMap
+		() const;
+
+	//! Name to index lookup
+	std::map<AcqName, AcqNdx>
+	acqNameNdxMap
+		() const;
+
+	//! Measurement data in table format
+	XRefSpots
+	spotTable
+		( std::map<PntName, PntNdx> const & pntNameNdxMap
+		) const;
+
+	//! Measurement data in table format
+	XRefSpots
+	spotTable
+		() const;
+
+	//! Descriptive information about this instance.
+	std::string
+	infoStringDetail
+		( std::string const & title = std::string()
+		) const;
+
+}; // Loader
 
 } // cam
 
 // Inline definitions
-// #include "libcam/cam.inl"
+// #include "libcam/Loader.inl"
 
-#endif // cam_cam_INCL_
+#endif // cam_Loader_INCL_
 

@@ -60,12 +60,13 @@ pntNameForNdx
 	return name;
 }
 
-std::vector<MeaInfo>
+MeaGroupOneAcq
 loadFromAsciiTrifecta
 	( std::istream & istrm
+	, std::set<PntName> * const ptNames
 	)
 {
-	std::vector<MeaInfo> meaInfos;
+	MeaGroupOneAcq meaGroups;
 
 	std::string line;
 	std::string record;
@@ -81,31 +82,35 @@ loadFromAsciiTrifecta
 			iss >> name >> spot[0] >> spot[1];
 			if ((! name.empty()) && (dat::isValid(spot)))
 			{
-				meaInfos.emplace_back(MeaInfo{ name, spot });
+				meaGroups.emplace_back(MeaForOnePnt{ name, spot });
+				if (ptNames)
+				{
+					ptNames->insert(name);
+				}
 			}
 		}
 	}
 
-	return meaInfos;
+	return meaGroups;
 }
 
 bool
 insertIntoTable
 	( cam::XRefSpots * const & ptSpotTab
-	, std::vector<MeaInfo> const & meaInfos
+	, MeaGroupOneAcq const & meaGroups
 	, AcqNdx const & acqNdx
 	, std::map<PntName, PntNdx> const & pntNameNdxMap
 	)
 {
 	bool okay{ false };
-	if (ptSpotTab && (! meaInfos.empty()))
+	if (ptSpotTab && (! meaGroups.empty()))
 	{
 		if (acqNdx < ptSpotTab->acqCapacity())
 		{
 			bool hitErr{ false };
-			for (MeaInfo const & meaInfo : meaInfos)
+			for (MeaForOnePnt const & meaGroup : meaGroups)
 			{
-				PntName const & pntName = meaInfo.thePntName;
+				PntName const & pntName = meaGroup.thePntName;
 				std::map<PntName, PntNdx>::const_iterator const itFind
 					{ pntNameNdxMap.find(pntName) };
 				if (pntNameNdxMap.end() != itFind)
@@ -113,7 +118,7 @@ insertIntoTable
 					size_t const & pntNdx = itFind->second;
 					if (pntNdx < ptSpotTab->pntCapacity())
 					{
-						(*ptSpotTab)(pntNdx, acqNdx) = meaInfo.theSpot;
+						(*ptSpotTab)(pntNdx, acqNdx) = meaGroup.theSpot;
 					}
 				}
 				else

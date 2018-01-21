@@ -326,14 +326,16 @@ public: // methods
 	std::string
 	infoStringPntMajor
 		( std::string const & title = {}
-		);
+		, bool const & showItemDetail = false
+		) const;
 
 	//! Description of active indices in acquisitionNdx major order
 	inline
 	std::string
 	infoStringAcqMajor
 		( std::string const & title = {}
-		);
+		, bool const & showItemDetail = false
+		) const;
 
 	//! Representation of dataGrid() in image-friendly layout
 	inline

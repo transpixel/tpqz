@@ -488,7 +488,8 @@ inline
 std::string
 XRefBase<DatType> :: infoStringPntMajor
 	( std::string const & title
-	)
+	, bool const & showItemDetail
+	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
@@ -513,6 +514,10 @@ XRefBase<DatType> :: infoStringPntMajor
 			if (dat::isValid(item))
 			{
 				oss << prefixer.nextFieldString(acqNdx);
+				if (showItemDetail)
+				{
+					oss << " " << dat::infoString(item);
+				}
 			}
 		}
 	}
@@ -524,7 +529,8 @@ inline
 std::string
 XRefBase<DatType> :: infoStringAcqMajor
 	( std::string const & title
-	)
+	, bool const & showItemDetail
+	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
@@ -549,6 +555,10 @@ XRefBase<DatType> :: infoStringAcqMajor
 			if (dat::isValid(item))
 			{
 				oss << prefixer.nextFieldString(pntNdx);
+				if (showItemDetail)
+				{
+					oss << " " << dat::infoString(item);
+				}
 			}
 		}
 	}

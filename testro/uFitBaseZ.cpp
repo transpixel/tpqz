@@ -95,10 +95,76 @@ ro_FitBaseZ_test0
 		return uvs;
 	}
 
+//! Check RO improvement (single step linear iteration)
+std::string
+ro_FitBaseZ_test1a
+	()
+{
+	std::ostringstream oss;
+
+	// simulate test configuration
+	ga::Vector const base2w1( 0., 0., 1. );
+	ga::BiVector const angle2w1( .0, .0, .0 );
+	ro::PairBaseZ const roExp
+		( ga::Rigid::identity()
+		, ga::Rigid(base2w1, ga::Pose(angle2w1))
+		);
+
+	// create a perturbed initial estimate
+	ga::Vector const baseDel( .01, .02, .00 );
+	ga::BiVector const angleDel( .30, .20, .40 );
+	ro::PairBaseZ const roSim
+		( ga::Rigid::identity()
+		, ga::Rigid(base2w1 + baseDel, ga::Pose(angle2w1 + angleDel))
+		);
+
+	// generate measurements (using ideal test data)
+	std::vector<PairUV> const uvs{ uvPairsFor(roExp) };
+
+	// construct fitter starting at perturbed value
+	std::array<PtrPairUV, 5u> const uvPtrs
+		{{ &(uvs[0]), &(uvs[1]), &(uvs[2]), &(uvs[3]), &(uvs[4]) }};
+	ro::FitBaseZ const fitter(uvPtrs);
+//	ro::PairBaseZ const roGot{ fitter.solutionNear(roSim) };
+
+	ro::Solution const roSoln{ fitter.roSolution() };
+
+	if (! roSoln.isValid())
+	{
+		oss << "Failure of valid solution test" << std::endl;
+	}
+	else
+	{
+		// check solution's RMS statistic
+		double const expGapRMS{ 0. };
+		double const gotGapRMS{ roSoln.rmsGap() };
+		if (! dat::nearlyEquals(gotGapRMS, expGapRMS))
+		{
+			oss << "Failure of rmsGap test" << std::endl;
+			oss << dat::infoString(expGapRMS, "expGapRMS") << std::endl;
+			oss << dat::infoString(gotGapRMS, "gotGapRMS") << std::endl;
+		}
+
+		// check full solution (internal iterations
+		for (size_t nn{0u} ; nn < uvs.size() ; ++nn)
+		{
+		//	double const gotGap = roSoln.theGaps[nn];
+			double const gotGap{ roSoln.gapForNdx(nn) };
+			if (! dat::nearlyEquals(gotGap, 0.))
+			{
+				oss << "Failure of solutionNear gap test" << std::endl;
+				oss << "gotGap: " << io::sprintf("%12.5e", gotGap) << std::endl;
+			}
+		}
+	}
+
+
+	return oss.str();
+}
 
 //! Check RO improvement (single step linear iteration)
 std::string
-ro_FitBaseZ_test1
+ro_FitBaseZ_test1b
 	()
 {
 	std::ostringstream oss;
@@ -344,8 +410,12 @@ main
 
 	// run tests
 	oss << ro_FitBaseZ_test0();
-	oss << ro_FitBaseZ_test1();
+	oss << ro_FitBaseZ_test1a();
+if (oss.str().empty())
+{
+	oss << ro_FitBaseZ_test1b();
 	oss << ro_FitBaseZ_test2();
+}
 
 	// check/report results
 	std::string const errMessages(oss.str());

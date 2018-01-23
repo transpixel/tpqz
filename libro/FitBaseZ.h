@@ -36,6 +36,7 @@
 
 #include "libro/PairBaseZ.h"
 #include "libga/ga.h"
+#include "libro/Solution.h"
 
 #include <array>
 #include <string>
@@ -95,11 +96,20 @@ public: // methods
 	ro::PairBaseZ
 	solutionNear
 		( ro::PairBaseZ const & roNom
-		, double const & tol = math::eps
+		, double const & tolRmsGap = math::eps
 		, size_t const & itMax = 25u //!< should only need a handful
 		, double const & maxCondNum = { 1.e6 }
 		, double * const & ptCondNum = nullptr
 		) const;
+
+	//! Solution after (trial and error) exploration of solution space
+	Solution
+	roSolution
+		() const
+	{
+		// TODO
+		return {};
+	}
 
 	//! Root-sum-squared tripleProductGap() for measurements
 	double

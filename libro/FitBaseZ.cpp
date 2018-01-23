@@ -209,7 +209,7 @@ FitBaseZ :: improvedNear
 ro::PairBaseZ
 FitBaseZ :: solutionNear
 	( ro::PairBaseZ const & roNom
-	, double const & tol
+	, double const & tolRmsGap
 	, size_t const & itMax
 	, double const & maxCondNum
 	, double * const & ptCondNum
@@ -221,7 +221,7 @@ FitBaseZ :: solutionNear
 		roSoln = roNom;
 		double rmsGap{ rmsGapFor(roSoln) };
 		size_t itCount{ 0u };
-		while ((tol < rmsGap) && (itCount++ < itMax))
+		while ((tolRmsGap < rmsGap) && (itCount++ < itMax))
 		{
 			roSoln = improvedNear(roSoln, maxCondNum, ptCondNum);
 			rmsGap = rmsGapFor(roSoln);

@@ -87,7 +87,10 @@ main
 	std::string const outpath(argv[++argnum]);
 
 	dat::Extents const detSize(2448u, 3264u);
-	double const pd{ .5 * dat::diagonalMag(detSize) };
+double const extpd{ .5 * dat::diagonalMag(detSize) };
+io::out() << dat::infoString(extpd, "extpd") << std::endl;
+double const pd{ 2550. };
+io::out() << dat::infoString(pd, "pd") << std::endl;
 	cam::Camera const camera(pd, detSize);
 
 	io::out() << dat::infoString(meapath1, "meapath1") << std::endl;

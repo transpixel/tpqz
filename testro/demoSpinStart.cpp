@@ -37,6 +37,7 @@
 #include "libio/stream.h"
 
 #include "libga/ga.h"
+#include "libga/groups.h"
 
 #include <cassert>
 #include <iostream>
@@ -45,80 +46,6 @@
 
 namespace
 {
-	/*! Spinor values associated with platonic solid vertices.
-	 *
-	 * Ref. "Relative Orientation" Horn, B. K.P.
-	 */
-	std::vector<ga::Spinor>
-	spinValues
-		()
-	{
-		std::vector<ga::Spinor> spins;
-
-		std::vector<ga::Spinor> const identity
-			{ ga::Spinor(1., ga::BiVector(0., 0., 0.))
-			};
-
-		std::vector<ga::Spinor> const cube
-			{ ga::Spinor(0., ga::BiVector(1., 0., 0.))
-			, ga::Spinor(0., ga::BiVector(0., 1., 0.))
-			, ga::Spinor(0., ga::BiVector(0., 0., 1.))
-			};
-
-		double const bb(.5);
-		std::vector<ga::Spinor> const tetrahedron
-			{ ga::Spinor( bb, ga::BiVector( bb,  bb,  bb))
-			, ga::Spinor( bb, ga::BiVector(-bb,  bb,  bb))
-			, ga::Spinor( bb, ga::BiVector( bb, -bb,  bb))
-			, ga::Spinor( bb, ga::BiVector( bb,  bb, -bb))
-			, ga::Spinor( bb, ga::BiVector( bb, -bb, -bb))
-			, ga::Spinor( bb, ga::BiVector(-bb,  bb, -bb))
-			, ga::Spinor( bb, ga::BiVector(-bb, -bb,  bb))
-			, ga::Spinor( bb, ga::BiVector(-bb, -bb, -bb))
-			};
-
-		double const cc(std::sqrt(.5));
-		std::vector<ga::Spinor> const octahedron
-			{ ga::Spinor( 0., ga::BiVector( 0.,  cc,  cc))
-			, ga::Spinor( 0., ga::BiVector( 0.,  cc, -cc))
-			, ga::Spinor( 0., ga::BiVector( cc,  0.,  cc))
-			, ga::Spinor( 0., ga::BiVector( cc,  0., -cc))
-			, ga::Spinor( 0., ga::BiVector( cc,  cc,  0.))
-			, ga::Spinor( 0., ga::BiVector( cc, -cc,  0.))
-			, ga::Spinor( cc, ga::BiVector( 0.,  0.,  cc))
-			, ga::Spinor( cc, ga::BiVector( 0.,  0., -cc))
-			, ga::Spinor( cc, ga::BiVector( 0.,  cc,  0.))
-			, ga::Spinor( cc, ga::BiVector( 0., -cc,  0.))
-			, ga::Spinor( cc, ga::BiVector( cc,  0.,  0.))
-			, ga::Spinor( cc, ga::BiVector(-cc,  0.,  0.))
-			};
-
-		// 1 value
-		spins.insert(spins.end(), identity.begin(), identity.end());
-		// 4 values
-		spins.insert(spins.end(), cube.begin(), cube.end());
-		// 12 values
-		spins.insert(spins.end(), tetrahedron.begin(), tetrahedron.end());
-		// 24 values
-		spins.insert(spins.end(), octahedron.begin(), octahedron.end());
-
-		return spins;
-	}
-
-	//! Physical angles associated with spinors
-	std::vector<ga::BiVector>
-	physAnglesFor
-		( std::vector<ga::Spinor> const & spins
-		)
-	{
-		std::vector<ga::BiVector> bivs;
-		bivs.reserve(spins.size());
-		for (ga::Spinor const & spin : spins)
-		{
-			bivs.emplace_back(ga::spin::physicalAngleFrom(-spin));
-		}
-		return bivs;
-	}
 }
 
 //! Display spinors proposed by Horn in "Relative Orientation [Revisisted]"
@@ -148,17 +75,23 @@ main
 //	int argnum(0);
 //	std::string const arg1(argv[++argnum]);
 
-	std::vector<ga::Spinor> const spins{ spinValues() };
-	std::vector<ga::BiVector> const bivs{ physAnglesFor(spins) };
+	std::vector<ga::Spinor> const spins{ ga::groups::spreadOfSpinors() };
+	std::vector<ga::BiVector> const bivs
+		{ ga::groups::physicalAnglesFor(spins) };
 	size_t const numAtts{ spins.size() };
 	assert(numAtts == bivs.size());
 	for (size_t nn{0u} ; nn < numAtts ; ++nn)
 	{
 		ga::Spinor const & spin = spins[nn];
 		ga::BiVector const & bivPos = bivs[nn];
+		ga::BiVector const pAng{ ga::spin::physicalAngleFrom(spin) };
+		double const pMag{ ga::magnitude(pAng) };
+		assert(pAng.nearlyEquals(bivPos));
 		io::out()
 			<< " " << dat::infoString(spin, "spin")
 			<< " " << dat::infoString(bivPos, "bivPos")
+		//	<< " " << dat::infoString(pAng, "pAng")
+			<< " " << dat::infoString(pMag, "pMag")
 			<< std::endl;
 	}
 

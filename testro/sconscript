@@ -79,6 +79,7 @@ env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
 env.Program('demoRO.cpp')
+env.Program('demoSpinStart.cpp')
 env.Program('evalRO.cpp')
 env.Program('uArgsBaseZ.cpp')
 env.Program('uFitBaseZ.cpp')

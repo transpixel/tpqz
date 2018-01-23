@@ -132,7 +132,7 @@ physicalAnglesFor
 	bivs.reserve(spins.size());
 	for (ga::Spinor const & spin : spins)
 	{
-		bivs.emplace_back(ga::spin::physicalAngleFrom(-spin));
+		bivs.emplace_back(ga::spin::physicalAngleFrom(spin));
 	}
 	return bivs;
 }

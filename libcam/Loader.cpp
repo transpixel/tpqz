@@ -91,19 +91,24 @@ Loader :: Loader
 
 namespace
 {
-	std::map<std::string, size_t>
+	std::pair
+		< std::map<std::string, size_t>
+		, std::vector<std::string>
+		>
 	aNameNdxMap
 		( std::set<std::string> const & names
 		)
 	{
 		std::map<std::string, size_t> nameNdxMap;
+		std::vector<std::string> nameByNdx(names.size());
 		size_t ndx{ 0u };
 		for (std::string const & name : names)
 		{
 			nameNdxMap[name] = ndx;
+			nameByNdx[ndx] = name;
 			++ndx;
 		}
-		return nameNdxMap;
+		return { nameNdxMap, nameByNdx };
 	}
 }
 
@@ -111,14 +116,28 @@ std::map<PntName, PntNdx>
 Loader :: pntNameNdxMap
 	() const
 {
-	return aNameNdxMap(thePntNames);
+	return aNameNdxMap(thePntNames).first;
 }
 
 std::map<AcqName, AcqNdx>
 Loader :: acqNameNdxMap
 	() const
 {
-	return aNameNdxMap(theAcqNames);
+	return aNameNdxMap(theAcqNames).first;
+}
+
+std::vector<PntName>
+Loader :: pntNames
+	() const
+{
+	return aNameNdxMap(thePntNames).second;
+}
+
+std::vector<AcqName>
+Loader :: acqNames
+	() const
+{
+	return aNameNdxMap(theAcqNames).second;
 }
 
 XRefSpots

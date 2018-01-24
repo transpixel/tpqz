@@ -93,6 +93,16 @@ public: // methods
 	acqNameNdxMap
 		() const;
 
+	//! Names of points (name = result[pntNdx])
+	std::vector<PntName>
+	pntNames // by pntNdx
+		() const;
+
+	//! Names of acquisitions (name = result[acqNdx])
+	std::vector<AcqName>
+	acqNames // by acqNdx
+		() const;
+
 	//! Measurement data in table format
 	XRefSpots
 	spotTable

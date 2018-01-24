@@ -593,13 +593,14 @@ namespace
 
 }
 
-Solution
+QuintSoln
 byCombo
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
 	)
 {
 	Solution bestSoln{};
+	FiveOf<size_t> bestNdxs{ dat::nullValue<size_t, 5u>() };
 
 	assert(areValidPairs(uvPairs));
 	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
@@ -607,7 +608,6 @@ byCombo
 	StateTracker<5u> sampleState(uvPairs.size());
 	ro::PairBaseZ const roNom(roPairNom);
 
-	{ //
 	BestSoln soln(uvPairs.size()); // track best encountered soln
 	// try fitting all combinations
 	Combo5 const combo(uvPairs.size());
@@ -631,6 +631,7 @@ byCombo
 			{
 				nqBest = nq;
 				bestSoln = roSoln;
+				bestNdxs = fitIndices;
 			}
 			sampleState.deactivate(fitIndices);
 		}
@@ -641,19 +642,18 @@ byCombo
 	if (soln.isValid() && dat::isValid(nqBest))
 	{
 		// check measurements are known
-		Combo5::NdxQuint const & bestIndices = combo.theQuints[nqBest];
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestIndices));
+		Combo5::NdxQuint const & usedNdxs = combo.theQuints[nqBest];
+		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, usedNdxs));
 		assert(areValidPtrs(uvFitPtrs));
 		// ensure physically legit solution
 		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
 	}
 #	endif
-	} //
 
-	return bestSoln;
+	return QuintSoln{ bestNdxs, bestSoln };
 }
 
-Solution
+QuintSoln
 bySample
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
@@ -662,11 +662,11 @@ bySample
 	)
 {
 	Solution bestSoln{};
+	FiveOf<size_t> bestNdxs{ dat::nullValue<size_t, 5u>() };
 
 	assert(areValidPairs(uvPairs));
 	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
 
-	{ //
 	StateTracker<5u> sampleState(uvPairs.size());
 	ro::PairBaseZ const roNom(roPairNom);
 
@@ -674,7 +674,6 @@ bySample
 	rand::Sampler sampler(uvPairs.size(), maxTrys);
 
 	BestSoln soln(uvPairs.size());
-	Combo5::NdxQuint bestIndices{{ dat::nullValue<size_t>() }};
 	for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
 	{
 		// partition samples into fit and evaluation groups
@@ -695,8 +694,8 @@ bySample
 				sampleState.enactivate(fitIndices);
 				if (updateSolution(roSoln.pair(), uvPairs, sampleState, &soln))
 				{
-					bestIndices = fitIndices;
 					bestSoln = roSoln;
+					bestNdxs = fitIndices;
 				}
 				sampleState.deactivate(fitIndices);
 			}
@@ -707,19 +706,18 @@ bySample
 
 #	if ! defined(NDEBUG)
 	// search for "forward" solution
-	if (soln.isValid() && dat::isValid(bestIndices[0]))
+	if (soln.isValid() && dat::isValid(bestNdxs[0]))
 	{
 		// access measurements to use for fitting
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestIndices));
+		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestNdxs));
 		assert(areValidPtrs(uvFitPtrs));
 
 		// ensure physically legit solution
 		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
 	}
 #	endif
-	} //
 
-	return bestSoln;
+	return QuintSoln{ bestNdxs, bestSoln };
 }
 
 

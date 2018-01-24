@@ -54,15 +54,21 @@ namespace ro
 
 namespace sampcon
 {
+	struct QuintSoln
+	{
+		FiveOf<size_t> const jtheFitNdxs;
+		Solution theSoln;
+	};
+
 	//! Best solution after exhaustive evaluation of all combinations
-	Solution
+	QuintSoln
 	byCombo
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom
 		);
 
 	//! Best solution from random sampling
-	Solution
+	QuintSoln
 	bySample
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom

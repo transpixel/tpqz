@@ -54,33 +54,6 @@ namespace ro
 
 namespace sampcon
 {
-	//! Pseudo-probability generating Functor
-	struct PseudoProbGen
-	{
-		double theInvSigmaSq{ dat::nullValue<double>() };
-
-		PseudoProbGen
-			() = default;
-
-		explicit
-		PseudoProbGen
-			( double const & estSigmaGap
-			)
-			: theInvSigmaSq{ 1. / math::sq(estSigmaGap) }
-		{ }
-
-		inline
-		double
-		operator()
-			( double const & gapSq
-			) const
-		{
-			assert(dat::isValid(theInvSigmaSq));
-			return std::exp(-theInvSigmaSq * gapSq);
-		}
-
-	};
-
 	//! Best solution after exhaustive evaluation of all combinations
 	Solution
 	byCombo

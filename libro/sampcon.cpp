@@ -453,13 +453,13 @@ namespace
 
 }
 
-BestSoln
+Solution
 byCombo
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
 	)
 {
-	BestSoln soln(uvPairs.size());
+	Solution bestSoln{};
 
 	assert(areValidPairs(uvPairs));
 	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
@@ -467,6 +467,8 @@ byCombo
 	StateTracker<5u> sampleState(uvPairs.size());
 	ro::PairBaseZ const roNom(roPairNom);
 
+	{ //
+	BestSoln soln(uvPairs.size()); // track best encountered soln
 	// try fitting all combinations
 	Combo5 const combo(uvPairs.size());
 	size_t const numQuints{ combo.theQuints.size() };
@@ -488,25 +490,30 @@ byCombo
 			if (updateSolution(roSoln.pair(), uvPairs, sampleState, &soln))
 			{
 				nqBest = nq;
+				bestSoln = roSoln;
 			}
 			sampleState.deactivate(fitIndices);
 		}
 	}
 
-	// search for "forward" solution
+#	if ! defined(NDEBUG)
+	// ensure computations are valid
 	if (soln.isValid() && dat::isValid(nqBest))
 	{
+		// check measurements are known
 		Combo5::NdxQuint const & bestIndices = combo.theQuints[nqBest];
 		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestIndices));
 		assert(areValidPtrs(uvFitPtrs));
 		// ensure physically legit solution
 		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
 	}
+#	endif
+	} //
 
-	return soln;
+	return bestSoln;
 }
 
-BestSoln
+Solution
 bySample
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
@@ -514,17 +521,19 @@ bySample
 	, size_t const & maxTrys
 	)
 {
-	BestSoln soln(uvPairs.size());
+	Solution bestSoln{};
 
 	assert(areValidPairs(uvPairs));
 	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
 
+	{ //
 	StateTracker<5u> sampleState(uvPairs.size());
 	ro::PairBaseZ const roNom(roPairNom);
 
 	Combo5::NdxQuint fitIndices{{}};
 	rand::Sampler sampler(uvPairs.size(), maxTrys);
 
+	BestSoln soln(uvPairs.size());
 	Combo5::NdxQuint bestIndices{{ dat::nullValue<size_t>() }};
 	for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
 	{
@@ -547,6 +556,7 @@ bySample
 				if (updateSolution(roSoln.pair(), uvPairs, sampleState, &soln))
 				{
 					bestIndices = fitIndices;
+					bestSoln = roSoln;
 				}
 				sampleState.deactivate(fitIndices);
 			}
@@ -555,6 +565,7 @@ bySample
 		// io::out() << "WARNING: invalid partition" << std::endl;
 	}
 
+#	if ! defined(NDEBUG)
 	// search for "forward" solution
 	if (soln.isValid() && dat::isValid(bestIndices[0]))
 	{
@@ -565,8 +576,10 @@ bySample
 		// ensure physically legit solution
 		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
 	}
+#	endif
+	} //
 
-	return soln;
+	return bestSoln;
 }
 
 

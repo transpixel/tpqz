@@ -257,11 +257,9 @@ ro_sampcon_test1
 
 	// compute consensus solution
 	constexpr size_t numRandSamps{ 252 };
-	ro::sampcon::BestSoln const roSoln
+	ro::Solution const roSoln
 		{ ro::sampcon::bySample(uvPairs, roPairNom, numRandSamps) };
-	ro::OriPair const & roPairFit = roSoln.theOriPair;
-
-	if (! dat::isValid(roPairFit))
+	if (! dat::isValid(roSoln))
 	{
 		oss << "Failure of fit test" << std::endl;
 	}

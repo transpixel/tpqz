@@ -36,6 +36,7 @@
 
 #include "libprob/median.h"
 #include "libro/ro.h"
+#include "libro/Solution.h"
 
 #include <vector>
 
@@ -194,14 +195,14 @@ namespace sampcon
 	};
 
 	//! Best solution after exhaustive evaluation of all combinations
-	BestSoln
+	Solution
 	byCombo
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom
 		);
 
 	//! Best solution from random sampling
-	BestSoln
+	Solution
 	bySample
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom

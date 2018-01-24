@@ -377,7 +377,8 @@ ro_FitBaseZ_test2
 	// get sample-consensus solution - by brute force combos
 	{
 		timer.start("consenusByCombo");
-		ro::PairBaseZ const roGot(ro::sampcon::byCombo(uvs, roNom).theOriPair);
+		ro::Solution const roSoln(ro::sampcon::byCombo(uvs, roNom));
+		ro::PairBaseZ const roGot(roSoln.pair());
 		timer.stop();
 		if (! roGot.nearlyEquals(roExp))
 		{
@@ -390,7 +391,8 @@ ro_FitBaseZ_test2
 	// get sample-consensus solution - by (pseudo) random sampling
 	{
 		timer.start("consenusBySamples");
-		ro::PairBaseZ const roGot(ro::sampcon::bySample(uvs, roNom).theOriPair);
+		ro::Solution const roSoln(ro::sampcon::bySample(uvs, roNom));
+		ro::PairBaseZ const roGot(roSoln.pair());
 		timer.stop();
 		if (! roGot.nearlyEquals(roExp))
 		{

@@ -146,9 +146,8 @@ io::out() << "================" << std::endl;
 	ga::Rigid const ori2w1
 		{ ga::unit(ga::e1+ga::e2), ga::Pose::identity() }; // soln
 	ro::PairRel const roNom{ ga::Rigid::identity(), ori2w1 };
-	ro::sampcon::BestSoln const bestRO
-		{ ro::sampcon::byCombo(uvPairs, roNom.pair()) };
-	ro::PairRel const roBest(bestRO.theOriPair);
+	ro::Solution const roSoln{ ro::sampcon::byCombo(uvPairs, roNom.pair()) };
+	ro::PairRel const roBest(roSoln.pair());
 
 io::out() << "================" << std::endl;
 	io::out() << dat::infoString(acqOvers.size(), "acqOvers.s") << std::endl;

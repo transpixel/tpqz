@@ -39,6 +39,7 @@
 #include "libdat/validity.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libro/Accord.h"
 #include "libro/QuadForm.h"
 
 #include <iostream>
@@ -119,15 +120,17 @@ ro_FitBaseZ_test1a
 		);
 
 	// generate measurements (using ideal test data)
-	std::vector<PairUV> const uvs{ uvPairsFor(roExp) };
+	std::vector<PairUV> const uvPairs{ uvPairsFor(roExp) };
 
 	// construct fitter starting at perturbed value
+	std::vector<PairUV> const & uvs = uvPairs;
 	std::array<PtrPairUV, 5u> const uvPtrs
 		{{ &(uvs[0]), &(uvs[1]), &(uvs[2]), &(uvs[3]), &(uvs[4]) }};
 	ro::FitBaseZ const fitter(uvPtrs);
-//	ro::PairBaseZ const roGot{ fitter.solutionNear(roSim) };
 
-	ro::Solution const roSoln{ fitter.roSolution() };
+	ga::Rigid const ori2w1{  ga::e3, ga::Pose::identity() };
+	ro::PairBaseZ const roNom{ ga::Rigid::identity(), ori2w1 };
+	ro::Solution const roSoln{ fitter.roSolution(roNom) };
 
 	if (! roSoln.isValid())
 	{
@@ -135,29 +138,39 @@ ro_FitBaseZ_test1a
 	}
 	else
 	{
-		// check solution's RMS statistic
+		ro::Accord const solnFit{ roSoln, &uvPairs };
+
+		// check that *no* RMS is available - for min ray test case
+		if ( dat::isValid(solnFit.rmsGap()))
+		{
+			oss << "Failure of (nan)rmsGap test for min uv" << std::endl;
+		}
+
+		// check full solution (internal iterations
+		for (size_t nn{0u} ; nn < uvPairs.size() ; ++nn)
+		{
+			double const expGap{ 0. };
+			double const gotGap{ solnFit.gapForNdx(nn) };
+			if (! dat::nearlyEquals(gotGap, expGap))
+			{
+				oss << "Failure of solutionNear gap test" << std::endl;
+				oss << "gotGap: " << io::sprintf("%12.5e", gotGap) << std::endl;
+			}
+		}
+
+		// check solution's RMS statistic - for more measurements
+		std::vector<PairUV> morePairs(uvPairs);
+		morePairs.insert(morePairs.end(), uvPairs.begin(), uvPairs.end());
+		ro::Accord const overFit{ roSoln, &morePairs };
 		double const expGapRMS{ 0. };
-		double const gotGapRMS{ roSoln.rmsGap() };
+		double const gotGapRMS{ overFit.rmsGap() };
 		if (! dat::nearlyEquals(gotGapRMS, expGapRMS))
 		{
 			oss << "Failure of rmsGap test" << std::endl;
 			oss << dat::infoString(expGapRMS, "expGapRMS") << std::endl;
 			oss << dat::infoString(gotGapRMS, "gotGapRMS") << std::endl;
 		}
-
-		// check full solution (internal iterations
-		for (size_t nn{0u} ; nn < uvs.size() ; ++nn)
-		{
-		//	double const gotGap = roSoln.theGaps[nn];
-			double const gotGap{ roSoln.gapForNdx(nn) };
-			if (! dat::nearlyEquals(gotGap, 0.))
-			{
-				oss << "Failure of solutionNear gap test" << std::endl;
-				oss << "gotGap: " << io::sprintf("%12.5e", gotGap) << std::endl;
-			}
-		}
 	}
-
 
 	return oss.str();
 }

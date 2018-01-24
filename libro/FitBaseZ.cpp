@@ -34,6 +34,7 @@
 
 #include "libro/FitBaseZ.h"
 
+#include "libga/groups.h"
 #include "libmath/angle.h"
 #include "libro/QuadForm.h"
 
@@ -228,6 +229,36 @@ FitBaseZ :: solutionNear
 		}
 	}
 	return roSoln;
+}
+
+Solution
+FitBaseZ :: roSolution
+	( ro::PairBaseZ const & roNom
+	, size_t const & itMax
+	, double const & maxCondNum
+	) const
+{
+	Solution soln{};
+	if (isValid() && roNom.isValid())
+	{
+		PairBaseZ roSoln{ roNom };
+		double rmsGap{ rmsGapFor(roSoln) };
+		size_t itCount{ 0u };
+		double condNum{ dat::nullValue<double>() };
+		double const tolRmsGap{ math::eps }; // convergence
+		while ((tolRmsGap < rmsGap) && (itCount++ < itMax))
+		{
+			roSoln = improvedNear(roSoln, maxCondNum, &condNum);
+			rmsGap = rmsGapFor(roSoln);
+		}
+		if (roSoln.isValid() && (itCount < itMax))
+		{
+			std::shared_ptr<Pair> const roPair
+				{ std::make_shared<PairBaseZ>(roSoln) };
+			soln = Solution(roPair, itCount, condNum);
+		}
+	}
+	return soln;
 }
 
 double

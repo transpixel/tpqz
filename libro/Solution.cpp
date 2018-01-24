@@ -26,67 +26,64 @@
 //
 //
 
-#ifndef ro_Solution_INCL_
-#define ro_Solution_INCL_
 
 /*! \file
-\brief Declarations for ro::Solution
+\brief Definitions for ro::Solution
 */
 
-#include "libdat/validity.h"
-#include "libro/Pair.h"
 
-#include <memory>
-#include <string>
+#include "libro/Solution.h"
+
+#include <sstream>
+
 
 namespace ro
 {
 
-/*! \brief Container for results associated with a RO solution
+// explicit
+Solution :: Solution
+	( std::shared_ptr<Pair> const & roPair
+	, size_t const & itCount
+	, size_t const & condNum
+	)
+	: theRoPair{ roPair }
+	, theItCount{ itCount }
+	, theCondNum{ condNum }
+{ }
 
-\par Example
-\dontinclude testro/uSolution.cpp
-\skip ExampleStart
-\until ExampleEnd
-*/
-
-struct Solution
+bool
+Solution :: isValid
+	() const
 {
-	std::shared_ptr<Pair> theRoPair;
-	size_t theItCount{ dat::nullValue<size_t>() };
-	size_t theCondNum{ dat::nullValue<size_t>() };
+	return (theRoPair && theRoPair->isValid());
+}
 
-public: // methods
-
-	//! default null constructor
-	Solution
-		() = default;
-
-	//! Value ctor
-	explicit
-	Solution
-		( std::shared_ptr<Pair> const & roPair
-		, size_t const & itCount
-		, size_t const & condNum
-		);
-
-	//! True if instance is valid
-	bool
-	isValid
-		() const;
-
-	//! Descriptive information about this instance.
-	std::string
-	infoString
-		( std::string const & title = std::string()
-		) const;
-
-}; // Solution
+std::string
+Solution :: infoString
+	( std::string const & title
+	) const
+{
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << std::endl;
+	}
+	if (isValid())
+	{
+		double const logCond{ std::log10(theCondNum) };
+		oss << dat::infoString(*theRoPair, "*theRoPair");
+		oss << std::endl;
+		oss
+			<< dat::infoString(theItCount, "theItCount")
+			<< dat::infoString(logCond, "log10Cond")
+			;
+	}
+	else
+	{
+		oss << " <null>";
+	}
+	return oss.str();
+}
 
 } // ro
-
-// Inline definitions
-// #include "libro/Solution.inl"
-
-#endif // ro_Solution_INCL_
 

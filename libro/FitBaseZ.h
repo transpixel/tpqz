@@ -96,7 +96,7 @@ public: // methods
 	ro::PairBaseZ
 	solutionNear
 		( ro::PairBaseZ const & roNom
-		, double const & tolRmsGap = math::eps
+		, double const & tolRmsGap = math::eps // convergence tolerance
 		, size_t const & itMax = 25u //!< should only need a handful
 		, double const & maxCondNum = { 1.e6 }
 		, double * const & ptCondNum = nullptr
@@ -105,11 +105,10 @@ public: // methods
 	//! Solution after (trial and error) exploration of solution space
 	Solution
 	roSolution
-		() const
-	{
-		// TODO
-		return {};
-	}
+		( ro::PairBaseZ const & roNom // TODO - replace with generated guesses?
+		, size_t const & itMax = { 25u } //!< should only need a handful
+		, double const & maxCondNum = { 1.e6 }
+		) const;
 
 	//! Root-sum-squared tripleProductGap() for measurements
 	double

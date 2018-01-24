@@ -26,53 +26,65 @@
 //
 //
 
-#ifndef ro_Solution_INCL_
-#define ro_Solution_INCL_
+#ifndef ro_Accord_INCL_
+#define ro_Accord_INCL_
 
 /*! \file
-\brief Declarations for ro::Solution
+\brief Declarations for ro::Accord
 */
 
-#include "libdat/validity.h"
-#include "libro/Pair.h"
 
-#include <memory>
+#include "libro/ro.h"
+#include "libro/Solution.h"
+
 #include <string>
+#include <vector>
+
 
 namespace ro
 {
 
-/*! \brief Container for results associated with a RO solution
+/*! \brief Data wrapper to assess solution's goodness of fit to data.
 
 \par Example
-\dontinclude testro/uSolution.cpp
+\dontinclude testro/uAccord.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-struct Solution
+struct Accord
 {
-	std::shared_ptr<Pair> theRoPair;
-	size_t theItCount{ dat::nullValue<size_t>() };
-	size_t theCondNum{ dat::nullValue<size_t>() };
+	Solution const theSoln;
+	std::vector<PairUV> const * const thePtPairUVs;
+//	std::array<size_t, 5u> theNdxQuint{ dat::nullValue<size_t, 5u>() };
+//	std::vector<double> theGaps{};
 
 public: // methods
-
-	//! default null constructor
-	Solution
-		() = default;
-
-	//! Value ctor
-	explicit
-	Solution
-		( std::shared_ptr<Pair> const & roPair
-		, size_t const & itCount
-		, size_t const & condNum
-		);
 
 	//! True if instance is valid
 	bool
 	isValid
+		() const;
+
+	//! Number of measurements in total
+	size_t
+	numTotalUVs
+		() const;
+
+	//! Number of measurements not consumed by (5-dof) RO fit
+	size_t
+	numFreeUVs
+		() const;
+
+	//! Gap associated with uvPair[ndx]
+	double
+	gapForNdx
+		( size_t const & ndx
+		) const;
+
+	//! Expected gap value (root-mean-square)
+	double
+	rmsGap
 		() const;
 
 	//! Descriptive information about this instance.
@@ -81,12 +93,12 @@ public: // methods
 		( std::string const & title = std::string()
 		) const;
 
-}; // Solution
+}; // Accord
 
 } // ro
 
 // Inline definitions
-// #include "libro/Solution.inl"
+// #include "libro/Accord.inl"
 
-#endif // ro_Solution_INCL_
+#endif // ro_Accord_INCL_
 

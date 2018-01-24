@@ -321,6 +321,119 @@ namespace
 		}
 	};
 
+	//! Consenus solution information
+	struct BestSoln
+	{
+		PseudoProbGen theProbGen;
+
+		OriPair theOriPair{};
+		double theProbMin{ dat::nullValue<double>() };
+		double theProbMax{ dat::nullValue<double>() };
+		std::vector<double> theBestGapSqs;
+
+		//! Construct a null instance
+		BestSoln
+			() = default;
+
+		explicit
+		BestSoln
+			( size_t const & numPnts
+			, double const & dirSigma = {  4. * 10./450. }
+			)
+			: theProbGen(dirSigma)
+			, theOriPair{}
+			, theProbMin{ std::numeric_limits<double>::max() }
+			, theProbMax{ std::numeric_limits<double>::lowest() }
+			, theBestGapSqs(numPnts, dat::nullValue<double>())
+		{ }
+
+		//! True if this instance is not null
+		bool
+		isValid
+			() const
+		{
+			return dat::isValid(theOriPair);
+		}
+
+		//! True if solution is modified
+		bool
+		updatePseudoProb
+			( OriPair const & roPair
+			, double const & pProbFit
+			, std::vector<double> const & gapSqs
+			)
+		{
+			bool modSoln{ false };
+			if (pProbFit < theProbMin)
+			{
+				theProbMin = pProbFit;
+			}
+			else
+			if (theProbMax < pProbFit)
+			{
+				modSoln = true;
+				theOriPair = roPair;
+				theBestGapSqs = gapSqs;
+				theProbMax = pProbFit;
+			}
+			return modSoln;
+		}
+
+		double
+		voteFor
+			( size_t const & pntNdx
+			) const
+		{
+			double vote{ dat::nullValue<double>() };
+			if (pntNdx < theBestGapSqs.size())
+			{
+				double const & gapSq = theBestGapSqs[pntNdx];
+
+				double const pProbMea{ theProbGen(gapSq) };
+				double const pProbPnt{ pProbMea * theProbMax };
+				vote = pProbPnt;
+			}
+			return vote;
+		}
+
+		//! Estimated gap (rms adjusted for 5 dof)
+		double
+		rmseGap
+			() const
+		{
+			double rmse{ dat::nullValue<double>() };
+			if (isValid() && (5u < theBestGapSqs.size()))
+			{
+				std::vector<double> const & gaps = theBestGapSqs;
+				double const dom{ double(theBestGapSqs.size() - 5u) };
+				double const sumSqs
+					{ std::accumulate(gaps.begin(), gaps.end(), 0.) };
+				rmse = std::sqrt(sumSqs / dom);
+			}
+			return rmse;
+		}
+
+		//! Estimated gap (rms adjusted for 5 dof)
+		double
+		medianGap
+			() const
+		{
+			double median{ dat::nullValue<double>() };
+			if (isValid() && (5u < theBestGapSqs.size()))
+			{
+				// make copy for sort
+				std::vector<double> gaps{ theBestGapSqs };
+				using Iter = typename std::vector<double>::iterator;
+				Iter const it0 = gaps.begin();
+				Iter const itBeg = it0 + 5u;
+				Iter const itEnd = gaps.end();
+				std::nth_element(it0, itBeg, itEnd);
+				median = prob::median::valueFromConst(itBeg, itEnd);
+			}
+			return median;
+		}
+	};
+
 	//! RMS gap value computed using ALL measurements - true if ptSoln modified
 	bool
 	updateSolution

@@ -28,12 +28,13 @@
 
 
 /*! \file
-\brief Definitions for ro::Solution
+\brief Definitions for ro::FitConfig
 */
 
 
-#include "libro/Solution.h"
+#include "libro/FitConfig.h"
 
+#include <cmath>
 #include <sstream>
 
 
@@ -41,59 +42,46 @@ namespace ro
 {
 
 // explicit
-Solution :: Solution
-	( std::shared_ptr<Pair> const & roPair
-	, size_t const & itCount
-	, size_t const & condNum
+FitConfig :: FitConfig
+	( double const & maxCondNum
 	)
-	: theRoPair{ roPair }
-	, theItCount{ itCount }
-	, theCondNum{ condNum }
-{ }
-
-bool
-Solution :: isValid
-	() const
+	: theMaxCondNum{ maxCondNum }
 {
-	return (theRoPair && theRoPair->isValid());
 }
 
-std::pair<ga::Rigid, ga::Rigid>
-Solution :: pair
-	() const
+// explicit
+FitConfig :: FitConfig
+	( double const & maxCondNum
+	, size_t const & maxItCount
+	)
+	: theMaxCondNum{ maxCondNum }
+	, theMaxItCount{ maxItCount }
 {
-	ro::OriPair oriPair{ ga::Rigid{}, ga::Rigid{} };
-	if (isValid())
-	{
-		oriPair = theRoPair->pair();
-	}
-	return oriPair;
 }
 
 std::string
-Solution :: infoString
+FitConfig :: infoString
 	( std::string const & title
 	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << title << std::endl;
+		oss << title << " ";
 	}
-	if (isValid())
+	//if (isValid())
 	{
-		double const logCond{ std::log10(theCondNum) };
-		oss << dat::infoString(*theRoPair, "*theRoPair");
-		oss << std::endl;
+		double const log10Cond{ std::log10(theMaxCondNum) };
 		oss
-			<< dat::infoString(theItCount, "theItCount")
-			<< dat::infoString(logCond, "log10Cond")
+			<< " " << dat::infoString(log10Cond, "log10Cond")
+			<< " " << dat::infoString(theMaxItCount, "maxIt")
+			<< " " << dat::infoString(theConvergeGap, "convergeGap")
 			;
 	}
-	else
-	{
-		oss << " <null>";
-	}
+	//else
+	//{
+	//	oss << " <null>";
+	//}
 	return oss.str();
 }
 

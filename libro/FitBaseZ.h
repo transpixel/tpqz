@@ -36,6 +36,7 @@
 
 #include "libro/PairBaseZ.h"
 #include "libga/ga.h"
+#include "libro/FitConfig.h"
 #include "libro/Solution.h"
 
 #include <array>
@@ -102,12 +103,14 @@ public: // methods
 		, double * const & ptCondNum = nullptr
 		) const;
 
-	//! Solution after (trial and error) exploration of solution space
+	/*! Solution after (trial and error) exploration of solution space
+	 *
+	 * NOTE: Only "forward" solutions are returned (if one exists)
+	 */
 	Solution
 	roSolution
 		( ro::PairBaseZ const & roNom // TODO - replace with generated guesses?
-		, size_t const & itMax = { 25u } //!< should only need a handful
-		, double const & maxCondNum = { 1.e6 }
+		, FitConfig const & config = {}
 		) const;
 
 	//! Root-sum-squared tripleProductGap() for measurements

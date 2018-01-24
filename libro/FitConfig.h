@@ -26,76 +26,68 @@
 //
 //
 
+#ifndef ro_FitConfig_INCL_
+#define ro_FitConfig_INCL_
 
 /*! \file
-\brief Definitions for ro::Solution
+\brief Declarations for ro::FitConfig
 */
 
 
-#include "libro/Solution.h"
+#include "libmath/math.h"
 
-#include <sstream>
+#include <cstddef>
+#include <string>
 
 
 namespace ro
 {
 
-// explicit
-Solution :: Solution
-	( std::shared_ptr<Pair> const & roPair
-	, size_t const & itCount
-	, size_t const & condNum
-	)
-	: theRoPair{ roPair }
-	, theItCount{ itCount }
-	, theCondNum{ condNum }
-{ }
+/*! \brief Configuration parameters for data fitting operations
 
-bool
-Solution :: isValid
-	() const
-{
-	return (theRoPair && theRoPair->isValid());
-}
+\par Example
+\dontinclude testro/uFitConfig.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-std::pair<ga::Rigid, ga::Rigid>
-Solution :: pair
-	() const
+struct FitConfig
 {
-	ro::OriPair oriPair{ ga::Rigid{}, ga::Rigid{} };
-	if (isValid())
-	{
-		oriPair = theRoPair->pair();
-	}
-	return oriPair;
-}
+	double const theMaxCondNum{ 1.e6 }; //!< discard solns less stable
+	size_t const theMaxItCount{ 25u }; //!< should only need a handful
+	double const theConvergeGap{ math::eps }; //!< convergence tolerance
 
-std::string
-Solution :: infoString
-	( std::string const & title
-	) const
-{
-	std::ostringstream oss;
-	if (! title.empty())
-	{
-		oss << title << std::endl;
-	}
-	if (isValid())
-	{
-		double const logCond{ std::log10(theCondNum) };
-		oss << dat::infoString(*theRoPair, "*theRoPair");
-		oss << std::endl;
-		oss
-			<< dat::infoString(theItCount, "theItCount")
-			<< dat::infoString(logCond, "log10Cond")
-			;
-	}
-	else
-	{
-		oss << " <null>";
-	}
-	return oss.str();
-}
+public: // methods
+
+	//! default null constructor
+	FitConfig
+		() = default;
+
+	//! Override default values
+	explicit
+	FitConfig
+		( double const & maxCondNum
+		);
+
+	//! Override default values
+	explicit
+	FitConfig
+		( double const & maxCondNum
+		, size_t const & maxItCount
+		);
+
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // FitConfig
 
 } // ro
+
+// Inline definitions
+// #include "libro/FitConfig.inl"
+
+#endif // ro_FitConfig_INCL_
 

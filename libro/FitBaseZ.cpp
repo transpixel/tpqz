@@ -36,7 +36,9 @@
 
 #include "libga/groups.h"
 #include "libmath/angle.h"
+#include "libro/model.h"
 #include "libro/QuadForm.h"
+#include "libro/SpinPQ.h"
 
 #include "Eigen"
 
@@ -231,31 +233,117 @@ FitBaseZ :: solutionNear
 	return roSoln;
 }
 
+// -----
+namespace
+{
+	using PtrQuint = FiveOf<PtrPairUV>;
+
+	//! True if all uv dirs intersect in forward directions.
+	size_t
+	numForward
+		( OriPair const & oriPair
+		, PtrQuint const & uvFitPtrs
+		)
+	{
+		size_t fwdCount{ 0u };
+		if (dat::isValid(oriPair))
+		{
+			for (ro::PtrPairUV const & uvFitPtr : uvFitPtrs)
+			{
+				PairUV const & uvPair = *uvFitPtr;
+				PntPair const pntPair{ model::pointPair(uvPair, oriPair) };
+				if (dat::isValid(pntPair))
+				{
+					++fwdCount;
+				}
+			}
+		}
+
+		return fwdCount;
+	}
+
+	//! Return one of multiple solutions with all points in front (or null).
+	ro::OriPair
+	aForwardRO
+		( ro::OriPair const & anyPair
+		, PtrQuint const & uvFitPtrs
+		)
+	{
+		OriPair qualPair;
+
+		// try given initial solution
+		{
+			size_t const numFwd{ numForward(anyPair, uvFitPtrs) };
+			bool const isForward{ (uvFitPtrs.size() == numFwd) };
+			if (isForward)
+			{
+				// return first qualifying solution
+				qualPair = anyPair;
+			}
+		}
+
+		// if initial solution doesn't qualify, try mirror permutations
+		if (! dat::isValid(qualPair))
+		{
+			// use the PQ spinor convention to explore mirror solutions
+			ro::SpinPQ const anyPQ(ro::SpinPQ::from(anyPair));
+			for (size_t nn{0u} ; nn < anyPQ.theNumPerms ; ++nn)
+			{
+				// check if each solution produces a forward intersection
+				ro::OriPair const tmpPair{ anyPQ[nn].pair() };
+				size_t const numFwd{ numForward(tmpPair, uvFitPtrs) };
+				bool const isForward{ (uvFitPtrs.size() == numFwd) };
+				if (isForward)
+				{
+					// return first qualifying solution
+					qualPair = tmpPair;
+					assert(dat::isValid(qualPair));
+					break;
+				}
+			}
+		}
+
+		return qualPair;
+	}
+}
+// -----
+
 Solution
 FitBaseZ :: roSolution
 	( ro::PairBaseZ const & roNom
-	, size_t const & itMax
-	, double const & maxCondNum
+	, FitConfig const & config
 	) const
 {
 	Solution soln{};
 	if (isValid() && roNom.isValid())
 	{
+		size_t const & itMax = config.theMaxItCount;
+		double const & maxCondNum = config.theMaxCondNum;
+		double const & tolRmsGap = config.theConvergeGap;
+
+		// iterate over solutions
 		PairBaseZ roSoln{ roNom };
 		double rmsGap{ rmsGapFor(roSoln) };
 		size_t itCount{ 0u };
 		double condNum{ dat::nullValue<double>() };
-		double const tolRmsGap{ math::eps }; // convergence
 		while ((tolRmsGap < rmsGap) && (itCount++ < itMax))
 		{
 			roSoln = improvedNear(roSoln, maxCondNum, &condNum);
 			rmsGap = rmsGapFor(roSoln);
 		}
+
+		// if iterations converged
 		if (roSoln.isValid() && (itCount < itMax))
 		{
-			std::shared_ptr<Pair> const roPair
-				{ std::make_shared<PairBaseZ>(roSoln) };
-			soln = Solution(roPair, itCount, condNum);
+			// check if there is a forward solution
+			OriPair const roFwd{ aForwardRO(roSoln.pair(), theUVPtrs) };
+			if (dat::isValid(roFwd))
+			{
+				// package valid forward solution for return
+				std::shared_ptr<Pair> const roPair
+					{ std::make_shared<PairBaseZ>(roSoln) };
+				soln = Solution(roPair, itCount, condNum);
+			}
 		}
 	}
 	return soln;

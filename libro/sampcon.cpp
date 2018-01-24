@@ -40,6 +40,7 @@
 #include "libgeo/intersect.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libro/Accord.h"
 #include "libro/cast.h"
 #include "libro/FitBaseZ.h"
 #include "libro/model.h"
@@ -320,27 +321,6 @@ namespace
 		}
 	};
 
-	/*
-	//! True if value is in array
-	bool
-	contains
-		( size_t const & key
-		, std::array<size_t, 5u> const & values
-		)
-	{
-		bool found{ false };
-		for (size_t const & value : values)
-		{
-			if (key == value)
-			{
-				found = true;
-				break;
-			}
-		}
-		return found;
-	}
-	*/
-
 	//! RMS gap value computed using ALL measurements - true if ptSoln modified
 	bool
 	updateSolution
@@ -471,73 +451,6 @@ namespace
 			}};
 	}
 
-	//! True if all uv dirs intersect in forward directions.
-	size_t
-	numForward
-		( ro::OriPair const & oriPair
-		, PtrQuint const & uvFitPtrs
-		)
-	{
-		size_t fwdCount{ 0u };
-		if (dat::isValid(oriPair))
-		{
-			for (PtrPairUV const & uvFitPtr : uvFitPtrs)
-			{
-				PairUV const & uvPair = *uvFitPtr;
-				PntPair const pntPair{ model::pointPair(uvPair, oriPair) };
-				if (dat::isValid(pntPair))
-				{
-					++fwdCount;
-				}
-			}
-		}
-
-		return fwdCount;
-	}
-
-	//! Return one of multiple solutions with all points in front (or null).
-	ro::OriPair
-	aForwardRO
-		( ro::OriPair const & anyPair
-		, PtrQuint const & uvFitPtrs
-		)
-	{
-		OriPair qualPair;
-
-		// try given initial solution
-		{
-			size_t const numFwd{ numForward(anyPair, uvFitPtrs) };
-			bool const isForward{ (uvFitPtrs.size() == numFwd) };
-			if (isForward)
-			{
-				// return first qualifying solution
-				qualPair = anyPair;
-			}
-		}
-
-		// if initial solution doesn't qualify, try mirror permutations
-		if (! dat::isValid(qualPair))
-		{
-			// use the PQ spinor convention to explore mirror solutions
-			ro::SpinPQ const anyPQ(ro::SpinPQ::from(anyPair));
-			for (size_t nn{0u} ; nn < anyPQ.theNumPerms ; ++nn)
-			{
-				// check if each solution produces a forward intersection
-				ro::OriPair const tmpPair{ anyPQ[nn].pair() };
-				size_t const numFwd{ numForward(tmpPair, uvFitPtrs) };
-				bool const isForward{ (uvFitPtrs.size() == numFwd) };
-				if (isForward)
-				{
-					// return first qualifying solution
-					qualPair = tmpPair;
-					assert(dat::isValid(qualPair));
-					break;
-				}
-			}
-		}
-
-		return qualPair;
-	}
 }
 
 BestSoln
@@ -567,23 +480,16 @@ byCombo
 
 		// compute RO using fit partition
 		FitBaseZ const fitter(uvFitPtrs);//.begin(), uvFitPtrs.end());
-		// ro::PairBaseZ const roFit{ fitter.improvedNear(roNom) };
-		ro::PairBaseZ const roFit{ fitter.solutionNear(roNom) };
-
-		// evaluate RO quality using evaluation partition
-		if (dat::isValid(roFit))
+		Solution const roSoln{ fitter.roSolution(roNom) };
+		if (dat::isValid(roSoln))
 		{
-			// check if there is a forward-qualified version of soln
-			OriPair const roFwd{ aForwardRO(roFit.pair(), uvFitPtrs) };
-			if (dat::isValid(roFwd))
+			// evaluate RO quality using current evaluation partition
+			sampleState.enactivate(fitIndices);
+			if (updateSolution(roSoln.pair(), uvPairs, sampleState, &soln))
 			{
-				sampleState.enactivate(fitIndices);
-				if (updateSolution(roFwd, uvPairs, sampleState, &soln))
-				{
-					nqBest = nq;
-				}
-				sampleState.deactivate(fitIndices);
+				nqBest = nq;
 			}
+			sampleState.deactivate(fitIndices);
 		}
 	}
 
@@ -593,8 +499,8 @@ byCombo
 		Combo5::NdxQuint const & bestIndices = combo.theQuints[nqBest];
 		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestIndices));
 		assert(areValidPtrs(uvFitPtrs));
-		// evaluate mirror solutions - to find physically legit one
-		soln.theOriPair = aForwardRO(soln.theOriPair, uvFitPtrs);
+		// ensure physically legit solution
+		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
 	}
 
 	return soln;
@@ -633,14 +539,12 @@ bySample
 			// compute RO using fit partition
 			FitBaseZ const fitter(uvFitPtrs);
 			// ro::PairBaseZ const roFit{ fitter.improvedNear(roNom) };
-			ro::PairBaseZ const roFit{ fitter.solutionNear(roNom) };
-
-			// evaluate RO quality using evaluation partition
-			if (dat::isValid(roFit))
+			Solution const roSoln{ fitter.roSolution(roNom) };
+			if (dat::isValid(roSoln))
 			{
-				OriPair const roFwd{ aForwardRO(roFit.pair(), uvFitPtrs) };
+				// evaluate RO quality using current evaluation partition
 				sampleState.enactivate(fitIndices);
-				if (updateSolution(roFwd, uvPairs, sampleState, &soln))
+				if (updateSolution(roSoln.pair(), uvPairs, sampleState, &soln))
 				{
 					bestIndices = fitIndices;
 				}
@@ -658,26 +562,8 @@ bySample
 		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestIndices));
 		assert(areValidPtrs(uvFitPtrs));
 
-		// evaluate mirror solutions - to find physically legit one
-		soln.theOriPair = aForwardRO(soln.theOriPair, uvFitPtrs);
-
-		/*
-		io::out() << "..Fwd:" << std::endl;
-		for (PtrPairUV const & ptrPairUV : uvFitPtrs)
-		{
-			PairUV const & uvPair = *ptrPairUV;
-			ga::Vector const & uDir = uvPair.first;
-			ga::Vector const & vDir = uvPair.second;
-			OriPair const oriPair{ soln.theOriPair };
-			bool const isFwd{ dat::isValid(model::pointPair(uvPair, oriPair)) };
-			io::out()
-				<< "arFwd:"
-				<< " " << dat::infoString(uDir, "uDir")
-				<< " " << dat::infoString(vDir, "vDir")
-				<< " " << dat::infoString(isFwd, "isFwd")
-				<< std::endl;
-		}
-		*/
+		// ensure physically legit solution
+		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
 	}
 
 	return soln;

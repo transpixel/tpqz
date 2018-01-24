@@ -75,6 +75,11 @@ public: // methods
 	isValid
 		() const;
 
+	//! OriPair from theRoPair (if valid)
+	std::pair<ga::Rigid, ga::Rigid>
+	pair
+		() const;
+
 	//! Descriptive information about this instance.
 	std::string
 	infoString

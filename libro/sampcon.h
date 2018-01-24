@@ -79,6 +79,25 @@ namespace sampcon
 		, size_t const & maxTrys = { 10u }
 		);
 
+	//! All solutions (N-choose-5 of them!!)
+	std::vector<QuintSoln>
+	allByCombo
+		( std::vector<PairUV> const & uvPairs
+		, OriPair const & roPairNom
+		, FitConfig const & fitConfig = {}
+		);
+
+	//! All solutions from random sampling
+	std::vector<QuintSoln>
+	allBySample
+		( std::vector<PairUV> const & uvPairs
+		, OriPair const & roPairNom
+		, size_t const & numDraws = { 640u }
+		, FitConfig const & fitConfig = {}
+		, size_t const & maxTrys = { 10u }
+		);
+
+
 } // sampcon
 
 } // ro

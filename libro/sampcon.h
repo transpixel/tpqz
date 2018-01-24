@@ -35,6 +35,7 @@
 
 
 #include "libprob/median.h"
+#include "libro/FitConfig.h"
 #include "libro/ro.h"
 #include "libro/Solution.h"
 
@@ -65,6 +66,7 @@ namespace sampcon
 	byCombo
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom
+		, FitConfig const & fitConfig = {}
 		);
 
 	//! Best solution from random sampling
@@ -73,6 +75,7 @@ namespace sampcon
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom
 		, size_t const & numDraws = { 640u }
+		, FitConfig const & fitConfig = {}
 		, size_t const & maxTrys = { 10u }
 		);
 

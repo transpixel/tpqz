@@ -596,6 +596,7 @@ QuintSoln
 byCombo
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
+	, FitConfig const & fitConfig
 	)
 {
 	Solution bestSoln{};
@@ -621,7 +622,7 @@ byCombo
 
 		// compute RO using fit partition
 		FitBaseZ const fitter(uvFitPtrs);//.begin(), uvFitPtrs.end());
-		Solution const roSoln{ fitter.roSolution(roNom) };
+		Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
 		if (dat::isValid(roSoln))
 		{
 			// evaluate RO quality using current evaluation partition
@@ -657,6 +658,7 @@ bySample
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
 	, size_t const & numDraws
+	, FitConfig const & fitConfig
 	, size_t const & maxTrys
 	)
 {
@@ -686,7 +688,7 @@ bySample
 			// compute RO using fit partition
 			FitBaseZ const fitter(uvFitPtrs);
 			// ro::PairBaseZ const roFit{ fitter.improvedNear(roNom) };
-			Solution const roSoln{ fitter.roSolution(roNom) };
+			Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
 			if (dat::isValid(roSoln))
 			{
 				// evaluate RO quality using current evaluation partition

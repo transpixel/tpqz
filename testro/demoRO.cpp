@@ -146,8 +146,10 @@ io::out() << "================" << std::endl;
 	ga::Rigid const ori2w1
 		{ ga::unit(ga::e1+ga::e2), ga::Pose::identity() }; // soln
 	ro::PairRel const roNom{ ga::Rigid::identity(), ori2w1 };
+	constexpr double const maxCondNum{ 1.e3 };
+	ro::FitConfig const fitConfig{ maxCondNum };
 	ro::sampcon::QuintSoln const roQuintSoln
-		{ ro::sampcon::byCombo(uvPairs, roNom.pair()) };
+		{ ro::sampcon::byCombo(uvPairs, roNom.pair(), fitConfig) };
 	ro::Solution const & roSoln = roQuintSoln.theSoln;
 	ro::PairRel const roBest(roSoln.pair());
 	ro::FiveOf<size_t> const & fitNdxs = roQuintSoln.theFitNdxs;

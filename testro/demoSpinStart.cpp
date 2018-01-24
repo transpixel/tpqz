@@ -38,6 +38,7 @@
 
 #include "libga/ga.h"
 #include "libga/groups.h"
+#include "libga/Spin1d.h"
 
 #include <cassert>
 #include <iostream>
@@ -94,6 +95,27 @@ main
 			<< " " << dat::infoString(pMag, "pMag")
 			<< std::endl;
 	}
+
+	/*
+	double const zMag{ 10.  };
+	ga::Vector const dir1{ ga::unit(ga::Vector( 1., 0., zMag)) };
+	ga::Vector const dir2{ ga::unit(ga::Vector(-1., 0., zMag)) };
+	ga::Spin1d const family(dir1, dir2);
+
+	io::out() << dat::infoString(family, "family") << std::endl;
+	constexpr double const dw{ (1./16.)*math::pi };
+	for (double ww{0.} ; ww < math::twoPi ; ww += dw)
+	{
+		ga::BiVector const bivArg{ family.argFor(ww) };
+		double const bivMag{ ga::magnitude(bivArg) };
+
+		io::out()
+			<< " " << dat::infoString(ww, "ww")
+			<< " " << dat::infoString(bivArg, "bivArg")
+			<< " " << dat::infoString(bivMag, "bivMag")
+			<< std::endl;
+	}
+	*/
 
 	return 0;
 }

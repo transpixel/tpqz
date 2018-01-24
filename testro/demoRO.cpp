@@ -148,7 +148,19 @@ io::out() << "================" << std::endl;
 	ro::PairRel const roNom{ ga::Rigid::identity(), ori2w1 };
 	ro::sampcon::QuintSoln const roQuintSoln
 		{ ro::sampcon::byCombo(uvPairs, roNom.pair()) };
-	ro::PairRel const roBest(roQuintSoln.theSoln.pair());
+	ro::Solution const & roSoln = roQuintSoln.theSoln;
+	ro::PairRel const roBest(roSoln.pair());
+	ro::FiveOf<size_t> const & fitNdxs = roQuintSoln.theFitNdxs;
+
+	std::vector<std::string> const pntNames{ loader.pntNames() };
+	ro::FiveOf<std::string> const fitNames
+		{ pntNames[ fitNdxs[0] ]
+		, pntNames[ fitNdxs[1] ]
+		, pntNames[ fitNdxs[2] ]
+		, pntNames[ fitNdxs[3] ]
+		, pntNames[ fitNdxs[4] ]
+		};
+
 
 io::out() << "================" << std::endl;
 	io::out() << dat::infoString(acqOvers.size(), "acqOvers.s") << std::endl;
@@ -160,7 +172,11 @@ io::out() << "================" << std::endl;
 io::out() << "----" << std::endl;
 	io::out() << dat::infoString(roNom, "roNom") << std::endl;
 io::out() << "----" << std::endl;
-	io::out() << dat::infoString(roBest, "roBest") << std::endl;
+	io::out() << dat::infoString(roSoln, "roSoln") << std::endl;
+io::out() << "----" << std::endl;
+io::out()
+	<< dat::infoString(fitNames.begin(), fitNames.end(), "fitNames")
+	<< std::endl;
 io::out() << "================" << std::endl;
 
 	return 0;

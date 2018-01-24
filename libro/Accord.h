@@ -59,28 +59,6 @@ struct Accord
 //	std::array<size_t, 5u> theNdxQuint{ dat::nullValue<size_t, 5u>() };
 //	std::vector<double> theGaps{};
 
-public: // static methods
-
-	//! Number of directions from ptrQuintUV that intersect 'in-front-of'
-	static
-	size_t
-	numForward
-		( OriPair const & oriPair
-		, FiveOf<PairUV const * const> const & ptrQuintUV
-		);
-
-	//! True if all directions from quint are forward
-	inline
-	static
-	bool
-	isForward
-		( OriPair const & oriPair
-		, FiveOf<PairUV const * const> const & quintPtrUVs
-		)
-	{
-		return (quintPtrUVs.size() == numForward(oriPair, quintPtrUVs));
-	}
-
 public: // methods
 
 	//! True if instance is valid

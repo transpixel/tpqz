@@ -40,7 +40,6 @@
 #include "libgeo/intersect.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
-#include "libro/Accord.h"
 #include "libro/cast.h"
 #include "libro/FitBaseZ.h"
 #include "libro/model.h"
@@ -646,7 +645,7 @@ byCombo
 		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, usedNdxs));
 		assert(areValidPtrs(uvFitPtrs));
 		// ensure physically legit solution
-		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
+		assert(model::isForward(soln.theOriPair, uvFitPtrs));
 	}
 #	endif
 
@@ -713,7 +712,7 @@ bySample
 		assert(areValidPtrs(uvFitPtrs));
 
 		// ensure physically legit solution
-		assert(Accord::isForward(soln.theOriPair, uvFitPtrs));
+		assert(model::isForward(soln.theOriPair, uvFitPtrs));
 	}
 #	endif
 

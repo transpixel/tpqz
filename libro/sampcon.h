@@ -56,7 +56,7 @@ namespace sampcon
 {
 	struct QuintSoln
 	{
-		FiveOf<size_t> const jtheFitNdxs;
+		FiveOf<size_t> const theFitNdxs;
 		Solution theSoln;
 	};
 

@@ -80,6 +80,24 @@ namespace model
 		, OriPair const & oriPairIn0
 		);
 
+	//! Number of directions from ptrQuintUV that intersect 'in-front-of'
+	size_t
+	numForward
+		( OriPair const & oriPair
+		, FiveOf<PairUV const * const> const & ptrQuintUV
+		);
+
+	//! True if all directions from quint are forward
+	inline
+	bool
+	isForward
+		( OriPair const & oriPair
+		, FiveOf<PairUV const * const> const & quintPtrUVs
+		)
+	{
+		return (quintPtrUVs.size() == numForward(oriPair, quintPtrUVs));
+	}
+
 } // model
 
 } // ro

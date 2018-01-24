@@ -34,6 +34,7 @@
 
 #include "libro/Accord.h"
 
+#include <algorithm>
 #include <sstream>
 
 
@@ -91,6 +92,46 @@ Accord :: gapForNdx
 	return gap;
 }
 
+namespace
+{
+	//! Functor to check if element is in collection of values
+	struct IsIn
+	{
+		ro::FiveOf<size_t> const & theValues;
+
+		inline
+		bool
+		operator()
+			( size_t const & aValue
+			) const
+		{
+			ro::FiveOf<size_t>::const_iterator const itFind
+				{ std::find(theValues.begin(), theValues.end(), aValue) };
+			return (theValues.end() != itFind);
+		}
+	};
+}
+
+std::vector<double>
+Accord :: gapsExcluding
+	( ro::FiveOf<size_t> const & omitNdxs
+	) const
+{
+	std::vector<double> gaps;
+	gaps.reserve(numTotalUVs() - omitNdxs.size());
+	IsIn const contains{ omitNdxs };
+	for (size_t ndx{0u} ; ndx < numTotalUVs() ; ++ndx)
+	{
+		if (! contains(ndx))
+		{
+			double const gap{ gapForNdx(ndx) };
+			assert(dat::isValid(gap));
+			gaps.emplace_back(gap);
+		}
+	}
+	return gaps;
+}
+
 double
 Accord :: rmsGap
 	() const
@@ -117,6 +158,21 @@ Accord :: rmsGap
 		}
 	}
 	return rms;
+}
+
+double
+Accord :: rssGapExcluding
+	( ro::FiveOf<size_t> const & omitNdxs
+	) const
+{
+	double rss{ dat::nullValue<double>() };
+	if (isValid())
+	{
+		std::vector<double> const gaps{ gapsExcluding(omitNdxs) };
+		double const sumSq{ math::sumSqs<double>(gaps.begin(), gaps.end()) };
+		rss = std::sqrt(sumSq); // no dof adjustment for RSS
+	}
+	return rss;
 }
 
 std::string

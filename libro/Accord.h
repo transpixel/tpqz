@@ -82,10 +82,22 @@ public: // methods
 		( size_t const & ndx
 		) const;
 
+	//! Gap values for measurements *other than* omitNdxs
+	std::vector<double>
+	gapsExcluding
+		( ro::FiveOf<size_t> const & omitNdxs
+		) const;
+
 	//! Expected gap value (root-mean-square)
 	double
 	rmsGap
 		() const;
+
+	//! Root-sum-square of gap values computed with *other than* omitNdx UVs
+	double
+	rssGapExcluding
+		( ro::FiveOf<size_t> const & omitNdxs
+		) const;
 
 	//! Descriptive information about this instance.
 	std::string

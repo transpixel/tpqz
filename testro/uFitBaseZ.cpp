@@ -170,6 +170,40 @@ ro_FitBaseZ_test1a
 			oss << dat::infoString(expGapRMS, "expGapRMS") << std::endl;
 			oss << dat::infoString(gotGapRMS, "gotGapRMS") << std::endl;
 		}
+
+		// check residual analysis
+		std::vector<PairUV> const uvFit{ uvPairsFor(roExp) };
+		std::vector<PairUV> const uvRes{ uvPairsFor(roSim) };
+		assert(5u == uvFit.size());
+		assert(5u == uvRes.size());
+		std::vector<PairUV> uvMany
+			{ uvFit[0], uvRes[0] // 0,1
+			, uvFit[1], uvRes[1] // 2,3
+			, uvFit[2], uvRes[2] // 4,5
+			, uvFit[3], uvRes[3] // 6,7
+			, uvFit[4], uvRes[4] // 8,9
+			};
+		ro::FiveOf<size_t> const ndxFit{{ 0u, 2u, 4u, 6u, 8u }};
+		ro::FiveOf<size_t> const ndxRes{{ 1u, 3u, 5u, 7u, 9u }};
+
+		ro::Accord const manyFit{ roSoln, &uvMany };
+
+		// check that gaps excluding noisy measurements are near zero
+		double const gotGapFit{ manyFit.rssGapExcluding(ndxRes) };
+		double const expGapFit{ 0. };
+		if (! dat::nearlyEquals(gotGapFit, expGapFit))
+		{
+			oss << "Failure of gapFit=0 test" << std::endl;
+		}
+
+		// check that gaps excluding perfect fit measurements are non-zero
+		double const gotGapRes{ manyFit.rssGapExcluding(ndxFit) };
+		double const someResMag{ 1./256. }; // non-trival value for this test
+		bool const bigResids{ (someResMag < gotGapRes) };
+		if (! bigResids)
+		{
+			oss << "Failure of non-trivial gapRes test" << std::endl;
+		}
 	}
 
 	return oss.str();

@@ -100,12 +100,11 @@ public: // methods
 		( Type const & item
 		);
 
-	//! The ndx-th best object being tracked
+	//! Best items in order CompFunc(item[nn], item[nn+1])
 	inline
-	Type
-	itemAt
-		( size_t const & ndx //!< 0:best, 1:second-best, etc
-		) const;
+	std::vector<Type>
+	bestItems
+		() const;
 
 	//! Descriptive information about this instance.
 	inline

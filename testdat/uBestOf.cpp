@@ -100,16 +100,87 @@ dat_BestOf_test1
 			(sorted.begin(), sorted.begin()+numBest);
 
 		// check if results match expected sort
+		std::vector<double> const gotBest{ besty.bestItems() };
 		for (size_t nn{0u} ; nn < numBest ; ++nn)
 		{
 			double const & expNext = expBest[nn];
-			double const gotNext{ besty.itemAt(nn) };
+			double const & gotNext = gotBest[nn];
 			if (! dat::nearlyEquals(gotNext, expNext))
 			{
-				oss << "Filure of next test: nn = " << nn << std::endl;
+				oss << "Failure of next test: nn = " << nn << std::endl;
 				oss << dat::infoString(expNext, "expNext") << std::endl;
 				oss << dat::infoString(gotNext, "gotNext") << std::endl;
 			}
+		}
+	}
+
+	return oss.str();
+}
+
+	//! Arbitrary object type
+	struct Foo
+	{
+		double theX;
+		double theY;
+		size_t theNdx; // test tracker
+
+		double
+		magSq
+			() const
+		{
+			return (theX*theX + theY*theY);
+		}
+	};
+
+	//! Comparison functor compatible with BestOf
+	struct CompFoo
+	{
+		bool
+		operator()
+			( Foo const & fA
+			, Foo const & fB
+			) const
+		{
+			return (fA.magSq() < fB.magSq());
+		}
+	};
+
+//! Check pseudo random cases with struct and functor
+std::string
+dat_BestOf_test2
+	()
+{
+	std::ostringstream oss;
+
+	constexpr size_t const numBest{ 7u };
+	std::vector<Foo> values;
+	// Note CompFoo provided as a struct type (no parenthesis)
+	dat::BestOf<Foo, CompFoo> besty(numBest);
+
+	constexpr size_t const numVals{ 64u };
+	values.reserve(numVals);
+	for (size_t nn{0u} ; nn < numVals ; ++nn)
+	{
+		Foo const foo{ double(nn), 4., nn };
+		values.emplace_back(foo);
+		besty.addSample(foo);
+	}
+
+	// Note CompFoo provided as an object instance (with parenthesis)
+	sort(values.begin(), values.end(), CompFoo());
+	std::vector<Foo> const & expBest = values;
+
+	// check if results match expected sort
+	std::vector<Foo> const gotBest{ besty.bestItems() };
+	for (size_t nn{0u} ; nn < numBest ; ++nn)
+	{
+		Foo const & expNext = expBest[nn];
+		Foo const & gotNext = gotBest[nn];
+		if (! dat::nearlyEquals(gotNext.theNdx, expNext.theNdx))
+		{
+			oss << "Failure of next test: nn = " << nn << std::endl;
+			oss << dat::infoString(expNext.theNdx, "expNext") << std::endl;
+			oss << dat::infoString(gotNext.theNdx, "gotNext") << std::endl;
 		}
 	}
 
@@ -131,6 +202,7 @@ main
 	// run tests
 	oss << dat_BestOf_test0();
 	oss << dat_BestOf_test1();
+	oss << dat_BestOf_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

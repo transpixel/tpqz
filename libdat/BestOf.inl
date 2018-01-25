@@ -124,18 +124,12 @@ BestOf<Type, Compare> :: addSample
 
 template <typename Type, typename Compare>
 inline
-Type
-BestOf<Type, Compare> :: itemAt
-	( size_t const & ndx
-	) const
+std::vector<Type>
+BestOf<Type, Compare> :: bestItems
+	() const
 {
-	Type item{};
-	assert(ndx < theItems.size());
-	{ // HACK - replace function
-		std::vector<Type> sorted(theItems.begin(), theItems.end());
-		item = sorted[ndx];
-	}
-	return item;
+	std::vector<Type> const values(theItems.begin(), theItems.end());
+	return values;
 }
 
 template <typename Type, typename Compare>

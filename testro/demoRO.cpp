@@ -148,21 +148,8 @@ io::out() << "================" << std::endl;
 	ro::PairRel const roNom{ ga::Rigid::identity(), ori2w1 };
 	constexpr double const maxCondNum{ 1.e3 };
 	ro::FitConfig const fitConfig{ maxCondNum };
-	ro::QuintSoln const roQuintSoln
-		{ ro::sampcon::byCombo(uvPairs, roNom.pair(), fitConfig) };
-	ro::Solution const & roSoln = roQuintSoln.theSoln;
-	ro::PairRel const roBest(roSoln.pair());
-	ro::FiveOf<size_t> const & fitNdxs = roQuintSoln.theFitNdxs;
-
-	std::vector<std::string> const pntNames{ loader.pntNames() };
-	ro::FiveOf<std::string> const fitNames
-		{ pntNames[ fitNdxs[0] ]
-		, pntNames[ fitNdxs[1] ]
-		, pntNames[ fitNdxs[2] ]
-		, pntNames[ fitNdxs[3] ]
-		, pntNames[ fitNdxs[4] ]
-		};
-
+	std::vector<ro::QuintSoln> const allQuintSolns
+		{ ro::sampcon::allByCombo(uvPairs, roNom.pair(), fitConfig) };
 
 io::out() << "================" << std::endl;
 	io::out() << dat::infoString(acqOvers.size(), "acqOvers.s") << std::endl;
@@ -173,12 +160,32 @@ io::out() << "================" << std::endl;
 	io::out() << dat::infoString(meapath2, "meapath2") << std::endl;
 io::out() << "----" << std::endl;
 	io::out() << dat::infoString(roNom, "roNom") << std::endl;
-io::out() << "----" << std::endl;
-	io::out() << dat::infoString(roSoln, "roSoln") << std::endl;
-io::out() << "----" << std::endl;
-io::out()
-	<< dat::infoString(fitNames.begin(), fitNames.end(), "fitNames")
-	<< std::endl;
+
+	constexpr size_t const numBest{ 3u };
+	constexpr double const sigmaDirs{ 4. * 10./450. };
+	std::vector<ro::QuintSoln> const roQuintSolns
+		{ ro::sampcon::bestOf(allQuintSolns, uvPairs, numBest, sigmaDirs) };
+
+	for (ro::QuintSoln const & roQuintSoln : roQuintSolns)
+	{
+		ro::FiveOf<size_t> const & fitNdxs = roQuintSoln.theFitNdxs;
+
+		std::vector<std::string> const pntNames{ loader.pntNames() };
+		ro::FiveOf<std::string> const fitNames
+			{ pntNames[ fitNdxs[0] ]
+			, pntNames[ fitNdxs[1] ]
+			, pntNames[ fitNdxs[2] ]
+			, pntNames[ fitNdxs[3] ]
+			, pntNames[ fitNdxs[4] ]
+			};
+
+		io::out() << "----" << std::endl;
+		io::out() << dat::infoString(roQuintSoln, "roQuintSoln") << std::endl;
+		io::out()
+			<< dat::infoString(fitNames.begin(), fitNames.end(), "fitNames")
+			<< std::endl;
+	}
+
 io::out() << "================" << std::endl;
 
 	return 0;

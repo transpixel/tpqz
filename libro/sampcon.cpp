@@ -536,7 +536,7 @@ namespace
 		)
 	{
 		Accord const fit{ quintSoln.theSoln, ptPairUVs };
-		double const gapSq{ fit.rssGapExcluding(quintSoln.theFitNdxs) };
+		double const gapSq{ fit.sumSqGapExcluding(quintSoln.theFitNdxs) };
 		return probGen(gapSq);
 	}
 }

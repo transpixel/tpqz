@@ -54,10 +54,11 @@ namespace ro
 
 struct Accord
 {
+	//! Solution to evaluate
 	Solution const theSoln;
+
+	//! Pointer to implicit external collection of UV direction pairs
 	std::vector<PairUV> const * const thePtPairUVs;
-//	std::array<size_t, 5u> theNdxQuint{ dat::nullValue<size_t, 5u>() };
-//	std::vector<double> theGaps{};
 
 public: // methods
 
@@ -90,14 +91,23 @@ public: // methods
 
 	//! Expected gap value (root-mean-square)
 	double
-	rmsGap
+	rmsGapAll
 		() const;
 
-	//! Root-sum-square of gap values computed with *other than* omitNdx UVs
+	//! Sum-square of gap values computed with *other than* omitNdx UVs
 	double
-	rssGapExcluding
+	sumSqGapExcluding
 		( ro::FiveOf<size_t> const & omitNdxs
 		) const;
+
+	/* TODO
+	//! (Pseudo)Probability of solution considering *other then* omitNdxs
+	double
+	probExcluding
+		( ro::FiveOf<size_t> const & omitNdxs
+		, double const & sigmaDirs
+		) const;
+	*/
 
 	//! Descriptive information about this instance.
 	std::string

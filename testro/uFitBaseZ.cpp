@@ -141,7 +141,7 @@ ro_FitBaseZ_test1a
 		ro::Accord const solnFit{ roSoln, &uvPairs };
 
 		// check that *no* RMS is available - for min ray test case
-		if ( dat::isValid(solnFit.rmsGap()))
+		if ( dat::isValid(solnFit.rmsGapAll()))
 		{
 			oss << "Failure of (nan)rmsGap test for min uv" << std::endl;
 		}
@@ -163,10 +163,10 @@ ro_FitBaseZ_test1a
 		morePairs.insert(morePairs.end(), uvPairs.begin(), uvPairs.end());
 		ro::Accord const overFit{ roSoln, &morePairs };
 		double const expGapRMS{ 0. };
-		double const gotGapRMS{ overFit.rmsGap() };
+		double const gotGapRMS{ overFit.rmsGapAll() };
 		if (! dat::nearlyEquals(gotGapRMS, expGapRMS))
 		{
-			oss << "Failure of rmsGap test" << std::endl;
+			oss << "Failure of rmsGapAll test" << std::endl;
 			oss << dat::infoString(expGapRMS, "expGapRMS") << std::endl;
 			oss << dat::infoString(gotGapRMS, "gotGapRMS") << std::endl;
 		}
@@ -189,7 +189,7 @@ ro_FitBaseZ_test1a
 		ro::Accord const manyFit{ roSoln, &uvMany };
 
 		// check that gaps excluding noisy measurements are near zero
-		double const gotGapFit{ manyFit.rssGapExcluding(ndxRes) };
+		double const gotGapFit{ manyFit.sumSqGapExcluding(ndxRes) };
 		double const expGapFit{ 0. };
 		if (! dat::nearlyEquals(gotGapFit, expGapFit))
 		{
@@ -197,7 +197,7 @@ ro_FitBaseZ_test1a
 		}
 
 		// check that gaps excluding perfect fit measurements are non-zero
-		double const gotGapRes{ manyFit.rssGapExcluding(ndxFit) };
+		double const gotGapRes{ manyFit.sumSqGapExcluding(ndxFit) };
 		double const someResMag{ 1./256. }; // non-trival value for this test
 		bool const bigResids{ (someResMag < gotGapRes) };
 		if (! bigResids)

@@ -135,7 +135,7 @@ Accord :: gapsExcluding
 }
 
 double
-Accord :: rmsGap
+Accord :: rmsGapAll
 	() const
 {
 	double rms{ dat::nullValue<double>() };
@@ -144,18 +144,15 @@ Accord :: rmsGap
 		double const dof{ (double)numFreeUVs() };
 		if (0. < dof)
 		{
-			std::vector<double> gaps(numTotalUVs());
+			double sumSq{ 0. };
 			for (size_t nn{0u} ; nn < numTotalUVs() ; ++nn)
 			{
 				double const gap{ gapForNdx(nn) };
 				if (dat::isValid(gap))
 				{
-					gaps[nn] = gap;
+					sumSq += math::sq(gap);
 				}
 			}
-
-			double const sumSq
-				{ math::sumSqs<double>(gaps.begin(), gaps.end()) };
 			rms = std::sqrt(sumSq / dof);
 		}
 	}
@@ -163,19 +160,32 @@ Accord :: rmsGap
 }
 
 double
-Accord :: rssGapExcluding
+Accord :: sumSqGapExcluding
 	( ro::FiveOf<size_t> const & omitNdxs
 	) const
 {
-	double rss{ dat::nullValue<double>() };
+	double sumSq{ dat::nullValue<double>() };
 	if (isValid())
 	{
 		std::vector<double> const gaps{ gapsExcluding(omitNdxs) };
-		double const sumSq{ math::sumSqs<double>(gaps.begin(), gaps.end()) };
-		rss = std::sqrt(sumSq); // no dof adjustment for RSS
+		sumSq = math::sumSqs<double>(gaps.begin(), gaps.end());
 	}
-	return rss;
+	return sumSq;
 }
+
+/*
+double
+Accord :: probExcluding
+	( ro::FiveOf<size_t> const & omitNdxs
+	, double const & // sigmaDirs
+	) const
+{
+//	PseudoProbGen const probGen(sigmaDirs);
+	double const sumSq{ sumSqGapExcluding(omitNdxs) };
+//	return probGen(std::exp(-(sumSq/sigmDirs)));
+	return { std::exp(-sumSq) };
+}
+*/
 
 std::string
 Accord :: infoString
@@ -190,7 +200,7 @@ Accord :: infoString
 		oss
 			<< " " << dat::infoString(numTotalUVs(), "numTotalUVs")
 			<< " " << dat::infoString(numFreeUVs(), "numFreeUVs")
-			<< " " << dat::infoString(rmsGap(), "rmsGap")
+			<< " " << dat::infoString(rmsGapAll(), "rmsGapAll")
 			;
 	}
 	else

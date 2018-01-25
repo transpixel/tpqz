@@ -322,190 +322,6 @@ namespace
 		}
 	};
 
-	//! Pseudo-probability generating Functor
-	struct PseudoProbGen
-	{
-		double theInvSigmaSq{ dat::nullValue<double>() };
-
-		PseudoProbGen
-			() = default;
-
-		explicit
-		PseudoProbGen
-			( double const & estSigmaGap
-			)
-			: theInvSigmaSq{ 1. / math::sq(estSigmaGap) }
-		{ }
-
-		inline
-		double
-		operator()
-			( double const & gapSq
-			) const
-		{
-			assert(dat::isValid(theInvSigmaSq));
-			return std::exp(-theInvSigmaSq * gapSq);
-		}
-
-	};
-
-	//! Consenus solution information
-	struct BestSoln
-	{
-		PseudoProbGen theProbGen;
-
-		OriPair theOriPair{};
-		double theProbMin{ dat::nullValue<double>() };
-		double theProbMax{ dat::nullValue<double>() };
-		std::vector<double> theBestGapSqs;
-
-		//! Construct a null instance
-		BestSoln
-			() = default;
-
-		explicit
-		BestSoln
-			( size_t const & numPnts
-			, double const & dirSigma = {  4. * 10./450. }
-			)
-			: theProbGen(dirSigma)
-			, theOriPair{}
-			, theProbMin{ std::numeric_limits<double>::max() }
-			, theProbMax{ std::numeric_limits<double>::lowest() }
-			, theBestGapSqs(numPnts, dat::nullValue<double>())
-		{ }
-
-		//! True if this instance is not null
-		bool
-		isValid
-			() const
-		{
-			return dat::isValid(theOriPair);
-		}
-
-		//! True if solution is modified
-		bool
-		updatePseudoProb
-			( OriPair const & roPair
-			, double const & pProbFit
-			, std::vector<double> const & gapSqs
-			)
-		{
-			bool modSoln{ false };
-			if (pProbFit < theProbMin)
-			{
-				theProbMin = pProbFit;
-			}
-			else
-			if (theProbMax < pProbFit)
-			{
-				modSoln = true;
-				theOriPair = roPair;
-				theBestGapSqs = gapSqs;
-				theProbMax = pProbFit;
-			}
-			return modSoln;
-		}
-
-		double
-		voteFor
-			( size_t const & pntNdx
-			) const
-		{
-			double vote{ dat::nullValue<double>() };
-			if (pntNdx < theBestGapSqs.size())
-			{
-				double const & gapSq = theBestGapSqs[pntNdx];
-
-				double const pProbMea{ theProbGen(gapSq) };
-				double const pProbPnt{ pProbMea * theProbMax };
-				vote = pProbPnt;
-			}
-			return vote;
-		}
-
-		//! Estimated gap (rms adjusted for 5 dof)
-		double
-		rmseGap
-			() const
-		{
-			double rmse{ dat::nullValue<double>() };
-			if (isValid() && (5u < theBestGapSqs.size()))
-			{
-				std::vector<double> const & gaps = theBestGapSqs;
-				double const dom{ double(theBestGapSqs.size() - 5u) };
-				double const sumSqs
-					{ std::accumulate(gaps.begin(), gaps.end(), 0.) };
-				rmse = std::sqrt(sumSqs / dom);
-			}
-			return rmse;
-		}
-
-		//! Estimated gap (rms adjusted for 5 dof)
-		double
-		medianGap
-			() const
-		{
-			double median{ dat::nullValue<double>() };
-			if (isValid() && (5u < theBestGapSqs.size()))
-			{
-				// make copy for sort
-				std::vector<double> gaps{ theBestGapSqs };
-				using Iter = typename std::vector<double>::iterator;
-				Iter const it0 = gaps.begin();
-				Iter const itBeg = it0 + 5u;
-				Iter const itEnd = gaps.end();
-				std::nth_element(it0, itBeg, itEnd);
-				median = prob::median::valueFromConst(itBeg, itEnd);
-			}
-			return median;
-		}
-	};
-
-	//! RMS gap value computed using ALL measurements - true if ptSoln modified
-	bool
-	updateSolution
-		( ro::OriPair const & roPair
-		, std::vector<ro::PairUV> const & uvPairs
-		, StateTracker<5u> const & sampleState
-		, BestSoln * const & ptSoln
-		)
-	{
-		bool modSoln{ false };
-		assert(ptSoln);
-		if (dat::isValid(roPair))
-		{
-			std::vector<std::pair<size_t, double> > pProbs
-				(uvPairs.size(), { dat::nullValue<size_t>(), 0. });
-
-			// use measurements EXCLUDED from the fitting process for:
-			// 	: gapSq values (save for next computation)
-			// 	: pseudo-prob of fit
-			size_t const uvSize{ uvPairs.size() };
-			std::vector<double> gapSqs(uvPairs.size());
-			ro::QuadForm const quad{ roPair };
-			double pProbSum{ 0. };
-			size_t pProbCount{ 0u };
-			for (size_t nn{0u} ; nn < uvSize ; ++nn)
-			{
-				ro::PairUV const & uvPair = uvPairs[nn];
-				double const gapSq{ math::sq(quad.tripleProductGap(uvPair)) };
-				gapSqs[nn] = gapSq;
-				if (! sampleState.isActiveIndex(nn))
-				{
-					pProbSum += ptSoln->theProbGen(gapSq);
-					++pProbCount;
-				}
-			}
-			assert(0u < pProbCount);
-			double const pProbFit{ pProbSum / double(pProbCount) };
-
-			// update best solution tracking
-			modSoln = ptSoln->updatePseudoProb(roPair, pProbFit, gapSqs);
-		}
-		return modSoln;
-	}
-
 	//! Combinatorial index generator
 	struct Combo5
 	{
@@ -567,6 +383,37 @@ namespace
 
 namespace
 {
+	//! Pseudo-probability generating Functor
+	struct PseudoProbGen
+	{
+		double theInvSigmaSq{ dat::nullValue<double>() };
+
+		PseudoProbGen
+			() = default;
+
+		explicit
+		PseudoProbGen
+			( double const & estSigmaGap
+			)
+			: theInvSigmaSq{ 1. / math::sq(estSigmaGap) }
+		{ }
+
+		inline
+		double
+		operator()
+			( double const & gapSq
+			) const
+		{
+			assert(dat::isValid(theInvSigmaSq));
+			return std::exp(-theInvSigmaSq * gapSq);
+		}
+
+	};
+}
+
+
+namespace
+{
 	using NdxQuint = FiveOf<size_t>;
 	using PtrQuint = FiveOf<PtrPairUV>;
 
@@ -594,134 +441,6 @@ namespace
 
 }
 
-QuintSoln
-byCombo
-	( std::vector<PairUV> const & uvPairs
-	, OriPair const & roPairNom
-	, FitConfig const & fitConfig
-	)
-{
-	Solution bestSoln{};
-	FiveOf<size_t> bestNdxs{ dat::nullValue<size_t, 5u>() };
-
-	assert(areValidPairs(uvPairs));
-	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
-
-	StateTracker<5u> sampleState(uvPairs.size());
-	ro::PairBaseZ const roNom(roPairNom);
-
-	BestSoln soln(uvPairs.size()); // track best encountered soln
-	// try fitting all combinations
-	Combo5 const combo(uvPairs.size());
-	size_t const numQuints{ combo.theQuints.size() };
-	size_t nqBest{ dat::nullValue<size_t>() }; 
-	for (size_t nq{0u} ; nq < numQuints ; ++nq)
-	{
-		// gain access to measurements for fitting
-		Combo5::NdxQuint const & fitIndices = combo.theQuints[nq];
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
-		assert(areValidPtrs(uvFitPtrs));
-
-		// compute RO using fit partition
-		FitBaseZ const fitter(uvFitPtrs);//.begin(), uvFitPtrs.end());
-		Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
-		if (dat::isValid(roSoln))
-		{
-			// evaluate RO quality using current evaluation partition
-			sampleState.enactivate(fitIndices);
-			if (updateSolution(roSoln.pair(), uvPairs, sampleState, &soln))
-			{
-				nqBest = nq;
-				bestSoln = roSoln;
-				bestNdxs = fitIndices;
-			}
-			sampleState.deactivate(fitIndices);
-		}
-	}
-
-#	if ! defined(NDEBUG)
-	// ensure computations are valid
-	if (soln.isValid() && dat::isValid(nqBest))
-	{
-		// check measurements are known
-		Combo5::NdxQuint const & usedNdxs = combo.theQuints[nqBest];
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, usedNdxs));
-		assert(areValidPtrs(uvFitPtrs));
-		// ensure physically legit solution
-		assert(model::isForward(soln.theOriPair, uvFitPtrs));
-	}
-#	endif
-
-	return QuintSoln{ bestNdxs, bestSoln };
-}
-
-
-QuintSoln
-bySample
-	( std::vector<PairUV> const & uvPairs
-	, OriPair const & roPairNom
-	, size_t const & numDraws
-	, FitConfig const & fitConfig
-	, size_t const & maxTrys
-	)
-{
-	Solution bestSoln{};
-	FiveOf<size_t> bestNdxs{ dat::nullValue<size_t, 5u>() };
-
-	assert(areValidPairs(uvPairs));
-	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
-
-	StateTracker<5u> sampleState(uvPairs.size());
-	ro::PairBaseZ const roNom(roPairNom);
-
-	Combo5::NdxQuint fitIndices{{}};
-	rand::Sampler sampler(uvPairs.size(), maxTrys);
-
-	BestSoln soln(uvPairs.size());
-	for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
-	{
-		// partition samples into fit and evaluation groups
-		bool const goodSample{ sampler.setIndices(&fitIndices) };
-		if (goodSample)
-		{
-			// access measurements to use for fitting
-			PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
-			assert(areValidPtrs(uvFitPtrs));
-
-			// compute RO using fit partition
-			FitBaseZ const fitter(uvFitPtrs);
-			Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
-			if (dat::isValid(roSoln))
-			{
-				// evaluate RO quality using current evaluation partition
-				sampleState.enactivate(fitIndices);
-				if (updateSolution(roSoln.pair(), uvPairs, sampleState, &soln))
-				{
-					bestSoln = roSoln;
-					bestNdxs = fitIndices;
-				}
-				sampleState.deactivate(fitIndices);
-			}
-		}
-		// else // ignore improper (e.g. duplicate) samples
-		// io::out() << "WARNING: invalid partition" << std::endl;
-	}
-
-#	if ! defined(NDEBUG)
-	// search for "forward" solution
-	if (soln.isValid() && dat::isValid(bestNdxs[0]))
-	{
-		// access measurements to use for fitting
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestNdxs));
-		assert(areValidPtrs(uvFitPtrs));
-
-		// ensure physically legit solution
-		assert(model::isForward(soln.theOriPair, uvFitPtrs));
-	}
-#	endif
-
-	return QuintSoln{ bestNdxs, bestSoln };
-}
 
 std::vector<QuintSoln>
 allByCombo
@@ -779,7 +498,6 @@ allBySample
 	Combo5::NdxQuint fitIndices{{}};
 	rand::Sampler sampler(uvPairs.size(), maxTrys);
 
-	BestSoln soln(uvPairs.size());
 	for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
 	{
 		// partition samples into fit and evaluation groups
@@ -856,6 +574,56 @@ bestOf
 
 	return best;
 }
+
+namespace
+{
+	QuintSoln
+	bestFrom
+		( std::vector<QuintSoln> const & allQuintSolns
+		, std::vector<PairUV> const & uvPairs
+		, double const & dirSigma
+		)
+	{
+		QuintSoln bestQuintSoln{};
+		constexpr size_t const numBest{ 1u };
+		std::vector<QuintSoln> const bestQuintSolns
+			{ bestOf(allQuintSolns, uvPairs, numBest, dirSigma) };
+		if (! bestQuintSolns.empty())
+		{
+			bestQuintSoln = bestQuintSolns[0];
+		}
+		return bestQuintSoln;
+	}
+}
+
+QuintSoln
+byCombo
+	( std::vector<PairUV> const & uvPairs
+	, OriPair const & roPairNom
+	, FitConfig const & fitConfig
+	, double const & dirSigma
+	)
+{
+	std::vector<QuintSoln> const allQuintSolns
+		{ allByCombo(uvPairs, roPairNom, fitConfig) };
+	return bestFrom(allQuintSolns, uvPairs, dirSigma);
+}
+
+QuintSoln
+bySample
+	( std::vector<PairUV> const & uvPairs
+	, OriPair const & roPairNom
+	, size_t const & numDraws
+	, FitConfig const & fitConfig
+	, double const & dirSigma
+	, size_t const & maxTrys
+	)
+{
+	std::vector<QuintSoln> const allQuintSolns
+		{ allBySample(uvPairs, roPairNom, numDraws, fitConfig, maxTrys) };
+	return bestFrom(allQuintSolns, uvPairs, dirSigma);
+}
+
 
 } // sampcon
 

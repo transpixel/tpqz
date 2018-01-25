@@ -34,6 +34,7 @@
 */
 
 
+#include "libdat/validity.h"
 #include "libprob/median.h"
 #include "libro/FitConfig.h"
 #include "libro/ro.h"
@@ -57,27 +58,22 @@ namespace sampcon
 {
 	struct QuintSoln
 	{
-		FiveOf<size_t> const theFitNdxs;
-		Solution theSoln;
+		FiveOf<size_t> theFitNdxs{ dat::nullValue<size_t, 5u>() };
+		Solution theSoln{};
+
+		QuintSoln
+			() = default;
+
+		//! Value ctor
+		explicit
+		QuintSoln
+			( FiveOf<size_t> const & fitNdxs
+			, Solution const & soln
+			)
+			: theFitNdxs{ fitNdxs }
+			, theSoln{ soln }
+		{ }
 	};
-
-	//! Best solution after exhaustive evaluation of all combinations
-	QuintSoln
-	byCombo
-		( std::vector<PairUV> const & uvPairs
-		, OriPair const & roPairNom
-		, FitConfig const & fitConfig = {}
-		);
-
-	//! Best solution from random sampling
-	QuintSoln
-	bySample
-		( std::vector<PairUV> const & uvPairs
-		, OriPair const & roPairNom
-		, size_t const & numDraws = { 640u }
-		, FitConfig const & fitConfig = {}
-		, size_t const & maxTrys = { 10u }
-		);
 
 	//! All solutions (N-choose-5 of them!!)
 	std::vector<QuintSoln>
@@ -104,6 +100,26 @@ namespace sampcon
 		, std::vector<PairUV> const & uvPairs
 		, size_t const & numBest = { 1u }
 		, double const & dirSigma = { 1./1000. }
+		);
+
+	//! Best solution after exhaustive evaluation of all combinations
+	QuintSoln
+	byCombo
+		( std::vector<PairUV> const & uvPairs
+		, OriPair const & roPairNom
+		, FitConfig const & fitConfig = {}
+		, double const & dirSigma = { 1./1000. }
+		);
+
+	//! Best solution from random sampling
+	QuintSoln
+	bySample
+		( std::vector<PairUV> const & uvPairs
+		, OriPair const & roPairNom
+		, size_t const & numDraws = { 640u }
+		, FitConfig const & fitConfig = {}
+		, double const & dirSigma = { 1./1000. }
+		, size_t const & maxTrys = { 10u }
 		);
 
 } // sampcon

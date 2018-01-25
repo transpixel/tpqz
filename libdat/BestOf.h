@@ -61,8 +61,8 @@ template <typename Type, typename Compare = std::greater<Type> >
 class BestOf
 {
 	size_t theNumBest{ dat::nullValue<size_t>() };
-//	std::set<Type, std::greater<double> > theItems;
-	std::set<Type, Compare > theItems;
+	std::multiset<Type, Compare > theItems;
+	Compare theCompFunc;
 
 public: // methods
 
@@ -121,61 +121,43 @@ public: // methods
 	{
 		bool wasAdded{ false };
 
-std::ostringstream oss;
-oss << dat::infoString(item);
-oss << "  ";
-
 		bool addItem{ false };
-		if (theItems.empty())
+		if (theItems.size() < theNumBest)
 		{
 			addItem = true;
-oss << "zero:";
 		}
 		else
 		{
-oss << "init:";
-			Type const & head = *(theItems.begin());
 			Type const & tail = *(theItems.rbegin());
-			if ((head < item) && (! (tail < item)))
+			bool beatsTail{ theCompFunc(item, tail) };
+			if (beatsTail)
 			{
-oss << "larger:";
 				addItem = true;
-			}
-			else
-			{
-oss << "ignore:";
 			}
 		}
 		
-addItem = true;
 		if (addItem)
 		{
 			theItems.insert(item);
 			wasAdded = true;
-oss << "added:";
 
-			// enforce set size
+			// enforce size limit
 			if (theNumBest < size())
 			{
 				theItems.erase(std::prev(theItems.end()));
-oss << "rm:";
 			}
-else
-{
-oss << "--:";
-}
 		}
-else
-{
-oss << "nooop:";
-}
 
-oss << "...:";
-for (Type const & inHeap : theItems)
-{
-	oss << " " << dat::infoString(inHeap);
-}
-io::out() << oss.str() << std::endl;
+		/*
+		std::ostringstream oss;
+		oss << dat::infoString(item);
+		oss << " ...:";
+		for (Type const & inHeap : theItems)
+		{
+			oss << " " << dat::infoString(inHeap);
+		}
+		io::out() << oss.str() << std::endl;
+		*/
 
 		return wasAdded;
 	}

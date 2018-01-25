@@ -40,6 +40,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -132,6 +133,16 @@ dat_BestOf_test1
 		}
 	};
 
+	Foo
+	randFoo
+		( size_t const & ndx
+		)
+	{
+		static std::random_device rdev;
+		static std::uniform_real_distribution<double> dist(10., 19.);
+		return Foo{ dist(rdev), dist(rdev), ndx };
+	}
+
 	//! Comparison functor compatible with BestOf
 	struct CompFoo
 	{
@@ -145,6 +156,21 @@ dat_BestOf_test1
 		}
 	};
 
+	std::vector<Foo>
+	simValues
+		( size_t const & numVals
+		)
+	{
+		std::vector<Foo> values;
+		values.reserve(numVals);
+		for (size_t nn{0u} ; nn < numVals ; ++nn)
+		{
+			Foo const foo{ randFoo(nn) };
+			values.emplace_back(foo);
+		}
+		return values;
+	}
+
 //! Check pseudo random cases with struct and functor
 std::string
 dat_BestOf_test2
@@ -152,35 +178,58 @@ dat_BestOf_test2
 {
 	std::ostringstream oss;
 
-	constexpr size_t const numBest{ 7u };
-	std::vector<Foo> values;
-	// Note CompFoo provided as a struct type (no parenthesis)
-	dat::BestOf<Foo, CompFoo> besty(numBest);
-
-	constexpr size_t const numVals{ 64u };
-	values.reserve(numVals);
-	for (size_t nn{0u} ; nn < numVals ; ++nn)
+	constexpr size_t const maxNumVals{ 64u };
+	for (size_t numVals{1u} ; numVals < maxNumVals ; ++numVals)
 	{
-		Foo const foo{ double(nn), 4., nn };
-		values.emplace_back(foo);
-		besty.addSample(foo);
-	}
+		constexpr size_t const numToTrack{ 7u };
+		// Note CompFoo provided as a struct type (no parenthesis)
+		dat::BestOf<Foo, CompFoo> besty(numToTrack);
 
-	// Note CompFoo provided as an object instance (with parenthesis)
-	sort(values.begin(), values.end(), CompFoo());
-	std::vector<Foo> const & expBest = values;
-
-	// check if results match expected sort
-	std::vector<Foo> const gotBest{ besty.bestItems() };
-	for (size_t nn{0u} ; nn < numBest ; ++nn)
-	{
-		Foo const & expNext = expBest[nn];
-		Foo const & gotNext = gotBest[nn];
-		if (! dat::nearlyEquals(gotNext.theNdx, expNext.theNdx))
+		bool hitErr{ false };
+		std::vector<Foo> values{ simValues(numVals) };
+		bool const gotAdd{ besty.addSamples(values.begin(), values.end()) };
+		if (! gotAdd)
 		{
-			oss << "Failure of next test: nn = " << nn << std::endl;
-			oss << dat::infoString(expNext.theNdx, "expNext") << std::endl;
-			oss << dat::infoString(gotNext.theNdx, "gotNext") << std::endl;
+			oss << "Failure of add status return test" << std::endl;
+			hitErr = true;
+		}
+
+		// use STL sort as evaluation standard
+		std::vector<Foo> expBest(values);
+		// Note CompFoo provided as an object instance (with parenthesis)
+		sort(expBest.begin(), expBest.end(), CompFoo());
+
+		// check if results match expected sort
+		std::vector<Foo> const gotBest{ besty.bestItems() };
+		size_t const expNum{ std::min(numVals, numToTrack) };
+		size_t const gotNum{ gotBest.size() };
+		if (! dat::nearlyEquals(gotNum, expNum))
+		{
+			oss << "Failure of bestItems size test" << std::endl;
+			oss << dat::infoString(expNum, "expNum") << std::endl;
+			oss << dat::infoString(gotNum, "gotNum") << std::endl;
+			hitErr = true;
+		}
+		else
+		{
+			for (size_t nn{0u} ; nn < expNum ; ++nn)
+			{
+				Foo const & expNext = expBest[nn];
+				Foo const & gotNext = gotBest[nn];
+				if (! dat::nearlyEquals(gotNext.theNdx, expNext.theNdx))
+				{
+					oss << "Failure of next test: nn = " << nn << std::endl;
+					oss << dat::infoString(expNext.theNdx, "expNext") << '\n';
+					oss << dat::infoString(gotNext.theNdx, "gotNext") << '\n';
+					hitErr = true;
+				}
+			}
+		}
+
+		if (hitErr)
+		{
+			oss << "... at numVals = " << numVals << std::endl;
+			break;
 		}
 	}
 

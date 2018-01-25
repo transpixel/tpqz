@@ -100,6 +100,15 @@ public: // methods
 		( Type const & item
 		);
 
+	//! Process collection of objects with addSample()
+	template <typename FwdIter>
+	inline
+	bool
+	addSamples
+		( FwdIter const & itBeg //!< *iter == Type
+		, FwdIter const & itEnd
+		);
+
 	//! Best items in order CompFunc(item[nn], item[nn+1])
 	inline
 	std::vector<Type>

@@ -123,6 +123,23 @@ BestOf<Type, Compare> :: addSample
 }
 
 template <typename Type, typename Compare>
+template <typename FwdIter>
+inline
+bool
+BestOf<Type, Compare> :: addSamples
+	( FwdIter const & itBeg
+	, FwdIter const & itEnd
+	)
+{
+	bool anyAdded{ false };
+	for (FwdIter iter{itBeg} ; itEnd != iter ; ++iter)
+	{
+		anyAdded |= addSample(*iter);
+	}
+	return anyAdded;
+}
+
+template <typename Type, typename Compare>
 inline
 std::vector<Type>
 BestOf<Type, Compare> :: bestItems

@@ -97,6 +97,14 @@ namespace sampcon
 		, size_t const & maxTrys = { 10u }
 		);
 
+	//! Select the "best" (TODO metric?) from quintSolns
+	std::vector<QuintSoln>
+	bestOf
+		( std::vector<QuintSoln> const & quintSolns
+		, std::vector<PairUV> const & uvPairs
+		, size_t const & numBest = { 1u }
+		, double const & dirSigma = { 1./1000. }
+		);
 
 } // sampcon
 

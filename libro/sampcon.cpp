@@ -34,12 +34,14 @@
 
 #include "libro/sampcon.h"
 
+#include "libdat/BestOf.h"
 #include "libdat/info.h"
 #include "libdat/random.h"
 #include "libdat/validity.h"
 #include "libgeo/intersect.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libro/Accord.h"
 #include "libro/cast.h"
 #include "libro/FitBaseZ.h"
 #include "libro/model.h"
@@ -804,6 +806,56 @@ allBySample
 	return quintSolns;
 }
 
+namespace
+{
+	//! Compute probability associated with putative solution
+	inline
+	double
+	probFor
+		( QuintSoln const & quintSoln
+		, std::vector<PairUV> const * const & ptPairUVs
+		, PseudoProbGen const & probGen
+		)
+	{
+		Accord const fit{ quintSoln.theSoln, ptPairUVs };
+		double const gapSq{ fit.rssGapExcluding(quintSoln.theFitNdxs) };
+		return probGen(gapSq);
+	}
+}
+
+std::vector<QuintSoln>
+bestOf
+	( std::vector<QuintSoln> const & quintSolns
+	, std::vector<PairUV> const & uvPairs
+	, size_t const & numBest
+	, double const & dirSigma
+	)
+{
+	std::vector<QuintSoln> best;
+
+	PseudoProbGen const probGen(dirSigma);
+	using ProbNdxPair = std::pair<double, size_t>;
+	dat::BestOf<ProbNdxPair> besty(numBest);
+
+	size_t const numSolns{ quintSolns.size() };
+	for (size_t ndx{0u} ; ndx < numSolns ; ++ndx)
+	{
+		QuintSoln const & quintSoln = quintSolns[ndx];
+		double const prob{ probFor(quintSoln, &uvPairs, probGen) };
+		ProbNdxPair const pnPair{ prob, ndx };
+		besty.addSample(pnPair);
+	}
+
+	std::vector<ProbNdxPair> const pnBests{ besty.bestItems() };
+	best.reserve(pnBests.size());
+	for (ProbNdxPair const & pnPair : pnBests)
+	{
+		size_t const ndx{ pnPair.second };
+		best.emplace_back(quintSolns[ndx]);
+	}
+
+	return best;
+}
 
 } // sampcon
 

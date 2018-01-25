@@ -148,7 +148,7 @@ io::out() << "================" << std::endl;
 	ro::PairRel const roNom{ ga::Rigid::identity(), ori2w1 };
 	constexpr double const maxCondNum{ 1.e3 };
 	ro::FitConfig const fitConfig{ maxCondNum };
-	ro::sampcon::QuintSoln const roQuintSoln
+	ro::QuintSoln const roQuintSoln
 		{ ro::sampcon::byCombo(uvPairs, roNom.pair(), fitConfig) };
 	ro::Solution const & roSoln = roQuintSoln.theSoln;
 	ro::PairRel const roBest(roSoln.pair());

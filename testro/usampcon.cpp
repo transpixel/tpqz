@@ -257,7 +257,7 @@ ro_sampcon_test1
 
 	// compute consensus solution
 	constexpr size_t numRandSamps{ 252 };
-	ro::sampcon::QuintSoln const roQuintSoln
+	ro::QuintSoln const roQuintSoln
 		{ ro::sampcon::bySample(uvPairs, roPairNom, numRandSamps) };
 	if (! dat::isValid(roQuintSoln.theSoln))
 	{

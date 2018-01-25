@@ -37,6 +37,7 @@
 #include "libdat/validity.h"
 #include "libprob/median.h"
 #include "libro/FitConfig.h"
+#include "libro/QuintSoln.h"
 #include "libro/ro.h"
 #include "libro/Solution.h"
 
@@ -56,25 +57,6 @@ namespace ro
 
 namespace sampcon
 {
-	struct QuintSoln
-	{
-		FiveOf<size_t> theFitNdxs{ dat::nullValue<size_t, 5u>() };
-		Solution theSoln{};
-
-		QuintSoln
-			() = default;
-
-		//! Value ctor
-		explicit
-		QuintSoln
-			( FiveOf<size_t> const & fitNdxs
-			, Solution const & soln
-			)
-			: theFitNdxs{ fitNdxs }
-			, theSoln{ soln }
-		{ }
-	};
-
 	//! All solutions (N-choose-5 of them!!)
 	std::vector<QuintSoln>
 	allByCombo

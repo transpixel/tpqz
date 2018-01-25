@@ -377,7 +377,7 @@ ro_FitBaseZ_test2
 	// get sample-consensus solution - by brute force combos
 	{
 		timer.start("consenusByCombo");
-		ro::sampcon::QuintSoln const roQuintSoln
+		ro::QuintSoln const roQuintSoln
 			{ ro::sampcon::byCombo(uvs, roNom) };
 		ro::PairBaseZ const roGot(roQuintSoln.theSoln.pair());
 		timer.stop();
@@ -392,7 +392,7 @@ ro_FitBaseZ_test2
 	// get sample-consensus solution - by (pseudo) random sampling
 	{
 		timer.start("consenusBySamples");
-		ro::sampcon::QuintSoln const roQuintSoln
+		ro::QuintSoln const roQuintSoln
 			{ ro::sampcon::bySample(uvs, roNom) };
 		ro::PairBaseZ const roGot(roQuintSoln.theSoln.pair());
 		timer.stop();

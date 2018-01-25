@@ -546,12 +546,12 @@ bestOf
 	( std::vector<QuintSoln> const & quintSolns
 	, std::vector<PairUV> const & uvPairs
 	, size_t const & numBest
-	, double const & dirSigma
+	, double const & sigmaDirs
 	)
 {
 	std::vector<QuintSoln> best;
 
-	PseudoProbGen const probGen(dirSigma);
+	PseudoProbGen const probGen(sigmaDirs);
 	using ProbNdxPair = std::pair<double, size_t>;
 	dat::BestOf<ProbNdxPair> besty(numBest);
 
@@ -581,13 +581,13 @@ namespace
 	bestFrom
 		( std::vector<QuintSoln> const & allQuintSolns
 		, std::vector<PairUV> const & uvPairs
-		, double const & dirSigma
+		, double const & sigmaDirs
 		)
 	{
 		QuintSoln bestQuintSoln{};
 		constexpr size_t const numBest{ 1u };
 		std::vector<QuintSoln> const bestQuintSolns
-			{ bestOf(allQuintSolns, uvPairs, numBest, dirSigma) };
+			{ bestOf(allQuintSolns, uvPairs, numBest, sigmaDirs) };
 		if (! bestQuintSolns.empty())
 		{
 			bestQuintSoln = bestQuintSolns[0];
@@ -601,12 +601,12 @@ byCombo
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
 	, FitConfig const & fitConfig
-	, double const & dirSigma
+	, double const & sigmaDirs
 	)
 {
 	std::vector<QuintSoln> const allQuintSolns
 		{ allByCombo(uvPairs, roPairNom, fitConfig) };
-	return bestFrom(allQuintSolns, uvPairs, dirSigma);
+	return bestFrom(allQuintSolns, uvPairs, sigmaDirs);
 }
 
 QuintSoln
@@ -615,13 +615,13 @@ bySample
 	, OriPair const & roPairNom
 	, size_t const & numDraws
 	, FitConfig const & fitConfig
-	, double const & dirSigma
+	, double const & sigmaDirs
 	, size_t const & maxTrys
 	)
 {
 	std::vector<QuintSoln> const allQuintSolns
 		{ allBySample(uvPairs, roPairNom, numDraws, fitConfig, maxTrys) };
-	return bestFrom(allQuintSolns, uvPairs, dirSigma);
+	return bestFrom(allQuintSolns, uvPairs, sigmaDirs);
 }
 
 

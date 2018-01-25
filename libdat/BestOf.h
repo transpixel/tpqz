@@ -35,15 +35,9 @@
 
 
 #include "libdat/validity.h"
-#include "libdat/info.h" // TODO
-#include "libio/stream.h" // TODO
 
-#include <cassert>
-#include <iterator>
 #include <set>
-#include <sstream>
 #include <string>
-#include <vector>
 
 
 namespace dat
@@ -75,38 +69,25 @@ public: // methods
 	explicit
 	BestOf
 		( size_t const & numBest
-		)
-		: theNumBest{ numBest }
-		, theItems{}
-	{
-	}
+		);
 
 	//! True if instance is valid
 	inline
 	bool
 	isValid
-		() const
-	{
-		return dat::isValid(theNumBest);
-	}
+		() const;
 
 	//! The number of objects currently being tracked
 	inline
 	size_t
 	capacity
-		() const
-	{
-		return theNumBest;
-	}
+		() const;
 
 	//! The number of objects currently being tracked
 	inline
 	size_t
 	size
-		() const
-	{
-		return theItems.size();
-	}
+		() const;
 
 	/*! Add object to tracking collection if "better" - true if added
 	 *
@@ -117,119 +98,35 @@ public: // methods
 	bool
 	addSample
 		( Type const & item
-		)
-	{
-		bool wasAdded{ false };
-
-		bool addItem{ false };
-		if (theItems.size() < theNumBest)
-		{
-			addItem = true;
-		}
-		else
-		{
-			Type const & tail = *(theItems.rbegin());
-			bool beatsTail{ theCompFunc(item, tail) };
-			if (beatsTail)
-			{
-				addItem = true;
-			}
-		}
-		
-		if (addItem)
-		{
-			theItems.insert(item);
-			wasAdded = true;
-
-			// enforce size limit
-			if (theNumBest < size())
-			{
-				theItems.erase(std::prev(theItems.end()));
-			}
-		}
-
-		/*
-		std::ostringstream oss;
-		oss << dat::infoString(item);
-		oss << " ...:";
-		for (Type const & inHeap : theItems)
-		{
-			oss << " " << dat::infoString(inHeap);
-		}
-		io::out() << oss.str() << std::endl;
-		*/
-
-		return wasAdded;
-	}
+		);
 
 	//! The ndx-th best object being tracked
 	inline
 	Type
 	itemAt
 		( size_t const & ndx //!< 0:best, 1:second-best, etc
-		) const
-	{
-		Type item{};
-		assert(ndx < theItems.size());
-		{ // HACK - replace function
-			std::vector<Type> sorted(theItems.begin(), theItems.end());
-			item = sorted[ndx];
-		}
-		return item;
-	}
+		) const;
 
 	//! Descriptive information about this instance.
 	inline
 	std::string
 	infoString
 		( std::string const & title = std::string()
-		) const
-	{
-		std::ostringstream oss;
-		if (! title.empty())
-		{
-			oss << title << " ";
-		}
-		if (isValid())
-		{
-			oss
-				<< " " << dat::infoString(capacity(), "capacity()")
-				<< " " << dat::infoString(size(), "size()")
-				;
-		}
-		else
-		{
-			oss << " <null>";
-		}
-		return oss.str();
-	}
+		) const;
 
 	//! Descriptive information about this instance.
 	inline
 	std::string
 	infoStringContents
 		( std::string const & title = std::string()
-		) const
-	{
-		std::ostringstream oss;
-		oss << infoString(title);
-		if (isValid())
-		{
-			for (Type const & item : theItems)
-			{
-				oss << std::endl;
-				oss << dat::infoString(item, "item");
-			}
-		}
-		return oss.str();
-	}
+		) const;
 
 }; // BestOf
 
 } // dat
 
 // Inline definitions
-// #include "libdat/BestOf.inl"
+#include "libdat/BestOf.inl"
 
 #endif // dat_BestOf_INCL_
 

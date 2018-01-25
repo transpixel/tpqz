@@ -70,7 +70,9 @@ dat_BestOf_test1
 	std::ostringstream oss;
 
 	std::vector<double> const values
-		{ 1., 15., 12., 0., 16., 0., 19., 7., 13., 2. };
+		{ 1., 15., 12., 0., 16., 0., 19., 7., 13., 2.
+		, 1., 15., 12., 0., 16., 0., 19., 7., 13., 2.
+		};
 
 	// create tracker and add samples
 	constexpr size_t const numBest{ 5u };

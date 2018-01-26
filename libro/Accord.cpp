@@ -199,6 +199,27 @@ Accord :: sumSqGapExcluding
 	return sumSq;
 }
 
+double
+Accord :: rmsGapExcluding
+	( ro::FiveOf<size_t> const & omitNdxs
+	) const
+{
+	double rms{ dat::nullValue<double>() };
+	if (isValid())
+	{
+		double const dof{ (double)numFreeUVs() };
+		if (0. < dof)
+		{
+			double const sumSq{ sumSqGapExcluding(omitNdxs) };
+			if (dat::isValid(sumSq))
+			{
+				rms = std::sqrt(sumSq / dof);
+			}
+		}
+	}
+	return rms;
+}
+
 namespace
 {
 	struct GapProbability

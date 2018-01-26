@@ -117,6 +117,12 @@ public: // methods
 		( ro::FiveOf<size_t> const & omitNdxs
 		) const;
 
+	//! Sum-square of gap values computed with *other than* omitNdx UVs
+	double
+	rmsGapExcluding
+		( ro::FiveOf<size_t> const & omitNdxs
+		) const;
+
 	//! (Pseudo)Probability of solution considering *other than* omitNdxs
 	double
 	probExcluding

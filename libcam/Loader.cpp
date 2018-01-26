@@ -75,9 +75,10 @@ namespace cam
 XRefSpots
 Loader :: spotTableFor
 	( std::vector<std::string> const & meapaths
+	, Camera const & camera
 	)
 {
-	return Loader(meapaths).spotTable();
+	return Loader(meapaths).spotTable(camera);
 }
 
 // explicit
@@ -143,6 +144,7 @@ Loader :: acqNames
 XRefSpots
 Loader :: spotTable
 	( std::map<PntName, PntNdx> const & pntNameNdxMap
+	, Camera const & camera
 	) const
 {
 	XRefSpots spotTab(thePntNames.size(), theMeaGroups.size());
@@ -154,13 +156,14 @@ Loader :: spotTable
 		for (MeaForOnePnt const & meaPnt : meaGroup)
 		{
 			std::string const & pntName = meaPnt.thePntName;
-			dat::Spot const & spot = meaPnt.theSpot;
+			dat::Spot const & detSpot = meaPnt.theSpot;
+			dat::Spot const imgSpot{ camera.imageSpotFor(detSpot) };
 
 			std::map<PntName, PntNdx>::const_iterator const iter
 				{ pntNameNdxMap.find(pntName) };
 			assert(pntNameNdxMap.end() != iter);
 			PntNdx const & pntNdx = iter->second;
-			spotTab(pntNdx, acqNdx) = spot;
+			spotTab(pntNdx, acqNdx) = imgSpot;
 		}
 	}
 
@@ -169,9 +172,10 @@ Loader :: spotTable
 
 XRefSpots
 Loader :: spotTable
-	() const
+	( Camera const & camera
+	) const
 {
-	return spotTable(pntNameNdxMap());
+	return spotTable(pntNameNdxMap(), camera);
 }
 
 std::string

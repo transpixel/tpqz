@@ -34,6 +34,7 @@
 */
 
 
+#include "libcam/Camera.h"
 #include "libcam/cam.h"
 #include "libcam/XRefSpots.h"
 
@@ -69,6 +70,7 @@ public: // static methods
 	XRefSpots
 	spotTableFor
 		( std::vector<std::string> const & meapaths
+		, Camera const & camera
 		);
 
 public: // methods
@@ -107,12 +109,14 @@ public: // methods
 	XRefSpots
 	spotTable
 		( std::map<PntName, PntNdx> const & pntNameNdxMap
+		, Camera const & camera
 		) const;
 
 	//! Measurement data in table format
 	XRefSpots
 	spotTable
-		() const;
+		( Camera const & camera
+		) const;
 
 	//! Descriptive information about this instance.
 	std::string

@@ -119,6 +119,13 @@ struct ArgsBaseZ
 				<< " " << "sumA3: " << io::sprintf("%12.5e", sumA3)
 				<< std::endl;
 		}
+		if (! (dat::nearlyEquals(sumA3, 0., fuzzyTol)))
+		{
+			static std::string const fmt{ "%21.18f" };
+			io::out() << "##ERROR\n";
+			io::out() << "..sumA3: " << io::sprintf(fmt, sumA3) << '\n';
+			io::out() << "..tol  : " << io::sprintf(fmt, fuzzyTol) << '\n';
+		}
 		assert(dat::nearlyEquals(sumA3, 0., fuzzyTol));
 	}
 

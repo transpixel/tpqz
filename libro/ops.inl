@@ -116,6 +116,16 @@ relative2w1
 }
 
 inline
+ga::Rigid
+unitRigid2w1
+	( std::pair<ga::Rigid, ga::Rigid> const & pair
+	)
+{
+	ga::Rigid const roIn{ relative2w1(pair) };
+	return ga::Rigid(ga::unit(roIn.location()), roIn.pose());
+}
+
+inline
 ga::Vector
 vectorBetween
 	( std::pair<ga::Rigid, ga::Rigid> const & roPair

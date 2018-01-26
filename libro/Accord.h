@@ -34,6 +34,7 @@
 */
 
 
+#include "libro/QuintSoln.h"
 #include "libro/ro.h"
 #include "libro/Solution.h"
 
@@ -59,6 +60,17 @@ struct Accord
 
 	//! Pointer to implicit external collection of UV direction pairs
 	std::vector<PairUV> const * const thePtPairUVs;
+
+public: // static methods
+
+	//! (Pseudo)Probability of quintSoln considering only NOT-fit UVs
+	static
+	double
+	probFor
+		( QuintSoln const & quintSoln
+		, std::vector<PairUV> const & uvPairs
+		, double const & gapSigma
+		);
 
 public: // methods
 
@@ -100,20 +112,32 @@ public: // methods
 		( ro::FiveOf<size_t> const & omitNdxs
 		) const;
 
-	/* TODO
-	//! (Pseudo)Probability of solution considering *other then* omitNdxs
+	//! (Pseudo)Probability of solution considering *other than* omitNdxs
 	double
 	probExcluding
 		( ro::FiveOf<size_t> const & omitNdxs
-		, double const & sigmaDirs
+		, double const & gapSigma
 		) const;
-	*/
 
 	//! Descriptive information about this instance.
 	std::string
 	infoString
 		( std::string const & title = std::string()
 		) const;
+
+private:
+
+	//! Gap value for ndx - w/o any validity checking
+	inline
+	double
+	gapNoCheck
+		( size_t const & ndx
+		) const
+	{
+		ro::PairUV const & uvPair = (*thePtPairUVs)[ndx];
+		return theSoln.theRoPair->tripleProductGap(uvPair);
+	}
+
 
 }; // Accord
 

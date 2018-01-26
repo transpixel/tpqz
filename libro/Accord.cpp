@@ -43,6 +43,21 @@
 namespace ro
 {
 
+// static
+double
+Accord :: probFor
+	( QuintSoln const & quintSoln
+	, std::vector<PairUV> const & uvPairs
+	, double const & gapSigma
+	)
+{
+	Solution const & roSoln = quintSoln.theSoln;
+	FiveOf<size_t> const & fitNdxs = quintSoln.theFitNdxs;
+	Accord const eval{ roSoln, &uvPairs };
+	double const prob{ eval.probExcluding(fitNdxs, gapSigma) };
+	return prob;
+}
+
 bool
 Accord :: isValid
 	() const
@@ -121,12 +136,12 @@ Accord :: gapsExcluding
 {
 	std::vector<double> gaps;
 	gaps.reserve(numTotalUVs() - omitNdxs.size());
-	IsIn const contains{ omitNdxs };
+	IsIn const omitContains{ omitNdxs };
 	for (size_t ndx{0u} ; ndx < numTotalUVs() ; ++ndx)
 	{
-		if (! contains(ndx))
+		if (! omitContains(ndx))
 		{
-			double const gap{ gapForNdx(ndx) };
+			double const gap{ gapNoCheck(ndx) };
 			assert(dat::isValid(gap));
 			gaps.emplace_back(gap);
 		}
@@ -173,19 +188,69 @@ Accord :: sumSqGapExcluding
 	return sumSq;
 }
 
-/*
+namespace
+{
+	struct GapProbability
+	{
+		double theArgCo;
+
+		explicit
+		GapProbability
+			( double const & gapSigma
+			)
+			: theArgCo{ -.5 / math::sq(gapSigma) }
+		{ }
+
+		inline
+		double
+		operator()
+			( double const & gap
+			) const
+		{
+			// NOTE: Ignore normalization constant (cancelled in calling code)
+			return std::exp(theArgCo * math::sq(gap));
+		}
+	};
+}
+
 double
 Accord :: probExcluding
 	( ro::FiveOf<size_t> const & omitNdxs
-	, double const & // sigmaDirs
+	, double const & gapSigma
 	) const
 {
-//	PseudoProbGen const probGen(sigmaDirs);
-	double const sumSq{ sumSqGapExcluding(omitNdxs) };
-//	return probGen(std::exp(-(sumSq/sigmDirs)));
-	return { std::exp(-sumSq) };
+	double prob{ dat::nullValue<double>() };
+
+	GapProbability const probForGap(gapSigma);
+	double const dof{ static_cast<double>(numFreeUVs()) };
+	if (isValid() && (0. < dof))
+	{
+		// compute baseline probability (if all prefect)
+		static double const refProb{ probForGap(0.) };
+		double const maxProb{ refProb * double(numFreeUVs()) };
+
+		// sum (disjuctively combine) component probabilities
+		double probSum{ 0. };
+		IsIn const omitContains{ omitNdxs };
+		for (size_t ndx{0u} ; ndx < numTotalUVs() ; ++ndx)
+		{
+			if (! omitContains(ndx))
+			{
+				double const gap{ gapNoCheck(ndx) };
+				assert(dat::isValid(gap));
+				double const aProb{ probForGap(gap) };
+				probSum += aProb;
+			}
+		}
+
+		// normalize to probability value
+		prob = (1./maxProb) * probSum;
+		assert(! (1. < prob));
+		assert(! (prob < 0.));
+	}
+
+	return prob;
 }
-*/
 
 std::string
 Accord :: infoString
@@ -209,6 +274,7 @@ Accord :: infoString
 	}
 	return oss.str();
 }
+
 
 } // ro
 

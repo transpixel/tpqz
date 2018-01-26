@@ -383,37 +383,6 @@ namespace
 
 namespace
 {
-	//! Pseudo-probability generating Functor
-	struct PseudoProbGen
-	{
-		double theInvSigmaSq{ dat::nullValue<double>() };
-
-		PseudoProbGen
-			() = default;
-
-		explicit
-		PseudoProbGen
-			( double const & estSigmaGap
-			)
-			: theInvSigmaSq{ 1. / math::sq(estSigmaGap) }
-		{ }
-
-		inline
-		double
-		operator()
-			( double const & gapSq
-			) const
-		{
-			assert(dat::isValid(theInvSigmaSq));
-			return std::exp(-theInvSigmaSq * gapSq);
-		}
-
-	};
-}
-
-
-namespace
-{
 	using NdxQuint = FiveOf<size_t>;
 	using PtrQuint = FiveOf<PtrPairUV>;
 
@@ -524,34 +493,16 @@ allBySample
 	return quintSolns;
 }
 
-namespace
-{
-	//! Compute probability associated with putative solution
-	inline
-	double
-	probFor
-		( QuintSoln const & quintSoln
-		, std::vector<PairUV> const * const & ptPairUVs
-		, PseudoProbGen const & probGen
-		)
-	{
-		Accord const fit{ quintSoln.theSoln, ptPairUVs };
-		double const gapSq{ fit.sumSqGapExcluding(quintSoln.theFitNdxs) };
-		return probGen(gapSq);
-	}
-}
-
 std::vector<QuintSoln>
 bestOf
 	( std::vector<QuintSoln> const & quintSolns
 	, std::vector<PairUV> const & uvPairs
 	, size_t const & numBest
-	, double const & sigmaDirs
+	, double const & gapSigma
 	)
 {
 	std::vector<QuintSoln> best;
 
-	PseudoProbGen const probGen(sigmaDirs);
 	using ProbNdxPair = std::pair<double, size_t>;
 	dat::BestOf<ProbNdxPair> besty(numBest);
 
@@ -559,7 +510,7 @@ bestOf
 	for (size_t ndx{0u} ; ndx < numSolns ; ++ndx)
 	{
 		QuintSoln const & quintSoln = quintSolns[ndx];
-		double const prob{ probFor(quintSoln, &uvPairs, probGen) };
+		double const prob{ Accord::probFor(quintSoln, uvPairs, gapSigma) };
 		ProbNdxPair const pnPair{ prob, ndx };
 		besty.addSample(pnPair);
 	}
@@ -581,13 +532,13 @@ namespace
 	bestFrom
 		( std::vector<QuintSoln> const & allQuintSolns
 		, std::vector<PairUV> const & uvPairs
-		, double const & sigmaDirs
+		, double const & gapSigma
 		)
 	{
 		QuintSoln bestQuintSoln{};
 		constexpr size_t const numBest{ 1u };
 		std::vector<QuintSoln> const bestQuintSolns
-			{ bestOf(allQuintSolns, uvPairs, numBest, sigmaDirs) };
+			{ bestOf(allQuintSolns, uvPairs, numBest, gapSigma) };
 		if (! bestQuintSolns.empty())
 		{
 			bestQuintSoln = bestQuintSolns[0];
@@ -601,12 +552,12 @@ byCombo
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
 	, FitConfig const & fitConfig
-	, double const & sigmaDirs
+	, double const & gapSigma
 	)
 {
 	std::vector<QuintSoln> const allQuintSolns
 		{ allByCombo(uvPairs, roPairNom, fitConfig) };
-	return bestFrom(allQuintSolns, uvPairs, sigmaDirs);
+	return bestFrom(allQuintSolns, uvPairs, gapSigma);
 }
 
 QuintSoln
@@ -615,13 +566,13 @@ bySample
 	, OriPair const & roPairNom
 	, size_t const & numDraws
 	, FitConfig const & fitConfig
-	, double const & sigmaDirs
+	, double const & gapSigma
 	, size_t const & maxTrys
 	)
 {
 	std::vector<QuintSoln> const allQuintSolns
 		{ allBySample(uvPairs, roPairNom, numDraws, fitConfig, maxTrys) };
-	return bestFrom(allQuintSolns, uvPairs, sigmaDirs);
+	return bestFrom(allQuintSolns, uvPairs, gapSigma);
 }
 
 

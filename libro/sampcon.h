@@ -81,7 +81,7 @@ namespace sampcon
 		( std::vector<QuintSoln> const & quintSolns
 		, std::vector<PairUV> const & uvPairs
 		, size_t const & numBest = { 1u }
-		, double const & sigmaDirs = { 1./1000. }
+		, double const & gapSigma = { 1./1000. }
 		);
 
 	//! Best solution after exhaustive evaluation of all combinations
@@ -90,7 +90,7 @@ namespace sampcon
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom
 		, FitConfig const & fitConfig = {}
-		, double const & sigmaDirs = { 1./1000. }
+		, double const & gapSigma = { 1./1000. }
 		);
 
 	//! Best solution from random sampling
@@ -100,7 +100,7 @@ namespace sampcon
 		, OriPair const & roPairNom
 		, size_t const & numDraws = { 640u }
 		, FitConfig const & fitConfig = {}
-		, double const & sigmaDirs = { 1./1000. }
+		, double const & gapSigma = { 1./1000. }
 		, size_t const & maxTrys = { 10u }
 		);
 

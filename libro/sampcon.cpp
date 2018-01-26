@@ -424,25 +424,26 @@ allByCombo
 	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
 
 	ro::PairBaseZ const roNom(roPairNom);
-
-	// try fitting all combinations
-	Combo5 const combo(uvPairs.size());
-	size_t const numQuints{ combo.theQuints.size() };
-	for (size_t nq{0u} ; nq < numQuints ; ++nq)
+	if (roNom.isValid())
 	{
-
-		// gain access to measurements for fitting
-		Combo5::NdxQuint const & fitIndices = combo.theQuints[nq];
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
-		assert(areValidPtrs(uvFitPtrs));
-
-		// compute RO using fit partition
-		FitBaseZ const fitter(uvFitPtrs);
-		Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
-		if (dat::isValid(roSoln))
+		// try fitting all combinations
+		Combo5 const combo(uvPairs.size());
+		size_t const numQuints{ combo.theQuints.size() };
+		for (size_t nq{0u} ; nq < numQuints ; ++nq)
 		{
-			QuintSoln const quintSoln{ fitIndices, roSoln };
-			quintSolns.emplace_back(quintSoln);
+			// gain access to measurements for fitting
+			Combo5::NdxQuint const & fitIndices = combo.theQuints[nq];
+			PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
+			assert(areValidPtrs(uvFitPtrs));
+
+			// compute RO using fit partition
+			FitBaseZ const fitter(uvFitPtrs);
+			Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
+			if (dat::isValid(roSoln))
+			{
+				QuintSoln const quintSoln{ fitIndices, roSoln };
+				quintSolns.emplace_back(quintSoln);
+			}
 		}
 	}
 
@@ -464,31 +465,33 @@ allBySample
 	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
 
 	ro::PairBaseZ const roNom(roPairNom);
-
-	Combo5::NdxQuint fitIndices{{}};
-	rand::Sampler sampler(uvPairs.size(), maxTrys);
-
-	for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
+	if (roNom.isValid())
 	{
-		// partition samples into fit and evaluation groups
-		bool const goodSample{ sampler.setIndices(&fitIndices) };
-		if (goodSample)
-		{
-			// access measurements to use for fitting
-			PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
-			assert(areValidPtrs(uvFitPtrs));
+		Combo5::NdxQuint fitIndices{{}};
+		rand::Sampler sampler(uvPairs.size(), maxTrys);
 
-			// compute RO using fit partition
-			FitBaseZ const fitter(uvFitPtrs);
-			Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
-			if (dat::isValid(roSoln))
+		for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
+		{
+			// partition samples into fit and evaluation groups
+			bool const goodSample{ sampler.setIndices(&fitIndices) };
+			if (goodSample)
 			{
-				QuintSoln const quintSoln{ fitIndices, roSoln };
-				quintSolns.emplace_back(quintSoln);
+				// access measurements to use for fitting
+				PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
+				assert(areValidPtrs(uvFitPtrs));
+
+				// compute RO using fit partition
+				FitBaseZ const fitter(uvFitPtrs);
+				Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
+				if (dat::isValid(roSoln))
+				{
+					QuintSoln const quintSoln{ fitIndices, roSoln };
+					quintSolns.emplace_back(quintSoln);
+				}
 			}
+			// else // ignore improper (e.g. duplicate) samples
+			// io::out() << "WARNING: invalid partition" << std::endl;
 		}
-		// else // ignore improper (e.g. duplicate) samples
-		// io::out() << "WARNING: invalid partition" << std::endl;
 	}
 
 	return quintSolns;

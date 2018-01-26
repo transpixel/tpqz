@@ -150,6 +150,26 @@ Accord :: gapsExcluding
 }
 
 double
+Accord :: sumSqGapAll
+	() const
+{
+	double sumSq{ dat::nullValue<double>() };
+	if (isValid())
+	{
+		sumSq = 0.;
+		for (size_t nn{0u} ; nn < numTotalUVs() ; ++nn)
+		{
+			double const gap{ gapForNdx(nn) };
+			if (dat::isValid(gap))
+			{
+				sumSq += math::sq(gap);
+			}
+		}
+	}
+	return sumSq;
+}
+
+double
 Accord :: rmsGapAll
 	() const
 {
@@ -159,16 +179,7 @@ Accord :: rmsGapAll
 		double const dof{ (double)numFreeUVs() };
 		if (0. < dof)
 		{
-			double sumSq{ 0. };
-			for (size_t nn{0u} ; nn < numTotalUVs() ; ++nn)
-			{
-				double const gap{ gapForNdx(nn) };
-				if (dat::isValid(gap))
-				{
-					sumSq += math::sq(gap);
-				}
-			}
-			rms = std::sqrt(sumSq / dof);
+			rms = std::sqrt(sumSqGapAll() / dof);
 		}
 	}
 	return rms;

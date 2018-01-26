@@ -101,6 +101,11 @@ public: // methods
 		( ro::FiveOf<size_t> const & omitNdxs
 		) const;
 
+	//! Sum of squared gaps for all corresponding pairs
+	double
+	sumSqGapAll
+		() const;
+
 	//! Expected gap value (root-mean-square)
 	double
 	rmsGapAll

@@ -34,6 +34,8 @@
 
 #include "libro/Solution.h"
 
+#include "libio/sprintf.h"
+
 #include <sstream>
 
 
@@ -45,10 +47,12 @@ Solution :: Solution
 	( std::shared_ptr<Pair> const & roPair
 	, size_t const & itCount
 	, size_t const & condNum
+	, size_t const & convergeGap
 	)
 	: theRoPair{ roPair }
 	, theItCount{ itCount }
 	, theCondNum{ condNum }
+	, theConvergeGap{ convergeGap }
 { }
 
 bool
@@ -88,6 +92,12 @@ Solution :: infoString
 		oss
 			<< dat::infoString(theItCount, "theItCount")
 			<< dat::infoString(logCond, "log10Cond")
+			;
+		oss << std::endl;
+		double const logGap{ std::log10(theConvergeGap) };
+		oss
+			<< "theConvergeGap: " << io::sprintf("%8.6f", theConvergeGap)
+			<< dat::infoString(logGap, "log10:")
 			;
 	}
 	else

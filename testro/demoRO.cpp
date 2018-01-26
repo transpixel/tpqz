@@ -41,15 +41,50 @@
 #include "libcam/Loader.h"
 #include "libdat/info.h"
 #include "libdat/ops.h"
+#include "libro/Accord.h"
+#include "libro/io.h"
+#include "libro/model.h"
 #include "libro/PairRel.h"
 #include "libro/sampcon.h"
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
 
 
 namespace
 {
+	constexpr bool const sSavePlotable{ false };
+
+	void
+	saveModel
+		( std::string const & fnameSta
+		, std::string const & fnamePnt
+		, ro::QuintSoln const & roQuintSoln
+		, std::vector<ro::PairUV> const & uvPairs
+		, std::vector<std::string> const & pntNames
+		)
+	{
+		std::shared_ptr<ro::Pair> const & ptRO = roQuintSoln.theSoln.theRoPair;
+
+		std::ofstream ofsSta(fnameSta);
+		ro::io::gnuplot::drawOXYZ(ofsSta, ptRO->rigid1w0());
+		ro::io::gnuplot::drawOXYZ(ofsSta, ptRO->rigid2w0());
+
+		std::ofstream ofsPnt(fnamePnt);
+		std::vector<ro::PntPair> const pntPairs
+			{ ro::model::pointPairs(uvPairs, ptRO->pair()) };
+		for (size_t nn{0u} ; nn < pntPairs.size() ; ++nn)
+		{
+			ro::PntPair const & pntPair = pntPairs[nn];
+			ga::Vector const pntAve{ .5 * (pntPair.first + pntPair.second) };
+			std::string const pntName{ pntNames[nn] };
+			ofsPnt
+				<< dat::infoString(pntAve, pntName)
+				<< std::endl;
+		}
+	}
+
 }
 
 //! Compute/report RO values given pair of .meapoint files
@@ -87,10 +122,8 @@ main
 	std::string const outpath(argv[++argnum]);
 
 	dat::Extents const detSize(2448u, 3264u);
-double const extpd{ .5 * dat::diagonalMag(detSize) };
-io::out() << dat::infoString(extpd, "extpd") << std::endl;
-double const pd{ 2550. };
-io::out() << dat::infoString(pd, "pd") << std::endl;
+	// double const estPd{ .5 * dat::diagonalMag(detSize) }; // 2040 or so
+	double const pd{ 2550. };
 	cam::Camera const camera(pd, detSize);
 
 	io::out() << dat::infoString(meapath1, "meapath1") << std::endl;
@@ -98,16 +131,17 @@ io::out() << dat::infoString(pd, "pd") << std::endl;
 	io::out() << dat::infoString(outpath, "outpath") << std::endl;
 
 	std::vector<std::string> const meapaths{ meapath1, meapath2 };
-//	cam::XRefSpots const spotTab{ cam::Loader::spotTableFor(meapaths) };
-
 	cam::Loader const loader(meapaths);
-	cam::XRefSpots const spotTab{ loader.spotTable() };
+	cam::XRefSpots const spotTab{ loader.spotTable(camera) };
+	std::vector<std::string> const pntNames{ loader.pntNames() };
 
-io::out() << "================" << std::endl;
-io::out() << loader.infoStringDetail("loader") << std::endl;
-io::out() << spotTab.infoStringAcqMajor("spotTab", true) << std::endl;
-io::out() << dat::infoString(camera, "camera") << std::endl;
-io::out() << "================" << std::endl;
+	/*
+	io::out() << "================" << std::endl;
+	io::out() << dat::infoString(camera, "camera") << std::endl;
+	io::out() << loader.infoStringDetail("loader") << std::endl;
+	//io::out() << spotTab.infoStringAcqMajor("spotTab", true) << std::endl;
+	io::out() << "================" << std::endl;
+	*/
 
 	std::vector<cam::XRefSpots::AcqOverlap> const acqOvers
 		{ spotTab.acqPairsWithOverlap(5u) };
@@ -115,24 +149,25 @@ io::out() << "================" << std::endl;
 	cam::AcqNdx const & acqNdx1 = acqOvers[0].theAcqNdx1;
 	cam::AcqNdx const & acqNdx2 = acqOvers[0].theAcqNdx2;
 	std::vector<cam::PntNdx> const & pntNdxs = acqOvers[0].thePntNdxs;
+
 	std::vector<ro::PairUV> uvPairs;
 	uvPairs.reserve(pntNdxs.size());
 	for (cam::PntNdx const & pntNdx : pntNdxs)
 	{
-		dat::Spot const & spotU = spotTab(acqNdx1, pntNdx);
-		dat::Spot const & spotV = spotTab(acqNdx2, pntNdx);
+		dat::Spot const & spotU = spotTab(pntNdx, acqNdx1);
+		dat::Spot const & spotV = spotTab(pntNdx, acqNdx2);
 		ro::PairUV const pairUV
 			{ camera.directionOf(spotU)
 			, camera.directionOf(spotV)
 			};
 		uvPairs.emplace_back(pairUV);
 		io::out()
-			<< dat::infoString(pntNdx, "pntNdx")
-			<< " " << "spot:U,V:"
+			<< " " << dat::infoString(pntNdx) << ")"
+			<< " " << io::sprintf("%12s", pntNames[pntNdx])
 		//	<< " " << dat::infoString(spotU)
 		//	<< " " << dat::infoString(spotV)
-			<< " " << dat::infoString(pairUV.first)
-			<< " " << dat::infoString(pairUV.second)
+			<< " " << dat::infoString(pairUV.first, "dir:U")
+			<< " " << dat::infoString(pairUV.second, "dir:V")
 			<< std::endl;
 	}
 
@@ -143,34 +178,43 @@ io::out() << "================" << std::endl;
 //	ga::Rigid const ori2w1{  ga::e3, ga::Pose::identity() }; // soln
 //	ga::Rigid const ori2w1{ -ga::e3, ga::Pose::identity() }; // soln
 
-	ga::Rigid const ori2w1
-		{ ga::unit(ga::e1+ga::e2), ga::Pose::identity() }; // soln
-	ro::PairRel const roNom{ ga::Rigid::identity(), ori2w1 };
-	constexpr double const maxCondNum{ 1.e3 };
+ga::Rigid const ori2w1{  ga::e2, ga::Pose::identity() }; // x
+
+	ro::OriPair const oriPairNom{ ga::Rigid::identity(), ori2w1 };
+	constexpr double const maxCondNum{ 1.e6 };
 	ro::FitConfig const fitConfig{ maxCondNum };
 	std::vector<ro::QuintSoln> const allQuintSolns
-		{ ro::sampcon::allByCombo(uvPairs, roNom.pair(), fitConfig) };
+		{ ro::sampcon::allByCombo(uvPairs, oriPairNom, fitConfig) };
 
-io::out() << "================" << std::endl;
-	io::out() << dat::infoString(acqOvers.size(), "acqOvers.s") << std::endl;
-	io::out() << dat::infoString(pntNdxs.size(), "pntNdxs.s") << std::endl;
-	io::out() << dat::infoString(uvPairs.size(), "uvPairs.s") << std::endl;
-io::out() << "================" << std::endl;
-	io::out() << dat::infoString(meapath1, "meapath1") << std::endl;
-	io::out() << dat::infoString(meapath2, "meapath2") << std::endl;
-io::out() << "----" << std::endl;
-	io::out() << dat::infoString(roNom, "roNom") << std::endl;
-
+	// compute putative solutions
 	constexpr size_t const numBest{ 3u };
-	constexpr double const sigmaDirs{ 4. * 10./450. };
+	constexpr double const gapSig{ 10./2500. };
 	std::vector<ro::QuintSoln> const roQuintSolns
-		{ ro::sampcon::bestOf(allQuintSolns, uvPairs, numBest, sigmaDirs) };
+		{ ro::sampcon::bestOf(allQuintSolns, uvPairs, numBest, gapSig) };
 
+	io::out() << "================" << '\n';
+		io::out() << dat::infoString(acqOvers.size(), "acqOvers.s") << '\n';
+		io::out() << dat::infoString(pntNdxs.size(), "pntNdxs.s") << '\n';
+		io::out() << dat::infoString(uvPairs.size(), "uvPairs.s") << '\n';
+	io::out() << "================" << '\n';
+		io::out() << dat::infoString(meapath1, "meapath1") << '\n';
+		io::out() << dat::infoString(meapath2, "meapath2") << '\n';
+	io::out() << "----" << '\n';
+		ro::PairRel const roNom(oriPairNom);
+		io::out() << dat::infoString(roNom, "roNom") << '\n';
+	io::out() << "================" << std::endl;
+	io::out() << "==== solutions: " << roQuintSolns.size() << '\n';
+
+	size_t solnCount{ 0u };
 	for (ro::QuintSoln const & roQuintSoln : roQuintSolns)
 	{
 		ro::FiveOf<size_t> const & fitNdxs = roQuintSoln.theFitNdxs;
 
-		std::vector<std::string> const pntNames{ loader.pntNames() };
+	//	double const prob{ ro::Accord::probFor(roQuintSoln, uvPairs, gapSig) };
+		ro::Accord const eval{ roQuintSoln.theSoln, &uvPairs };
+		double const prob{ eval.probExcluding(fitNdxs, gapSig) };
+		double const rmsGap{ eval.rmsGapExcluding(fitNdxs) };
+
 		ro::FiveOf<std::string> const fitNames
 			{ pntNames[ fitNdxs[0] ]
 			, pntNames[ fitNdxs[1] ]
@@ -179,13 +223,41 @@ io::out() << "----" << std::endl;
 			, pntNames[ fitNdxs[4] ]
 			};
 
+		// report solns
 		io::out() << "----" << std::endl;
-		io::out() << dat::infoString(roQuintSoln, "roQuintSoln") << std::endl;
 		io::out()
 			<< dat::infoString(fitNames.begin(), fitNames.end(), "fitNames")
 			<< std::endl;
+		io::out() << dat::infoString(roQuintSoln, "roQuintSoln") << std::endl;
+		io::out() << "prob: " << io::sprintf("%9.6f", prob) << std::endl;
+		io::out() << "rmsGap: " << io::sprintf("%9.6f", rmsGap) << std::endl;
+
+		if (sSavePlotable)
+		{
+			// save to gnuplot file
+			std::string const idStr{ io::sprintf("%03d", solnCount) };
+			++solnCount;
+			std::string const fnameSta{ "tmpSta_" + idStr + ".dat" };
+			std::string const fnamePnt{ "tmpPnt_" + idStr + ".dat" };
+			saveModel(fnameSta, fnamePnt, roQuintSoln, uvPairs, pntNames);
+
+			// save input as gnuplot-able 'rays'
+			std::ofstream ofsNom("tmpNom_" + idStr + ".dat");
+			(void)ro::io::gnuplot::saveModelRays(ofsNom, oriPairNom, uvPairs);
+			std::ofstream ofsFit("tmpFit_" + idStr + ".dat");
+			ro::OriPair const oriPairFit{ roQuintSoln.theSoln.pair() };
+			(void)ro::io::gnuplot::saveModelRays(ofsFit, oriPairFit, uvPairs);
+		}
 	}
 
+	if (sSavePlotable)
+	{
+		using namespace ro::io::gnuplot;
+		std::ofstream ofsNomA("tmpNom_imgA.dat");
+		(void)saveImageRays(ofsNomA,  First, oriPairNom, uvPairs);
+		std::ofstream ofsNomB("tmpNom_imgB.dat");
+		(void)saveImageRays(ofsNomB, Second, oriPairNom, uvPairs);
+	}
 io::out() << "================" << std::endl;
 
 	return 0;

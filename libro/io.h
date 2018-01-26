@@ -71,6 +71,14 @@ namespace gnuplot
 		, std::vector<PairUV> const & uvPairs
 		);
 
+	//! Draw an asymmetric shape to represent axis triad
+	bool
+	drawOXYZ
+		( std::ostream & ostrm
+		, ga::Rigid const & oriStaWrtRef
+		, double const & axisMag = { 1. }
+		);
+
 	//! Perform space intersections and save as 'gnuplot vector' ascii data
 	bool
 	saveModelRays

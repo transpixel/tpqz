@@ -116,6 +116,34 @@ saveImageRays
 }
 
 bool
+drawOXYZ
+	( std::ostream & ostrm
+	, ga::Rigid const & oriStaWrtRef
+	, double const & axisMag
+	)
+{
+	ga::Rigid const oriRefWrtSta{ oriStaWrtRef.inverse() };
+	static ga::Vector const pnt0InSta{ ga::vZero };
+	static ga::Vector const pntXInSta{ ga::e1 };
+	static ga::Vector const pntYInSta{ ga::e2 };
+	static ga::Vector const pntZInSta{ ga::e3 };
+	ga::Vector const pnt0InRef{ axisMag * oriRefWrtSta(pnt0InSta) };
+	ga::Vector const pntXInRef{ axisMag * oriRefWrtSta(pntXInSta) };
+	ga::Vector const pntYInRef{ axisMag * oriRefWrtSta(pntYInSta) };
+	ga::Vector const pntZInRef{ axisMag * oriRefWrtSta(pntZInSta) };
+
+	ostrm << dat::infoString(pnt0InRef) << '\n';
+	ostrm << dat::infoString(pntXInRef) << '\n';
+	ostrm << dat::infoString(pntYInRef) << '\n';
+	ostrm << dat::infoString(pnt0InRef) << '\n';
+	ostrm << dat::infoString(pntZInRef) << '\n';
+	ostrm << '\n';
+	ostrm << '\n';
+
+	return (! ostrm.fail());
+}
+
+bool
 saveModelRays
 	( std::ostream & ostrm
 	, OriPair const & oriPair

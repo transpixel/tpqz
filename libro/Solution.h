@@ -55,7 +55,7 @@ struct Solution
 	std::shared_ptr<Pair> theRoPair;
 	size_t theItCount{ dat::nullValue<size_t>() };
 	size_t theCondNum{ dat::nullValue<size_t>() };
-	size_t theConvergeGap{ dat::nullValue<size_t>() };
+	double theConvergeGap{ dat::nullValue<double>() };
 
 public: // methods
 
@@ -69,7 +69,7 @@ public: // methods
 		( std::shared_ptr<Pair> const & roPair
 		, size_t const & itCount
 		, size_t const & condNum
-		, size_t const & convergeGap
+		, double const & convergeGap
 		);
 
 	//! True if instance is valid

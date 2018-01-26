@@ -89,17 +89,7 @@ public: // methods
 	ro::PairBaseZ
 	improvedNear
 		( ro::PairBaseZ const & roNom
-		, double const & maxCondNum = { 1.e6 }
-		, double * const & ptCondNum = nullptr
-		) const;
-
-	//! Solution via linearized iteration starting from roNom
-	ro::PairBaseZ
-	solutionNear
-		( ro::PairBaseZ const & roNom
-		, double const & tolRmsGap = math::eps // convergence tolerance
-		, size_t const & itMax = 25u //!< should only need a handful
-		, double const & maxCondNum = { 1.e6 }
+		, double const & maxCondNum = { std::numeric_limits<double>::max() }
 		, double * const & ptCondNum = nullptr
 		) const;
 

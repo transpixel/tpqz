@@ -37,8 +37,10 @@
 #include "libdat/validity.h"
 #include "libgeo/intersect.h"
 #include "libio/stream.h"
+#include "libro/Accord.h"
 #include "libro/cast.h"
 #include "libro/model.h"
+#include "libro/ops.h"
 #include "libro/SpinPQ.h"
 
 #include <fstream>
@@ -308,6 +310,105 @@ ro_sampcon_test1
 	return oss.str();
 }
 
+//! Check solution for a typical case
+std::string
+ro_sampcon_test2
+	()
+{
+	std::ostringstream oss;
+
+	ga::Vector const expSta1(  -1., 0., 0. );
+	ga::Vector const expSta2(   1., 0., 0. );
+
+	ga::Rigid const expOri1(expSta1, ga::Pose::identity());
+	ga::Rigid const expOri2(expSta2, ga::Pose::identity());
+
+	ga::Rigid const oriNom1(ga::Vector(-1., .1, .1), ga::Pose::identity());
+	ga::Rigid const oriNom2(ga::Vector( 1., .0, .0), ga::Pose::identity());
+
+	ga::Vector const expPntAn( -1., -1., -1. );
+	ga::Vector const expPntAz(  0., -1., -1. );
+	ga::Vector const expPntAp(  1., -1., -1. );
+	ga::Vector const expPntBn( -1.,  1., -1. );
+	ga::Vector const expPntBz(  0.,  1., -1. );
+	ga::Vector const expPntBp(  1.,  1., -1. );
+
+	ga::Vector const   dirAn1{ ga::unit(expPntAn - expSta1) };
+	ga::Vector const   dirAz1{ ga::unit(expPntAz - expSta1) };
+	ga::Vector const   dirAp1{ ga::unit(expPntAp - expSta1) };
+	ga::Vector const   dirBn1{ ga::unit(expPntBn - expSta1) };
+	ga::Vector const   dirBz1{ ga::unit(expPntBz - expSta1) };
+	ga::Vector const   dirBp1{ ga::unit(expPntBp - expSta1) };
+
+	ga::Vector const   dirAn2{ ga::unit(expPntAn - expSta2) };
+	ga::Vector const   dirAz2{ ga::unit(expPntAz - expSta2) };
+	ga::Vector const   dirAp2{ ga::unit(expPntAp - expSta2) };
+	ga::Vector const   dirBn2{ ga::unit(expPntBn - expSta2) };
+	ga::Vector const   dirBz2{ ga::unit(expPntBz - expSta2) };
+	ga::Vector const   dirBp2{ ga::unit(expPntBp - expSta2) };
+
+	std::vector<ro::PairUV> const uvPairs
+		{ ro::PairUV{ dirAn1, dirAn2 }
+		, ro::PairUV{ dirAz1, dirAz2 }
+		, ro::PairUV{ dirAp1, dirAp2 }
+		, ro::PairUV{ dirBn1, dirBn2 }
+		, ro::PairUV{ dirBz1, dirBz2 }
+		, ro::PairUV{ dirBp1, dirBp2 }
+		};
+
+	/*
+	// display input as gnuplot-able 'rays'
+	for (ro::PairUV const & uvPair : uvPairs)
+	{
+		io::out()
+			<< "sta,dir:1:"
+			<< " " << dat::infoString(oriNom1.location())
+			<< " " << dat::infoString(2.*uvPair.first)
+			<< std::endl;
+		io::out()
+			<< "sta,dir:2:"
+			<< " " << dat::infoString(oriNom2.location())
+			<< " " << dat::infoString(2.*uvPair.second)
+			<< std::endl;
+	}
+	*/
+
+	// approximate nominal starting point
+	ro::PairBaseZ const nomBaseZ(oriNom1, oriNom2);
+	// io::out() << nomBaseZ.infoStringDetail("nomBaseZ") << std::endl;
+	ro::OriPair const roNom{ ro::unitOriPair(nomBaseZ.pair()) };
+
+	// compute nearest RO
+	ro::FitConfig const fitConfig{ 1.e9 };
+	ro::QuintSoln const quintSoln
+		{ ro::sampcon::byCombo(uvPairs, roNom, fitConfig) };
+
+	// check if solution is valid
+	if (! quintSoln.isValid())
+	{
+		oss << "Failure of quintSoln validity test" << std::endl;
+	}
+	else
+	{
+		// check if solution satisfies (nearly) zero gap condition
+		ro::Solution const & roSoln = quintSoln.theSoln;
+		ro::Accord const eval{ roSoln, &uvPairs };
+		double const gotGapRMS{ eval.rmsGapAll() };
+		double const expGapRMS{ 0. };
+		double const tolGapRMS{ 100.*math::eps }; // slight base/angle coupling
+		if (! dat::nearlyEquals(gotGapRMS, expGapRMS, tolGapRMS))
+		{
+			oss << "Failure of quintSoln gap test" << std::endl;
+			std::string const fmt{ "%21.18f" };
+			oss << "gotGapRMS: " << io::sprintf(fmt, gotGapRMS) << '\n';
+			oss << "expGapRMS: " << io::sprintf(fmt, expGapRMS) << '\n';
+			oss << "tolGapRMS: " << io::sprintf(fmt, tolGapRMS) << '\n';
+		}
+	}
+
+	return oss.str();
+}
+
 
 }
 
@@ -321,8 +422,13 @@ main
 	std::ostringstream oss;
 
 	// run tests
+bool const useIt{ false };
+if (useIt)
+{
 	oss << ro_sampcon_test0();
 	oss << ro_sampcon_test1();
+}
+	oss << ro_sampcon_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

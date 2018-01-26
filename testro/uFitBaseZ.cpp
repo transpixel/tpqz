@@ -39,6 +39,7 @@
 #include "libdat/validity.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libmath/math.h"
 #include "libro/Accord.h"
 #include "libro/QuadForm.h"
 
@@ -146,14 +147,14 @@ ro_FitBaseZ_test1a
 			oss << "Failure of (nan)rmsGap test for min uv" << std::endl;
 		}
 
-		// check full solution (internal iterations
+		// check full solution for zero gap
 		for (size_t nn{0u} ; nn < uvPairs.size() ; ++nn)
 		{
 			double const expGap{ 0. };
 			double const gotGap{ solnFit.gapForNdx(nn) };
 			if (! dat::nearlyEquals(gotGap, expGap))
 			{
-				oss << "Failure of solutionNear gap test" << std::endl;
+				oss << "Failure of solution 1a gap test" << std::endl;
 				oss << "gotGap: " << io::sprintf("%12.5e", gotGap) << std::endl;
 			}
 		}
@@ -257,15 +258,15 @@ ro_FitBaseZ_test1b
 	}
 
 	// continue iterating until convergence
-	ro::PairBaseZ roSoln{ roFit };
+	ro::PairBaseZ roCurr{ roFit };
 	constexpr size_t maxIt{ 25u };
 	size_t numIt{ 0u };
-	rmsGap = fitter.rmsGapFor(roSoln);
+	rmsGap = fitter.rmsGapFor(roCurr);
 	// io::out() << dat::infoString(rmsGap, "rmsGap.1") << std::endl;
 	while ((math::eps < rmsGap) && (numIt++ < maxIt))
 	{
-		roSoln = fitter.improvedNear(roSoln);
-		rmsGap = fitter.rmsGapFor(roSoln);
+		roCurr = fitter.improvedNear(roCurr);
+		rmsGap = fitter.rmsGapFor(roCurr);
 		// io::out() << "rmsGap.it: " << io::sprintf("%21.18f", rmsGap) << '\n';
 	}
 
@@ -279,7 +280,7 @@ ro_FitBaseZ_test1b
 	else
 	{
 		// check if computed solution satisifes coplanarity condition
-		ro::PairBaseZ const roGot = roSoln;
+		ro::PairBaseZ const roGot = roCurr;
 		for (PairUV const & uv : uvs)
 		{
 			double const gotGap{ roGot.tripleProductGap(uv) };
@@ -295,15 +296,16 @@ ro_FitBaseZ_test1b
 	}
 
 	// Check full solution (internal iterations
-	ro::PairBaseZ const roGot{ fitter.solutionNear(roSim) };
-	for (PairUV const & uv : uvs)
+	ro::Solution const roSoln{ fitter.roSolution(roSim) };
+
+	//io::out() << dat::infoString(roSoln, "roSoln") << std::endl;
+
+	ro::Accord const eval{ roSoln, &uvs };
+	double const gotGapSq{ eval.sumSqGapAll() };
+	if (! dat::nearlyEquals(gotGapSq, 0.))
 	{
-		double const gotGap{ roGot.tripleProductGap(uv) };
-		if (! dat::nearlyEquals(gotGap, 0.))
-		{
-			oss << "Failure of solutionNear gap test" << std::endl;
-			oss << "gotGap: " << io::sprintf("%12.5e", gotGap) << std::endl;
-		}
+		oss << "Failure of solution 1b gap test" << std::endl;
+		oss << "gotGapSq: " << io::sprintf("%12.5e", gotGapSq) << std::endl;
 	}
 
 	return oss.str();
@@ -462,11 +464,8 @@ main
 	// run tests
 	oss << ro_FitBaseZ_test0();
 	oss << ro_FitBaseZ_test1a();
-if (oss.str().empty())
-{
 	oss << ro_FitBaseZ_test1b();
 	oss << ro_FitBaseZ_test2();
-}
 
 	// check/report results
 	std::string const errMessages(oss.str());

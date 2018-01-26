@@ -430,13 +430,14 @@ allByCombo
 	size_t const numQuints{ combo.theQuints.size() };
 	for (size_t nq{0u} ; nq < numQuints ; ++nq)
 	{
+
 		// gain access to measurements for fitting
 		Combo5::NdxQuint const & fitIndices = combo.theQuints[nq];
 		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
 		assert(areValidPtrs(uvFitPtrs));
 
 		// compute RO using fit partition
-		FitBaseZ const fitter(uvFitPtrs);//.begin(), uvFitPtrs.end());
+		FitBaseZ const fitter(uvFitPtrs);
 		Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
 		if (dat::isValid(roSoln))
 		{

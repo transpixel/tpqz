@@ -196,6 +196,7 @@ FitBaseZ :: improvedNear
 	{
 		*ptCondNum = condNum;
 	}
+
 	if (dat::isValid(dParms[0]) && (condNum < maxCondNum))
 	{
 		// compute updated parameters
@@ -207,30 +208,6 @@ FitBaseZ :: improvedNear
 	}
 
 	return roNext;
-}
-
-ro::PairBaseZ
-FitBaseZ :: solutionNear
-	( ro::PairBaseZ const & roNom
-	, double const & tolRmsGap
-	, size_t const & itMax
-	, double const & maxCondNum
-	, double * const & ptCondNum
-	) const
-{
-	PairBaseZ roPair;
-	if (isValid() && roNom.isValid())
-	{
-		roPair = roNom;
-		double rmsGap{ rmsGapFor(roPair) };
-		size_t itCount{ 0u };
-		while ((tolRmsGap < rmsGap) && (itCount++ < itMax))
-		{
-			roPair = improvedNear(roPair, maxCondNum, ptCondNum);
-			rmsGap = rmsGapFor(roPair);
-		}
-	}
-	return roPair;
 }
 
 // -----
@@ -277,6 +254,39 @@ namespace
 
 		return qualPair;
 	}
+
+	/*
+	size_t
+	countForward
+		( ro::OriPair const & anyPair
+		, FiveOf<PtrPairUV> const & uvFitPtrs
+		)
+	{
+		size_t count{ 0u };
+
+		bool const isForward{ model::isForward(anyPair, uvFitPtrs) };
+		if (isForward)
+		{
+			++count;
+		}
+
+		// use the PQ spinor convention to explore mirror solutions
+		ro::SpinPQ const anyPQ(ro::SpinPQ::from(anyPair));
+		for (size_t nn{0u} ; nn < anyPQ.theNumPerms ; ++nn)
+		{
+			// check if each solution produces a forward intersection
+			ro::OriPair const tmpPair{ anyPQ[nn].pair() };
+			bool const isForward{ model::isForward(tmpPair, uvFitPtrs) };
+			if (isForward)
+			{
+				++count;
+			}
+		}
+
+		return count;
+	}
+	*/
+
 }
 // -----
 
@@ -291,8 +301,9 @@ FitBaseZ :: roSolution
 	if (isValid() && roNom.isValid())
 	{
 		size_t const & itMax = config.theMaxItCount;
-		double const & maxCondNum = config.theMaxCondNum;
-		double const & tolRmsGap = config.theConvergeGap;
+// TODO - remove maxCond test altogether?
+//		double const & maxCondNum = config.theMaxCondNum;
+		double const & tolRmsGap = config.theConvergeTol;
 
 		// iterate over solutions
 		PairBaseZ roCurr{ roNom };
@@ -301,12 +312,28 @@ FitBaseZ :: roSolution
 		double condNum{ dat::nullValue<double>() };
 		while ((tolRmsGap < rmsGap) && (itCount++ < itMax))
 		{
-			roCurr = improvedNear(roCurr, maxCondNum, &condNum);
-			rmsGap = rmsGapFor(roCurr);
+			// use unlimited condition number here
+			// since results tested below on own merit (gap size)
+			constexpr double hugeCond{ std::numeric_limits<double>::max() };
+			PairBaseZ const roTmp{ improvedNear(roCurr, hugeCond, &condNum) };
+			double const rmsTmp{ rmsGapFor(roTmp) };
+
+			// check if this solution is better than previous
+			if (rmsTmp < rmsGap)
+			{
+				rmsGap = rmsTmp;
+				roCurr = roTmp;
+			}
+			else
+			{
+			//	io::out() << "###### worse solution" << std::endl;
+				break;
+			}
 		}
 
 		// if iterations converged
 		if (roCurr.isValid() && (itCount < itMax))
+	//	if (roCurr.isValid() && (itCount < itMax) && (condNum < maxCondNum))
 		{
 			// check if there is a forward solution
 			OriPair const roFwd{ aForwardRO(roCurr.pair(), theUVPtrs) };
@@ -315,7 +342,7 @@ FitBaseZ :: roSolution
 				// package valid forward solution for return
 				std::shared_ptr<Pair> const roPair
 					{ std::make_shared<PairBaseZ>(roFwd) };
-				roSoln = Solution(roPair, itCount, condNum);
+				roSoln = Solution(roPair, itCount, condNum, rmsGap);
 			}
 		}
 	}

@@ -55,7 +55,7 @@ struct FitConfig
 {
 	double const theMaxCondNum{ 1.e6 }; //!< discard solns less stable
 	size_t const theMaxItCount{ 25u }; //!< should only need a handful
-	double const theConvergeGap{ math::eps }; //!< convergence tolerance
+	double const theConvergeTol{ math::eps }; //!< convergence tolerance
 
 public: // methods
 

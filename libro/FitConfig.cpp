@@ -75,7 +75,7 @@ FitConfig :: infoString
 		oss
 			<< " " << dat::infoString(log10Cond, "log10Cond")
 			<< " " << dat::infoString(theMaxItCount, "maxIt")
-			<< " " << dat::infoString(theConvergeGap, "convergeGap")
+			<< " " << dat::infoString(theConvergeTol, "convergeTol")
 			;
 	}
 	//else

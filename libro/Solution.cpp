@@ -47,7 +47,7 @@ Solution :: Solution
 	( std::shared_ptr<Pair> const & roPair
 	, size_t const & itCount
 	, size_t const & condNum
-	, size_t const & convergeGap
+	, double const & convergeGap
 	)
 	: theRoPair{ roPair }
 	, theItCount{ itCount }
@@ -96,7 +96,8 @@ Solution :: infoString
 		oss << std::endl;
 		double const logGap{ std::log10(theConvergeGap) };
 		oss
-			<< "theConvergeGap: " << io::sprintf("%8.6f", theConvergeGap)
+			<< "theConvergeGap:"
+			<< " " << io::sprintf("%9.6f", theConvergeGap)
 			<< dat::infoString(logGap, "log10:")
 			;
 	}

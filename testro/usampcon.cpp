@@ -39,6 +39,7 @@
 #include "libio/stream.h"
 #include "libro/Accord.h"
 #include "libro/cast.h"
+#include "libro/io.h"
 #include "libro/model.h"
 #include "libro/ops.h"
 #include "libro/SpinPQ.h"
@@ -266,7 +267,7 @@ ro_sampcon_test1
 		oss << "Failure of fit test" << std::endl;
 	}
 
-	// saveModelRaysIn1(roNom, uvPairs, "Nom");
+	// saveModelRaysIn1(oriPairNom, uvPairs, "Nom");
 	// saveModelRaysIn1(roFit, uvPairs, "Fit");
 
 	/*
@@ -291,13 +292,13 @@ ro_sampcon_test1
 
 	// display ro pairs
 	io::out() << std::endl;
-	io::out() << roNom.infoString("roNom") << std::endl;
+	io::out() << oriPairNom.infoString("oriPairNom") << std::endl;
 	io::out() << roFit.infoString("roFit") << std::endl;
 
 	// display solution info
 	io::out() << std::endl;
-	io::out() << roNom.infoStringParms("roNom")
-		<< " " << dat::infoString(roNom.parmRMS(), "rms")
+	io::out() << oriPairNom.infoStringParms("oriPairNom")
+		<< " " << dat::infoString(oriPairNom.parmRMS(), "rms")
 		<< std::endl;
 	io::out() << roFit.infoStringParms("roFit")
 		<< " " << dat::infoString(roFit.parmRMS(), "rms")
@@ -356,32 +357,15 @@ ro_sampcon_test2
 		, ro::PairUV{ dirBp1, dirBp2 }
 		};
 
-	/*
-	// display input as gnuplot-able 'rays'
-	for (ro::PairUV const & uvPair : uvPairs)
-	{
-		io::out()
-			<< "sta,dir:1:"
-			<< " " << dat::infoString(oriNom1.location())
-			<< " " << dat::infoString(2.*uvPair.first)
-			<< std::endl;
-		io::out()
-			<< "sta,dir:2:"
-			<< " " << dat::infoString(oriNom2.location())
-			<< " " << dat::infoString(2.*uvPair.second)
-			<< std::endl;
-	}
-	*/
-
 	// approximate nominal starting point
 	ro::PairBaseZ const nomBaseZ(oriNom1, oriNom2);
 	// io::out() << nomBaseZ.infoStringDetail("nomBaseZ") << std::endl;
-	ro::OriPair const roNom{ ro::unitOriPair(nomBaseZ.pair()) };
+	ro::OriPair const oriPairNom{ ro::unitOriPair(nomBaseZ.pair()) };
 
 	// compute nearest RO
 	ro::FitConfig const fitConfig{ 1.e9 };
 	ro::QuintSoln const quintSoln
-		{ ro::sampcon::byCombo(uvPairs, roNom, fitConfig) };
+		{ ro::sampcon::byCombo(uvPairs, oriPairNom, fitConfig) };
 
 	// check if solution is valid
 	if (! quintSoln.isValid())
@@ -405,6 +389,15 @@ ro_sampcon_test2
 			oss << "tolGapRMS: " << io::sprintf(fmt, tolGapRMS) << '\n';
 		}
 	}
+
+	/*
+	// save input as gnuplot-able 'rays'
+	std::ofstream ofsNom("fooNom.dat");
+	(void)ro::io::gnuplot::saveModelRays(ofsNom, oriPairNom, uvPairs);
+	std::ofstream ofsFit("fooFit.dat");
+	ro::OriPair const oriPairFit{ quintSoln.theSoln.pair() };
+	(void)ro::io::gnuplot::saveModelRays(ofsFit, oriPairFit, uvPairs);
+	*/
 
 	return oss.str();
 }

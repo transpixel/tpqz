@@ -39,6 +39,8 @@
 #include "libdat/validity.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libmath/math.h"
+#include "libro/Accord.h"
 #include "libro/QuadForm.h"
 
 #include <iostream>
@@ -95,10 +97,122 @@ ro_FitBaseZ_test0
 		return uvs;
 	}
 
+//! Check RO improvement (single step linear iteration)
+std::string
+ro_FitBaseZ_test1a
+	()
+{
+	std::ostringstream oss;
+
+	// simulate test configuration
+	ga::Vector const base2w1( 0., 0., 1. );
+	ga::BiVector const angle2w1( .0, .0, .0 );
+	ro::PairBaseZ const roExp
+		( ga::Rigid::identity()
+		, ga::Rigid(base2w1, ga::Pose(angle2w1))
+		);
+
+	// create a perturbed initial estimate
+	ga::Vector const baseDel( .01, .02, .00 );
+	ga::BiVector const angleDel( .30, .20, .40 );
+	ro::PairBaseZ const roSim
+		( ga::Rigid::identity()
+		, ga::Rigid(base2w1 + baseDel, ga::Pose(angle2w1 + angleDel))
+		);
+
+	// generate measurements (using ideal test data)
+	std::vector<PairUV> const uvPairs{ uvPairsFor(roExp) };
+
+	// construct fitter starting at perturbed value
+	std::vector<PairUV> const & uvs = uvPairs;
+	std::array<PtrPairUV, 5u> const uvPtrs
+		{{ &(uvs[0]), &(uvs[1]), &(uvs[2]), &(uvs[3]), &(uvs[4]) }};
+	ro::FitBaseZ const fitter(uvPtrs);
+
+	ga::Rigid const ori2w1{  ga::e3, ga::Pose::identity() };
+	ro::PairBaseZ const roNom{ ga::Rigid::identity(), ori2w1 };
+	ro::Solution const roSoln{ fitter.roSolution(roNom) };
+
+	if (! roSoln.isValid())
+	{
+		oss << "Failure of valid solution test" << std::endl;
+	}
+	else
+	{
+		ro::Accord const solnFit{ roSoln, &uvPairs };
+
+		// check that *no* RMS is available - for min ray test case
+		if ( dat::isValid(solnFit.rmsGapAll()))
+		{
+			oss << "Failure of (nan)rmsGap test for min uv" << std::endl;
+		}
+
+		// check full solution for zero gap
+		for (size_t nn{0u} ; nn < uvPairs.size() ; ++nn)
+		{
+			double const expGap{ 0. };
+			double const gotGap{ solnFit.gapForNdx(nn) };
+			if (! dat::nearlyEquals(gotGap, expGap))
+			{
+				oss << "Failure of solution 1a gap test" << std::endl;
+				oss << "gotGap: " << io::sprintf("%12.5e", gotGap) << std::endl;
+			}
+		}
+
+		// check solution's RMS statistic - for more measurements
+		std::vector<PairUV> morePairs(uvPairs);
+		morePairs.insert(morePairs.end(), uvPairs.begin(), uvPairs.end());
+		ro::Accord const overFit{ roSoln, &morePairs };
+		double const expGapRMS{ 0. };
+		double const gotGapRMS{ overFit.rmsGapAll() };
+		if (! dat::nearlyEquals(gotGapRMS, expGapRMS))
+		{
+			oss << "Failure of rmsGapAll test" << std::endl;
+			oss << dat::infoString(expGapRMS, "expGapRMS") << std::endl;
+			oss << dat::infoString(gotGapRMS, "gotGapRMS") << std::endl;
+		}
+
+		// check residual analysis
+		std::vector<PairUV> const uvFit{ uvPairsFor(roExp) };
+		std::vector<PairUV> const uvRes{ uvPairsFor(roSim) };
+		assert(5u == uvFit.size());
+		assert(5u == uvRes.size());
+		std::vector<PairUV> uvMany
+			{ uvFit[0], uvRes[0] // 0,1
+			, uvFit[1], uvRes[1] // 2,3
+			, uvFit[2], uvRes[2] // 4,5
+			, uvFit[3], uvRes[3] // 6,7
+			, uvFit[4], uvRes[4] // 8,9
+			};
+		ro::FiveOf<size_t> const ndxFit{{ 0u, 2u, 4u, 6u, 8u }};
+		ro::FiveOf<size_t> const ndxRes{{ 1u, 3u, 5u, 7u, 9u }};
+
+		ro::Accord const manyFit{ roSoln, &uvMany };
+
+		// check that gaps excluding noisy measurements are near zero
+		double const gotGapFit{ manyFit.sumSqGapExcluding(ndxRes) };
+		double const expGapFit{ 0. };
+		if (! dat::nearlyEquals(gotGapFit, expGapFit))
+		{
+			oss << "Failure of gapFit=0 test" << std::endl;
+		}
+
+		// check that gaps excluding perfect fit measurements are non-zero
+		double const gotGapRes{ manyFit.sumSqGapExcluding(ndxFit) };
+		double const someResMag{ 1./256. }; // non-trival value for this test
+		bool const bigResids{ (someResMag < gotGapRes) };
+		if (! bigResids)
+		{
+			oss << "Failure of non-trivial gapRes test" << std::endl;
+		}
+	}
+
+	return oss.str();
+}
 
 //! Check RO improvement (single step linear iteration)
 std::string
-ro_FitBaseZ_test1
+ro_FitBaseZ_test1b
 	()
 {
 	std::ostringstream oss;
@@ -144,15 +258,15 @@ ro_FitBaseZ_test1
 	}
 
 	// continue iterating until convergence
-	ro::PairBaseZ roSoln{ roFit };
+	ro::PairBaseZ roCurr{ roFit };
 	constexpr size_t maxIt{ 25u };
 	size_t numIt{ 0u };
-	rmsGap = fitter.rmsGapFor(roSoln);
+	rmsGap = fitter.rmsGapFor(roCurr);
 	// io::out() << dat::infoString(rmsGap, "rmsGap.1") << std::endl;
 	while ((math::eps < rmsGap) && (numIt++ < maxIt))
 	{
-		roSoln = fitter.improvedNear(roSoln);
-		rmsGap = fitter.rmsGapFor(roSoln);
+		roCurr = fitter.improvedNear(roCurr);
+		rmsGap = fitter.rmsGapFor(roCurr);
 		// io::out() << "rmsGap.it: " << io::sprintf("%21.18f", rmsGap) << '\n';
 	}
 
@@ -166,7 +280,7 @@ ro_FitBaseZ_test1
 	else
 	{
 		// check if computed solution satisifes coplanarity condition
-		ro::PairBaseZ const roGot = roSoln;
+		ro::PairBaseZ const roGot = roCurr;
 		for (PairUV const & uv : uvs)
 		{
 			double const gotGap{ roGot.tripleProductGap(uv) };
@@ -182,15 +296,16 @@ ro_FitBaseZ_test1
 	}
 
 	// Check full solution (internal iterations
-	ro::PairBaseZ const roGot{ fitter.solutionNear(roSim) };
-	for (PairUV const & uv : uvs)
+	ro::Solution const roSoln{ fitter.roSolution(roSim) };
+
+	//io::out() << dat::infoString(roSoln, "roSoln") << std::endl;
+
+	ro::Accord const eval{ roSoln, &uvs };
+	double const gotGapSq{ eval.sumSqGapAll() };
+	if (! dat::nearlyEquals(gotGapSq, 0.))
 	{
-		double const gotGap{ roGot.tripleProductGap(uv) };
-		if (! dat::nearlyEquals(gotGap, 0.))
-		{
-			oss << "Failure of solutionNear gap test" << std::endl;
-			oss << "gotGap: " << io::sprintf("%12.5e", gotGap) << std::endl;
-		}
+		oss << "Failure of solution 1b gap test" << std::endl;
+		oss << "gotGapSq: " << io::sprintf("%12.5e", gotGapSq) << std::endl;
 	}
 
 	return oss.str();
@@ -264,7 +379,9 @@ ro_FitBaseZ_test2
 	// get sample-consensus solution - by brute force combos
 	{
 		timer.start("consenusByCombo");
-		ro::PairBaseZ const roGot(ro::sampcon::byCombo(uvs, roNom).theOriPair);
+		ro::QuintSoln const roQuintSoln
+			{ ro::sampcon::byCombo(uvs, roNom) };
+		ro::PairBaseZ const roGot(roQuintSoln.theSoln.pair());
 		timer.stop();
 		if (! roGot.nearlyEquals(roExp))
 		{
@@ -277,7 +394,9 @@ ro_FitBaseZ_test2
 	// get sample-consensus solution - by (pseudo) random sampling
 	{
 		timer.start("consenusBySamples");
-		ro::PairBaseZ const roGot(ro::sampcon::bySample(uvs, roNom).theOriPair);
+		ro::QuintSoln const roQuintSoln
+			{ ro::sampcon::bySample(uvs, roNom) };
+		ro::PairBaseZ const roGot(roQuintSoln.theSoln.pair());
 		timer.stop();
 		if (! roGot.nearlyEquals(roExp))
 		{
@@ -344,7 +463,8 @@ main
 
 	// run tests
 	oss << ro_FitBaseZ_test0();
-	oss << ro_FitBaseZ_test1();
+	oss << ro_FitBaseZ_test1a();
+	oss << ro_FitBaseZ_test1b();
 	oss << ro_FitBaseZ_test2();
 
 	// check/report results

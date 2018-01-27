@@ -26,62 +26,74 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
+#ifndef ro_Solution_INCL_
+#define ro_Solution_INCL_
 
 /*! \file
-\brief Declarations for namespace cam
+\brief Declarations for ro::Solution
 */
 
+#include "libdat/validity.h"
+#include "libro/Pair.h"
 
-#include "libdat/Spot.h"
-
+#include <memory>
 #include <string>
-#include <vector>
 
-
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
-
-
-*/
-namespace cam
+namespace ro
 {
 
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
+/*! \brief Container for results associated with a RO solution
 
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
+\par Example
+\dontinclude testro/uSolution.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-	//! Descriptive point name/key
-	using PntName = std::string;
+struct Solution
+{
+	std::shared_ptr<Pair> theRoPair;
+	size_t theItCount{ dat::nullValue<size_t>() };
+	size_t theCondNum{ dat::nullValue<size_t>() };
+	double theConvergeGap{ dat::nullValue<double>() };
 
-	//! Descriptive acquisition name/key
-	using AcqName = std::string;
+public: // methods
 
-	//! Image measurement for a single object space point
-	struct MeaForOnePnt
-	{
-		std::string const thePntName;
-		dat::Spot const theSpot;
-		// Uncertainty - e.g. Covar matrix info
-	};
+	//! default null constructor
+	Solution
+		() = default;
 
-	//! All image measurements associated with a single acquisition
-	using MeaGroupOneAcq = std::vector<MeaForOnePnt>;
+	//! Value ctor
+	explicit
+	Solution
+		( std::shared_ptr<Pair> const & roPair
+		, size_t const & itCount
+		, size_t const & condNum
+		, double const & convergeGap
+		);
 
-} // cam
+	//! True if instance is valid
+	bool
+	isValid
+		() const;
+
+	//! OriPair from theRoPair (if valid)
+	std::pair<ga::Rigid, ga::Rigid>
+	pair
+		() const;
+
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // Solution
+
+} // ro
 
 // Inline definitions
-// #include "libcam/cam.inl"
+// #include "libro/Solution.inl"
 
-#endif // cam_cam_INCL_
+#endif // ro_Solution_INCL_
 

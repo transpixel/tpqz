@@ -34,8 +34,11 @@
 
 #include "libro/FitBaseZ.h"
 
+#include "libga/groups.h"
 #include "libmath/angle.h"
+#include "libro/model.h"
 #include "libro/QuadForm.h"
+#include "libro/SpinPQ.h"
 
 #include "Eigen"
 
@@ -193,6 +196,7 @@ FitBaseZ :: improvedNear
 	{
 		*ptCondNum = condNum;
 	}
+
 	if (dat::isValid(dParms[0]) && (condNum < maxCondNum))
 	{
 		// compute updated parameters
@@ -206,25 +210,140 @@ FitBaseZ :: improvedNear
 	return roNext;
 }
 
-ro::PairBaseZ
-FitBaseZ :: solutionNear
+// -----
+namespace
+{
+	//! Return one of multiple solutions with all points in front (or null).
+	ro::OriPair
+	aForwardRO
+		( ro::OriPair const & anyPair
+		, FiveOf<PtrPairUV> const & uvFitPtrs
+		)
+	{
+		OriPair qualPair{ ga::Rigid{}, ga::Rigid{} };
+
+		// try given initial solution
+		{
+			bool const isForward{ model::isForward(anyPair, uvFitPtrs) };
+			if (isForward)
+			{
+				// return first qualifying solution
+				qualPair = anyPair;
+			}
+		}
+
+		// if initial solution doesn't qualify, try mirror permutations
+		if (! dat::isValid(qualPair))
+		{
+			// use the PQ spinor convention to explore mirror solutions
+			ro::SpinPQ const anyPQ(ro::SpinPQ::from(anyPair));
+			for (size_t nn{0u} ; nn < anyPQ.theNumPerms ; ++nn)
+			{
+				// check if each solution produces a forward intersection
+				ro::OriPair const tmpPair{ anyPQ[nn].pair() };
+				bool const isForward{ model::isForward(tmpPair, uvFitPtrs) };
+				if (isForward)
+				{
+					// return first qualifying solution
+					qualPair = tmpPair;
+					assert(dat::isValid(qualPair));
+					break;
+				}
+			}
+		}
+
+		return qualPair;
+	}
+
+	/*
+	size_t
+	countForward
+		( ro::OriPair const & anyPair
+		, FiveOf<PtrPairUV> const & uvFitPtrs
+		)
+	{
+		size_t count{ 0u };
+
+		bool const isForward{ model::isForward(anyPair, uvFitPtrs) };
+		if (isForward)
+		{
+			++count;
+		}
+
+		// use the PQ spinor convention to explore mirror solutions
+		ro::SpinPQ const anyPQ(ro::SpinPQ::from(anyPair));
+		for (size_t nn{0u} ; nn < anyPQ.theNumPerms ; ++nn)
+		{
+			// check if each solution produces a forward intersection
+			ro::OriPair const tmpPair{ anyPQ[nn].pair() };
+			bool const isForward{ model::isForward(tmpPair, uvFitPtrs) };
+			if (isForward)
+			{
+				++count;
+			}
+		}
+
+		return count;
+	}
+	*/
+
+}
+// -----
+
+Solution
+FitBaseZ :: roSolution
 	( ro::PairBaseZ const & roNom
-	, double const & tol
-	, size_t const & itMax
-	, double const & maxCondNum
-	, double * const & ptCondNum
+	, FitConfig const & config
 	) const
 {
-	PairBaseZ roSoln;
+	Solution roSoln{};
+
 	if (isValid() && roNom.isValid())
 	{
-		roSoln = roNom;
-		double rmsGap{ rmsGapFor(roSoln) };
+		size_t const & itMax = config.theMaxItCount;
+// TODO - remove maxCond test altogether?
+//		double const & maxCondNum = config.theMaxCondNum;
+		double const & tolRmsGap = config.theConvergeTol;
+
+		// iterate over solutions
+		PairBaseZ roCurr{ roNom };
+		double rmsGap{ rmsGapFor(roCurr) };
 		size_t itCount{ 0u };
-		while ((tol < rmsGap) && (itCount++ < itMax))
+		double condNum{ dat::nullValue<double>() };
+		while ((tolRmsGap < rmsGap) && (itCount++ < itMax))
 		{
-			roSoln = improvedNear(roSoln, maxCondNum, ptCondNum);
-			rmsGap = rmsGapFor(roSoln);
+			// use unlimited condition number here
+			// since results tested below on own merit (gap size)
+			constexpr double hugeCond{ std::numeric_limits<double>::max() };
+			PairBaseZ const roTmp{ improvedNear(roCurr, hugeCond, &condNum) };
+			double const rmsTmp{ rmsGapFor(roTmp) };
+
+			// check if this solution is better than previous
+			if (rmsTmp < rmsGap)
+			{
+				rmsGap = rmsTmp;
+				roCurr = roTmp;
+			}
+			else
+			{
+			//	io::out() << "###### worse solution" << std::endl;
+				break;
+			}
+		}
+
+		// if iterations converged
+		if (roCurr.isValid() && (itCount < itMax))
+	//	if (roCurr.isValid() && (itCount < itMax) && (condNum < maxCondNum))
+		{
+			// check if there is a forward solution
+			OriPair const roFwd{ aForwardRO(roCurr.pair(), theUVPtrs) };
+			if (dat::isValid(roFwd))
+			{
+				// package valid forward solution for return
+				std::shared_ptr<Pair> const roPair
+					{ std::make_shared<PairBaseZ>(roFwd) };
+				roSoln = Solution(roPair, itCount, condNum, rmsGap);
+			}
 		}
 	}
 	return roSoln;

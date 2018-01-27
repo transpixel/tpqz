@@ -26,101 +26,115 @@
 //
 //
 
-#ifndef ro_FitBaseZ_INCL_
-#define ro_FitBaseZ_INCL_
+#ifndef dat_BestOf_INCL_
+#define dat_BestOf_INCL_
 
 /*! \file
-\brief Declarations for ro::FitBaseZ
+\brief Declarations for dat::BestOf
 */
 
 
-#include "libro/PairBaseZ.h"
-#include "libga/ga.h"
-#include "libro/FitConfig.h"
-#include "libro/Solution.h"
+#include "libdat/validity.h"
 
-#include <array>
+#include <set>
 #include <string>
-#include <utility>
 
 
-namespace ro
+namespace dat
 {
 
-/*! \brief Wrapper around iterative improvement of a PairBaseZ model.
+/*! \brief Collection comprised of the N "best" objects encountered
 
 \par Example
-\dontinclude testro/uFitBaseZ.cpp
+\dontinclude testdat/uBestOf.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class FitBaseZ
+template <typename Type, typename Compare = std::greater<Type> >
+class BestOf
 {
-
-public: // types
-
-	using PairUV = std::pair<ga::Vector, ga::Vector>;
-	using PtrPairUV = PairUV const * const;
-
-public: // data
-
-	std::array<PtrPairUV, 5u> const theUVPtrs
-		{{ nullptr, nullptr, nullptr, nullptr, nullptr }};
+	size_t theNumBest{ dat::nullValue<size_t>() };
+	std::multiset<Type, Compare > theItems;
+	Compare theCompFunc;
 
 public: // methods
 
 	//! default null constructor
-	FitBaseZ
+	BestOf
 		() = default;
 
-	//! Construct to fit a collection of measurements
+	//! Configure to select numBest objects
+	inline
 	explicit
-	FitBaseZ
-		( std::array<PtrPairUV, 5u> const & uvPtrs
+	BestOf
+		( size_t const & numBest
 		);
 
 	//! True if instance is valid
+	inline
 	bool
 	isValid
 		() const;
 
-	//! Pair with parameters improved by a single linearized iteration.
-	ro::PairBaseZ
-	improvedNear
-		( ro::PairBaseZ const & roNom
-		, double const & maxCondNum = { std::numeric_limits<double>::max() }
-		, double * const & ptCondNum = nullptr
-		) const;
+	//! The number of objects currently being tracked
+	inline
+	size_t
+	capacity
+		() const;
 
-	/*! Solution after (trial and error) exploration of solution space
+	//! The number of objects currently being tracked
+	inline
+	size_t
+	size
+		() const;
+
+	/*! Add object to tracking collection if "better" - true if added
 	 *
-	 * NOTE: Only "forward" solutions are returned (if one exists)
+	 * \arg "better" means (item < allTrackedItems)
+	 *
 	 */
-	Solution
-	roSolution
-		( ro::PairBaseZ const & roNom // TODO - replace with generated guesses?
-		, FitConfig const & config = {}
-		) const;
+	inline
+	bool
+	addSample
+		( Type const & item
+		);
 
-	//! Root-sum-squared tripleProductGap() for measurements
-	double
-	rmsGapFor
-		( ro::Pair const & roNom
-		) const;
+	//! Process collection of objects with addSample()
+	template <typename FwdIter>
+	inline
+	bool
+	addSamples
+		( FwdIter const & itBeg //!< *iter == Type
+		, FwdIter const & itEnd
+		);
+
+	//! Best items in order CompFunc(item[nn], item[nn+1])
+	inline
+	std::vector<Type>
+	bestItems
+		() const;
 
 	//! Descriptive information about this instance.
+	inline
 	std::string
 	infoString
 		( std::string const & title = std::string()
 		) const;
 
-}; // FitBaseZ
+	//! Descriptive information about this instance.
+	inline
+	std::string
+	infoStringContents
+		( std::string const & title = std::string()
+		) const;
 
-} // ro
+}; // BestOf
+
+} // dat
 
 // Inline definitions
-// #include "libro/FitBaseZ.inl"
+#include "libdat/BestOf.inl"
 
-#endif // ro_FitBaseZ_INCL_
+#endif // dat_BestOf_INCL_
 

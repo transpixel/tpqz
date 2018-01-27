@@ -195,12 +195,50 @@ ga_groups_test1
 		oss << "Failure of polyhedra size tests" << std::endl;
 	}
 
+	// check that spread contains all contributions
 	std::vector<ga::Spinor> const spinSpread{ ga::groups::spreadOfSpinors() };
 	size_t const allSize
 		{ std::accumulate(expSizes.begin(), expSizes.end(), 0u) };
 	if (! dat::nearlyEquals(allSize, spinSpread.size()))
 	{
 		oss << "Failure of spread size tests" << std::endl;
+	}
+
+	// check if all spinors are shortest convention
+	for (ga::Spinor const spin : spinSpread)
+	{
+		if (spin.theS.theValue < 0.)
+		{
+			oss << "Failure of positive scalar test" << std::endl;
+			oss << dat::infoString(spin, "spin") << std::endl;
+		}
+	}
+
+	return oss.str();
+}
+
+//! Check angle extraction
+std::string
+ga_groups_test2
+	()
+{
+	std::ostringstream oss;
+
+	std::vector<ga::Spinor> const spins{ ga::groups::spreadOfSpinors() };
+	std::vector<ga::BiVector> const gotAngels
+		{ ga::groups::physicalAnglesFor(spins) };
+
+	// check for shortest rotation convention
+	for (ga::BiVector const & gotAngle : gotAngels)
+	{
+		double const gotMag{ ga::magnitude(gotAngle) };
+		if (math::pi < gotMag)
+		{
+			oss << "Failure of principal magnitude return test" << std::endl;
+			oss << dat::infoString(gotAngle, "gotAngle") << std::endl;
+			oss << dat::infoString(gotMag, "gotMag") << std::endl;
+			break;
+		}
 	}
 
 	return oss.str();
@@ -221,6 +259,7 @@ main
 	// run tests
 	oss << ga_groups_test0();
 	oss << ga_groups_test1();
+	oss << ga_groups_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

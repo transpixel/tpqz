@@ -116,6 +116,39 @@ relative2w1
 }
 
 inline
+ga::Rigid
+unitRigid2w1
+	( std::pair<ga::Rigid, ga::Rigid> const & pair
+	)
+{
+	ga::Rigid const roIn{ relative2w1(pair) };
+	return ga::Rigid(ga::unit(roIn.location()), roIn.pose());
+}
+
+inline
+std::pair<ga::Rigid, ga::Rigid>
+unitOriPair
+	( std::pair<ga::Rigid, ga::Rigid> const & inPair
+	)
+{
+	std::pair<ga::Rigid, ga::Rigid> outPair;
+	double const inGap{ gapBetween(inPair) };
+	if (dat::isValid(inGap) && (0. < inGap))
+	{
+		ga::Rigid const & ori1 = inPair.first;
+		ga::Rigid const & ori2 = inPair.second;
+		double const outPerIn{ 1. / inGap };
+		ga::Vector const outLoc1{ outPerIn * ori1.location() };
+		ga::Vector const outLoc2{ outPerIn * ori2.location() };
+		outPair = 
+			{ ga::Rigid(outLoc1, ori1.pose())
+			, ga::Rigid(outLoc2, ori2.pose())
+			};
+	}
+	return outPair;
+}
+
+inline
 ga::Vector
 vectorBetween
 	( std::pair<ga::Rigid, ga::Rigid> const & roPair

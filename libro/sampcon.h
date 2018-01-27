@@ -34,8 +34,12 @@
 */
 
 
+#include "libdat/validity.h"
 #include "libprob/median.h"
+#include "libro/FitConfig.h"
+#include "libro/QuintSoln.h"
 #include "libro/ro.h"
+#include "libro/Solution.h"
 
 #include <vector>
 
@@ -53,159 +57,50 @@ namespace ro
 
 namespace sampcon
 {
-	//! Pseudo-probability generating Functor
-	struct PseudoProbGen
-	{
-		double theInvSigmaSq{ dat::nullValue<double>() };
+	//! All solutions (N-choose-5 of them!!)
+	std::vector<QuintSoln>
+	allByCombo
+		( std::vector<PairUV> const & uvPairs
+		, OriPair const & roPairNom
+		, FitConfig const & fitConfig = {}
+		);
 
-		PseudoProbGen
-			() = default;
+	//! All solutions from random sampling
+	std::vector<QuintSoln>
+	allBySample
+		( std::vector<PairUV> const & uvPairs
+		, OriPair const & roPairNom
+		, size_t const & numDraws = { 640u }
+		, FitConfig const & fitConfig = {}
+		, size_t const & maxTrys = { 10u }
+		);
 
-		explicit
-		PseudoProbGen
-			( double const & estSigmaGap
-			)
-			: theInvSigmaSq{ 1. / math::sq(estSigmaGap) }
-		{ }
-
-		inline
-		double
-		operator()
-			( double const & gapSq
-			) const
-		{
-			assert(dat::isValid(theInvSigmaSq));
-			return std::exp(-theInvSigmaSq * gapSq);
-		}
-
-	};
-
-	//! Consenus solution information
-	struct BestSoln
-	{
-		PseudoProbGen theProbGen;
-
-		OriPair theOriPair{};
-		double theProbMin{ dat::nullValue<double>() };
-		double theProbMax{ dat::nullValue<double>() };
-		std::vector<double> theBestGapSqs;
-
-		//! Construct a null instance
-		BestSoln
-			() = default;
-
-		explicit
-		BestSoln
-			( size_t const & numPnts
-			, double const & dirSigma = {  4. * 10./450. }
-			)
-			: theProbGen(dirSigma)
-			, theOriPair{}
-			, theProbMin{ std::numeric_limits<double>::max() }
-			, theProbMax{ std::numeric_limits<double>::lowest() }
-			, theBestGapSqs(numPnts, dat::nullValue<double>())
-		{ }
-
-		//! True if this instance is not null
-		bool
-		isValid
-			() const
-		{
-			return dat::isValid(theOriPair);
-		}
-
-		//! True if solution is modified
-		bool
-		updatePseudoProb
-			( OriPair const & roPair
-			, double const & pProbFit
-			, std::vector<double> const & gapSqs
-			)
-		{
-			bool modSoln{ false };
-			if (pProbFit < theProbMin)
-			{
-				theProbMin = pProbFit;
-			}
-			else
-			if (theProbMax < pProbFit)
-			{
-				modSoln = true;
-				theOriPair = roPair;
-				theBestGapSqs = gapSqs;
-				theProbMax = pProbFit;
-			}
-			return modSoln;
-		}
-
-		double
-		voteFor
-			( size_t const & pntNdx
-			) const
-		{
-			double vote{ dat::nullValue<double>() };
-			if (pntNdx < theBestGapSqs.size())
-			{
-				double const & gapSq = theBestGapSqs[pntNdx];
-
-				double const pProbMea{ theProbGen(gapSq) };
-				double const pProbPnt{ pProbMea * theProbMax };
-				vote = pProbPnt;
-			}
-			return vote;
-		}
-
-		//! Estimated gap (rms adjusted for 5 dof)
-		double
-		rmseGap
-			() const
-		{
-			double rmse{ dat::nullValue<double>() };
-			if (isValid() && (5u < theBestGapSqs.size()))
-			{
-				std::vector<double> const & gaps = theBestGapSqs;
-				double const dom{ double(theBestGapSqs.size() - 5u) };
-				double const sumSqs
-					{ std::accumulate(gaps.begin(), gaps.end(), 0.) };
-				rmse = std::sqrt(sumSqs / dom);
-			}
-			return rmse;
-		}
-
-		//! Estimated gap (rms adjusted for 5 dof)
-		double
-		medianGap
-			() const
-		{
-			double median{ dat::nullValue<double>() };
-			if (isValid() && (5u < theBestGapSqs.size()))
-			{
-				// make copy for sort
-				std::vector<double> gaps{ theBestGapSqs };
-				using Iter = typename std::vector<double>::iterator;
-				Iter const it0 = gaps.begin();
-				Iter const itBeg = it0 + 5u;
-				Iter const itEnd = gaps.end();
-				std::nth_element(it0, itBeg, itEnd);
-				median = prob::median::valueFromConst(itBeg, itEnd);
-			}
-			return median;
-		}
-	};
+	//! Select the "best" (TODO metric?) from quintSolns
+	std::vector<QuintSoln>
+	bestOf
+		( std::vector<QuintSoln> const & quintSolns
+		, std::vector<PairUV> const & uvPairs
+		, size_t const & numBest = { 1u }
+		, double const & gapSigma = { 1./1000. }
+		);
 
 	//! Best solution after exhaustive evaluation of all combinations
-	BestSoln
+	QuintSoln
 	byCombo
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom
+		, FitConfig const & fitConfig = {}
+		, double const & gapSigma = { 1./1000. }
 		);
 
 	//! Best solution from random sampling
-	BestSoln
+	QuintSoln
 	bySample
 		( std::vector<PairUV> const & uvPairs
 		, OriPair const & roPairNom
 		, size_t const & numDraws = { 640u }
+		, FitConfig const & fitConfig = {}
+		, double const & gapSigma = { 1./1000. }
 		, size_t const & maxTrys = { 10u }
 		);
 

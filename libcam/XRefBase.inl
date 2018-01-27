@@ -178,6 +178,42 @@ XRefBase<DatType> :: begin
 }
 
 template <typename DatType>
+typename dat::grid<DatType>::const_iterator
+inline
+XRefBase<DatType> :: beginTable
+	() const
+{
+	return theItemGrid.begin();
+}
+
+template <typename DatType>
+typename dat::grid<DatType>::const_iterator
+inline
+XRefBase<DatType> :: endTable
+	() const
+{
+	return theItemGrid.end();
+}
+
+template <typename DatType>
+typename dat::grid<DatType>::iterator
+inline
+XRefBase<DatType> :: beginTable
+	()
+{
+	return theItemGrid.begin();
+}
+
+template <typename DatType>
+typename dat::grid<DatType>::iterator
+inline
+XRefBase<DatType> :: endTable
+	()
+{
+	return theItemGrid.end();
+}
+
+template <typename DatType>
 inline
 size_t
 XRefBase<DatType> :: pntCapacity
@@ -452,12 +488,13 @@ inline
 std::string
 XRefBase<DatType> :: infoStringPntMajor
 	( std::string const & title
-	)
+	, bool const & showItemDetail
+	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << infoString(title) << std::endl;
+		oss << infoString(title);
 	}
 	size_t const numPnts{ pntCapacity() };
 	for (size_t pntNdx{0u} ; pntNdx < numPnts ; ++pntNdx)
@@ -477,6 +514,10 @@ XRefBase<DatType> :: infoStringPntMajor
 			if (dat::isValid(item))
 			{
 				oss << prefixer.nextFieldString(acqNdx);
+				if (showItemDetail)
+				{
+					oss << " " << dat::infoString(item);
+				}
 			}
 		}
 	}
@@ -488,12 +529,13 @@ inline
 std::string
 XRefBase<DatType> :: infoStringAcqMajor
 	( std::string const & title
-	)
+	, bool const & showItemDetail
+	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << infoString(title) << std::endl;
+		oss << infoString(title);
 	}
 	size_t const numAcqs{ acqCapacity() };
 	for (size_t acqNdx{0u} ; acqNdx < numAcqs ; ++acqNdx)
@@ -513,6 +555,10 @@ XRefBase<DatType> :: infoStringAcqMajor
 			if (dat::isValid(item))
 			{
 				oss << prefixer.nextFieldString(pntNdx);
+				if (showItemDetail)
+				{
+					oss << " " << dat::infoString(item);
+				}
 			}
 		}
 	}

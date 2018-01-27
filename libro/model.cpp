@@ -156,6 +156,28 @@ pointPairs
 	return uvPnts;
 }
 
+size_t
+numForward
+	( OriPair const & oriPair
+	, FiveOf<PairUV const * const> const & ptrQuintUV
+	)
+{
+	size_t fwdCount{ 0u };
+	if (dat::isValid(oriPair))
+	{
+		for (PairUV const * const & ptrUV : ptrQuintUV)
+		{
+			PairUV const & uvPair = *ptrUV;
+			PntPair const pntPair{ pointPair(uvPair, oriPair) };
+			if (dat::isValid(pntPair))
+			{
+				++fwdCount;
+			}
+		}
+	}
+	return fwdCount;
+}
+
 
 } // model
 } // ro

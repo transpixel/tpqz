@@ -26,62 +26,64 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
 
 /*! \file
-\brief Declarations for namespace cam
+\brief Definitions for ro::FitConfig
 */
 
 
-#include "libdat/Spot.h"
+#include "libro/FitConfig.h"
 
-#include <string>
-#include <vector>
-
-
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
+#include <cmath>
+#include <sstream>
 
 
-*/
-namespace cam
+namespace ro
 {
 
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
+// explicit
+FitConfig :: FitConfig
+	( double const & maxCondNum
+	)
+	: theMaxCondNum{ maxCondNum }
+{
+}
 
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
+// explicit
+FitConfig :: FitConfig
+	( double const & maxCondNum
+	, size_t const & maxItCount
+	)
+	: theMaxCondNum{ maxCondNum }
+	, theMaxItCount{ maxItCount }
+{
+}
 
-	//! Descriptive point name/key
-	using PntName = std::string;
-
-	//! Descriptive acquisition name/key
-	using AcqName = std::string;
-
-	//! Image measurement for a single object space point
-	struct MeaForOnePnt
+std::string
+FitConfig :: infoString
+	( std::string const & title
+	) const
+{
+	std::ostringstream oss;
+	if (! title.empty())
 	{
-		std::string const thePntName;
-		dat::Spot const theSpot;
-		// Uncertainty - e.g. Covar matrix info
-	};
+		oss << title << " ";
+	}
+	//if (isValid())
+	{
+		double const log10Cond{ std::log10(theMaxCondNum) };
+		oss
+			<< " " << dat::infoString(log10Cond, "log10Cond")
+			<< " " << dat::infoString(theMaxItCount, "maxIt")
+			<< " " << dat::infoString(theConvergeTol, "convergeTol")
+			;
+	}
+	//else
+	//{
+	//	oss << " <null>";
+	//}
+	return oss.str();
+}
 
-	//! All image measurements associated with a single acquisition
-	using MeaGroupOneAcq = std::vector<MeaForOnePnt>;
-
-} // cam
-
-// Inline definitions
-// #include "libcam/cam.inl"
-
-#endif // cam_cam_INCL_
+} // ro
 

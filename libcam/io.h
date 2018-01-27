@@ -38,6 +38,9 @@
 #include "libcam/XRefRays.h"
 #include "libcam/XRefSpots.h"
 
+#include <iostream>
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -55,6 +58,43 @@ namespace cam
 
 namespace io
 {
+	//! Name used by save*() functions in association with point index
+	PntName
+	pntNameForNdx
+		( cam::PntNdx const & pntNdx
+		, std::string const & ndxFmt = { "%05d" }
+		);
+
+	/*! \brief Load measurements data from ascii file (trifecta convention).
+	 *
+	 * Record format is: 
+	 *   <pntID row col [srr, src, scr, scc]>
+	 *
+	 * Note: Covariance values are currently ignored
+	 *
+	 */
+	MeaGroupOneAcq
+	loadFromAsciiTrifecta
+		( std::istream & istrm
+		, std::set<PntName> * const ptNames = { nullptr }
+		);
+
+	//! Insert mea into table col(acqNdx), using map for pntNdx lookup
+	bool
+	insertIntoTable
+		( cam::XRefSpots * const & ptSpotTab
+		, MeaGroupOneAcq const & meaInfos
+		, AcqNdx const & acqNdx
+		, std::map<PntName, PntNdx> const & pntNameNdxMap
+		);
+
+	//! Save measurements to stream in ascii format (trifecta convention)
+	bool
+	saveToAsciiTrifecta
+		( cam::XRefSpots const & spotTab
+		, std::ostream & ostrm
+		, AcqNdx const & acqNdx
+		);
 
 	//! Save measurements to output files in (trifecta convention)
 	bool

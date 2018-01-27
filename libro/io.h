@@ -26,62 +26,75 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
+#ifndef ro_io_INCL_
+#define ro_io_INCL_
 
 /*! \file
-\brief Declarations for namespace cam
+\brief Declarations for ro::io
 */
 
 
-#include "libdat/Spot.h"
+#include "libro/ro.h"
 
-#include <string>
+#include <iostream>
 #include <vector>
 
 
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
-
-
-*/
-namespace cam
+namespace ro
 {
 
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
+/*! \brief Functions for object I/O
 
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
+\par Example
+\dontinclude testro/uio.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-	//! Descriptive point name/key
-	using PntName = std::string;
+namespace io
+{
 
-	//! Descriptive acquisition name/key
-	using AcqName = std::string;
-
-	//! Image measurement for a single object space point
-	struct MeaForOnePnt
+namespace gnuplot
+{
+	enum WhichOne
 	{
-		std::string const thePntName;
-		dat::Spot const theSpot;
-		// Uncertainty - e.g. Covar matrix info
+		  First
+		, Second
 	};
 
-	//! All image measurements associated with a single acquisition
-	using MeaGroupOneAcq = std::vector<MeaForOnePnt>;
+	//! Save directions as 'gnuplot vector' ascii data
+	bool
+	saveImageRays
+		( std::ostream & ostrm
+		, WhichOne const & which
+		, OriPair const & oriPair
+		, std::vector<PairUV> const & uvPairs
+		);
 
-} // cam
+	//! Draw an asymmetric shape to represent axis triad
+	bool
+	drawOXYZ
+		( std::ostream & ostrm
+		, ga::Rigid const & oriStaWrtRef
+		, double const & axisMag = { 1. }
+		);
+
+	//! Perform space intersections and save as 'gnuplot vector' ascii data
+	bool
+	saveModelRays
+		( std::ostream & ostrm
+		, OriPair const & oriPair
+		, std::vector<PairUV> const & uvPairs
+		);
+}
+
+
+} // io
+
+} // ro
 
 // Inline definitions
-// #include "libcam/cam.inl"
+// #include "libro/io.inl"
 
-#endif // cam_cam_INCL_
+#endif // ro_io_INCL_
 

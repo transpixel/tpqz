@@ -26,101 +26,110 @@
 //
 //
 
-#ifndef ro_FitBaseZ_INCL_
-#define ro_FitBaseZ_INCL_
+#ifndef cam_Loader_INCL_
+#define cam_Loader_INCL_
 
 /*! \file
-\brief Declarations for ro::FitBaseZ
+\brief Declarations for cam::Loader
 */
 
 
-#include "libro/PairBaseZ.h"
-#include "libga/ga.h"
-#include "libro/FitConfig.h"
-#include "libro/Solution.h"
+#include "libcam/Camera.h"
+#include "libcam/cam.h"
+#include "libcam/XRefSpots.h"
 
-#include <array>
 #include <string>
-#include <utility>
+#include <set>
+#include <map>
 
 
-namespace ro
+namespace cam
 {
 
-/*! \brief Wrapper around iterative improvement of a PairBaseZ model.
+/*! \brief Loader object for reading image measurements
 
 \par Example
-\dontinclude testro/uFitBaseZ.cpp
+\dontinclude testcam/uLoader.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class FitBaseZ
+class Loader
 {
 
-public: // types
+private:
 
-	using PairUV = std::pair<ga::Vector, ga::Vector>;
-	using PtrPairUV = PairUV const * const;
+	std::set<PntName> thePntNames;
+	std::set<AcqName> theAcqNames;
+	std::vector<MeaGroupOneAcq> theMeaGroups;
 
-public: // data
+public: // static methods
 
-	std::array<PtrPairUV, 5u> const theUVPtrs
-		{{ nullptr, nullptr, nullptr, nullptr, nullptr }};
+	//! Measurement data in table form from all measurement files
+	static
+	XRefSpots
+	spotTableFor
+		( std::vector<std::string> const & meapaths
+		, Camera const & camera
+		);
 
 public: // methods
 
 	//! default null constructor
-	FitBaseZ
+	Loader
 		() = default;
 
-	//! Construct to fit a collection of measurements
+	//! Attached to spot table
 	explicit
-	FitBaseZ
-		( std::array<PtrPairUV, 5u> const & uvPtrs
+	Loader
+		( std::vector<std::string> const & meapaths
 		);
 
-	//! True if instance is valid
-	bool
-	isValid
+	//! Name to index lookup
+	std::map<PntName, PntNdx>
+	pntNameNdxMap
 		() const;
 
-	//! Pair with parameters improved by a single linearized iteration.
-	ro::PairBaseZ
-	improvedNear
-		( ro::PairBaseZ const & roNom
-		, double const & maxCondNum = { std::numeric_limits<double>::max() }
-		, double * const & ptCondNum = nullptr
+	//! Name to index lookup
+	std::map<AcqName, AcqNdx>
+	acqNameNdxMap
+		() const;
+
+	//! Names of points (name = result[pntNdx])
+	std::vector<PntName>
+	pntNames // by pntNdx
+		() const;
+
+	//! Names of acquisitions (name = result[acqNdx])
+	std::vector<AcqName>
+	acqNames // by acqNdx
+		() const;
+
+	//! Measurement data in table format
+	XRefSpots
+	spotTable
+		( std::map<PntName, PntNdx> const & pntNameNdxMap
+		, Camera const & camera
 		) const;
 
-	/*! Solution after (trial and error) exploration of solution space
-	 *
-	 * NOTE: Only "forward" solutions are returned (if one exists)
-	 */
-	Solution
-	roSolution
-		( ro::PairBaseZ const & roNom // TODO - replace with generated guesses?
-		, FitConfig const & config = {}
-		) const;
-
-	//! Root-sum-squared tripleProductGap() for measurements
-	double
-	rmsGapFor
-		( ro::Pair const & roNom
+	//! Measurement data in table format
+	XRefSpots
+	spotTable
+		( Camera const & camera
 		) const;
 
 	//! Descriptive information about this instance.
 	std::string
-	infoString
+	infoStringDetail
 		( std::string const & title = std::string()
 		) const;
 
-}; // FitBaseZ
+}; // Loader
 
-} // ro
+} // cam
 
 // Inline definitions
-// #include "libro/FitBaseZ.inl"
+// #include "libcam/Loader.inl"
 
-#endif // ro_FitBaseZ_INCL_
+#endif // cam_Loader_INCL_
 

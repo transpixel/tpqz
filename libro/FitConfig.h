@@ -26,62 +26,68 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
+#ifndef ro_FitConfig_INCL_
+#define ro_FitConfig_INCL_
 
 /*! \file
-\brief Declarations for namespace cam
+\brief Declarations for ro::FitConfig
 */
 
 
-#include "libdat/Spot.h"
+#include "libmath/math.h"
 
+#include <cstddef>
 #include <string>
-#include <vector>
 
 
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
-
-
-*/
-namespace cam
+namespace ro
 {
 
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
+/*! \brief Configuration parameters for data fitting operations
 
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
+\par Example
+\dontinclude testro/uFitConfig.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-	//! Descriptive point name/key
-	using PntName = std::string;
+struct FitConfig
+{
+	double const theMaxCondNum{ 1.e6 }; //!< discard solns less stable
+	size_t const theMaxItCount{ 25u }; //!< should only need a handful
+	double const theConvergeTol{ math::eps }; //!< convergence tolerance
 
-	//! Descriptive acquisition name/key
-	using AcqName = std::string;
+public: // methods
 
-	//! Image measurement for a single object space point
-	struct MeaForOnePnt
-	{
-		std::string const thePntName;
-		dat::Spot const theSpot;
-		// Uncertainty - e.g. Covar matrix info
-	};
+	//! default null constructor
+	FitConfig
+		() = default;
 
-	//! All image measurements associated with a single acquisition
-	using MeaGroupOneAcq = std::vector<MeaForOnePnt>;
+	//! Override default values
+	explicit
+	FitConfig
+		( double const & maxCondNum
+		);
 
-} // cam
+	//! Override default values
+	explicit
+	FitConfig
+		( double const & maxCondNum
+		, size_t const & maxItCount
+		);
+
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // FitConfig
+
+} // ro
 
 // Inline definitions
-// #include "libcam/cam.inl"
+// #include "libro/FitConfig.inl"
 
-#endif // cam_cam_INCL_
+#endif // ro_FitConfig_INCL_
 

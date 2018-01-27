@@ -26,62 +26,70 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
+#ifndef ro_QuintSoln_INCL_
+#define ro_QuintSoln_INCL_
 
 /*! \file
-\brief Declarations for namespace cam
+\brief Declarations for ro::QuintSoln
 */
 
 
-#include "libdat/Spot.h"
+#include "libdat/validity.h"
+#include "libro/ro.h"
+#include "libro/Solution.h"
 
 #include <string>
-#include <vector>
 
 
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
-
-
-*/
-namespace cam
+namespace ro
 {
 
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
+/*! \brief Relative Orientation for 5 pair of corresponding rays.
 
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
+\par Example
+\dontinclude testro/uQuintSoln.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
 
-	//! Descriptive point name/key
-	using PntName = std::string;
+struct QuintSoln
+{
+	//! Indices into implicit external collection of UV direction pairs
+	FiveOf<size_t> theFitNdxs{ dat::nullValue<size_t, 5u>() };
 
-	//! Descriptive acquisition name/key
-	using AcqName = std::string;
+	//! Solution associated with the five indicated values
+	Solution theSoln{};
 
-	//! Image measurement for a single object space point
-	struct MeaForOnePnt
-	{
-		std::string const thePntName;
-		dat::Spot const theSpot;
-		// Uncertainty - e.g. Covar matrix info
-	};
+public: // methods
 
-	//! All image measurements associated with a single acquisition
-	using MeaGroupOneAcq = std::vector<MeaForOnePnt>;
+	//! default null constructor
+	QuintSoln
+		() = default;
 
-} // cam
+	//! Value ctor
+	explicit
+	QuintSoln
+		( FiveOf<size_t> const & fitNdxs
+		, Solution const & soln
+		);
+
+	//! True if instance is valid
+	bool
+	isValid
+		() const;
+
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
+
+}; // QuintSoln
+
+} // ro
 
 // Inline definitions
-// #include "libcam/cam.inl"
+// #include "libro/QuintSoln.inl"
 
-#endif // cam_cam_INCL_
+#endif // ro_QuintSoln_INCL_
 

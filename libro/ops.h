@@ -106,6 +106,20 @@ namespace ro
 		( std::pair<Type, Type> const & pair
 		);
 
+	//! Relative orientation enforcing unit-magnitude base length
+	inline
+	ga::Rigid
+	unitRigid2w1
+		( std::pair<ga::Rigid, ga::Rigid> const & pair
+		);
+
+	//! Pair of orientations with locations scaled to unit separation
+	inline
+	std::pair<ga::Rigid, ga::Rigid>
+	unitOriPair
+		( std::pair<ga::Rigid, ga::Rigid> const & pair
+		);
+
 	//! Vector from first to second
 	inline
 	ga::Vector

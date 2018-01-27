@@ -34,12 +34,14 @@
 
 #include "libro/sampcon.h"
 
+#include "libdat/BestOf.h"
 #include "libdat/info.h"
 #include "libdat/random.h"
 #include "libdat/validity.h"
 #include "libgeo/intersect.h"
 #include "libio/sprintf.h"
 #include "libio/stream.h"
+#include "libro/Accord.h"
 #include "libro/cast.h"
 #include "libro/FitBaseZ.h"
 #include "libro/model.h"
@@ -320,71 +322,6 @@ namespace
 		}
 	};
 
-	/*
-	//! True if value is in array
-	bool
-	contains
-		( size_t const & key
-		, std::array<size_t, 5u> const & values
-		)
-	{
-		bool found{ false };
-		for (size_t const & value : values)
-		{
-			if (key == value)
-			{
-				found = true;
-				break;
-			}
-		}
-		return found;
-	}
-	*/
-
-	//! RMS gap value computed using ALL measurements - true if ptSoln modified
-	bool
-	updateSolution
-		( ro::OriPair const & roPair
-		, std::vector<ro::PairUV> const & uvPairs
-		, StateTracker<5u> const & sampleState
-		, BestSoln * const & ptSoln
-		)
-	{
-		bool modSoln{ false };
-		assert(ptSoln);
-		if (dat::isValid(roPair))
-		{
-			std::vector<std::pair<size_t, double> > pProbs
-				(uvPairs.size(), { dat::nullValue<size_t>(), 0. });
-
-			// use measurements EXCLUDED from the fitting process for:
-			// 	: gapSq values (save for next computation)
-			// 	: pseudo-prob of fit
-			size_t const uvSize{ uvPairs.size() };
-			std::vector<double> gapSqs(uvPairs.size());
-			ro::QuadForm const quad{ roPair };
-			double pProbSum{ 0. };
-			size_t pProbCount{ 0u };
-			for (size_t nn{0u} ; nn < uvSize ; ++nn)
-			{
-				ro::PairUV const & uvPair = uvPairs[nn];
-				double const gapSq{ math::sq(quad.tripleProductGap(uvPair)) };
-				gapSqs[nn] = gapSq;
-				if (! sampleState.isActiveIndex(nn))
-				{
-					pProbSum += ptSoln->theProbGen(gapSq);
-					++pProbCount;
-				}
-			}
-			assert(0u < pProbCount);
-			double const pProbFit{ pProbSum / double(pProbCount) };
-
-			// update best solution tracking
-			modSoln = ptSoln->updatePseudoProb(roPair, pProbFit, gapSqs);
-		}
-		return modSoln;
-	}
-
 	//! Combinatorial index generator
 	struct Combo5
 	{
@@ -471,216 +408,175 @@ namespace
 			}};
 	}
 
-	//! True if all uv dirs intersect in forward directions.
-	size_t
-	numForward
-		( ro::OriPair const & oriPair
-		, PtrQuint const & uvFitPtrs
-		)
-	{
-		size_t fwdCount{ 0u };
-		if (dat::isValid(oriPair))
-		{
-			for (PtrPairUV const & uvFitPtr : uvFitPtrs)
-			{
-				PairUV const & uvPair = *uvFitPtr;
-				PntPair const pntPair{ model::pointPair(uvPair, oriPair) };
-				if (dat::isValid(pntPair))
-				{
-					++fwdCount;
-				}
-			}
-		}
-
-		return fwdCount;
-	}
-
-	//! Return one of multiple solutions with all points in front (or null).
-	ro::OriPair
-	aForwardRO
-		( ro::OriPair const & anyPair
-		, PtrQuint const & uvFitPtrs
-		)
-	{
-		OriPair qualPair;
-
-		// try given initial solution
-		{
-			size_t const numFwd{ numForward(anyPair, uvFitPtrs) };
-			bool const isForward{ (uvFitPtrs.size() == numFwd) };
-			if (isForward)
-			{
-				// return first qualifying solution
-				qualPair = anyPair;
-			}
-		}
-
-		// if initial solution doesn't qualify, try mirror permutations
-		if (! dat::isValid(qualPair))
-		{
-			// use the PQ spinor convention to explore mirror solutions
-			ro::SpinPQ const anyPQ(ro::SpinPQ::from(anyPair));
-			for (size_t nn{0u} ; nn < anyPQ.theNumPerms ; ++nn)
-			{
-				// check if each solution produces a forward intersection
-				ro::OriPair const tmpPair{ anyPQ[nn].pair() };
-				size_t const numFwd{ numForward(tmpPair, uvFitPtrs) };
-				bool const isForward{ (uvFitPtrs.size() == numFwd) };
-				if (isForward)
-				{
-					// return first qualifying solution
-					qualPair = tmpPair;
-					assert(dat::isValid(qualPair));
-					break;
-				}
-			}
-		}
-
-		return qualPair;
-	}
 }
 
-BestSoln
-byCombo
+
+std::vector<QuintSoln>
+allByCombo
 	( std::vector<PairUV> const & uvPairs
 	, OriPair const & roPairNom
+	, FitConfig const & fitConfig
 	)
 {
-	BestSoln soln(uvPairs.size());
+	std::vector<QuintSoln> quintSolns;
 
 	assert(areValidPairs(uvPairs));
 	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
 
-	StateTracker<5u> sampleState(uvPairs.size());
 	ro::PairBaseZ const roNom(roPairNom);
-
-	// try fitting all combinations
-	Combo5 const combo(uvPairs.size());
-	size_t const numQuints{ combo.theQuints.size() };
-	size_t nqBest{ dat::nullValue<size_t>() }; 
-	for (size_t nq{0u} ; nq < numQuints ; ++nq)
+	if (roNom.isValid())
 	{
-		// gain access to measurements for fitting
-		Combo5::NdxQuint const & fitIndices = combo.theQuints[nq];
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
-		assert(areValidPtrs(uvFitPtrs));
-
-		// compute RO using fit partition
-		FitBaseZ const fitter(uvFitPtrs);//.begin(), uvFitPtrs.end());
-		// ro::PairBaseZ const roFit{ fitter.improvedNear(roNom) };
-		ro::PairBaseZ const roFit{ fitter.solutionNear(roNom) };
-
-		// evaluate RO quality using evaluation partition
-		if (dat::isValid(roFit))
+		// try fitting all combinations
+		Combo5 const combo(uvPairs.size());
+		size_t const numQuints{ combo.theQuints.size() };
+		for (size_t nq{0u} ; nq < numQuints ; ++nq)
 		{
-			// check if there is a forward-qualified version of soln
-			OriPair const roFwd{ aForwardRO(roFit.pair(), uvFitPtrs) };
-			if (dat::isValid(roFwd))
-			{
-				sampleState.enactivate(fitIndices);
-				if (updateSolution(roFwd, uvPairs, sampleState, &soln))
-				{
-					nqBest = nq;
-				}
-				sampleState.deactivate(fitIndices);
-			}
-		}
-	}
-
-	// search for "forward" solution
-	if (soln.isValid() && dat::isValid(nqBest))
-	{
-		Combo5::NdxQuint const & bestIndices = combo.theQuints[nqBest];
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestIndices));
-		assert(areValidPtrs(uvFitPtrs));
-		// evaluate mirror solutions - to find physically legit one
-		soln.theOriPair = aForwardRO(soln.theOriPair, uvFitPtrs);
-	}
-
-	return soln;
-}
-
-BestSoln
-bySample
-	( std::vector<PairUV> const & uvPairs
-	, OriPair const & roPairNom
-	, size_t const & numDraws
-	, size_t const & maxTrys
-	)
-{
-	BestSoln soln(uvPairs.size());
-
-	assert(areValidPairs(uvPairs));
-	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
-
-	StateTracker<5u> sampleState(uvPairs.size());
-	ro::PairBaseZ const roNom(roPairNom);
-
-	Combo5::NdxQuint fitIndices{{}};
-	rand::Sampler sampler(uvPairs.size(), maxTrys);
-
-	Combo5::NdxQuint bestIndices{{ dat::nullValue<size_t>() }};
-	for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
-	{
-		// partition samples into fit and evaluation groups
-		bool const goodSample{ sampler.setIndices(&fitIndices) };
-		if (goodSample)
-		{
-			// access measurements to use for fitting
+			// gain access to measurements for fitting
+			Combo5::NdxQuint const & fitIndices = combo.theQuints[nq];
 			PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
 			assert(areValidPtrs(uvFitPtrs));
 
 			// compute RO using fit partition
 			FitBaseZ const fitter(uvFitPtrs);
-			// ro::PairBaseZ const roFit{ fitter.improvedNear(roNom) };
-			ro::PairBaseZ const roFit{ fitter.solutionNear(roNom) };
-
-			// evaluate RO quality using evaluation partition
-			if (dat::isValid(roFit))
+			Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
+			if (dat::isValid(roSoln))
 			{
-				OriPair const roFwd{ aForwardRO(roFit.pair(), uvFitPtrs) };
-				sampleState.enactivate(fitIndices);
-				if (updateSolution(roFwd, uvPairs, sampleState, &soln))
-				{
-					bestIndices = fitIndices;
-				}
-				sampleState.deactivate(fitIndices);
+				QuintSoln const quintSoln{ fitIndices, roSoln };
+				quintSolns.emplace_back(quintSoln);
 			}
 		}
-		// else // ignore improper (e.g. duplicate) samples
-		// io::out() << "WARNING: invalid partition" << std::endl;
 	}
 
-	// search for "forward" solution
-	if (soln.isValid() && dat::isValid(bestIndices[0]))
+	return quintSolns;
+}
+
+std::vector<QuintSoln>
+allBySample
+	( std::vector<PairUV> const & uvPairs
+	, OriPair const & roPairNom
+	, size_t const & numDraws
+	, FitConfig const & fitConfig
+	, size_t const & maxTrys
+	)
+{
+	std::vector<QuintSoln> quintSolns;
+
+	assert(areValidPairs(uvPairs));
+	assert(5u < uvPairs.size()); // need at least one mea redundancy for rms
+
+	ro::PairBaseZ const roNom(roPairNom);
+	if (roNom.isValid())
 	{
-		// access measurements to use for fitting
-		PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, bestIndices));
-		assert(areValidPtrs(uvFitPtrs));
+		Combo5::NdxQuint fitIndices{{}};
+		rand::Sampler sampler(uvPairs.size(), maxTrys);
 
-		// evaluate mirror solutions - to find physically legit one
-		soln.theOriPair = aForwardRO(soln.theOriPair, uvFitPtrs);
-
-		/*
-		io::out() << "..Fwd:" << std::endl;
-		for (PtrPairUV const & ptrPairUV : uvFitPtrs)
+		for (size_t nDraw{0u} ; nDraw < numDraws ; ++nDraw)
 		{
-			PairUV const & uvPair = *ptrPairUV;
-			ga::Vector const & uDir = uvPair.first;
-			ga::Vector const & vDir = uvPair.second;
-			OriPair const oriPair{ soln.theOriPair };
-			bool const isFwd{ dat::isValid(model::pointPair(uvPair, oriPair)) };
-			io::out()
-				<< "arFwd:"
-				<< " " << dat::infoString(uDir, "uDir")
-				<< " " << dat::infoString(vDir, "vDir")
-				<< " " << dat::infoString(isFwd, "isFwd")
-				<< std::endl;
+			// partition samples into fit and evaluation groups
+			bool const goodSample{ sampler.setIndices(&fitIndices) };
+			if (goodSample)
+			{
+				// access measurements to use for fitting
+				PtrQuint const uvFitPtrs(ptrQuintInto(&uvPairs, fitIndices));
+				assert(areValidPtrs(uvFitPtrs));
+
+				// compute RO using fit partition
+				FitBaseZ const fitter(uvFitPtrs);
+				Solution const roSoln{ fitter.roSolution(roNom, fitConfig) };
+				if (dat::isValid(roSoln))
+				{
+					QuintSoln const quintSoln{ fitIndices, roSoln };
+					quintSolns.emplace_back(quintSoln);
+				}
+			}
+			// else // ignore improper (e.g. duplicate) samples
+			// io::out() << "WARNING: invalid partition" << std::endl;
 		}
-		*/
 	}
 
-	return soln;
+	return quintSolns;
+}
+
+std::vector<QuintSoln>
+bestOf
+	( std::vector<QuintSoln> const & quintSolns
+	, std::vector<PairUV> const & uvPairs
+	, size_t const & numBest
+	, double const & gapSigma
+	)
+{
+	std::vector<QuintSoln> best;
+
+	using ProbNdxPair = std::pair<double, size_t>;
+	dat::BestOf<ProbNdxPair> besty(numBest);
+
+	size_t const numSolns{ quintSolns.size() };
+	for (size_t ndx{0u} ; ndx < numSolns ; ++ndx)
+	{
+		QuintSoln const & quintSoln = quintSolns[ndx];
+		double const prob{ Accord::probFor(quintSoln, uvPairs, gapSigma) };
+		ProbNdxPair const pnPair{ prob, ndx };
+		besty.addSample(pnPair);
+	}
+
+	std::vector<ProbNdxPair> const pnBests{ besty.bestItems() };
+	best.reserve(pnBests.size());
+	for (ProbNdxPair const & pnPair : pnBests)
+	{
+		size_t const ndx{ pnPair.second };
+		best.emplace_back(quintSolns[ndx]);
+	}
+
+	return best;
+}
+
+namespace
+{
+	QuintSoln
+	bestFrom
+		( std::vector<QuintSoln> const & allQuintSolns
+		, std::vector<PairUV> const & uvPairs
+		, double const & gapSigma
+		)
+	{
+		QuintSoln bestQuintSoln{};
+		constexpr size_t const numBest{ 1u };
+		std::vector<QuintSoln> const bestQuintSolns
+			{ bestOf(allQuintSolns, uvPairs, numBest, gapSigma) };
+		if (! bestQuintSolns.empty())
+		{
+			bestQuintSoln = bestQuintSolns[0];
+		}
+		return bestQuintSoln;
+	}
+}
+
+QuintSoln
+byCombo
+	( std::vector<PairUV> const & uvPairs
+	, OriPair const & roPairNom
+	, FitConfig const & fitConfig
+	, double const & gapSigma
+	)
+{
+	std::vector<QuintSoln> const allQuintSolns
+		{ allByCombo(uvPairs, roPairNom, fitConfig) };
+	return bestFrom(allQuintSolns, uvPairs, gapSigma);
+}
+
+QuintSoln
+bySample
+	( std::vector<PairUV> const & uvPairs
+	, OriPair const & roPairNom
+	, size_t const & numDraws
+	, FitConfig const & fitConfig
+	, double const & gapSigma
+	, size_t const & maxTrys
+	)
+{
+	std::vector<QuintSoln> const allQuintSolns
+		{ allBySample(uvPairs, roPairNom, numDraws, fitConfig, maxTrys) };
+	return bestFrom(allQuintSolns, uvPairs, gapSigma);
 }
 
 

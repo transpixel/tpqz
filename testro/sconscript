@@ -39,10 +39,10 @@ env = env.Clone() # allow module to change anything it wants
 libpaths = \
  [ '../libro/'
 
- , '../libgeo/'
  , '../libcloud/'
  , '../libcam/'
 
+ , '../libgeo/'
  , '../libga/'
 
  , '../libprob/'
@@ -51,14 +51,16 @@ libpaths = \
  , '../libapp/'
  , '../libdat/'
  , '../libio/'
+ , '../libfile/'
  ]
 
 linklibs = \
  [ 'ro'
 
- , 'geo'
  , 'cloud'
  , 'cam'
+
+ , 'geo'
  , 'ga'
 
  , 'prob'
@@ -67,11 +69,17 @@ linklibs = \
  , 'app'
  , 'dat'
  , 'io'
+ , 'file'
+
+ , 'libboost_filesystem'
+ , 'libboost_system'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('demoRO.cpp')
+env.Program('demoSpinStart.cpp')
 env.Program('evalRO.cpp')
 env.Program('uArgsBaseZ.cpp')
 env.Program('uFitBaseZ.cpp')

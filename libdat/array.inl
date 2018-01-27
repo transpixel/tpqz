@@ -37,6 +37,7 @@ namespace dat
 // Operations on std::array data type
 
 template <typename Type, size_t Dim>
+constexpr
 std::array<Type, Dim>
 nullValue
 	()
@@ -45,6 +46,7 @@ nullValue
 }
 
 template <typename AType>
+constexpr
 AType
 nullArray
 	()

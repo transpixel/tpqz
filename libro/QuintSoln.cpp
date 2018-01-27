@@ -26,62 +26,64 @@
 //
 //
 
-#ifndef cam_cam_INCL_
-#define cam_cam_INCL_
 
 /*! \file
-\brief Declarations for namespace cam
+\brief Definitions for ro::QuintSoln
 */
 
 
-#include "libdat/Spot.h"
+#include "libro/QuintSoln.h"
 
-#include <string>
-#include <vector>
+#include "libdat/info.h"
 
-
-/*! \brief Declarations and Definitions for libcam.
-
-\par General Concept:
-
-Basic photogrammetric imaging operations.
-
-\par Special Notes:
-
-+ XRefBase and typedefs provide object/image relationship mangement.
+#include <sstream>
 
 
-*/
-namespace cam
+namespace ro
 {
 
-	//! Type to identify (object space) point entities
-	using PntNdx = size_t;
+// explicit
+QuintSoln :: QuintSoln
+	( FiveOf<size_t> const & fitNdxs
+	, Solution const & soln
+	)
+	: theFitNdxs{ fitNdxs }
+	, theSoln{ soln }
+{ }
 
-	//! Type to identify sensor acquisition events (imprint records)
-	using AcqNdx = size_t;
+bool
+QuintSoln :: isValid
+	() const
+{
+	return theSoln.isValid();
+}
 
-	//! Descriptive point name/key
-	using PntName = std::string;
-
-	//! Descriptive acquisition name/key
-	using AcqName = std::string;
-
-	//! Image measurement for a single object space point
-	struct MeaForOnePnt
+std::string
+QuintSoln :: infoString
+	( std::string const & title
+	) const
+{
+	std::ostringstream oss;
+	if (! title.empty())
 	{
-		std::string const thePntName;
-		dat::Spot const theSpot;
-		// Uncertainty - e.g. Covar matrix info
-	};
+		oss << title << std::endl;
+	}
+	if (isValid())
+	{
+		oss << "...uvNdx: ";
+		for (size_t const & fitNdx : theFitNdxs)
+		{
+			oss << dat::infoString(fitNdx);
+		}
+		oss << std::endl;
+		oss << dat::infoString(theSoln);
+	}
+	else
+	{
+		oss << " <null>";
+	}
+	return oss.str();
+}
 
-	//! All image measurements associated with a single acquisition
-	using MeaGroupOneAcq = std::vector<MeaForOnePnt>;
-
-} // cam
-
-// Inline definitions
-// #include "libcam/cam.inl"
-
-#endif // cam_cam_INCL_
+} // ro
 

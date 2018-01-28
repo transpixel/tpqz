@@ -184,6 +184,27 @@ IsoGeo :: delta
 	return std::hypot(theSplitterMu.theDelta, theSplitterNu.theDelta);
 }
 
+IsoGeo::Vec2D
+IsoGeo :: dirA
+	() const
+{
+	return theDirA;
+}
+
+IsoGeo::Vec2D
+IsoGeo :: dirU
+	() const
+{
+	return theDirU;
+}
+
+IsoGeo::Vec2D
+IsoGeo :: dirV
+	() const
+{
+	return theDirV;
+}
+
 std::string
 IsoGeo :: infoString
 	( std::string const & title

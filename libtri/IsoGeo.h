@@ -110,6 +110,22 @@ public: // methods
 	delta
 		() const;
 
+
+	//! Overall alignment of the IsoTille w.r.t. domain
+	Vec2D
+	dirA
+		() const;
+
+	//! Alignment of the primary axis w.r.t. domain
+	Vec2D
+	dirU
+		() const;
+
+	//! Alignment of the secondary axis w.r.t. domain
+	Vec2D
+	dirV
+		() const;
+	
 	//
 	// Tile locations
 	//

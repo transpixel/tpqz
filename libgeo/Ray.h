@@ -127,6 +127,13 @@ public: // methods
 		( ga::Vector const & pnt
 		) const;
 
+	//! Physical angle from ray direction to point (subtented at start point)
+	inline
+	ga::BiVector
+	angleTo
+		( ga::Vector const & pnt
+		) const;
+
 	//! Descriptive information about this instance.
 	std::string
 	infoString

@@ -82,6 +82,18 @@ Ray :: rejectionTo
 	return (pnt - projectionOf(pnt));
 }
 
+inline
+ga::BiVector
+Ray :: angleTo
+	( ga::Vector const & pnt
+	) const
+{
+	ga::Vector const & dirFrom = theDir;
+	ga::Vector const dirInto{ ga::unit(pnt - theStart) };
+	ga::Spinor const spin{ ga::spin::between(dirFrom, dirInto) };
+	return ga::spin::physicalAngleFrom(spin);
+}
+
 //======================================================================
 }
 

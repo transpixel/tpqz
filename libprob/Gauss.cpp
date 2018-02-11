@@ -90,7 +90,7 @@ Gauss :: infoString
 		oss
 			<< "SDev,Mean:"
 			<< " " << dat::infoString(theSigma)
-			<< " " << dat::infoString(theSigma)
+			<< " " << dat::infoString(theMean)
 			;
 	}
 	else

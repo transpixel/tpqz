@@ -88,7 +88,7 @@ Gauss :: infoString
 	if (isValid())
 	{
 		oss
-			<< "StdDev,Mean:"
+			<< "SDev,Mean:"
 			<< " " << dat::infoString(theSigma)
 			<< " " << dat::infoString(theSigma)
 			;

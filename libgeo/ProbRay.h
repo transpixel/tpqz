@@ -141,20 +141,6 @@ public: // methods
 	numSamples
 		() const;
 
-// TODO
-	//! Probability *DENSITY* at distAlong this ray
-	double
-	probDensityAt
-		( double const & distAlong
-		) const;
-
-// TODO
-	//! Probability at distAlong this ray (density time partition increment)
-	double
-	probAt
-		( double const & distAlong
-		) const;
-
 	//! Incorporate point into probability
 	void
 	considerPoint
@@ -213,6 +199,13 @@ public:
 	ga::Vector
 	likelyPoint
 		() const;
+
+	//! Probability *DENSITY* at distAlong this ray
+	double
+	probDensityAt
+		( double const & distAlong
+		, std::vector<DistProb> const & distProbs //!< e.g. from above method
+		) const;
 
 	//! Descriptive information about this instance.
 	std::string

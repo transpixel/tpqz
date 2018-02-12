@@ -406,10 +406,12 @@ geo_ProbRay_test5
 
 	// check returned probability value rays 1
 	geo::ProbRay pRay1(ray1, pPart, angleSigma);
-	double const gotR1{ pRay1.probDensityAt(expDistOn1) };
+io::out() << pRay1.infoStringPDF() << std::endl;
+	double const gotR1
+		{ pRay1.probDensityAt(expDistOn1, pRay1.distProbs()) };
 	if (! dat::nearlyEquals(gotR1, expR1))
 	{
-		oss << "Failure of probRay1Ray2 test" << std::endl;
+		oss << "Failure of one-ray test" << std::endl;
 		oss << "expR1: " << io::sprintf(pfmt, expR1) << std::endl;
 		oss << "gotR1: " << io::sprintf(pfmt, gotR1) << std::endl;
 	}
@@ -419,24 +421,26 @@ geo_ProbRay_test5
 
 	// check returned probability value rays 1 or 2
 	pRay1.considerRay(ray2, angleSigma);
-	double const gotR1o2{ pRay1.probDensityAt(expDistOn1) };
+	double const gotR1o2
+		{ pRay1.probDensityAt(expDistOn1, pRay1.distProbs()) };
 	bool const improved2{ gotR1 < gotR1o2 };
 	// if (! dat::nearlyEquals(gotR1o2, expR1o2))
 	if (! improved2)
 	{
-		oss << "Failure of probRay1Ray2 test" << std::endl;
+		oss << "Failure of two-ray test" << std::endl;
 		oss << "expR1o2: " << io::sprintf(pfmt, expR1o2) << std::endl;
 		oss << "gotR1o2: " << io::sprintf(pfmt, gotR1o2) << std::endl;
 	}
 
 	// check returned probability value rays 1 or 2 or 3
 	pRay1.considerRay(ray3, angleSigma);
-	double const gotR1o2o3{ pRay1.probDensityAt(expDistOn1) };
+	double const gotR1o2o3
+		{ pRay1.probDensityAt(expDistOn1, pRay1.distProbs()) };
 	bool const improved3{ gotR1o2 < gotR1o2o3 };
 	// if (! dat::nearlyEquals(gotR1o2o3, expR1o2o3))
 	if (! improved3)
 	{
-		oss << "Failure of probRay1Ray2 test" << std::endl;
+		oss << "Failure of three-ray test" << std::endl;
 		oss << "expR1o2o3: " << io::sprintf(pfmt, expR1o2o3) << std::endl;
 		oss << "gotR1o2o3: " << io::sprintf(pfmt, gotR1o2o3) << std::endl;
 	}

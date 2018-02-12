@@ -46,33 +46,6 @@
 
 namespace
 {
-	/*
-	bool
-	isProb
-		( double const & prob
-		)
-	{
-		bool okay{ dat::isValid(prob) };
-		okay &= (! (1. < prob));
-		okay &= (! (prob < 0.));
-		return okay;
-	}
-	*/
-
-	/*
-	//! Additive probability rule
-	double
-	netProb
-		( double const & pA
-		, double const & pB
-		)
-	{
-		assert(isProb(pA));
-		assert(isProb(pB));
-		return (pA + pB - pA*pB);
-	}
-	*/
-
 	std::vector<ga::Vector>
 	pointsAlong
 		( geo::Ray const & uRay
@@ -95,105 +68,6 @@ namespace
 
 namespace geo
 {
-
-/*
-// static
-std::pair<double, double>
-ProbRay :: likelyDistProb
-	( std::vector<DistProb> const & distProbs
-	)
-{
-	std::pair<double, double> dpPair
-		{ dat::nullValue<double>(), dat::nullValue<double>() };
-	double & dist = dpPair.first;
-	double & prob = dpPair.second;
-	std::vector<DistProb> const & dps = distProbs;
-
-	if (isValid())
-	{
-		using Iter = std::vector<double>::const_iterator;
-		std::pair<Iter, Iter> const itMinMax
-			{ std::minmax_element
-				( dps.begin(), dps.end()
-				, [] (DistProb const & dpA, DistProb const &dpB)
-					{ return (dpA.second < dpB.second) };
-				)
-			};
-		Iter const & itMin = itMinMax.first;
-		Iter const & itMax = itMinMax.second;
-		if (itMax != itMin) // non-const prob samples
-		{
-			size_t const ndxCurr{ size_t(itMax - dps.begin()) };
-			if (0u < ndxCurr)
-			{
-				size_t const ndxPrev{ ndxCurr - 1u }; 
-				size_t const ndxNext{ ndxCurr + 1u }; 
-				if (ndxNext < dps.size())
-				{
-					// three values spaning the (assumed) peak
-					double const alpha{ dps[ndxPrev].second };
-					double const beta{ dps[ndxCurr].second };
-					double const gamma{ dps[ndxNext].second };
-
-					// verify a 'true' peak (not a flat-ish spot)
-					if ((alpha < beta) && (gamma < beta))
-					{
-						// interpolated peak location
-						// formula from
-						//   https://www.dsprelated.com
-						//   /freebooks/sasp
-						//   /Quadratic_Interpolation_Spectral_Peaks.html
-						double const num{ alpha - gamma };
-						double const den{ alpha - 2.*beta + gamma };
-						double const denMag{ std::abs(den) };
-						if (std::numeric_limits<double>::min() < denMag)
-						{
-							// peak location - provides distance
-							double const fndx{ .5 * num / den };
-							double const ndx{ double(ndxCurr) + fndx };
-
-							double const & distPrev = dps[ndxPrev].first;
-							double const & distCurr = dps[ndxCurr].first;
-							double const & distNext = dps[ndxNext].first;
-							double ndxA{ dat::nullValue<double>() };
-							double ndxB{ dat::nullValue<double>() };
-							double pdfA{ dat::nullValue<double>() };
-							double pdfB{ dat::nullValue<double>() };
-							if (ndx < ndxCurr)
-							{
-								// use Prev/Curr to interpolate distance
-								ndxA = ndxPrev;
-								ndxB = ndxCurr;
-								pdfA = dps[ndxPrev].second;
-								pdfB = dps[ndxCurr].second;
-							}
-							else // if (ndxCurr <= ndx)
-							{
-								// use Curr/Next to interpolate distance
-								ndxA = ndxCurr;
-								ndxB = ndxNext;
-								pdfA = dps[ndxCurr].second;
-								pdfB = dps[ndxNext].second;
-							}
-							std::pair<double, double> const xRng{ ndxA, ndxB };
-							ndx
-							std::pair<double, double> const xRng{ pdfA, pdfB };
-
-							dist = thePart.interpValueFor(ndx);
-
-							// peak magnitude - provides (quasi)probability
-							prob = beta - .25*(alpha - gamma)*fndx;
-						}
-					}
-				} // not at end
-			} // not at start
-		} // distinct min and max
-
-	} // valid instance
-
-	return dpPair;
-}
-*/
 
 // explicit
 ProbRay :: ProbRay
@@ -231,38 +105,6 @@ ProbRay :: isValid
 		);
 }
 
-double
-ProbRay :: probDensityAt
-	( double const & distAlong
-	) const
-{
-	double prob{ dat::nullValue<double>() };
-	if (isValid() && dat::isValid(distAlong))
-	{
-		double const fndx{ thePart.interpIndexFor(distAlong) };
-		size_t const ndxLo{ (size_t)std::floor(fndx) };
-		size_t const ndxHi{ ndxLo + 1u };
-		if ((0u < ndxLo) && (ndxHi < theAccums.size()))
-		{
-			double const frac{ fndx - double(ndxLo) };
-			std::pair<double, double> const probPair
-				{ theAccums[ndxLo], theAccums[ndxHi] };
-			prob = math::interp::valueAtValid(frac, probPair);
-		}
-	}
-	return prob;
-}
-
-double
-ProbRay :: probAt
-	( double const & distAlong
-	) const
-{
-	size_t const ndx{ thePart.binIndexFor(distAlong) };
-	double const du{ thePart.rangeForBin(ndx).magnitude() };
-	return { probDensityAt(distAlong) * du };
-}
-
 void
 ProbRay :: considerPoint
 	( ga::Vector const & vPnt
@@ -276,21 +118,6 @@ ProbRay :: considerPoint
 
 		prob::Gauss const & distroVwU = theDistroAngU;
 		prob::Gauss const distroUwV(vPntSigma);
-
-/*
-io::out() << "\n-----------------------" << std::endl;
-io::out() << dat::infoString(distroVwU, "distroVwU") << std::endl;
-io::out() << dat::infoString(distroUwV, "distroUwV") << std::endl;
-for (double xx{0.} ; xx < 3. ; xx += .25)
-{
-io::out()
-	<< dat::infoString(xx, "xx")
-	<< " " << dat::infoString(distroVwU(xx), "distroVwU(xx)")
-	<< " " << dat::infoString(distroUwV(xx), "distroUwV(xx)")
-	<< std::endl;
-}
-io::out() << "\n=======================" << std::endl;
-*/
 
 		for (size_t nn{0u} ; nn < numSamps ; ++nn)
 		{
@@ -310,25 +137,7 @@ io::out() << "\n=======================" << std::endl;
 			// use composite as probability of interest (TODO good?bad?)
 			double const density{ pdfVwU * pdfUwV };
 			accumulateDensity(density, nn);
-
-/*
-std::string const fmt{ "%12.9f" };
-io::out()
-	<< "at:"
-	<< " " << dat::infoString(uPnt)
-	<< " " << "dstUwV:"
-	<< " " << dat::infoString(dstUwV)
-	<< " " << io::sprintf(fmt, pdfUwV)
-	<< " " << "angVwU:"
-	<< " " << dat::infoString(angVwU)
-	<< " " << io::sprintf(fmt, pdfVwU)
-	<< " " << "density:"
-	<< " " << io::sprintf(fmt, density)
-	<< std::endl;
-*/
-
 		}
-//io::out() << "=======================" << std::endl;
 	}
 }
 
@@ -547,6 +356,29 @@ ProbRay :: likelyPoint
 		}
 	}
 	return pnt;
+}
+
+double
+ProbRay :: probDensityAt
+	( double const & distAlong
+	, std::vector<DistProb> const & distProbs
+	) const
+{
+	double prob{ dat::nullValue<double>() };
+	if (isValid() && dat::isValid(distAlong))
+	{
+		double const fndx{ thePart.interpIndexFor(distAlong) };
+		size_t const ndxLo{ (size_t)std::floor(fndx) };
+		size_t const ndxHi{ ndxLo + 1u };
+		if ((0u < ndxLo) && (ndxHi < theAccums.size()))
+		{
+			double const frac{ fndx - double(ndxLo) };
+			std::pair<double, double> const probPair
+				{ distProbs[ndxLo].second, distProbs[ndxHi].second };
+			prob = math::interp::valueAtValid(frac, probPair);
+		}
+	}
+	return prob;
 }
 
 std::string

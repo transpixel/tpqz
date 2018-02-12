@@ -73,20 +73,6 @@ public: // data
 
 public: // static methods
 
-	/*! Most probable (mode) depth along ray and associated (quasi) probability
-	 *
-	 * Provided probability has at least one peak value (probMin < probMax)
-	 * return location of that peak (first one if multiple peaks).
-	 *
-	 */
-	/*
-	static
-	std::pair<double, double>
-	likelyDistProb
-		( std::vector<DistProb> const & distProbs
-		);
-	*/
-
 // TODO
 	//! Construction of ray within an environment of conical measurements
 	template <typename FwdIter>
@@ -140,6 +126,21 @@ public: // methods
 	size_t
 	numSamples
 		() const;
+
+	/*! Calls functor to initialize theAccums (e.g. to set a priori PDF)
+	 *
+	 * \verbatim
+	 * void
+	 * func
+	 * 	( double const & distOnThisRay
+	 * 	) const
+	 * \endverbatim
+	 */
+	template <typename InitFunc>
+	void
+	initAccumulator
+		( InitFunc const & func
+		);
 
 	//! Incorporate point into probability
 	void
@@ -227,6 +228,7 @@ public:
 		, std::string const & fmt = { "%9.6f" }
 		) const;
 
+	/*
 	//! Probability of deviation by angleMag from ray
 	static
 	inline
@@ -235,6 +237,7 @@ public:
 		( double const & angleValue //! Deviation from zero
 		, double const & angleSigma //! much less than pi
 		);
+	*/
 
 private:
 

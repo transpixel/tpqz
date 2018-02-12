@@ -112,6 +112,21 @@ ProbRay :: numSamples
 	return thePart.size();
 }
 
+template <typename InitFunc>
+void
+ProbRay :: initAccumulator
+	( InitFunc const & func
+	)
+{
+	size_t const numSamp{ numSamples() };
+	for (size_t ndx{0u} ; ndx < numSamp ; ++ndx)
+	{
+		double const mu{ thePart.interpValueFor(double(ndx)) };
+		theAccums[ndx] = func(mu);
+	}
+}
+
+/*
 // static
 inline
 double
@@ -125,6 +140,7 @@ ProbRay :: probFor
 	double const normCo( 1. / den );
 	return (normCo * std::exp(argSq));
 }
+*/
 
 } // geo
 

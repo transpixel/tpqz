@@ -84,11 +84,7 @@ ProbRay :: ProbRay
 	assert(thePart.isValid());
 	assert(theDistroAngU.isValid());
 	assert(thePntUs.size() == theAccums.size());
-	/* -- conceptually: start with zero prob, then add a first (self) ray
-	double const p0{ 0. };
-	double const p1{ theDistroAngU(0.) };
-	std::fill(theAccums.begin(), theAccums.end(), netProb(p0, p1));
-	*/
+
 	// TODO - move to init method
 	double const pSelf{ theDistroAngU(0.) };
 	std::fill(theAccums.begin(), theAccums.end(), pSelf);

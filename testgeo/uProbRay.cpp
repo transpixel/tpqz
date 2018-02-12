@@ -123,8 +123,8 @@ geo_ProbRay_test1
 	geo::Ray const ray(ga::Vector(-0., 0., 0.), ga::e1);
 
 	// check that lone ray has no likely distance
-	constexpr double rayDirSigma{ 1. };
-	geo::ProbRay probRay(ray, somePart(), rayDirSigma);
+	constexpr double rayAngSigma{ .125 };
+	geo::ProbRay probRay(ray, somePart(), rayAngSigma);
 
 	// check for invalid probability if no additional information
 	{
@@ -144,11 +144,11 @@ geo_ProbRay_test1
 	double const tolDist{ .001 * (1. / double(probRay.numSamples())) };
 	if (! dat::nearlyEquals(gotDist, expDist, tolDist))
 	{
-		double const delDist{ gotDist - expDist };
+		double const difDist{ gotDist - expDist };
 		oss << "Failure of likelyDistance point test" << std::endl;
 		oss << dat::infoString(expDist, "expDist") << std::endl;
 		oss << dat::infoString(gotDist, "gotDist") << std::endl;
-		oss << "deltaDist: " << io::sprintf("%.15e", delDist) << std::endl;
+		oss << "difDist: " << io::sprintf("%.15e", difDist) << std::endl;
 	}
 
 	// save to file e.g. for debugging
@@ -196,9 +196,11 @@ geo_ProbRay_test2
 	double const tolDist{ .001 * (1. / double(probRay.numSamples())) };
 	if (! dat::nearlyEquals(gotDist, expDist, tolDist))
 	{
+		double const difDist{ gotDist - expDist };
 		oss << "Failure of multi-ray test" << std::endl;
 		oss << dat::infoString(expDist, "expDist") << std::endl;
 		oss << dat::infoString(gotDist, "gotDist") << std::endl;
+		oss << "difDist: " << io::sprintf("%.15e", difDist) << std::endl;
 	}
 
 	return oss.str();
@@ -212,26 +214,35 @@ geo_ProbRay_test3
 	std::ostringstream oss;
 
 	std::vector<ga::Vector> const stations
-		{ ga::Vector( 0.,  0.,  0.)
+		{ ga::Vector( 0.,  0.,  0.) // prime ray station
+
+		, ga::Vector( 0.,  0., -3.)
+
+		, ga::Vector( 0.,  0., -2.)
+		, ga::Vector( 0.,  0., -1.)
 		, ga::Vector( 0.,  0.,  1.)
 		, ga::Vector( 0.,  0.,  2.)
+
 		, ga::Vector( 0.,  0.,  3.)
-		, ga::Vector( 0.,  0.,  4.)
-		, ga::Vector( 0.,  0.,  5.)
 		};
+	constexpr double const qq{ 1./8. };
+	constexpr double const tolDist{ qq / 400. }; // arbitrary fm inspection
+	constexpr double const expX{ 2.000 };
 	std::vector<ga::Vector> const targets
-		{ ga::Vector( 1.,  .0,  0.) // prime ray
+		{ ga::Vector( 1.,  .0,  0.) // prime ray target
 
 		// points of interest
-		, ga::Vector( 1.000,  .0,  0.) // blunder
-		, ga::Vector( 2.000,  .0,  0.)
-		, ga::Vector( 2.500,  .0,  0.)
-		, ga::Vector( 3.000,  .0,  0.)
 		, ga::Vector( 5.000,  .0,  0.) // blunder
+
+		, ga::Vector( expX+qq,  .0,  0.)
+		, ga::Vector( expX   , -qq,  0.)
+		, ga::Vector( expX   ,  qq,  0.)
+		, ga::Vector( expX-qq,  .0,  0.)
+
+		, ga::Vector( 0.000,  8.,  0.) // blunder
 		};
+	ga::Vector const expPnt(expX, 0., 0.); // from inspection of test case
 	dat::Range<double> const distRange(0., 10.);
-	ga::Vector const expPnt(2.575, 0., 0.); // from inspection of test case
-	double const tolDist{ .01 };
 
 	// generate rays from stations and associated target points
 	size_t const numRays{ stations.size() };
@@ -246,14 +257,14 @@ geo_ProbRay_test3
 	geo::Ray const & primeRay = rays.front();
 
 	// populate probability configuration
-	constexpr double dirSigma{ .1 };
+	constexpr double uRaySigma{ .08 };
 	constexpr size_t numParts{ 1024u };
 	math::Partition const distPart(distRange, numParts);
-	geo::ProbRay probRay(primeRay, distPart, dirSigma);
+	geo::ProbRay probRay(primeRay, distPart, uRaySigma);
 	for (geo::Ray const & ray : rays)
 	{
-		constexpr double skewSigma{ 1. };
-		probRay.considerRay(ray, skewSigma);
+		constexpr double vRaySigma{ .25 };
+		probRay.considerRay(ray, vRaySigma);
 	}
 
 	// compute probablistic solution
@@ -261,9 +272,12 @@ geo_ProbRay_test3
 
 	if (! gotPnt.nearlyEquals(expPnt, tolDist))
 	{
+		double const difDist{ ga::magnitude(gotPnt - expPnt) };
 		oss << "Failure of skew ray test" << std::endl;
 		oss << dat::infoString(expPnt, "expPnt") << std::endl;
 		oss << dat::infoString(gotPnt, "gotPnt") << std::endl;
+		oss << "difDist: " << io::sprintf("%.15e", difDist) << std::endl;
+		oss << "tolDist: " << io::sprintf("%.15e", tolDist) << std::endl;
 	}
 
 	// save to file e.g. for debugging
@@ -341,6 +355,105 @@ geo_ProbRay_test4
 	return oss.str();
 }
 
+//! Check probability magnitude computations
+std::string
+geo_ProbRay_test5
+	()
+{
+	std::ostringstream oss;
+
+	dat::Range<double> const distRange{ 0., 2. };
+	math::Partition pPart(distRange, 1024u);
+
+	using namespace ga;
+
+	// configure two rays
+	Vector const d1{ 2. * e1 };
+	Vector const d2{ 2. * e2 };
+	geo::Ray const ray1(e2+e3, e1);
+	geo::Ray const ray2(e1   , e2);
+	geo::Ray const ray3(e1+d2, e3);
+
+	// establish geometry
+	constexpr double expDistOn1{ 1. };
+	Vector const vPnt2{ ray2.pointAt(1.) };
+	Vector const vPnt3{ ray3.pointAt(1.) };
+	double const angMagRay1Pnt2{ magnitude(ray1.angleTo(vPnt2)) };
+	double const angMagRay1Pnt3{ magnitude(ray1.angleTo(vPnt3)) };
+
+	// use sigma = angle for ease of testing
+	double const angleSigma{ angMagRay1Pnt2 };
+
+	// compute expected values
+	prob::Gauss const distro(angleSigma);
+	double const expProbRay1Ray2{ math::sq(distro(angMagRay1Pnt2)) };
+	double const expProbRay1Ray3{ math::sq(distro(angMagRay1Pnt3)) };
+
+	// prob rules:
+	// https://www2.isye.gatech.edu/~brani/isyebayes/bank/handout1.pdf
+
+	double const pR1{ distro(0.) }; // prob on ray1 only
+	double const pR2{ expProbRay1Ray2 };
+	double const pR1o2{ pR1 + pR2 - pR1*pR2 }; // from ray1 or ray2
+	double const pR3{ expProbRay1Ray3 };
+	double const pR1o2o3{ pR1o2 + pR3 - pR1o2*pR3 }; // from ray 1, or 2 or 3
+
+	double const & expR1 = pR1;
+	double const & expR1o2 = pR1o2;
+	double const & expR1o2o3 = pR1o2o3;
+
+	std::string const pfmt{ "%9.6f" };
+
+	// check returned probability value rays 1
+	geo::ProbRay pRay1(ray1, pPart, angleSigma);
+	double const gotR1{ pRay1.probDensityAt(expDistOn1) };
+	if (! dat::nearlyEquals(gotR1, expR1))
+	{
+		oss << "Failure of probRay1Ray2 test" << std::endl;
+		oss << "expR1: " << io::sprintf(pfmt, expR1) << std::endl;
+		oss << "gotR1: " << io::sprintf(pfmt, gotR1) << std::endl;
+	}
+
+	// Difficult to formulate theoretical model - use crude test
+	// ... use simple(trivial?) 'improvement' tests below
+
+	// check returned probability value rays 1 or 2
+	pRay1.considerRay(ray2, angleSigma);
+	double const gotR1o2{ pRay1.probDensityAt(expDistOn1) };
+	bool const improved2{ gotR1 < gotR1o2 };
+	// if (! dat::nearlyEquals(gotR1o2, expR1o2))
+	if (! improved2)
+	{
+		oss << "Failure of probRay1Ray2 test" << std::endl;
+		oss << "expR1o2: " << io::sprintf(pfmt, expR1o2) << std::endl;
+		oss << "gotR1o2: " << io::sprintf(pfmt, gotR1o2) << std::endl;
+	}
+
+	// check returned probability value rays 1 or 2 or 3
+	pRay1.considerRay(ray3, angleSigma);
+	double const gotR1o2o3{ pRay1.probDensityAt(expDistOn1) };
+	bool const improved3{ gotR1o2 < gotR1o2o3 };
+	// if (! dat::nearlyEquals(gotR1o2o3, expR1o2o3))
+	if (! improved3)
+	{
+		oss << "Failure of probRay1Ray2 test" << std::endl;
+		oss << "expR1o2o3: " << io::sprintf(pfmt, expR1o2o3) << std::endl;
+		oss << "gotR1o2o3: " << io::sprintf(pfmt, gotR1o2o3) << std::endl;
+	}
+
+	// check returned solution location
+	double const gotDistOn1{ pRay1.likelyDistance() };
+	if (! dat::nearlyEquals(gotDistOn1, expDistOn1))
+	{
+		oss << "Failure of distOn1 test" << std::endl;
+		oss << dat::infoString(expDistOn1, "expDistOn1") << std::endl;
+		oss << dat::infoString(gotDistOn1, "gotDistOn1") << std::endl;
+	}
+
+	return oss.str();
+}
+
+
 
 }
 
@@ -359,6 +472,7 @@ main
 	oss << geo_ProbRay_test2();
 	oss << geo_ProbRay_test3();
 	oss << geo_ProbRay_test4();
+	oss << geo_ProbRay_test5();
 
 	// check/report results
 	std::string const errMessages(oss.str());

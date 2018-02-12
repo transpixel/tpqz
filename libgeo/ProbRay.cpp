@@ -85,7 +85,7 @@ ProbRay :: ProbRay
 	assert(theDistroAngU.isValid());
 	assert(thePntUs.size() == theAccums.size());
 
-	// TODO - move to init method
+	// can override in initAccumulator
 	double const pSelf{ theDistroAngU(0.) };
 	std::fill(theAccums.begin(), theAccums.end(), pSelf);
 }
@@ -217,13 +217,36 @@ ProbRay :: considerCone
 			double const angUwV{ angleMagBetween(uDir, aDir) };
 
 			// probability value at this sample
-			double const prob{ distroUwV(angUwV) };
-			if (dat::isValid(prob))
+			double const density{ distroUwV(angUwV) };
+			if (dat::isValid(density))
 			{
-				theAccums[nn] += prob;
+				theAccums[nn] += density;
 			}
 		}
 	}
+}
+
+double
+ProbRay :: probDensityAt
+	( double const & distAlong
+	, std::vector<DistProb> const & distProbs
+	) const
+{
+	double prob{ dat::nullValue<double>() };
+	if (isValid() && dat::isValid(distAlong))
+	{
+		double const fndx{ thePart.interpIndexFor(distAlong) };
+		size_t const ndxLo{ (size_t)std::floor(fndx) };
+		size_t const ndxHi{ ndxLo + 1u };
+		if ((0u < ndxLo) && (ndxHi < theAccums.size()))
+		{
+			double const frac{ fndx - double(ndxLo) };
+			std::pair<double, double> const probPair
+				{ distProbs[ndxLo].second, distProbs[ndxHi].second };
+			prob = math::interp::valueAtValid(frac, probPair);
+		}
+	}
+	return prob;
 }
 
 std::vector<ProbRay::DistProb>
@@ -352,29 +375,6 @@ ProbRay :: likelyPoint
 		}
 	}
 	return pnt;
-}
-
-double
-ProbRay :: probDensityAt
-	( double const & distAlong
-	, std::vector<DistProb> const & distProbs
-	) const
-{
-	double prob{ dat::nullValue<double>() };
-	if (isValid() && dat::isValid(distAlong))
-	{
-		double const fndx{ thePart.interpIndexFor(distAlong) };
-		size_t const ndxLo{ (size_t)std::floor(fndx) };
-		size_t const ndxHi{ ndxLo + 1u };
-		if ((0u < ndxLo) && (ndxHi < theAccums.size()))
-		{
-			double const frac{ fndx - double(ndxLo) };
-			std::pair<double, double> const probPair
-				{ distProbs[ndxLo].second, distProbs[ndxHi].second };
-			prob = math::interp::valueAtValid(frac, probPair);
-		}
-	}
-	return prob;
 }
 
 std::string

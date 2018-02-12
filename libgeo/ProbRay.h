@@ -73,7 +73,6 @@ public: // data
 
 public: // static methods
 
-// TODO
 	//! Construction of ray within an environment of conical measurements
 	template <typename FwdIter>
 	static
@@ -88,7 +87,6 @@ public: // static methods
 		, double const & coneSigma
 		);
 
-// TODO
 	//! Construction of ray within an environment
 	template <typename FwdIter>
 	static
@@ -149,7 +147,6 @@ public: // methods
 		, double const & vPntSigma
 		);
 
-// TODO
 	//! Incorporate other ray into probability
 	void
 	considerRay
@@ -157,7 +154,6 @@ public: // methods
 		, double const & vRaySigma
 		);
 
-// TODO
 	//! Incorporate (only) the conical information of another ray
 	void
 	considerCone
@@ -166,7 +162,12 @@ public: // methods
 		, double const & apexSigma
 		);
 
-public:
+	//! Probability *DENSITY* at distAlong this ray
+	double
+	probDensityAt
+		( double const & distAlong
+		, std::vector<DistProb> const & distProbs //!< e.g. from above method
+		) const;
 
 	//! Sampling of (distance along ray, probability of this distance)
 	std::vector<DistProb>
@@ -184,29 +185,20 @@ public:
 		( std::vector<DistProb> const & distProbs //!< e.g. from above method
 		) const;
 
-	//! Like above (calls distProbs() method internally)
+	//! Like above (calls distProbs() method internally) - calls distProbs()
 	std::pair<double, double>
 	likelyDistProb
 		() const;
 
-// TODO
-	//! Most probable (mode) depth along ray
+	//! Convenience: Most probable (mode) depth along ray - calls distProbs()
 	double
 	likelyDistance
 		() const;
 
-// TODO
-	//! Point at likelyDistance along theRay
+	//! Convenience: Point at likelyDistance along theRay - calls distProbs()
 	ga::Vector
 	likelyPoint
 		() const;
-
-	//! Probability *DENSITY* at distAlong this ray
-	double
-	probDensityAt
-		( double const & distAlong
-		, std::vector<DistProb> const & distProbs //!< e.g. from above method
-		) const;
 
 	//! Descriptive information about this instance.
 	std::string
@@ -227,17 +219,6 @@ public:
 		( std::ostream & oss
 		, std::string const & fmt = { "%9.6f" }
 		) const;
-
-	/*
-	//! Probability of deviation by angleMag from ray
-	static
-	inline
-	double
-	probFor
-		( double const & angleValue //! Deviation from zero
-		, double const & angleSigma //! much less than pi
-		);
-	*/
 
 private:
 

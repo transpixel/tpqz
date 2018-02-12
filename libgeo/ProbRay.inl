@@ -126,21 +126,5 @@ ProbRay :: initAccumulator
 	}
 }
 
-/*
-// static
-inline
-double
-ProbRay :: probFor
-	( double const & angleValue
-	, double const & angleSigma
-	)
-{
-	double const argSq{ -.5 * math::sq(angleValue / angleSigma) };
-	double const den{ std::sqrt(math::twoPi) * angleSigma };
-	double const normCo( 1. / den );
-	return (normCo * std::exp(argSq));
-}
-*/
-
 } // geo
 

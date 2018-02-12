@@ -459,6 +459,67 @@ geo_ProbRay_test5
 	return oss.str();
 }
 
+//! Check probability variation with ray directions
+std::string
+geo_ProbRay_test6
+	()
+{
+	std::ostringstream oss;
+
+	double const x0{ 1. };
+	geo::Ray const ray0(ga::Vector(x0, 0., 0.), -ga::e1);
+	ga::Vector const target{ ga::vZero };
+	constexpr double angSigma{ (1./8.) * math::pi };
+	dat::Range<double> const dRange{ 0., 2. };
+	constexpr size_t const numParts{ 1024u };
+	math::Partition const pPart(dRange, numParts);
+
+	constexpr size_t const numAngs{ 16u };
+	constexpr double da{ (1./double(numAngs)) * math::halfPi };
+	for (size_t nn{1u} ; nn <= numAngs ; ++nn)
+	{
+		double const ang{ double(nn) * da };
+
+		double const xloc{ std::cos(ang) };
+		double const dy{ -1./8. };
+		ga::Vector const sta(xloc, dy, std::sin(ang));
+		geo::Ray const ray1(sta, ga::unit(target - sta));
+
+		double const expDist{ ga::magnitude(target - ray0.theStart) };
+
+		geo::ProbRay pRay0(ray0, pPart, angSigma);
+
+		pRay0.considerCone(ray1, -ga::e3, angSigma);
+
+		/*
+		std::vector<geo::ProbRay::DistProb> const dps{ pRay0.distProbs() };
+		geo::ProbRay::DistProb const gotDP{ pRay0.likelyDistProb(dps) };
+		double const & gotDist = gotDP.first;
+		double const & gotProb = gotDP.second;
+		io::out()
+			<< " " << dat::infoString(gotDist, "gotDist")
+			<< " " << "gotProb: " << io::sprintf("%12.9f", gotProb)
+			<< std::endl;
+		*/
+		double const gotDist{ pRay0.likelyDistance() };
+
+		constexpr double const tolDist{ 1.e-4 }; // sensitive geometry
+		if (! dat::nearlyEquals(gotDist, expDist, tolDist))
+		{
+			double const difDist{ gotDist - expDist };
+			oss << "Failure of cone distance test" << std::endl;
+			oss << dat::infoString(ray1, "ray1") << std::endl;
+			oss << dat::infoString(expDist, "expDist") << std::endl;
+			oss << dat::infoString(gotDist, "gotDist") << std::endl;
+			oss << "difDist: " << io::sprintf("%12.5e", difDist) << std::endl;
+			oss << "tolDist: " << io::sprintf("%12.5e", tolDist) << std::endl;
+//io::out() << pRay0.infoStringPDF() << std::endl;
+			break;
+		}
+	}
+
+	return oss.str();
+}
 
 
 }
@@ -479,6 +540,7 @@ main
 	oss << geo_ProbRay_test3();
 	oss << geo_ProbRay_test4();
 	oss << geo_ProbRay_test5();
+	oss << geo_ProbRay_test6();
 
 	// check/report results
 	std::string const errMessages(oss.str());

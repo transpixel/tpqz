@@ -80,14 +80,14 @@ ProbRay :: from
 	, FwdIter const & end
 	, FwdIter const & primary
 	, math::Partition const & probPart
-	, double const & rayDirSigma
+	, double const & rayAngleSigma
 	)
 {
 	ProbRay probRay;
 	geo::Ray const & ray = *primary;
 	if (ray.isValid() && probPart.isValid())
 	{
-		probRay = ProbRay(ray, probPart, rayDirSigma);
+		probRay = ProbRay(ray, probPart, rayAngleSigma);
 		for (FwdIter iter{beg} ; end != iter ; ++iter)
 		{
 			if (primary != iter) // skip self
@@ -96,7 +96,7 @@ ProbRay :: from
 				if (ray.isValid())
 				{
 					// assume other rays have the same uncertainty
-					probRay.considerRay(ray, rayDirSigma);
+					probRay.considerRay(ray, rayAngleSigma);
 				}
 			}
 		}
@@ -112,21 +112,19 @@ ProbRay :: numSamples
 	return thePart.size();
 }
 
-// static
-inline
-double
-ProbRay :: pseudoProbFor
-	( double const & value
-	, double const & sigma
+template <typename InitFunc>
+void
+ProbRay :: initAccumulator
+	( InitFunc const & func
 	)
 {
-	double const argSq{ math::sq(value / sigma) };
-	// TODO replace if important - but generally "falls out" of use here
-	// constexpr double normCo{ 1. };
-	// return (normCo * std::exp(-argSq));
-	return std::exp(-argSq);
+	size_t const numSamp{ numSamples() };
+	for (size_t ndx{0u} ; ndx < numSamp ; ++ndx)
+	{
+		double const mu{ thePart.interpValueFor(double(ndx)) };
+		theAccums[ndx] = func(mu);
+	}
 }
-
 
 } // geo
 

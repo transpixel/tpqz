@@ -38,6 +38,7 @@
 #include "libgeo/Ray.h"
 #include "libmath/math.h"
 #include "libmath/Partition.h"
+#include "libprob/Gauss.h"
 
 #include <string>
 #include <vector>
@@ -57,12 +58,18 @@ namespace geo
 class ProbRay
 {
 
+public: // types
+
+	//! Distance along ray, probability of that distance
+	using DistProb = std::pair<double, double>;
+
 public: // data
 
 	geo::Ray theRay{};
 	math::Partition thePart{};
-	std::vector<double> theProbs{};
-	double theDirSigma{ dat::nullValue<double>() };
+	std::vector<double> theAccums{};
+	std::vector<ga::Vector> thePntUs{};
+	prob::Gauss theDistroAngU{};
 
 public: // static methods
 
@@ -90,7 +97,7 @@ public: // static methods
 		, FwdIter const & end
 		, FwdIter const & primary //!< between [beg,end): Probs for this ray
 		, math::Partition const & probPart
-		, double const & rayDirSigma // = { (1./1024.) * math::pi }
+		, double const & rayAngleSigma
 		);
 
 public: // methods
@@ -104,7 +111,7 @@ public: // methods
 	ProbRay
 		( geo::Ray const & ray
 		, math::Partition const & probPart
-		, double const & rayDirSigma // = { (1./1024.) * math::pi }
+		, double const & rayAngleSigma
 		);
 
 	//! Check if instance is valid
@@ -118,18 +125,33 @@ public: // methods
 	numSamples
 		() const;
 
+	/*! Calls functor to initialize theAccums (e.g. to set a priori PDF)
+	 *
+	 * \verbatim
+	 * void
+	 * func
+	 * 	( double const & distOnThisRay
+	 * 	) const
+	 * \endverbatim
+	 */
+	template <typename InitFunc>
+	void
+	initAccumulator
+		( InitFunc const & func
+		);
+
 	//! Incorporate point into probability
 	void
 	considerPoint
-		( ga::Vector const & pnt
-		, double const & pntSigma
+		( ga::Vector const & vPnt
+		, double const & vPntSigma
 		);
 
 	//! Incorporate other ray into probability
 	void
 	considerRay
-		( geo::Ray const & ray
-		, double const & raySigma
+		( geo::Ray const & vRay
+		, double const & vRaySigma
 		);
 
 	//! Incorporate (only) the conical information of another ray
@@ -140,8 +162,12 @@ public: // methods
 		, double const & apexSigma
 		);
 
-	//! Distance along ray, probability of that distance
-	using DistProb = std::pair<double, double>;
+	//! Probability *DENSITY* at distAlong this ray
+	double
+	probDensityAt
+		( double const & distAlong
+		, std::vector<DistProb> const & distProbs //!< e.g. from above method
+		) const;
 
 	//! Sampling of (distance along ray, probability of this distance)
 	std::vector<DistProb>
@@ -156,14 +182,20 @@ public: // methods
 	 */
 	std::pair<double, double>
 	likelyDistProb
+		( std::vector<DistProb> const & distProbs //!< e.g. from above method
+		) const;
+
+	//! Like above (calls distProbs() method internally) - calls distProbs()
+	std::pair<double, double>
+	likelyDistProb
 		() const;
 
-	//! Most probable (mode) depth along ray
+	//! Convenience: Most probable (mode) depth along ray - calls distProbs()
 	double
 	likelyDistance
 		() const;
 
-	//! Point at likelyDistance along theRay
+	//! Convenience: Point at likelyDistance along theRay - calls distProbs()
 	ga::Vector
 	likelyPoint
 		() const;
@@ -172,6 +204,13 @@ public: // methods
 	std::string
 	infoString
 		( std::string const & title = std::string()
+		) const;
+
+	//! Description of entire probability distribution
+	std::string
+	infoStringPDF
+		( std::string const & fmtDist = { "%9.3f" }
+		, std::string const & fmtProb = { "%12.9f" }
 		) const;
 
 	//! Save Dist,Prob values to stream in ascii format
@@ -183,23 +222,12 @@ public: // methods
 
 private:
 
-	//! Angle substended between raydir and pnt at ray start
-	static
-	double
-	subtendedAngleFor
-		( ga::Vector const & pnt
-		, geo::Ray const & ray
+	// Composite nextProb into theAccums at index ndx
+	void
+	accumulateDensity
+		( double const & nextProb
+		, size_t const & ndx
 		);
-
-	//! Probability of deviation by angleMag from ray
-	static
-	inline
-	double
-	pseudoProbFor
-		( double const & value
-		, double const & sigma
-		);
-
 
 }; // ProbRay
 

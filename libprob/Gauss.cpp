@@ -28,72 +28,77 @@
 
 
 /*! \file
-\brief Inline definitions for geo::Ray
+\brief Declarations for prob::Gauss
 */
 
 
-namespace geo
-{
-//======================================================================
+#include "libprob/Gauss.h"
 
-inline
+#include "libmath/math.h"
+
+#include <limits>
+#include <sstream>
+
+
+namespace prob
+{
+
+// explicit
+Gauss :: Gauss
+	( double const & sigma
+	, double const & mean
+	)
+	: theSigma{ sigma }
+	, theMean{ mean }
+	, theArgCo{ -1. / (2. * math::sq(theSigma)) }
+	, theNormCo{ 1. / (std::sqrt(math::twoPi) * theSigma) }
+{
+}
+
 bool
-Ray :: isValid
+Gauss :: isValid
 	() const
 {
-	return (theStart.isValid() && theDir.isValid());
+	return 
+		(  dat::isValid(theSigma)
+		&& (std::numeric_limits<double>::epsilon() < theSigma)
+		&& dat::isValid(theArgCo)
+		&& dat::isValid(theNormCo)
+		);
 }
 
-
-inline
-ga::Vector
-Ray :: pointAt
-	( double const & dist
-	) const
-{
-	return (theStart + dist*theDir);
-}
-
-inline
 double
-Ray :: distanceAlong
-	( ga::Vector const & pnt
+Gauss :: operator()
+	( double const value
 	) const
 {
-	ga::Vector const delta(pnt - theStart);
-	return ga::dot(delta, theDir).theValue;
+	return theNormCo * std::exp(theArgCo * math::sq(value - theMean));
 }
 
-inline
-ga::Vector
-Ray :: projectionOf
-	( ga::Vector const & pnt
+std::string
+Gauss :: infoString
+	( std::string const & title
 	) const
 {
-	return (theStart + distanceAlong(pnt) * theDir);
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << " ";
+	}
+	if (isValid())
+	{
+		oss
+			<< "SDev,Mean:"
+			<< " " << dat::infoString(theSigma)
+			<< " " << dat::infoString(theMean)
+			;
+	}
+	else
+	{
+		oss << " <null>";
+	}
+	return oss.str();
 }
 
-inline
-ga::Vector
-Ray :: rejectionTo
-	( ga::Vector const & pnt
-	) const
-{
-	return (pnt - projectionOf(pnt));
-}
-
-inline
-ga::BiVector
-Ray :: angleTo
-	( ga::Vector const & pnt
-	) const
-{
-	ga::Vector const & dirFrom = theDir;
-	ga::Vector const dirInto{ ga::unit(pnt - theStart) };
-	ga::Spinor const spin{ ga::spin::between(dirFrom, dirInto) };
-	return ga::spin::physicalAngleFrom(spin);
-}
-
-//======================================================================
-}
+} // prob
 

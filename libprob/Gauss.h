@@ -26,74 +26,73 @@
 //
 //
 
+#ifndef prob_Gauss_INCL_
+#define prob_Gauss_INCL_
 
 /*! \file
-\brief Inline definitions for geo::Ray
+\brief Declarations for prob::Gauss
 */
 
 
-namespace geo
+#include "libdat/validity.h"
+
+#include <string>
+
+
+namespace prob
 {
-//======================================================================
 
-inline
-bool
-Ray :: isValid
-	() const
+/*! \brief Classic normal (Gauss-Laplace) distribution
+
+\par Example
+\dontinclude testprob/uGauss.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+class Gauss
 {
-	return (theStart.isValid() && theDir.isValid());
-}
+	double theSigma{ dat::nullValue<double>() };
+	double theMean{ dat::nullValue<double>() };
+	double theArgCo{ dat::nullValue<double>() };
+	double theNormCo{ dat::nullValue<double>() };
 
+public: // methods
 
-inline
-ga::Vector
-Ray :: pointAt
-	( double const & dist
-	) const
-{
-	return (theStart + dist*theDir);
-}
+	//! default null constructor
+	Gauss
+		() = default;
 
-inline
-double
-Ray :: distanceAlong
-	( ga::Vector const & pnt
-	) const
-{
-	ga::Vector const delta(pnt - theStart);
-	return ga::dot(delta, theDir).theValue;
-}
+	//! Construct with deviation
+	explicit
+	Gauss
+		( double const & sigma
+		, double const & mean = { 0. }
+		);
 
-inline
-ga::Vector
-Ray :: projectionOf
-	( ga::Vector const & pnt
-	) const
-{
-	return (theStart + distanceAlong(pnt) * theDir);
-}
+	//! True if instance is valid
+	bool
+	isValid
+		() const;
 
-inline
-ga::Vector
-Ray :: rejectionTo
-	( ga::Vector const & pnt
-	) const
-{
-	return (pnt - projectionOf(pnt));
-}
+	//! Probability of observing value
+	double
+	operator()
+		( double const value
+		) const;
 
-inline
-ga::BiVector
-Ray :: angleTo
-	( ga::Vector const & pnt
-	) const
-{
-	ga::Vector const & dirFrom = theDir;
-	ga::Vector const dirInto{ ga::unit(pnt - theStart) };
-	ga::Spinor const spin{ ga::spin::between(dirFrom, dirInto) };
-	return ga::spin::physicalAngleFrom(spin);
-}
+	//! Descriptive information about this instance.
+	std::string
+	infoString
+		( std::string const & title = std::string()
+		) const;
 
-//======================================================================
-}
+}; // Gauss
+
+} // prob
+
+// Inline definitions
+// #include "libprob/Gauss.inl"
+
+#endif // prob_Gauss_INCL_
 

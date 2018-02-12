@@ -37,6 +37,10 @@
 #include "libdat/validity.h"
 #include "libio/stream.h"
 
+#include "libga/Pose.h"
+#include "libga/spin.h"
+#include "libio/sprintf.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -115,6 +119,53 @@ geo_Ray_test1
 	return oss.str();
 }
 
+//! Check angleTo()
+std::string
+geo_Ray_test2
+	()
+{
+	std::ostringstream oss;
+
+	using namespace ga;
+
+//#define EasyData
+#	if defined(EasyData)
+	Vector const pntInRef( -1.,  -1.,   0.);
+	Vector const staInRef(  0.,   0.,   0. );
+	Vector const dirInRef{ unit(Vector(0., 1., 0.)) };
+#	else
+	Vector const pntInRef( 1.20, 2.30, 3.40);
+	Vector const staInRef(-1.00, 2.00, 3.00 );
+	Vector const dirInRef{ unit(Vector(3., 2., 1.)) };
+#	endif
+	geo::Ray const rayInRef(staInRef, dirInRef);
+
+	// get angle of pnt w.r.t. ray
+	BiVector const gotAngPntWrtRay{ rayInRef.angleTo(pntInRef) };
+	Pose const attPntWrtRef(gotAngPntWrtRay);
+
+	// transform direction of ray
+	geo::Ray const rayToPnt(staInRef, attPntWrtRef(dirInRef));
+	ga::Vector const gotRejVec{ rayToPnt.rejectionTo(pntInRef) };
+
+	// and check if rotated ray hits point
+	if (! gotRejVec.nearlyEquals(vZero))
+	{
+		double const gotRejMag{ magnitude(gotRejVec) };
+		oss << "Failure of angleTo, rejection test" << std::endl;
+		oss << dat::infoString(gotRejVec, "gotRejVec") << std::endl;
+		oss << "gotRejMag: " << io::sprintf("%12.5e", gotRejMag) << std::endl;
+		/*
+		oss << dat::infoString(pntInRef, "pntInRef") << std::endl;
+		oss << dat::infoString(rayInRef, "rayInRef") << std::endl;
+		oss << dat::infoString(gotAngPntWrtRay, "gotAngPntWrtRay") << std::endl;
+		oss << dat::infoString(dirInRef, "dirInRef") << std::endl;
+		oss << dat::infoString(rayToPnt, "rayToPnt") << std::endl;
+		*/
+	}
+
+	return oss.str();
+}
 
 }
 
@@ -130,6 +181,7 @@ main
 	// run tests
 	oss << geo_Ray_test0();
 	oss << geo_Ray_test1();
+	oss << geo_Ray_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

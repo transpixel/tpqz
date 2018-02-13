@@ -50,9 +50,14 @@ Gauss :: Gauss
 	)
 	: theSigma{ sigma }
 	, theMean{ mean }
-	, theArgCo{ -1. / (2. * math::sq(theSigma)) }
-	, theNormCo{ 1. / (std::sqrt(math::twoPi) * theSigma) }
+	, theArgCo{ dat::nullValue<double>() }
+	, theNormCo{ dat::nullValue<double>() }
 {
+	if (std::numeric_limits<double>::min() < theSigma)
+	{
+		theArgCo = -1. / (2. * math::sq(theSigma));
+		theNormCo = 1. / (std::sqrt(math::twoPi) * theSigma);
+	}
 }
 
 bool
@@ -61,7 +66,7 @@ Gauss :: isValid
 {
 	return 
 		(  dat::isValid(theSigma)
-		&& (std::numeric_limits<double>::epsilon() < theSigma)
+		&& (std::numeric_limits<double>::min() < theSigma)
 		&& dat::isValid(theArgCo)
 		&& dat::isValid(theNormCo)
 		);
@@ -72,7 +77,12 @@ Gauss :: operator()
 	( double const value
 	) const
 {
-	return theNormCo * std::exp(theArgCo * math::sq(value - theMean));
+	double prob{ dat::nullValue<double>() };
+	if (isValid())
+	{
+		prob = theNormCo * std::exp(theArgCo * math::sq(value - theMean));
+	}
+	return prob;
 }
 
 std::string

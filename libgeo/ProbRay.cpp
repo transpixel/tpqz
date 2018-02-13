@@ -53,14 +53,17 @@ namespace
 		)
 	{
 		std::vector<ga::Vector> uPnts;
-		size_t const numSamps{ uPart.size() };
-		uPnts.reserve(numSamps);
-		for (size_t nn{0u} ; nn < numSamps ; ++nn)
+		if (uRay.isValid() && uPart.isValid())
 		{
-			// sampling distance along the ray
-			double const mu{ uPart.interpValueFor(double(nn)) };
-			ga::Vector const uPnt{ uRay.pointAt(mu) };
-			uPnts.emplace_back(uPnt);
+			size_t const numSamps{ uPart.size() };
+			uPnts.reserve(numSamps);
+			for (size_t nn{0u} ; nn < numSamps ; ++nn)
+			{
+				// sampling distance along the ray
+				double const mu{ uPart.interpValueFor(double(nn)) };
+				ga::Vector const uPnt{ uRay.pointAt(mu) };
+				uPnts.emplace_back(uPnt);
+			}
 		}
 		return uPnts;
 	}
@@ -77,17 +80,18 @@ ProbRay :: ProbRay
 	)
 	: theRay{ ray }
 	, thePart{ probPart }
-	, theAccums(thePart.size(), 0.) // allocate and initialize
+	, theAccums{} // alloc/init below
 	, thePntUs{ pointsAlong(theRay, thePart) }
 	, theDistroAngU{ rayAngleSigma, 0. }
 {
 	assert(thePart.isValid());
 	assert(theDistroAngU.isValid());
-	assert(thePntUs.size() == theAccums.size());
 
 	// can override in initAccumulator
 	double const pSelf{ theDistroAngU(0.) };
-	std::fill(theAccums.begin(), theAccums.end(), pSelf);
+	theAccums.resize(thePart.size(), pSelf); // allocate and initialize
+
+	assert(thePntUs.size() == theAccums.size());
 }
 
 bool

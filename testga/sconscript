@@ -58,6 +58,7 @@ env.Append(LIBPATH=libpaths)
 
 env.Program('demoFitRigid.cpp')
 env.Program('uAligner.cpp')
+env.Program('uConform.cpp')
 env.Program('uconstructs.cpp')
 env.Program('uderivative.cpp')
 env.Program('ufunctions.cpp')

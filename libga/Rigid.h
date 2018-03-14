@@ -51,8 +51,8 @@ namespace ga
 
 class Rigid
 {
-	Vector theTrans;
-	Pose thePose;
+	Vector theTrans{};
+	Pose thePose{};
 
 public: // static methods
 
@@ -67,13 +67,20 @@ public: // methods
 
 	//! default null constructor
 	Rigid
-		();
+		() = default;
 
 	//! Value ctor
 	explicit
 	Rigid
 		( Vector const & orig
 		, Pose const & pose
+		);
+
+	//! Implicit value ctor
+	explicit
+	Rigid
+		( Vector const & orig
+		, BiVector const & physAngle
 		);
 
 	// copy constructor -- compiler provided

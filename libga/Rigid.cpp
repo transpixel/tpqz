@@ -43,12 +43,6 @@ namespace ga
 //======================================================================
 
 
-Rigid :: Rigid
-	()
-	: theTrans()
-	, thePose()
-{ }
-
 // explicit
 Rigid :: Rigid
 	( Vector const & orig
@@ -56,6 +50,14 @@ Rigid :: Rigid
 	)
 	: theTrans(orig)
 	, thePose(pose)
+{ }
+
+// explicit
+Rigid :: Rigid
+	( Vector const & orig
+	, BiVector const & physAngle
+	)
+	: Rigid(orig, Pose(physAngle))
 { }
 
 // copy constructor -- compiler provided

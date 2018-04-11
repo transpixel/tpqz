@@ -49,5 +49,6 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('ubinary.cpp')
 env.Program('ustream.cpp')
 

@@ -26,58 +26,64 @@
 //
 //
 
-
 /*! \file
-\brief Definitions for cloud::io
+\brief Definitions for namespace io::binary
 */
 
 
-#include "libcloud/io.h"
-
-#include "libcloud/cast.h"
-#include "libdat/info.h"
-#include "libio/binary.h"
-#include "libio/stream.h"
-
-#include <cassert>
-#include <fstream>
-#include <limits>
-
-
-namespace cloud
-{
 namespace io
 {
 
-std::vector<RecordBin>
-loadAsBinary
-	( std::string const & fpath
-	)
+namespace binary
 {
-	std::vector<RecordBin> const recs{ ::io::binary::load<RecordBin>(fpath) };
-	return recs;
-}
 
-std::vector<FixedPoint>
-loadAsFixed
-	( std::string const & fpath
-	)
-{
-	std::vector<FixedPoint> const pnts{ ::io::binary::load<FixedPoint>(fpath) };
-	return pnts;
-}
-
+template <typename Type>
+inline
 bool
-saveAsAscii
-	( std::ostream & ostrm
-	, std::vector<FixedPoint> const & fpnts
-	, std::string const & fmt
+save
+	( std::vector<Type> const & items
+	, std::string const & fpath
 	)
 {
-	return saveFixedPointAsAscii(ostrm, fpnts.begin(), fpnts.end(), fmt);
+	std::ofstream ofs(fpath, std::ios::binary);
+	ofs.write
+		( reinterpret_cast<char const * const>( items.data() )
+		, static_cast<std::streamsize>( items.size() * sizeof(Type) )
+		);
+	return ofs.good();
 }
 
+template <typename Type>
+inline
+std::vector<Type>
+load
+	( std::string const & fpath
+	)
+{
+	std::vector<Type> items;
+	std::streamsize const bytesPerRec{ sizeof(Type) };
+	std::streamsize numRecs{};
+	std::ifstream ifs;
+	bool const okay{ prepareStream(ifs, fpath, bytesPerRec, &numRecs) };
+	if (okay)
+	{
+		// allocate space and read data
+		items.resize(numRecs);
+		std::streamsize const expBytes{ numRecs * bytesPerRec };
+		ifs.read
+			( reinterpret_cast<char * const>( items.data() )
+			, expBytes
+			);
+		std::streamsize const gotBytes{ ifs.gcount() };
+		if (! (gotBytes == expBytes))
+		{
+			items.clear();
+		}
+	}
+	return items;
+}
 
-}
-}
+} // binary
+
+} // io
 

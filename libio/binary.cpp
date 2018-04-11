@@ -28,56 +28,65 @@
 
 
 /*! \file
-\brief Definitions for cloud::io
+\brief Definitions for namespace io::binary
 */
 
 
-#include "libcloud/io.h"
-
-#include "libcloud/cast.h"
-#include "libdat/info.h"
 #include "libio/binary.h"
-#include "libio/stream.h"
 
 #include <cassert>
-#include <fstream>
-#include <limits>
 
 
-namespace cloud
-{
 namespace io
 {
 
-std::vector<RecordBin>
-loadAsBinary
-	( std::string const & fpath
-	)
+namespace binary
 {
-	std::vector<RecordBin> const recs{ ::io::binary::load<RecordBin>(fpath) };
-	return recs;
-}
-
-std::vector<FixedPoint>
-loadAsFixed
-	( std::string const & fpath
-	)
-{
-	std::vector<FixedPoint> const pnts{ ::io::binary::load<FixedPoint>(fpath) };
-	return pnts;
-}
 
 bool
-saveAsAscii
-	( std::ostream & ostrm
-	, std::vector<FixedPoint> const & fpnts
-	, std::string const & fmt
+prepareStream
+	( std::ifstream & ifs
+	, std::string const & fpath
+	, std::streamsize const & bytesPerRec
+	, std::streamsize * const & ptNumRecs
 	)
 {
-	return saveFixedPointAsAscii(ostrm, fpnts.begin(), fpnts.end(), fmt);
+	bool okay{ false };
+
+	// open at end of file
+	ifs.open
+		( fpath
+		, std::ios_base::binary | std::ios_base::ate
+		);
+
+	// check size
+	if (ifs.good())
+	{
+		// determine number of records
+		std::streamsize const allBytes{ (std::streamsize)ifs.tellg() };
+		std::streamsize const numRecs{ allBytes / bytesPerRec };
+		std::streamsize const expBytes{ numRecs * bytesPerRec };
+		if (allBytes == expBytes)
+		{
+			assert(ptNumRecs);
+			*ptNumRecs = numRecs;
+
+			// return to start of file
+			ifs.seekg(0);
+			okay = ifs.good();
+		}
+		else
+		{
+			// incongruent filesize
+			ifs.close();
+		}
+	}
+	// else // bad file open
+
+	return okay;
 }
 
+} // binary
 
-}
-}
+} // io
 

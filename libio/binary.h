@@ -26,58 +26,68 @@
 //
 //
 
+#ifndef io_binary_INCL_
+#define io_binary_INCL_
 
 /*! \file
-\brief Definitions for cloud::io
+\brief Declarations for namespace io::binary
 */
 
 
-#include "libcloud/io.h"
-
-#include "libcloud/cast.h"
-#include "libdat/info.h"
-#include "libio/binary.h"
-#include "libio/stream.h"
-
-#include <cassert>
 #include <fstream>
-#include <limits>
+#include <string>
+#include <vector>
 
 
-namespace cloud
-{
 namespace io
 {
 
-std::vector<RecordBin>
-loadAsBinary
-	( std::string const & fpath
-	)
+/*! \brief Declarations and Definitions for libio.
+
+\par General Concept:
+
+Package-specific conventions for Input/Output involving strings and streams.
+
+\par Special Notes:
+
++ Provides thread-save wrapping for output streams.
+
+
+*/
+namespace binary
 {
-	std::vector<RecordBin> const recs{ ::io::binary::load<RecordBin>(fpath) };
-	return recs;
-}
+	//! Open stream and verify data size
+	bool
+	prepareStream
+		( std::ifstream & ifs
+		, std::string const & fpath
+		, std::streamsize const & bytesPerRec
+		, std::streamsize * const & ptNumRecs
+		);
 
-std::vector<FixedPoint>
-loadAsFixed
-	( std::string const & fpath
-	)
-{
-	std::vector<FixedPoint> const pnts{ ::io::binary::load<FixedPoint>(fpath) };
-	return pnts;
-}
+	//! Load collection of objects from binary file
+	template <typename Type>
+	inline
+	bool
+	save
+		( std::vector<Type> const & items
+		, std::string const & fpath
+		);
 
-bool
-saveAsAscii
-	( std::ostream & ostrm
-	, std::vector<FixedPoint> const & fpnts
-	, std::string const & fmt
-	)
-{
-	return saveFixedPointAsAscii(ostrm, fpnts.begin(), fpnts.end(), fmt);
-}
+	//! Load collection of objects from binary file
+	template <typename Type>
+	inline
+	std::vector<Type>
+	load
+		( std::string const & fpath
+		);
 
+} // binary
 
-}
-}
+} // io
+
+// Inline definitions
+#include "libio/binary.inl"
+
+#endif // io_binary_INCL_
 

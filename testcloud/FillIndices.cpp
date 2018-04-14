@@ -39,260 +39,25 @@
 
 #include "libapp/Timer.h"
 #include "libcloud/cloud.h"
-#include "libdat/algorithm.h"
-#include "libdat/cast.h"
-#include "libdat/compare.h"
-#include "libdat/Extents.h"
-#include "libdat/ExtentsIterator.h"
-#include "libdat/grid.h"
-#include "libdat/IndexIterator.h"
+#include "libimg/dilate.h"
+
 #include "libdat/io.h"
-#include "libdat/SubExtents.h"
 #include "libimg/io.h"
-#include "libio/sprintf.h"
 #include "libio/string.h"
-#include "libmath/Extreme.h"
-#include "libmath/math.h"
 
 #include <cassert>
 #include <fstream>
 #include <iostream>
-#include <memory>
 
 
 namespace
 {
 	using PixVal = cloud::NdxType;
-	constexpr bool sShowProgress{ true };
 	constexpr bool sShowTiming{ true };
 	constexpr bool sSaveTmpGrids{ true };
 
-	//! Ancillary structure for proximity assessment
-	struct RowColDist
-	{
-		dat::RowCol theRowCol
-			{{ dat::nullValue<size_t>(), dat::nullValue<size_t>() }};
-		double theDist{ dat::nullValue<double>() };
 
-		RowColDist
-			() = default;
-
-		RowColDist
-			( dat::RowCol const & rowcol
-			, double const & dist
-			)
-			: theRowCol(rowcol)
-			, theDist{ dist }
-		{ }
-
-		//! Invalid instance
-		inline
-		static
-		RowColDist
-		null
-			()
-		{
-			static RowColDist const aNull;
-			return aNull;
-		}
-
-		//! True if this instance is valid
-		inline
-		bool
-		isValid
-			() const
-		{
-			return dat::isValid(theDist);
-		}
-	};
-
-	//! True if dist member of A is less than that of B
-	inline
-	bool
-	isMinDist
-		( RowColDist const & rcdA
-		, RowColDist const & rcdB
-		)
-	{
-		return (rcdA.theDist < rcdB.theDist);
-	}
-
-	//! Return limits associated with value
-	dat::IndexIterator
-	indexIteratorFor
-		( size_t const & value
-		, size_t const & delta
-		, std::pair<size_t, size_t> const & range
-		)
-	{
-		size_t beg{ 0u };
-		if (dat::canSubtract(value, delta))
-		{
-			beg = value - delta;
-		}
-		size_t const end{ dat::clamped((value + delta), range) };
-		return dat::IndexIterator({ beg, end });
-	}
-
-	//! Functor providing distance to reference point
-	struct Distanator
-	{
-		dat::Spot const theRefSpot;
-
-		//! Construct with rcRef as one endpoint of distances
-		explicit
-		Distanator
-			( dat::RowCol const & refRowCol
-			)
-			: theRefSpot(dat::cast::Spot(refRowCol))
-		{ }
-
-		//! Distance to this rowcol
-		inline
-		double
-		operator()
-			( dat::RowCol const & anyRowCol
-			) const
-		{
-			dat::Spot const currSpot(dat::cast::Spot(anyRowCol));
-			using dat::operator-;
-			return dat::magnitude(currSpot - theRefSpot);
-		}
-	};
-
-	//! Neighborhood functor - extracts RowColDist instances from grid
-	struct NeighborHoodsOf
-	{
-		dat::grid<PixVal> const * const thePtGrid;
-		size_t const theDelta;
-		std::shared_ptr<std::vector<RowColDist> > const thePtRCDs;
-
-		// cache
-		std::pair<size_t, size_t> const theRowRange;
-		std::pair<size_t, size_t> const theColRange;
-
-		//! Attach to grid
-		explicit
-		NeighborHoodsOf
-			( dat::grid<PixVal> const * const & ptGrid
-			, size_t const & delta
-			)
-			: thePtGrid{ ptGrid }
-			, theDelta{ delta }
-			, thePtRCDs
-				{ std::make_shared<std::vector<RowColDist> >
-					(math::sq(2u*theDelta + 1u))
-				}
-			, theRowRange{0u, thePtGrid->high()}
-			, theColRange{0u, thePtGrid->wide()}
-		{
-			assert(thePtGrid); // 
-			assert(0u < theDelta);
-		}
-
-		//! (Only) valid RowColDist instances from neighborhood of atRowCol
-		std::vector<RowColDist> const &
-		operator()
-			( dat::RowCol const & atRowCol
-			) const
-		{
-			thePtRCDs->clear();
-
-			// compute distances relative to input rowcol
-			Distanator const distanceTo(atRowCol);
-
-			dat::IndexIterator itRow
-				(indexIteratorFor(atRowCol[0], theDelta, theRowRange));
-			for ( ; itRow ; ++itRow)
-			{
-				dat::IndexIterator itCol
-					(indexIteratorFor(atRowCol[1], theDelta, theColRange));
-				for ( ; itCol ; ++itCol)
-				{
-					dat::RowCol const rcLook{{ *itRow, *itCol }};
-					PixVal const & tryPix = (*thePtGrid)(rcLook);
-					if (dat::isValid(tryPix))
-					{
-						double const dist(distanceTo(rcLook));
-						RowColDist const rcd{ rcLook, dist };
-						thePtRCDs->emplace_back(rcd);
-					}
-				}
-			}
-			return *thePtRCDs;
-		}
-	};
-
-	//! Value of nearest valid pixel
-	PixVal
-	valueOfNearest
-		( std::vector<RowColDist> const & rcds
-		, dat::grid<PixVal> const & origGrid
-		)
-	{
-		PixVal outPix{ dat::nullValue<PixVal>() };
-		math::Extreme<std::vector<RowColDist>::const_iterator> const extreme
-			(rcds.begin(), rcds.end(), isMinDist);
-		if (extreme.isValid())
-		{
-			dat::RowCol const & rcNear = extreme.theExVal.theRowCol;
-			outPix = origGrid(rcNear);
-		}
-		return outPix;
-	}
-
-	//! Fill each invalid pixel with the value of valid pixel nearest to it
-	dat::grid<PixVal>
-	fillWithNearest
-		( dat::grid<PixVal> const & origGrid
-		, size_t const & rcDel
-		, size_t * const & ptNumFilled = nullptr
-		)
-	{
-		dat::grid<PixVal> fullGrid(origGrid);
-		dat::Extents const gridSize(origGrid.hwSize());
-
-		// create neighborhood producer
-		NeighborHoodsOf const hoodsOf(&origGrid, rcDel);
-
-		size_t fillCount{ 0u };
-		for (dat::ExtentsIterator iter(gridSize) ; iter ; ++iter)
-		{
-			// grid location to be updated
-			dat::RowCol const & currRowCol = *iter;
-
-			// compute output pixel given neighborhood of current pixel
-			PixVal const & srcPix = origGrid(currRowCol);
-			PixVal outPix{ srcPix };
-			if (! dat::isValid(srcPix))
-			{
-				// track number of fill operations
-				++fillCount;
-
-				// grab valid neighbors
-				std::vector<RowColDist> const & rcds = hoodsOf(currRowCol);
-
-				// if any valid neighbors, find the one closest
-				if (! rcds.empty())
-				{
-					outPix = valueOfNearest(rcds, origGrid);
-				}
-			}
-
-			// assign output value
-			fullGrid(currRowCol) = outPix;
-		}
-
-		// report number of elements filled
-		if (ptNumFilled)
-		{
-			*ptNumFilled = fillCount;
-		}
-
-		return fullGrid;
-	}
-
-	//! An "on" value for pixels that are valid - else 0
+	//! An "on" value for pixels that are valid - else off value
 	inline
 	uint8_t
 	outValue
@@ -385,31 +150,8 @@ main
 	{
 		// fill indices
 		app::Timer timer;
-		constexpr size_t halfSize{ 2u }; // seems faster to iterate
-		constexpr size_t maxIter{ 32u }; // than to use a larger window
-		dat::grid<PixVal> fullGrid(origGrid);
-		size_t fillCount{ fullGrid.size() };
-		io::out() << "iter,fillCount:" << std::endl;
-		for (size_t nn{0u} ; (0u < fillCount) && (nn < maxIter) ; ++nn)
-		{
-			std::string const nstr{ io::sprintf("%02d", nn) };
-			if (sShowProgress)
-			{
-				io::out()
-					<< " " << dat::infoString(nn)
-					<< " " << dat::infoString(fillCount)
-					<< std::endl;
-			}
-			if (sSaveTmpGrids)
-			{
-				std::string const tmpname{ "tmpGrid" + nstr + ".png" };
-				saveGridViz(fullGrid, tmpname);
-			}
-
-			timer.start(nstr);
-			fullGrid = fillWithNearest(fullGrid, halfSize, &fillCount);
-			timer.stop();
-		}
+		dat::grid<PixVal> const fullGrid{ img::dilate::floodFilled(origGrid) };
+		timer.stop();
 
 		if (sShowTiming)
 		{

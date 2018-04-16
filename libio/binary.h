@@ -65,7 +65,17 @@ namespace binary
 		, std::streamsize * const & ptNumRecs
 		);
 
-	//! Load collection of objects from binary file
+	//! Save contiguous collection of objects to binary file
+	template <typename Type>
+	inline
+	bool
+	save
+		( Type * const & ptData
+		, size_t const & numItems
+		, std::string const & fpath
+		);
+
+	//! Convenience function for above save()
 	template <typename Type>
 	inline
 	bool

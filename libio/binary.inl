@@ -41,16 +41,28 @@ template <typename Type>
 inline
 bool
 save
-	( std::vector<Type> const & items
+	( Type * const & ptData
+	, size_t const & numItems
 	, std::string const & fpath
 	)
 {
 	std::ofstream ofs(fpath, std::ios::binary);
 	ofs.write
-		( reinterpret_cast<char const * const>( items.data() )
-		, static_cast<std::streamsize>( items.size() * sizeof(Type) )
+		( reinterpret_cast<char const * const>(ptData)
+		, static_cast<std::streamsize>( numItems * sizeof(Type) )
 		);
 	return ofs.good();
+}
+
+template <typename Type>
+inline
+bool
+save
+	( std::vector<Type> const & items
+	, std::string const & fpath
+	)
+{
+	return save(items.data(), items.size(), fpath);
 }
 
 template <typename Type>

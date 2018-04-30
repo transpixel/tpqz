@@ -379,7 +379,7 @@ ro_sampcon_test2
 		ro::Accord const eval{ roSoln, &uvPairs };
 		double const gotGapRMS{ eval.rmsGapAll() };
 		double const expGapRMS{ 0. };
-		double const tolGapRMS{ 100.*math::eps }; // slight base/angle coupling
+		double const tolGapRMS{ 256.*math::eps }; // slight base/angle coupling
 		if (! dat::nearlyEquals(gotGapRMS, expGapRMS, tolGapRMS))
 		{
 			oss << "Failure of quintSoln gap test" << std::endl;

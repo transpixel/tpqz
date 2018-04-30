@@ -143,7 +143,6 @@ insertSubGrid
 		if (srcGrid.isValid() && srcSub.isValid() && ptOutGrid->isValid())
 		{
 			dat::RowCol const & outUL = srcSub.theUL;
-			typename dat::grid<OutType>::iterator itOut(ptOutGrid->begin());
 			dat::Extents const outSize{ ptOutGrid->hwSize() };
 			for (dat::ExtentsIterator iter{srcSub.theSize} ; iter ; ++iter)
 			{
@@ -162,6 +161,7 @@ insertSubGrid
 
 namespace
 {
+	inline
 	size_t
 	rowsToFit
 		( size_t const & numItems
@@ -180,6 +180,7 @@ namespace
 namespace
 {
 	template <typename PixType>
+	inline
 	void
 	fillWithDither
 		( dat::grid<PixType> * const & ptGrid
@@ -205,6 +206,7 @@ namespace
 
 	//! min/max active pixel value of entire collection
 	template <typename PixType, typename FwdIter>
+	inline
 	dat::MinMax<PixType>
 	activeMinMax
 		( FwdIter const & beg

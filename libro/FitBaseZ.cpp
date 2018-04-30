@@ -35,12 +35,11 @@
 #include "libro/FitBaseZ.h"
 
 #include "libga/groups.h"
+#include "libla/eigen.h"
 #include "libmath/angle.h"
 #include "libro/model.h"
 #include "libro/QuadForm.h"
 #include "libro/SpinPQ.h"
-
-#include "Eigen"
 
 #include <sstream>
 

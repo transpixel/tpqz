@@ -42,6 +42,7 @@
 #include <complex>
 #include <iterator>
 #include <type_traits>
+#include <vector>
 
 
 namespace dat

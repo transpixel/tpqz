@@ -69,6 +69,7 @@ namespace iter
 
 	//! Iterator pairs that partition totalSize into numGroups
 	template <typename Iter>
+	inline
 	std::vector<std::pair<Iter, Iter> >
 	groups
 		( Iter const & beg

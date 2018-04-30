@@ -39,6 +39,7 @@
 #include "libio/stream.h"
 
 #include <iostream>
+#include <numeric>
 #include <sstream>
 #include <string>
 

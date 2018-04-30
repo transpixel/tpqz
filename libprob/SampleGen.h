@@ -36,6 +36,8 @@
 
 #include "libprob/CdfInverse.h"
 
+#include <random>
+
 
 namespace prob
 {

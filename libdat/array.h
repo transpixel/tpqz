@@ -37,6 +37,7 @@
 
 #include <algorithm>
 #include <array>
+#include <numeric>
 #include <type_traits>
 
 

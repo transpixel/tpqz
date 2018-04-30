@@ -38,6 +38,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 
 
 namespace prob

@@ -1,0 +1,14 @@
+# useful commands
+
+docker build -t transpixel/tpqz:gcc7.3 .
+
+docker run --rm -d -P \
+	--mount="type=bind,source=/home/stcdave/gitTPQZ/tpqz,destination=/tpqz" \
+	--name=tpqzBuild_gcc7.3 \
+	--hostname=tpqzBuild \
+	transpixel/tpqz:gcc7.3
+
+docker container ls -a
+docker ps
+
+

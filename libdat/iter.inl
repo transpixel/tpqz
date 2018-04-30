@@ -44,13 +44,14 @@ namespace iter
 	namespace
 	{
 		//! Sizes for maximally uniform partition of numTotal
+		inline
 		std::vector<size_t>
 		groupSizes
 			( size_t const numTotal
 			, size_t const numGroups
 			)
 		{
-			std::vector<size_t> groupSizes(numGroups);
+			std::vector<size_t> gSizes(numGroups);
 
 			assert(0u < numTotal);
 			assert(0u < numGroups);
@@ -60,28 +61,29 @@ namespace iter
 			if (numTotal < numGroups)
 			{
 				// will be some empty groups - fill residuals below
-				std::fill(groupSizes.begin(), groupSizes.end(), 0u);
+				std::fill(gSizes.begin(), gSizes.end(), 0u);
 			}
 			else // if (numGroups <= numTotal)
 			{
 				// fill each group to same size - add residuals below
 				size_t const minPerGroup{ numTotal / numGroups };
-				std::fill(groupSizes.begin(), groupSizes.end(), minPerGroup);
+				std::fill(gSizes.begin(), gSizes.end(), minPerGroup);
 				sumOfGroups += minPerGroup * numGroups;
 			}
 
 			// distribute residual amount over groups from first to last
 			for (size_t nn{0u} ; (sumOfGroups < numTotal); ++nn)
 			{
-				++(groupSizes[nn]);
+				++(gSizes[nn]);
 				++sumOfGroups;
 			}
 
-			return groupSizes;
+			return gSizes;
 		}
 	}
 
 template <typename Iter>
+inline
 std::vector<std::pair<Iter, Iter> >
 groups
 	( Iter const & beg

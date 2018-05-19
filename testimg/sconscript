@@ -55,6 +55,8 @@ linklibs = \
  , 'math'
  , 'dat'
 
+ , 'png'
+
  , 'opencv_highgui'
  , 'opencv_imgproc'
  , 'opencv_core'
@@ -71,6 +73,7 @@ env.Program('uconvert.cpp')
 env.Program('udilate.cpp')
 env.Program('ugeo.cpp')
 env.Program('uimg.cpp')
+env.Program('ulibpng.cpp')
 env.Program('urad.cpp')
 env.Program('usample.cpp')
 env.Program('ustats.cpp')

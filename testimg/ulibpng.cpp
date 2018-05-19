@@ -196,6 +196,53 @@ hwSizeFor
 		return loadFromRgb<png::rgb_pixel>(ifs);
 	}
 
+	dat::grid<std::array<uint16_t, 3u> >
+	downCast16
+		( dat::grid<std::array<float, 3u> > const & fgrid
+		)
+	{
+		dat::grid<std::array<uint16_t, 3u> > ugrid(fgrid.hwSize());
+		for (dat::ExtentsIterator iter{fgrid.hwSize()} ; iter ; ++iter)
+		{
+			dat::RowCol const & rowcol = *iter;
+			std::array<float, 3u> const & fpix = fgrid(rowcol);
+			std::array<uint16_t, 3u> & upix = ugrid(rowcol);
+			upix[0] = static_cast<uint16_t>(fpix[0]);
+			upix[1] = static_cast<uint16_t>(fpix[1]);
+			upix[2] = static_cast<uint16_t>(fpix[2]);
+		}
+		return ugrid;
+	}
+
+class PixGen16 : public png::generator<png::rgb_pixel_16, PixGen16>
+{
+	dat::grid<std::array<uint16_t, 3u> > const & theGrid;
+
+public:
+
+	PixGen16
+		( dat::grid<std::array<uint16_t, 3u> > const & ugrid
+		)
+		: png::generator<png::rgb_pixel_16, PixGen16>
+		  	(ugrid.wide(), ugrid.high())
+		, theGrid{ ugrid }
+	{ }
+
+// TODO - constness?
+	png::byte *
+	get_next_row
+		( size_t const & row
+		)
+	{
+		std::array<uint16_t, 3u> const * const ptConstRow
+			{ theGrid.beginRow(row) };
+		std::array<uint16_t, 3u> * const ptVarRow
+			{ const_cast<std::array<uint16_t, 3u> * const>(ptConstRow) };
+		return reinterpret_cast<png::byte *>(ptVarRow);
+	}
+
+};
+
 void
 experiment
 	( std::string const & fname
@@ -237,12 +284,19 @@ io::out() << dat::infoString(bytesTotal, "bytesTotal") << std::endl;
 	{
 		// RGB: 16 bits per channel
 		fgrid = loadFromRgb16(ifs);
+
+		dat::grid<std::array<uint16_t, 3u> > const ugrid{ downCast16(fgrid) };
+		std::ofstream ofs("outgen.png");
+		PixGen16 pgen(ugrid);
+		pgen.write(ofs);
+
 	}
 	else
 	if (isRgb8)
 	{
 		// RGB: 8 bits per channel
 		fgrid = loadFromRgb8(ifs);
+
 	}
 	else
 	{

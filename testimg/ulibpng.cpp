@@ -143,6 +143,59 @@ hwSizeFor
 		{ (size_t)info.get_height(), (size_t)info.get_width() };
 }
 
+	//! A color floating point grid from 8 or 16 bit RGB PNG
+	template <typename RgbType>
+	dat::grid<std::array<float, 3u> >
+	loadFromRgb
+		( std::ifstream & ifs
+		)
+	{
+		dat::grid<std::array<float, 3u> > fgrid;
+
+		png::image<RgbType> img(ifs);
+
+		dat::Extents const hwSize
+			{ (size_t)img.get_height(), (size_t)img.get_width() };
+
+		// as grid structure
+		fgrid = dat::grid<std::array<float, 3u> >(hwSize);
+
+		// copy data
+		//  - should be able to read directly into fgrid buffer
+		//  - or at least do a buffer copy
+		//  - or at least a row by row copy
+		//  ... TODO figure out png++ syntax
+		for (dat::ExtentsIterator iter{hwSize} ; iter ; ++iter)
+		{
+			dat::RowCol const & rowcol = *iter;
+			RgbType const rgbPix{ img.get_pixel(rowcol[1], rowcol[0]) };
+			std::array<float, 3u> & outPix = fgrid(rowcol);
+			outPix[0] = static_cast<float>(rgbPix.red);
+			outPix[1] = static_cast<float>(rgbPix.green);
+			outPix[2] = static_cast<float>(rgbPix.blue);
+		}
+
+		return fgrid;
+	}
+
+	inline
+	dat::grid<std::array<float, 3u> >
+	loadFromRgb16
+		( std::ifstream & ifs
+		)
+	{
+		return loadFromRgb<png::rgb_pixel_16>(ifs);
+	}
+
+	inline
+	dat::grid<std::array<float, 3u> >
+	loadFromRgb8
+		( std::ifstream & ifs
+		)
+	{
+		return loadFromRgb<png::rgb_pixel>(ifs);
+	}
+
 void
 experiment
 	( std::string const & fname
@@ -152,6 +205,9 @@ experiment
 	std::ifstream ifs(fname);
 	png::reader<std::ifstream> reader(ifs);
 	reader.read_info();
+	// reset stream for subsequent image loading
+	ifs.clear();
+	ifs.seekg(0);
 
 	png::info const & info = reader.get_info();
 	dat::Extents const hwSize{ hwSizeFor(info) };
@@ -166,36 +222,27 @@ io::out() << dat::infoString(bytesPerChan, "bytesPerChan") << std::endl;
 io::out() << dat::infoString(bytesPerPix, "bytesPerPix") << std::endl;
 io::out() << dat::infoString(bytesTotal, "bytesTotal") << std::endl;
 
+	bool const isRgb8
+		{ (png::color_type_rgb == info.get_color_type())
+		  && (1u == bytesPerChan)
+		};
+	bool const isRgb16
+		{ (png::color_type_rgb == info.get_color_type())
+		  && (2u == bytesPerChan)
+		};
+
 	// instantiate image of supported type
-	if ( (png::color_type_rgb == info.get_color_type())
-	  && (2u == bytesPerChan)
-	   )
+	dat::grid<std::array<float, 3u> > fgrid;
+	if (isRgb16)
 	{
-		using rgb16_t = png::rgb_pixel_16;
-		ifs.clear();
-		ifs.seekg(0);
-		png::image<rgb16_t> img(ifs);
-
-
-		// as grid structure
-		dat::grid<std::array<float, 3u> > fgrid(hwSize);
-
-		// copy data
-		//  - should be able to read directly into fgrid buffer
-		//  - or at least do a buffer copy
-		//  - or at least a row by row copy
-		//  ... TODO figure out png++ syntax
-		for (dat::ExtentsIterator iter{hwSize} ; iter ; ++iter)
-		{
-			dat::RowCol const & rowcol = *iter;
-			rgb16_t const rgbPix{ img.get_pixel(rowcol[1], rowcol[0]) };
-			std::array<float, 3u> & outPix = fgrid(rowcol);
-			outPix[0] = rgbPix.red;
-			outPix[1] = rgbPix.green;
-			outPix[2] = rgbPix.blue;
-		}
-
-		img.write("out.png");
+		// RGB: 16 bits per channel
+		fgrid = loadFromRgb16(ifs);
+	}
+	else
+	if (isRgb8)
+	{
+		// RGB: 8 bits per channel
+		fgrid = loadFromRgb8(ifs);
 	}
 	else
 	{

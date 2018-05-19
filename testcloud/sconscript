@@ -69,6 +69,7 @@ linklibs = \
  , 'opencv_highgui'
  , 'opencv_imgproc'
  , 'opencv_core'
+ , 'opencv_imgcodecs'
 
 # , 'libboost_filesystem'
 # , 'libboost_system'

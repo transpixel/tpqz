@@ -38,17 +38,22 @@
 #include "info.hpp"
 #include "end_info.hpp"
 
+#ifdef DEBUG_IO_TRANSFORM
 static void
 trace_io_transform(char const* fmt, ...)
 {
-#ifdef DEBUG_IO_TRANSFORM
     va_list va;
     va_start(va, fmt);
     fprintf(stderr, "TRANSFORM_IO: ");
     vfprintf(stderr, fmt, va);
     va_end(va);
-#endif
 }
+#else
+static void
+trace_io_transform(char const* /*fmt*/, ...)
+{
+}
+#endif
 #define TRACE_IO_TRANSFORM trace_io_transform
 
 namespace png

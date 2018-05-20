@@ -1,0 +1,19 @@
+
+# - list of resources
+https://github.com/jbhuang0604/awesome-computer-vision
+
+# (very)lightweight file I/O
+# Read many, but no jpeg output
+https://github.com/mnhrdt/iio
+
+# libpng, libjpeg, libtiff
+
+# For jpeg support - consider:
+https://libjpeg-turbo.org/Documentation/Documentation
+# example use:
+https://stackoverflow.com/questions/9094691/examples-or-tutorials-of-using-libjpeg-turbos-turbojpeg
+
+
+# includes image processing (uses iio)
+https://github.com/kmhofmann/selene
+

@@ -109,6 +109,19 @@ RUN \
 	&& \
 	xbps-remove -Oo
 
+# numeric libraries (used by ceres)
+# +  18 MB
+RUN \
+	xbps-install -S -y \
+		libstdc++ \
+		lapack \
+		eigen \
+	&& \
+	xbps-remove -Oo
+
+# patch - missing from libtiff install?
+RUN ln -s /usr/lib/libtiff.so.5 /usr/lib/libtiff.so
+
 # enable ssh server as access method
 # and configure default behavior as ssh-accessible container
 # + .004 MB

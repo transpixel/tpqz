@@ -1,5 +1,7 @@
 
+# + 214 MB
 FROM voidlinux/voidlinux
+
 # Change to this (otherwise trivial) env-var value will
 # force docker to reset its cache (and rebuild image from scratch)
 ENV DOCKER_CACHE 2018.05.22
@@ -31,7 +33,7 @@ RUN \
 		/etc/ssh/sshd_config
 
 # configure development user
-# + .194 MB
+# + .130 MB
 RUN \
 	# setup development group
 	groupadd --gid 2001 tpdev \
@@ -48,7 +50,7 @@ RUN \
 	echo 'tpuser:transpix' | chpasswd
 
 # general build tools (used below)
-# + 134 MB
+# +  49 MB
 RUN \
 	xbps-install -S -y \
 		vim \
@@ -67,7 +69,7 @@ RUN \
 
 # boost libraries (using -graph, -filesystem)
 # only header files (and maybe serialization library) are needed for BGL
-# + 174 MB
+# + 213 MB
 RUN \
 	xbps-install -S -y \
 		# PIG !!
@@ -76,7 +78,7 @@ RUN \
 	xbps-remove -Oo
 
 # image processing
-# + 
+# +   5 MB
 RUN \
 	xbps-install -S -y \
 		libpng-devel \
@@ -85,6 +87,7 @@ RUN \
 	xbps-remove -Oo
 
 # project specific build tools
+# + 176 MB
 RUN \
 	xbps-install -S -y \
 		git \
@@ -93,12 +96,24 @@ RUN \
 	xbps-remove -Oo
 
 # update dynamic load paths (e.g. for results from source builds above)
+# + .027 MB
 RUN \
 	ldconfig
 
+# openCV - trasitory - to be replaced
+# + 445 MB
+RUN \
+	xbps-install -S -y \
+		# HUGE PIG !!
+		libopencv-devel \
+	&& \
+	xbps-remove -Oo
+
 # enable ssh server as access method
 # and configure default behavior as ssh-accessible container
+# + .004 MB
 RUN ssh-keygen -A
+
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
 

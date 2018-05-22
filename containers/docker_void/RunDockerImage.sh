@@ -6,5 +6,7 @@ docker run \
 	--mount="type=bind,source=${DirCode}/,destination=/tpqz" \
 	--name=tpDev \
 	--hostname=tpHost \
-	transpixel/void:dev_v1.0.0
+	transpixel/void:opencv
+
+#	transpixel/void:dev_v1.0.0
 

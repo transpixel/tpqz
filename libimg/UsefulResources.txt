@@ -6,7 +6,13 @@ https://github.com/jbhuang0604/awesome-computer-vision
 # Read many, but no jpeg output
 https://github.com/mnhrdt/iio
 
+# JPEGReader/JPEGWriter C++ wrapper
+https://cs.nyu.edu/~ajsecord/downloads.html
+
 # libpng, libjpeg, libtiff
+
+# PngLite
+https://github.com/dankar/pnglite
 
 # For jpeg support - consider:
 https://libjpeg-turbo.org/Documentation/Documentation

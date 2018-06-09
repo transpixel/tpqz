@@ -36,6 +36,8 @@
 
 #include "libdat/MinMax.h"
 
+#include "libio/stream.h"
+
 #include <deque>
 #include <string>
 #include <vector>

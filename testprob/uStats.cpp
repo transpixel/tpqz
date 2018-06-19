@@ -34,6 +34,7 @@
 #include "libprob/Stats.h"
 
 #include "libdat/dat.h"
+#include "libdat/info.h"
 #include "libio/stream.h"
 
 #include <iostream>
@@ -128,6 +129,29 @@ prob_Stats_test1
 	return oss.str();
 }
 
+//! Check simple set of data
+std::string
+prob_Stats_test2
+	()
+{
+	std::ostringstream oss;
+
+	std::vector<double> const data{ .016, -.003, -.448 };
+	dat::MinMax<double> const expMinMax{ -.448, .016 };
+
+	prob::Stats const stats(data.begin(), data.end());
+	dat::MinMax<double> const & gotMinMax = stats.theMinMax;
+
+	if (! gotMinMax.nearlyEquals(expMinMax))
+	{
+		oss << "Failure of MinMax test" << std::endl;
+		oss << dat::infoString(expMinMax, "expMinMax") << std::endl;
+		oss << dat::infoString(gotMinMax, "gotMinMax") << std::endl;
+	}
+
+	return oss.str();
+}
+
 
 }
 
@@ -143,6 +167,7 @@ main
 	// run tests
 	oss << prob_Stats_test0();
 	oss << prob_Stats_test1();
+	oss << prob_Stats_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

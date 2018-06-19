@@ -50,11 +50,10 @@ Stats :: Stats
 	)
 	: theSamples()
 {
-	FwdIter itIn(beg);
-	while (end != itIn)
+	for (FwdIter iter{beg} ; end != iter ; ++iter)
 	{
-		theSamples.push_back((double)*itIn++);
-
+		double const value{ static_cast<double>(*iter) };
+		add(value);
 	}
 }
 

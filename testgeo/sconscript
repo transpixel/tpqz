@@ -48,6 +48,7 @@ libpaths = \
 
  , '../libdat/'
  , '../libio/'
+ , '../libapp/'
  ]
 
 linklibs = \
@@ -61,11 +62,13 @@ linklibs = \
 
  , 'dat'
  , 'io'
+ , 'app'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('demoArcQuant.cpp')
 env.Program('demoRayGaps.cpp')
 env.Program('ucube.cpp')
 env.Program('uintersect.cpp')

@@ -1,0 +1,32 @@
+
+# - list of resources
+https://github.com/jbhuang0604/awesome-computer-vision
+
+# (very)lightweight file I/O
+# Read many, but no jpeg output
+https://github.com/mnhrdt/iio
+
+# JPEGReader/JPEGWriter C++ wrapper
+https://cs.nyu.edu/~ajsecord/downloads.html
+
+# libpng, libjpeg, libtiff
+
+# PngLite
+https://github.com/dankar/pnglite
+
+# png++
+http://www.piko3d.net/tutorials/libpng-tutorial-loading-png-files-from-streams/
+
+# For jpeg support - consider:
+https://libjpeg-turbo.org/Documentation/Documentation
+# example use:
+https://stackoverflow.com/questions/9094691/examples-or-tutorials-of-using-libjpeg-turbos-turbojpeg
+
+http://www.andrewewhite.net/wordpress/2010/04/07/simple-cc-jpeg-writer-part-2-write-to-buffer-in-memory/
+
+http://www.andrewewhite.net/wordpress/2008/09/02/very-simple-jpeg-writer-in-c-c/
+
+
+# includes image processing (uses iio)
+https://github.com/kmhofmann/selene
+

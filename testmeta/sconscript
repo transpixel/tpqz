@@ -49,5 +49,5 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('unull.cpp')
+env.Program('udetect.cpp')
 

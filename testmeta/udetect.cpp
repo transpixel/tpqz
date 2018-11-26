@@ -31,7 +31,7 @@
 */
 
 
-//#include "libdat/null.h"
+#include "libmeta/detect.h"
 
 //#include "libdat/info.h"
 //#include "libdat/validity.h"
@@ -66,50 +66,6 @@ namespace dat // template logic (logic.h?)
 	};
 }
 
-namespace dat
-{
-	template <typename Type>
-	class DetectNull
-	{
-		//! Base class that [also|only] has same member name
-		struct FakeBase { int null; };
-
-		//! Has either one member (FakeBase) or ambiguous dual definitions
-		struct Derived : Type, FakeBase { };
-
-		//! Instantiatable only if second arg of type defined by first arg
-		template <typename Dummy, Dummy> struct Check; // else SFINAE fail
-
-		//! Intermediate data to test which func() is instantiated
-		static constexpr size_t const onlySize{ 1u };
-		static constexpr size_t const alsoSize{ 2u };
-		using OnlyInBase = char[onlySize];
-		using AlsoInType = char[alsoSize];
-
-		//! Resolves if 'null' method is unique (in FakeBase only)
-		template <typename Dummy>
-		static
-		OnlyInBase &
-		func
-			( Check<int FakeBase::*, &Dummy::null> *
-			);
-
-		//! Resolves if 'null' method is ambiguous (in Type and FakeBase)
-		template <typename Dummy>
-		static
-		AlsoInType &
-		func
-			( ...
-			);
-
-	public:
-
-		//! Value is set to true/false based on which func() can be resolved
-		static constexpr bool const value
-			{ (alsoSize == sizeof(func<Derived>(0))) };
-	};
-
-}
 
 namespace aType
 {
@@ -203,17 +159,17 @@ dat_null_test1
 	std::ostringstream oss;
 
 	bool const expSans{ false };
-	bool const gotSans{ dat::DetectNull<aFunc::CustomSansAll>::value };
+	bool const gotSans{ meta::detect::HasNull<aFunc::CustomSansAll>::isFound };
 	if (! (gotSans == expSans))
 	{
-		oss << "Failure of DetectNull<Sans> test" << std::endl;
+		oss << "Failure of detect::HasNull<Sans> test" << std::endl;
 	}
 
 	bool const expWith{ true };
-	bool const gotWith{ dat::DetectNull<aFunc::CustomWithNull>::value };
+	bool const gotWith{ meta::detect::HasNull<aFunc::CustomWithNull>::isFound };
 	if (! (gotWith == expWith))
 	{
-		oss << "Failure of DetectNull<With> test" << std::endl;
+		oss << "Failure of detect::HasNull<With> test" << std::endl;
 	}
 
 	return oss.str();

@@ -1,4 +1,4 @@
 # Stop running container
 
-docker stop transpixel/tpqz:gcc7.3
+docker stop tpqzBuild_gcc-latest
 

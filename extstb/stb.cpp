@@ -28,6 +28,18 @@
 
 
 // ====
+// ==== Not thread safe (at least global variables are not)
+// ====
+
+#include <mutex>
+
+namespace stb
+{
+std::mutex gStbMutex();
+}
+
+
+// ====
 // ==== Read capabilities
 // ====
 

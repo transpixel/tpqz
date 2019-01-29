@@ -33,6 +33,13 @@
 \brief Declarations for stb::stb
 */
 
+#include <mutex>
+
+namespace stb
+{
+	static std::mutex gStbMutex;
+}
+
 #include "stb_image.h"
 #include "stb_image_write.h"
 

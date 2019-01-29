@@ -46,6 +46,8 @@ libpaths = \
  , '../libio/'
  , '../libmath/'
  , '../libdat/'
+
+ , '../extstb/'
  ]
 
 linklibs = \
@@ -55,10 +57,10 @@ linklibs = \
  , 'math'
  , 'dat'
 
+ , 'stb'
  , 'opencv_highgui'
  , 'opencv_imgproc'
  , 'opencv_core'
- , 'opencv_imgcodecs'
  ]
 
 env.Append(CPPPATH=cpppaths)
@@ -71,6 +73,7 @@ env.Program('uconvert.cpp')
 env.Program('udilate.cpp')
 env.Program('ugeo.cpp')
 env.Program('uimg.cpp')
+env.Program('uio.cpp')
 env.Program('urad.cpp')
 env.Program('usample.cpp')
 env.Program('ustats.cpp')

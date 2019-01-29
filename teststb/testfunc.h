@@ -36,15 +36,14 @@
 #include "libdat/array.h"
 #include "libdat/info.h"
 #include "libdat/validity.h"
-//#include "libio/stream.h"
 #include "libmath/math.h"
 
+#include "libimg/convert.h"
 #include "libdat/grid.h"
 
 #include <array>
 #include <cstddef>
 #include <iostream>
-//#include <sstream>
 #include <string>
 
 
@@ -135,32 +134,6 @@ namespace testfunc
 		}
 	}
 
-	//! Cast 8-bit RGB datablock into grid<PixRGB>
-	dat::grid<PixRGB>
-	gridFrom
-		( int const & gotHigh
-		, int const & gotWide
-		, unsigned char const * const rgb8
-		)
-	{
-		assert(0 < gotHigh);
-		assert(0 < gotWide);
-		dat::grid<PixRGB> grid((size_t)gotHigh, (size_t)gotWide);
-
-		// copy image for compare later
-		unsigned char const * ptIn{ rgb8 };
-		dat::grid<PixRGB>::iterator itOut{ grid.begin() };
-		for (size_t nn{0u} ; nn < grid.size() ; ++nn)
-		{
-			uint8_t const red{ *ptIn++ };
-			uint8_t const grn{ *ptIn++ };
-			uint8_t const blu{ *ptIn++ };
-			*itOut++ = PixRGB{ red, grn, blu };
-		}
-
-		return grid;
-	}
-
 	//! A grid<PixRGB> for imgdat data block after performing size tests
 	dat::grid<PixRGB>
 	checkedGridFrom
@@ -203,7 +176,7 @@ namespace testfunc
 			if (okaySizes)
 			{
 				// copy image for compare later
-				grid = gridFrom(gotHigh, gotWide, imgdat);
+				grid = img::convert::gridRgb8From(gotHigh, gotWide, imgdat);
 			}
 
 		}

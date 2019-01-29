@@ -42,6 +42,7 @@ cpppaths = \
 
 libpaths = \
  [ '../extstb/'
+ , '../libimg/'
  , '../libio/'
  , '../libmath/'
  , '../libdat/'
@@ -49,6 +50,7 @@ libpaths = \
 
 linklibs = \
  [ 'stb'
+ , 'img'
  , 'io'
  , 'math'
  , 'dat'

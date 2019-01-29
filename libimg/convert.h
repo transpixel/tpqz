@@ -49,6 +49,14 @@ namespace img
 //! \brief Functions and operations for converting imagery.
 namespace convert
 {
+	//! Cast 8-bit RGB datablock into grid<std::array<uint8_t, 3> >
+	dat::grid<std::array<uint8_t, 3> >
+	gridRgb8From
+		( size_t const & gotHigh
+		, size_t const & gotWide
+		, uint8_t const * const rgb8
+		);
+
 	//! Convert Raw8 Bayer format to LRGB B-bit color format
 	cv::Mat
 	cvRgb8FromCvRaw8

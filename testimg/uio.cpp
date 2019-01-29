@@ -27,24 +27,18 @@
 //
 
 /*! \file
-\brief  This file contains unit test for ext::stb
+\brief  This file contains unit test for img::io
 */
 
 
-#include "teststb/testfunc.h"
+#include "libimg/io.h"
 
-#include "extstb/stb_image.h"
-#include "extstb/stb_image_write.h"
-
-#include "libdat/array.h"
 #include "libdat/info.h"
 #include "libdat/validity.h"
 #include "libio/stream.h"
-#include "libmath/math.h"
 
-#include "libdat/grid.h"
+#include "teststb/testfunc.h"
 
-#include <array>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -53,9 +47,9 @@
 namespace
 {
 
-//! Check JPEG
+//! Check JPEG image i/o
 std::string
-ext_stb_test0
+img_io_test0
 	()
 {
 	std::ostringstream oss;
@@ -63,44 +57,41 @@ ext_stb_test0
 	using PixRGB = stb::testfunc::PixRGB;
 	constexpr size_t const tolPixDif{ 1u }; // jpeg compression loss
 
-	std::string const fpath{ "ustb_foo.jpg" };
+	std::string const fpath{ "uio_foo.jpg" };
 
 	// simulate image
-	constexpr int const expHigh{ 73 };
-	constexpr int const expWide{ 35 };
-	constexpr int const expDeep{ 3 };
+	constexpr int const expHigh{ 731 };
+	constexpr int const expWide{ 355 };
 	dat::grid<PixRGB> const expGrid{ stb::testfunc::simRGB(expHigh, expWide) };
 	dat::grid<PixRGB> gotGrid;
 
 	// write to file
 	constexpr int const expQual{ 100 };
-	int const wstat
-		{ stbi_write_jpg
-			(fpath.c_str(), expWide, expHigh, expDeep, expGrid.begin(), expQual)
-		};
+	bool const okaySave{ img::io::saveJpg(expGrid, fpath, expQual) };
+
+io::out() << "== writing to: " << fpath << std::endl;
+io::out() << dat::infoString(okaySave, "okaySave") << std::endl;
 
 	// check write status
-	bool const okayWrite{ (0 < wstat) };
-	if (! okayWrite)
+	if (! okaySave)
 	{
-		oss << "Failure of stbi_write_jpg test" << std::endl;
-		oss << "wstat = " << wstat << std::endl;
+		oss << "Failure of JPG write test" << std::endl;
 	}
 
-	else // if (okayWrite); have test image in file
+	else // if (okaySave); have test image in file
 	{
-		// read jpeg image
-		int gotWide{}, gotHigh{}, gotDeep{};
-		unsigned char * imgdat
-			{ stbi_load(fpath.c_str(), &gotWide, &gotHigh, &gotDeep, expDeep) };
-		gotGrid = stb::testfunc::checkedGridFrom
-			(oss, gotHigh, gotWide, gotDeep, imgdat, "JPG reload", expGrid);
-		stbi_image_free(imgdat);
+io::out() << "== loading from: " << fpath << std::endl;
+		// read image back from file
+		gotGrid = img::io::loadFromJpgRgb8(fpath);
+io::out() << dat::infoString(gotGrid, "gotGrid") << std::endl;
+io::out() << dat::infoString(gotGrid(0u,0u), "gotGrid(0u,0u)") << std::endl;
+io::out() << dat::infoString(gotGrid(0u,1u), "gotGrid(0u,1u)") << std::endl;
+io::out() << dat::infoString(gotGrid(1u,1u), "gotGrid(1u,1u)") << std::endl;
 	}
 
 	// check contents of loaded data
-	bool const okayReadBack{ gotGrid.isValid() };
-	if (okayWrite && okayReadBack)
+	bool const okayLoad{ gotGrid.isValid() };
+	if (okaySave && okayLoad)
 	{
 		assert(expGrid.size() == gotGrid.size()); // else above code is bad
 		stb::testfunc::checkGrids
@@ -115,54 +106,40 @@ ext_stb_test0
 
 //! Check PNG image i/o
 std::string
-ext_stb_test1
+img_io_test1
 	()
 {
 	std::ostringstream oss;
 
 	using PixRGB = stb::testfunc::PixRGB;
-	constexpr size_t const tolPixDif{ 0u }; // png lossless encoding
+	constexpr size_t const tolPixDif{ 0u };
 
-	std::string const fpath{ "ustb_foo.png" };
+	std::string const fpath{ "uio_foo.png" };
 
 	// simulate image
-	constexpr int const expHigh{ 73 };
-	constexpr int const expWide{ 35 };
-	constexpr int const expDeep{ 3 };
+	constexpr int const expHigh{ 731 };
+	constexpr int const expWide{ 355 };
 	dat::grid<PixRGB> const expGrid{ stb::testfunc::simRGB(expHigh, expWide) };
 	dat::grid<PixRGB> gotGrid;
 
 	// write to file
-	stbi_write_png_compression_level = 9;
-	int const rowBytes{ expWide * expDeep * sizeof(uint8_t) };
-	void const * const ptData{ expGrid.begin() };
-	int const wstat
-		{ stbi_write_png
-			(fpath.c_str(), expWide, expHigh, expDeep, ptData, rowBytes)
-		};
+	bool const okaySave{ img::io::savePng(expGrid, fpath) };
 
 	// check write status
-	bool const okayWrite{ (0 < wstat) };
-	if (! okayWrite)
+	if (! okaySave)
 	{
-		oss << "Failure of stbi_write_png test" << std::endl;
-		oss << "wstat = " << wstat << std::endl;
+		oss << "Failure of PNG write test" << std::endl;
 	}
 
-	else // if (okayWrite); have test image in file
+	else // if (okaySave); have test image in file
 	{
-		// read jpeg image
-		int gotWide{}, gotHigh{}, gotDeep{};
-		unsigned char * imgdat
-			{ stbi_load(fpath.c_str(), &gotWide, &gotHigh, &gotDeep, expDeep) };
-		gotGrid = stb::testfunc::checkedGridFrom
-			(oss, gotHigh, gotWide, gotDeep, imgdat, "PNG reload", expGrid);
-		stbi_image_free(imgdat);
+		// read image back from file
+		gotGrid = img::io::loadFromPngRgb8(fpath);
 	}
 
 	// check contents of loaded data
-	bool const okayReadBack{ gotGrid.isValid() };
-	if (okayWrite && okayReadBack)
+	bool const okayLoad{ gotGrid.isValid() };
+	if (okaySave && okayLoad)
 	{
 		assert(expGrid.size() == gotGrid.size()); // else above code is bad
 		stb::testfunc::checkGrids
@@ -178,7 +155,7 @@ ext_stb_test1
 
 }
 
-//! Unit test for ext::stb
+//! Unit test for img::io
 int
 main
 	( int const /*argc*/
@@ -188,8 +165,8 @@ main
 	std::ostringstream oss;
 
 	// run tests
-	oss << ext_stb_test0();
-	oss << ext_stb_test1();
+	oss << img_io_test0();
+//	oss << img_io_test1();
 
 	// check/report results
 	std::string const errMessages(oss.str());

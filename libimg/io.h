@@ -57,6 +57,18 @@ namespace io
 		( std::string const & fpath
 		);
 
+	//! Load 8-bit RGB JPEG image
+	dat::grid<std::array<uint8_t, 3> >
+	loadFromJpgRgb8
+		( std::string const & fpath
+		);
+
+	//! Load 8-bit RGB PNG image
+	dat::grid<std::array<uint8_t, 3> >
+	loadFromPngRgb8
+		( std::string const & fpath
+		);
+
 	//! Load from floating point format - valid on success
 	dat::grid<float>
 	loadFromFloat
@@ -98,6 +110,28 @@ namespace io
 	savePgmAutoScale
 		( dat::grid<float> const & fgrid
 		, std::string const & filename
+		);
+
+	//! Save 3-channel data to JPEG format
+	bool
+	saveJpg // TODO - could templatize
+		( dat::grid<std::array<uint8_t, 3u> > const & rgbGrid
+		, std::string const & fpath
+		, size_t const & qualPercent = { 80u }
+		);
+
+	//! Save one-channel data to PNG format
+	bool
+	savePng // TODO - could templatize
+		( dat::grid<uint8_t> const & ugrid
+		, std::string const & fpath
+		);
+
+	//! Save 3-channel data to PNG format
+	bool
+	savePng // TODO - could templatize
+		( dat::grid<std::array<uint8_t, 3u> > const & rgbGrid
+		, std::string const & fpath
 		);
 
 	//! Save one-channel data to any openCV format - true if successful

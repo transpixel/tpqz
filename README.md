@@ -22,6 +22,10 @@ consistent with the TPQZ licensing. Specifically
    MIT License: Copyright (c) 2015 - 2016 Florian Rappl
 https://github.com/FlorianRappl/CmdParser
 
+* extstb:
+   MIT License: Copyright (c) 2017 Sean Barrett
+http://nothings.org/stb
+
 * boost:
    Boost License:
    * Website: http://www.boost.org/

@@ -69,6 +69,12 @@ namespace io
 		( std::string const & fpath
 		);
 
+	//! Load 8-bit Gray PNG image
+	dat::grid<uint8_t>
+	loadFromPng8
+		( std::string const & fpath
+		);
+
 	//! Load from floating point format - valid on success
 	dat::grid<float>
 	loadFromFloat

@@ -85,6 +85,19 @@ namespace testfunc
 		return grid;
 	}
 
+	size_t
+	maxAbsPixDif
+		( uint8_t const & pixA
+		, uint8_t const & pixB
+		)
+	{
+		long const lA{ static_cast<long>(pixA) };
+		long const lB{ static_cast<long>(pixB) };
+		long const lDif{ lA - lB };
+		long const lMag{ std::abs(lDif) };
+		return static_cast<size_t>(lMag);
+	}
+
 	//! Magnitude of largest difference between corresponding channel values
 	size_t
 	maxAbsPixDif
@@ -103,18 +116,19 @@ namespace testfunc
 	}
 
 	//! Check if expGrid and gotGrid are the same (within tolPixDif)
+	template <typename PixType>
 	void
 	checkGrids
 		( std::ostream & oss
-		, dat::grid<PixRGB> const & expGrid
-		, dat::grid<PixRGB> const & gotGrid
+		, dat::grid<PixType> const & expGrid
+		, dat::grid<PixType> const & gotGrid
 		, std::string const & title
 		, size_t const & tolPixDif
 		)
 	{
 		assert(expGrid.size() == gotGrid.size()); // else above code is bad
 		size_t maxPixDif{ 0u };
-		for ( dat::grid<PixRGB>::const_iterator
+		for ( typename dat::grid<PixType>::const_iterator
 				itExp{expGrid.begin()}, itGot{gotGrid.begin()}
 			; expGrid.end() != itExp
 			; ++itExp, ++itGot

@@ -69,9 +69,6 @@ img_io_test0
 	constexpr int const expQual{ 100 };
 	bool const okaySave{ img::io::saveJpg(expGrid, fpath, expQual) };
 
-io::out() << "== writing to: " << fpath << std::endl;
-io::out() << dat::infoString(okaySave, "okaySave") << std::endl;
-
 	// check write status
 	if (! okaySave)
 	{
@@ -80,13 +77,8 @@ io::out() << dat::infoString(okaySave, "okaySave") << std::endl;
 
 	else // if (okaySave); have test image in file
 	{
-io::out() << "== loading from: " << fpath << std::endl;
 		// read image back from file
 		gotGrid = img::io::loadFromJpgRgb8(fpath);
-io::out() << dat::infoString(gotGrid, "gotGrid") << std::endl;
-io::out() << dat::infoString(gotGrid(0u,0u), "gotGrid(0u,0u)") << std::endl;
-io::out() << dat::infoString(gotGrid(0u,1u), "gotGrid(0u,1u)") << std::endl;
-io::out() << dat::infoString(gotGrid(1u,1u), "gotGrid(1u,1u)") << std::endl;
 	}
 
 	// check contents of loaded data
@@ -104,7 +96,7 @@ io::out() << dat::infoString(gotGrid(1u,1u), "gotGrid(1u,1u)") << std::endl;
 	return oss.str();
 }
 
-//! Check PNG image i/o
+//! Check RGB-PNG image i/o
 std::string
 img_io_test1
 	()
@@ -152,6 +144,80 @@ img_io_test1
 	return oss.str();
 }
 
+namespace split
+{
+	using PixRGB = stb::testfunc::PixRGB;
+
+	//! Grid with value from the chan-th rgb channel of rgbGrid
+	dat::grid<uint8_t>
+	channelFrom
+		( dat::grid<PixRGB> const & rgbGrid
+		, size_t const & chan
+		)
+	{
+		dat::grid<uint8_t> ugrid(rgbGrid.hwSize());
+		dat::grid<PixRGB>::const_iterator itIn{ rgbGrid.begin() };
+		dat::grid<uint8_t>::iterator itOut{ ugrid.begin() };
+		while (rgbGrid.end() != itIn)
+		{
+			PixRGB const & pix = *itIn;
+			*itOut = pix[chan];
+			++itIn;
+			++itOut;
+		}
+		return ugrid;
+	}
+}
+
+//! Check Gray-PNG image i/o
+std::string
+img_io_test2
+	()
+{
+	std::ostringstream oss;
+
+	using PixRGB = stb::testfunc::PixRGB;
+	constexpr size_t const tolPixDif{ 0u };
+
+	std::string const fpath{ "uio_foo.png" };
+
+	// simulate image
+	constexpr int const expHigh{ 731 };
+	constexpr int const expWide{ 355 };
+	dat::grid<PixRGB> const rgbGrid{ stb::testfunc::simRGB(expHigh, expWide) };
+	dat::grid<uint8_t> const expGrid{ split::channelFrom(rgbGrid, 0u) };
+	dat::grid<uint8_t> gotGrid;
+
+	// write to file
+	bool const okaySave{ img::io::savePng(expGrid, fpath) };
+
+	// check write status
+	if (! okaySave)
+	{
+		oss << "Failure of PNG write test" << std::endl;
+	}
+
+	else // if (okaySave); have test image in file
+	{
+		// read image back from file
+		gotGrid = img::io::loadFromPng8(fpath);
+	}
+
+	// check contents of loaded data
+	bool const okayLoad{ gotGrid.isValid() };
+	if (okaySave && okayLoad)
+	{
+		assert(expGrid.size() == gotGrid.size()); // else above code is bad
+		stb::testfunc::checkGrids
+			(oss, expGrid, gotGrid, "png max pix dif", tolPixDif);
+	}
+
+	// cleanup test data
+	std::remove(fpath.c_str());
+
+	return oss.str();
+}
+
 
 }
 
@@ -166,7 +232,8 @@ main
 
 	// run tests
 	oss << img_io_test0();
-//	oss << img_io_test1();
+	oss << img_io_test1();
+	oss << img_io_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

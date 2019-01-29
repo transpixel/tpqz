@@ -204,12 +204,15 @@ namespace
 		)
 	{
 		dat::grid<std::array<uint8_t, 3> > grid;
-		int gotWide{}, gotHigh{}, gotDeep{};
-		unsigned char * imgdat
-			{ stbi_load(fpath.c_str(), &gotWide, &gotHigh, &gotDeep, 3) };
-		if (imgdat && (3u == gotDeep))
+		int high{}, wide{}, deep{};
+		unsigned char * imgdat{ nullptr };
+		{ // guarded
+			std::lock_guard<std::mutex> lock(stb::gStbMutex);
+			imgdat = stbi_load(fpath.c_str(), &wide, &high, &deep, 3);
+		}
+		if (imgdat && (3u == deep))
 		{
-			grid = convert::gridRgb8From(gotHigh, gotWide, imgdat);
+			grid = convert::gridRgb8From(high, wide, imgdat);
 		}
 		return grid;
 	}
@@ -229,6 +232,35 @@ loadFromPngRgb8
 	)
 {
 	return loadRgb8_stb(fpath);
+}
+
+dat::grid<uint8_t>
+loadFromPng8
+	( std::string const & fpath
+	)
+{
+	dat::grid<uint8_t> grid;
+	if (! fpath.empty())
+	{
+		int wide{}, high{}, deep{};
+		unsigned char * imgdat{ nullptr };
+		{ // guarded
+			std::lock_guard<std::mutex> lock(stb::gStbMutex);
+			imgdat = stbi_load(fpath.c_str(), &wide, &high, &deep, 1);
+		}
+		if (imgdat && (1u == deep))
+		{
+			grid = dat::grid<uint8_t>(high, wide);
+			size_t const byteSize{ high * wide * sizeof(unsigned char) };
+			std::transform
+				( imgdat, imgdat + byteSize
+				, grid.begin()
+				, [] (unsigned char const & pix)
+					{ return static_cast<uint8_t>(pix); }
+				);
+		}
+	}
+	return grid;
 }
 
 
@@ -499,21 +531,22 @@ saveJpg
 	)
 {
 	bool okay{ false };
-
-::io::out() << "saveJpg" << std::endl;
 	if ((! fpath.empty()) && rgbGrid.isValid())
 	{
 		constexpr std::pair<size_t, size_t> const pctRange{ 0u, 100u };
 		int const useQual{ (int)dat::clamped(qualPercent, pctRange) };
 		int const high{ (int)rgbGrid.high() };
 		int const wide{ (int)rgbGrid.wide() };
-		constexpr int deep{ 3 };
-		int const wstat
-			{ stbi_write_jpg
-				(fpath.c_str(), wide, high, deep, rgbGrid.begin(), useQual)
-			};
-		bool const okayWrite{ (0 < wstat) };
-		okay = okayWrite;
+		{ // guarded
+			std::lock_guard<std::mutex> lock(stb::gStbMutex);
+			constexpr int deep{ 3 };
+			int const wstat
+				{ stbi_write_jpg
+					(fpath.c_str(), wide, high, deep, rgbGrid.begin(), useQual)
+				};
+			bool const okayWrite{ (0 < wstat) };
+			okay = okayWrite;
+		}
 	}
 	return okay;
 }
@@ -525,7 +558,24 @@ savePng
 	)
 {
 	bool okay{ false };
-// TODO
+	if ((! fpath.empty()) && ugrid.isValid())
+	{
+		{ // guarded
+			std::lock_guard<std::mutex> lock(stb::gStbMutex);
+			stbi_write_png_compression_level = 9;
+			size_t const high{ ugrid.high() };
+			size_t const wide{ ugrid.wide() };
+			constexpr size_t const deep{ 1u };
+			size_t const rowBytes{ wide * deep * sizeof(uint8_t) };
+			int const stride{ static_cast<int>(rowBytes) };
+			void const * const ptData{ ugrid.begin() };
+			int const wstat
+				{ stbi_write_png
+					(fpath.c_str(), wide, high, deep, ptData, stride)
+				};
+			okay = (0 < wstat);
+		}
+	}
 	return okay;
 }
 
@@ -536,10 +586,24 @@ savePng
 	)
 {
 	bool okay{ false };
-
-// TODO
-::io::out() << "savePng: fpath " << fpath << std::endl;
-::io::out() << dat::infoString(rgbGrid, "rgbGrid") << std::endl;
+	if ((! fpath.empty()) && rgbGrid.isValid())
+	{
+		{ // guarded
+			std::lock_guard<std::mutex> lock(stb::gStbMutex);
+			stbi_write_png_compression_level = 9;
+			size_t const high{ rgbGrid.high() };
+			size_t const wide{ rgbGrid.wide() };
+			constexpr size_t const deep{ 3u };
+			size_t const rowBytes{ wide * deep * sizeof(uint8_t) };
+			int const stride{ static_cast<int>(rowBytes) };
+			void const * const ptData{ rgbGrid.begin() };
+			int const wstat
+				{ stbi_write_png
+					(fpath.c_str(), wide, high, deep, ptData, stride)
+				};
+			okay = (0 < wstat);
+		}
+	}
 	return okay;
 }
 

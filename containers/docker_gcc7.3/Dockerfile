@@ -2,7 +2,7 @@
 FROM gcc:7.3
 # Change to this (otherwise trivial) env-var value will
 # force docker to reset its cache (and rebuild image from scratch)
-ENV DOCKER_CACHE 2018.04.30
+ENV DOCKER_CACHE 2019.01.30
 
 # ---
 # --- System Config:
@@ -18,7 +18,6 @@ RUN \
 		scons \
 		vim \
 		libboost-graph-dev \
-		libopencv-dev \
 		libeigen3-dev \
 		libboost-filesystem-dev \
 	&& \

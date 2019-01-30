@@ -62,7 +62,6 @@ linklibs = \
  , 'opencv_highgui'
  , 'opencv_imgproc'
  , 'opencv_core'
- , 'opencv_imgcodecs'
  ]
 
 env.Append(CPPPATH=cpppaths)

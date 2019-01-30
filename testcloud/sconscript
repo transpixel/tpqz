@@ -36,10 +36,9 @@ if showSconsProgress :
 
 env = env.Clone() # allow module to change anything it wants
 
-cpppaths = ''
-#cpppaths = \
-#	[ '/usr/include/opencv2/'
-#	]
+cpppaths = \
+ [ 
+ ]
 
 libpaths = \
  [ '../libcloud/'
@@ -52,6 +51,7 @@ libpaths = \
  , '../libapp/'
  , '../libio/'
  , '../libdat/'
+ , '../extstb/'
  ]
 
 linklibs = \
@@ -66,14 +66,12 @@ linklibs = \
  , 'io'
  , 'dat'
 
+ , 'stb'
  , 'opencv_highgui'
  , 'opencv_imgproc'
  , 'opencv_core'
- , 'opencv_imgcodecs'
 
-# , 'libboost_filesystem'
-# , 'libboost_system'
-  ]
+ ]
 
 
 env.Append(CPPPATH=cpppaths)

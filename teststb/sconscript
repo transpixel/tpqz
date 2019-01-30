@@ -37,28 +37,25 @@ if showSconsProgress :
 env = env.Clone() # allow module to change anything it wants
 
 cpppaths = \
- [ '/usr/include/opencv2/'
+ [ '/usr/include/opencv2/' # TODO - remove
  ]
 
 libpaths = \
- [ '../libsig/'
+ [ '../extstb/'
  , '../libimg/'
- , '../libmath/'
  , '../libio/'
- , '../libapp/'
+ , '../libmath/'
  , '../libdat/'
- , '../libsys/'
  ]
 
 linklibs = \
- [ 'sig'
+ [ 'stb'
  , 'img'
- , 'math'
  , 'io'
- , 'app'
+ , 'math'
  , 'dat'
- , 'sys'
 
+ # TODO remove
  , 'opencv_highgui'
  , 'opencv_imgproc'
  , 'opencv_core'
@@ -68,9 +65,6 @@ env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('uFilterContext.cpp')
-env.Program('ufilter.cpp')
-env.Program('umatch.cpp')
-env.Program('uPeak.cpp')
+env.Program('ustb.cpp')
 
 

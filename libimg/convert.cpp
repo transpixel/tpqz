@@ -253,6 +253,33 @@ namespace
 
 //======================================================================
 
+dat::grid<std::array<uint8_t, 3> >
+gridRgb8From
+	( size_t const & high
+	, size_t const & wide
+	, uint8_t const * const rgb8
+	)
+{
+	dat::grid<std::array<uint8_t, 3> > grid;
+	if ((0 < high) && (0 < wide))
+	{
+		grid = dat::grid<std::array<uint8_t, 3> >(high, wide);
+
+		// copy individual pixels
+		uint8_t const * ptIn{ rgb8 };
+		dat::grid<std::array<uint8_t, 3> >::iterator itOut{ grid.begin() };
+		for (size_t nn{0u} ; nn < grid.size() ; ++nn)
+		{
+			uint8_t const red{ *ptIn++ };
+			uint8_t const grn{ *ptIn++ };
+			uint8_t const blu{ *ptIn++ };
+			*itOut++ = std::array<uint8_t, 3>{ red, grn, blu };
+		}
+	}
+
+	return grid;
+}
+
 cv::Mat
 cvRgb8FromCvRaw8
 	( cv::Mat const & raw8

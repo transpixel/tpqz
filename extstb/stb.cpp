@@ -58,8 +58,14 @@ std::mutex gStbMutex();
 // #define STBI_ONLY_PIC
 // #define STBI_ONLY_PNM  // (.ppm and .pgm)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 // include source code inlcuding (conditional) definitions
 #include "stb_image.h"
+
+#pragma GCC diagnostic pop
 
 
 // ====

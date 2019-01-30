@@ -37,7 +37,7 @@ if showSconsProgress :
 env = env.Clone() # allow module to change anything it wants
 
 cpppaths = \
- [ '/usr/include/opencv2/'
+ [ 
  ]
 
 libpaths = \
@@ -59,9 +59,6 @@ linklibs = \
  , 'dat'
  , 'sys'
 
- , 'opencv_highgui'
- , 'opencv_imgproc'
- , 'opencv_core'
  ]
 
 env.Append(CPPPATH=cpppaths)

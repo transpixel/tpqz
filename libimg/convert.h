@@ -39,8 +39,6 @@
 #include "libdat/SubExtents.h"
 #include "libimg/img.h"
 
-#include "opencv.hpp"
-
 #include <array>
 
 
@@ -55,36 +53,6 @@ namespace convert
 		( size_t const & gotHigh
 		, size_t const & gotWide
 		, uint8_t const * const rgb8
-		);
-
-	//! Convert Raw8 Bayer format to LRGB B-bit color format
-	cv::Mat
-	cvRgb8FromCvRaw8
-		( cv::Mat const & raw8
-		);
-
-	//! OpenCV matrix from single color channel: TODO - could templatize
-	cv::Mat
-	cvMatFromGrid
-		( dat::grid<uint8_t> const & ugrid
-		);
-
-	//! OpenCV matrix from three separate channels: TODO - could templatize
-	cv::Mat
-	cvMatFromBands
-		( std::array<dat::grid<uint8_t>, 3u> const & bands
-		);
-
-	//! OPenCV matrix from compound pixels: TODO - could templatize
-	cv::Mat
-	cvMatFromComposite
-		( dat::grid<std::array<uint8_t, 3u> > const & deepGrid
-		);
-
-	//! Inverse of cvMatFromBands()
-	std::array<dat::grid<uint8_t>, 3u>
-	bandsFromCvMat
-		( cv::Mat const & mat
 		);
 
 	/*! Convert linear-RGB (CIE version) to standard-RGB (default '90s-y2k+).

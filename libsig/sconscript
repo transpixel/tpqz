@@ -37,7 +37,7 @@ if showSconsProgress :
 env = env.Clone() # allow module to change anything it wants
 
 cpppaths = \
- [ '/usr/include/opencv2/'
+ [ 
  ]
 
 env.Append(CPPPATH=cpppaths)

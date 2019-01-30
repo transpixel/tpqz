@@ -74,7 +74,7 @@ namespace
 
 	//! Save visualization grid
 	void
-	saveGridViz
+	saveGridVizPng
 		( dat::grid<PixVal> const & ndxGrid
 		, std::string const & fpath
 		)
@@ -86,7 +86,7 @@ namespace
 			, ugrid.begin()
 			, [] (PixVal const & pix) { return outValue(pix); }
 			);
-		(void)img::io::saveViaOpenCV(ugrid, fpath);
+		(void)img::io::savePng(ugrid, fpath);
 	}
 }
 
@@ -161,7 +161,7 @@ main
 		// save visualization
 		if (sSaveTmpGrids)
 		{
-			saveGridViz(fullGrid, "fullGrid.png");
+			saveGridVizPng(fullGrid, "fullGrid.png");
 		}
 
 		std::ofstream ofs(outpath);

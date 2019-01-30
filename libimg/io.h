@@ -45,11 +45,13 @@ namespace img
 //! \brief Functions and operations related to img object I/O.
 namespace io
 {
+	/*
 	//! Load Raw8 (bayer) image from PGM file - valid image if success
 	dat::grid<uint16_t>
 	loadFromPgm
 		( std::string const & fpath
 		);
+	*/
 
 	//! Specialization of loadFromPgm for 8-bit pgm / little endian
 	dat::grid<uint8_t>
@@ -137,27 +139,6 @@ namespace io
 	bool
 	savePng // TODO - could templatize
 		( dat::grid<std::array<uint8_t, 3u> > const & rgbGrid
-		, std::string const & fpath
-		);
-
-	//! Save one-channel data to any openCV format - true if successful
-	bool
-	saveViaOpenCV // TODO - could templatize
-		( dat::grid<uint8_t> const & ugrid
-		, std::string const & fpath
-		);
-
-	//! Save three-channel data to any openCV format - true if successful
-	bool
-	saveViaOpenCV // TODO - could templatize
-		( std::array<dat::grid<uint8_t>, 3u> const & bands
-		, std::string const & fpath
-		);
-
-	//! Save grid of composite pixel data - true if successful
-	bool
-	saveViaOpenCV // TODO - could templatize
-		( dat::grid<std::array<uint8_t, 3u> > const & deepGrid
 		, std::string const & fpath
 		);
 

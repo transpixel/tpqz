@@ -43,8 +43,6 @@
 
 #include "extstb/stb.h"
 
-#include "opencv.hpp"
-
 #include <cassert>
 #include <cmath>
 #include <fstream>
@@ -58,6 +56,7 @@ namespace io
 {
 //======================================================================
 
+/* TODO - replace with stb_image call - or direct binary io (like Pgm8)
 dat::grid<uint16_t>
 loadFromPgm
 	( std::string const & fpath
@@ -89,6 +88,7 @@ loadFromPgm
 	}
 	return image16;
 }
+*/
 
 namespace
 {
@@ -604,57 +604,6 @@ savePng
 			okay = (0 < wstat);
 		}
 	}
-	return okay;
-}
-
-bool
-saveViaOpenCV
-	( dat::grid<uint8_t> const & ugrid
-	, std::string const & fpath
-	)
-{
-	bool okay(false);
-
-	// convert to OpenCV format
-	cv::Mat const cvMat(convert::cvMatFromGrid(ugrid));
-
-	// save via OpenCV lib
-	okay = cv::imwrite(fpath, cvMat);
-
-	return okay;
-}
-
-bool
-saveViaOpenCV
-	( std::array<dat::grid<uint8_t>, 3u> const & bands
-	, std::string const & fpath
-	)
-{
-	bool okay(false);
-
-	// convert to OpenCV format
-	cv::Mat const cvMat(convert::cvMatFromBands(bands));
-
-	// save via OpenCV lib
-	okay = cv::imwrite(fpath, cvMat);
-
-	return okay;
-}
-
-bool
-saveViaOpenCV
-	( dat::grid<std::array<uint8_t, 3u> > const & deepGrid
-	, std::string const & fpath
-	)
-{
-	bool okay(false);
-
-	// convert to OpenCV format
-	cv::Mat const cvMat(convert::cvMatFromComposite(deepGrid));
-
-	// save via OpenCV lib
-	okay = cv::imwrite(fpath, cvMat);
-
 	return okay;
 }
 

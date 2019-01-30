@@ -296,7 +296,7 @@ img_geo_test2
 		oss << dat::infoString(gotSize, "gotSize") << std::endl;
 	}
 
-	// img::io::saveViaOpenCV(montage, "montage.png");
+	// img::io::savePng(montage, "montage.png");
 
 	return oss.str();
 }

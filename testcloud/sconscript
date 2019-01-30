@@ -67,10 +67,6 @@ linklibs = \
  , 'dat'
 
  , 'stb'
- , 'opencv_highgui'
- , 'opencv_imgproc'
- , 'opencv_core'
-
  ]
 
 

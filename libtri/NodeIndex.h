@@ -64,6 +64,7 @@ private:
 
 	dat::Offset2D<size_t, long> theRowColMap{};
 	dat::grid<index_type> theNdxGrid;
+	std::vector<NodeKey> theNodeKeys{};
 	size_t theSize{ dat::nullValue<size_t>() };
 
 public: // methods
@@ -106,6 +107,21 @@ public: // methods
 			}
 		}
 		return ndx;
+	}
+
+	//! NodeKey associated with ndx (inverse of indexForNodeKey)
+	inline
+	NodeKey
+	nodeKeyForIndex
+		( index_type const & ndx
+		) const
+	{
+		NodeKey keyIJ{};
+		if (dat::isValid(ndx) && (ndx < theNodeKeys.size()))
+		{
+			keyIJ = theNodeKeys[ndx];
+		}
+		return keyIJ;
 	}
 
 	//! Descriptive information about this instance.

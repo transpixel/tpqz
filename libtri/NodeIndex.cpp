@@ -83,19 +83,24 @@ namespace
 		( tri::IsoTille const & trinet
 		, dat::grid<tri::NodeIndex::index_type> * const & ptNdxGrid
 		, dat::Offset2D<size_t, long> const & offMap
+		, std::vector<tri::NodeKey> * const & ptNodeKeys
 		)
 	{
 		assert(ptNdxGrid);
 		assert(ptNdxGrid->isValid());
+		assert(ptNodeKeys);
 		std::fill
 			( ptNdxGrid->begin(), ptNdxGrid->end()
 			, dat::nullValue<tri::NodeIndex::index_type>()
 			);
+		ptNodeKeys->reserve(ptNdxGrid->size());
 		size_t count{ 0u };
 		for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
 		{
-			dat::RowCol const rowcol(offMap(iter.nodeKey()));
+			tri::NodeKey const keyIJ{ iter.nodeKey() };
+			dat::RowCol const rowcol(offMap(keyIJ));
 			(*ptNdxGrid)(rowcol) = count;
+			ptNodeKeys->emplace_back(keyIJ);
 			++count;
 		}
 		return count;
@@ -112,7 +117,8 @@ NodeIndex :: NodeIndex
 	)
 	: theRowColMap{ offsetFor(trinet) }
 	, theNdxGrid{ hwSizeActive(trinet) }
-	, theSize{ sizeFor(trinet, &theNdxGrid, theRowColMap) }
+	, theNodeKeys{}
+	, theSize{ sizeFor(trinet, &theNdxGrid, theRowColMap, &theNodeKeys) }
 {
 	/*
 	io::out() << dat::infoString(theRowColMap, "theRowColMap") << std::endl;

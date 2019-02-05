@@ -64,6 +64,7 @@ private:
 
 	dat::Offset2D<size_t, long> theRowColMap{};
 	dat::grid<index_type> theNdxGrid;
+	std::vector<NodeKey> theNodeKeys{};
 	size_t theSize{ dat::nullValue<size_t>() };
 
 public: // methods
@@ -93,20 +94,14 @@ public: // methods
 	index_type
 	indexForNodeKey
 		( NodeKey const & keyIJ
-		) const
-	{
-		index_type ndx{ dat::nullValue<index_type>() };
-		assert(isValid());
-		dat::RowCol const rcNdxGrid(theRowColMap(keyIJ));
-		if (dat::isValid(rcNdxGrid))
-		{
-			if (theNdxGrid.hwSize().includes(rcNdxGrid))
-			{
-				ndx = theNdxGrid(rcNdxGrid);
-			}
-		}
-		return ndx;
-	}
+		) const;
+
+	//! NodeKey associated with ndx (inverse of indexForNodeKey)
+	inline
+	NodeKey
+	nodeKeyForIndex
+		( index_type const & ndx
+		) const;
 
 	//! Descriptive information about this instance.
 	std::string
@@ -119,7 +114,7 @@ public: // methods
 } // tri
 
 // Inline definitions
-// #include "libtri/NodeIndex.inl"
+#include "libtri/NodeIndex.inl"
 
 #endif // tri_NodeIndex_INCL_
 

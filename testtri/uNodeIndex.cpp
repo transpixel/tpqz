@@ -98,8 +98,8 @@ tri_NodeIndex_test1
 	NodeValue value{ 0.f };
 	for (tri::NodeIterator iter(trinet.begin()) ; iter ; ++iter)
 	{
-		tri::NodeKey const keyIJ{ iter.nodeKey() };
-		tri::NodeIndex::index_type const ndx{ cache.indexForNodeKey(keyIJ) };
+		tri::NodeKey const expKeyIJ{ iter.nodeKey() };
+		tri::NodeIndex::index_type const ndx{ cache.indexForNodeKey(expKeyIJ) };
 		if (! (ndx < numNodes))
 		{
 			oss << "Failure of node index size test" << std::endl;
@@ -109,6 +109,16 @@ tri_NodeIndex_test1
 		}
 		nodeItems[ndx] = value;
 		value += 1.f;
+
+		// check reverse lookup with cache (keyIJ from ndx)
+		tri::NodeKey const gotKeyIJ{ cache.nodeKeyForIndex(ndx) };
+		if (! dat::nearlyEquals(gotKeyIJ, expKeyIJ))
+		{
+			oss << "Failure of nodeKeyForIndex test" << std::endl;
+			oss << dat::infoString(expKeyIJ, "expKeyIJ") << std::endl;
+			oss << dat::infoString(gotKeyIJ, "gotKeyIJ") << std::endl;
+			break;
+		}
 	}
 
 	// check if all storage nodes have been set and are correct

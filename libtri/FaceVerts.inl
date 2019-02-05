@@ -35,6 +35,35 @@
 namespace tri
 {
 
+inline
+bool
+FaceVerts::Vertex :: isValid
+	() const
+{
+	return
+		{  dat::isValid(theNdxIJ)
+		&& dat::isValid(theW)
+		};
+}
+
+
+//===========================================================================
+//===========================================================================
+//===========================================================================
+
+
+inline
+bool
+FaceVerts :: isValid
+	() const
+{
+	return
+		{  theVerts[0].isValid()
+		&& theVerts[1].isValid()
+		&& theVerts[2].isValid()
+		};
+}
+
 template <typename PropSampFunc>
 inline
 typename PropSampFunc::value_type
@@ -55,6 +84,32 @@ FaceVerts :: valueFrom
 		+ w2 * propGrid(ij2)
 		+ w3 * propGrid(ij3)
 		);
+}
+
+inline
+NodeKey
+FaceVerts :: nodeKeyMaxW
+	() const
+{
+	tri::NodeKey keyIJ{ tri::sNullNdxPair };
+	if (isValid())
+	{
+		std::array<Vertex, 3u>::const_iterator const itMax
+			{ std::max_element
+				( theVerts.begin(), theVerts.end()
+				, [] (Vertex const & vertA, Vertex const & vertB)
+					{ return (vertA.theW < vertB.theW); }
+				)
+			};
+		if (theVerts.end() != itMax)
+		{
+			size_t const ndx
+				{ static_cast<size_t>(itMax - theVerts.begin()) };
+			assert(ndx < theVerts.size());
+			keyIJ = theVerts[ndx].theNdxIJ;
+		}
+	}
+	return keyIJ;
 }
 
 } // tri

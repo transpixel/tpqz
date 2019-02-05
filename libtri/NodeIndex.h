@@ -94,35 +94,14 @@ public: // methods
 	index_type
 	indexForNodeKey
 		( NodeKey const & keyIJ
-		) const
-	{
-		index_type ndx{ dat::nullValue<index_type>() };
-		assert(isValid());
-		dat::RowCol const rcNdxGrid(theRowColMap(keyIJ));
-		if (dat::isValid(rcNdxGrid))
-		{
-			if (theNdxGrid.hwSize().includes(rcNdxGrid))
-			{
-				ndx = theNdxGrid(rcNdxGrid);
-			}
-		}
-		return ndx;
-	}
+		) const;
 
 	//! NodeKey associated with ndx (inverse of indexForNodeKey)
 	inline
 	NodeKey
 	nodeKeyForIndex
 		( index_type const & ndx
-		) const
-	{
-		NodeKey keyIJ{};
-		if (dat::isValid(ndx) && (ndx < theNodeKeys.size()))
-		{
-			keyIJ = theNodeKeys[ndx];
-		}
-		return keyIJ;
-	}
+		) const;
 
 	//! Descriptive information about this instance.
 	std::string
@@ -135,7 +114,7 @@ public: // methods
 } // tri
 
 // Inline definitions
-// #include "libtri/NodeIndex.inl"
+#include "libtri/NodeIndex.inl"
 
 #endif // tri_NodeIndex_INCL_
 

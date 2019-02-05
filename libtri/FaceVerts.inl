@@ -35,6 +35,35 @@
 namespace tri
 {
 
+inline
+bool
+FaceVerts::Vertex :: isValid
+	() const
+{
+	return
+		{  dat::isValid(theNdxIJ)
+		&& dat::isValid(theW)
+		};
+}
+
+
+//===========================================================================
+//===========================================================================
+//===========================================================================
+
+
+inline
+bool
+FaceVerts :: isValid
+	() const
+{
+	return
+		{  theVerts[0].isValid()
+		&& theVerts[1].isValid()
+		&& theVerts[2].isValid()
+		};
+}
+
 template <typename PropSampFunc>
 inline
 typename PropSampFunc::value_type

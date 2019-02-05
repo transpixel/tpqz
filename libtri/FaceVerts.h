@@ -66,9 +66,21 @@ struct FaceVerts
 			( std::string const & title = std::string()
 			, std::string const & fmt = std::string("%12.6f")
 			) const;
+
+		//! True if this instance is valid
+		inline
+		bool
+		isValid
+			() const;
 	};
 
-	std::array<Vertex, 3u> theVerts{{}};
+	std::array<Vertex, 3u> theVerts{};
+
+	//! True if all three vertices are valid
+	inline
+	bool
+	isValid
+		() const;
 
 	/*! Interpolate value from a collection of properties
 	 *

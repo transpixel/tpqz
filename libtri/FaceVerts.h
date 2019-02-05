@@ -37,6 +37,7 @@
 #include "libdat/validity.h"
 #include "libtri/tri.h"
 
+#include <algorithm>
 #include <array>
 #include <string>
 
@@ -98,6 +99,12 @@ struct FaceVerts
 	valueFrom
 		( PropSampFunc const & propGrid
 		) const;
+
+	//! Node key of maximum weight value (std::max_element convention if dups)
+	inline
+	NodeKey
+	nodeKeyMaxW
+		() const;
 
 	//! Descriptive information about this instance.
 	std::string

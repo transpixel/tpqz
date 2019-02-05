@@ -118,8 +118,8 @@ tri_FaceVerts_test1
 {
 	std::ostringstream oss;
 
-	double const wgtA{ 3. };
-	double const wgtB{ 2. };
+	double const wgtA{ 2. };
+	double const wgtB{ 3. };
 	double const wgtC{ 1. };
 
 	// populate test face
@@ -141,6 +141,16 @@ tri_FaceVerts_test1
 		oss << "Failure of valueFrom() test" << std::endl;
 		oss << dat::infoString(expVal, "expVal") << std::endl;
 		oss << dat::infoString(gotVal, "gotVal") << std::endl;
+	}
+
+	// get index associated with largest weight (e.g. nearest node in IsoTille)
+	tri::NodeKey const gotNearKey{ fverts.nodeKeyMaxW() };
+	tri::NodeKey const expNearKey{ sKeyB };
+	if (! dat::nearlyEquals(gotNearKey, expNearKey))
+	{
+		oss << "Failure of nodeKeyMaxW() test" << std::endl;
+		oss << dat::infoString(expNearKey, "expNearKey") << std::endl;
+		oss << dat::infoString(gotNearKey, "gotNearKey") << std::endl;
 	}
 
 	return oss.str();

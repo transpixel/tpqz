@@ -86,5 +86,31 @@ FaceVerts :: valueFrom
 		);
 }
 
+inline
+NodeKey
+FaceVerts :: nodeKeyMaxW
+	() const
+{
+	tri::NodeKey keyIJ{ tri::sNullNdxPair };
+	if (isValid())
+	{
+		std::array<Vertex, 3u>::const_iterator const itMax
+			{ std::max_element
+				( theVerts.begin(), theVerts.end()
+				, [] (Vertex const & vertA, Vertex const & vertB)
+					{ return (vertA.theW < vertB.theW); }
+				)
+			};
+		if (theVerts.end() != itMax)
+		{
+			size_t const ndx
+				{ static_cast<size_t>(itMax - theVerts.begin()) };
+			assert(ndx < theVerts.size());
+			keyIJ = theVerts[ndx].theNdxIJ;
+		}
+	}
+	return keyIJ;
+}
+
 } // tri
 

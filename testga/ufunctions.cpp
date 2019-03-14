@@ -379,6 +379,8 @@ ga_functions_test3
 {
 	std::ostringstream oss;
 
+	// check fundamental blades
+
 	ga::Scalar const sFwd(4.);
 	ga::Vector const vFwd(4., 2., -8.);
 	ga::BiVector const bFwd(-3., -2., 5.);
@@ -414,6 +416,26 @@ ga_functions_test3
 	{
 		oss << "Failure of trivector inversion test" << std::endl;
 		oss << dat::infoString(tGot, "tGot") << std::endl;
+	}
+
+	// check multivector entities
+	ga::Spinor const spFwd(sFwd, bFwd);
+	ga::ImSpinor const imFwd(vFwd, tFwd);
+	ga::Spinor const spInv{ ga::inverse(spFwd) };
+	ga::ImSpinor const imInv{ ga::inverse(imFwd) };
+	ga::Scalar const spGot{ (spInv * spFwd).theS };
+	ga::Scalar const imGot{ (imInv * imFwd).theS };
+
+	if (! spGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of spinor inversion test" << std::endl;
+		oss << dat::infoString(spGot, "spGot") << std::endl;
+	}
+
+	if (! imGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of im-spinor inversion test" << std::endl;
+		oss << dat::infoString(imGot, "imGot") << std::endl;
 	}
 
 	return oss.str();

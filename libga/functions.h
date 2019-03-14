@@ -42,6 +42,14 @@ namespace ga
 {
 	// General purpose GA functions.
 
+	//! Inverse of multivector if it exists (else null instance)
+	template <typename Type>
+	inline
+	Type
+	inverse
+		( Type const & arg
+		);
+
 	//! Magnitude of quantity
 	template <typename Type>
 	inline

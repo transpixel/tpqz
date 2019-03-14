@@ -39,6 +39,28 @@ namespace ga
 
 template <typename Type>
 inline
+Type
+inverse
+	( Type const & arg
+	)
+{
+	Type result{};
+	if (arg.isValid())
+	{
+		// NOTE: could implement individual inverse() methods for speed
+		// this does double work -- e.g. sq(sqrt(..))
+		double const magSq{ math::sq(arg.magnitude()) };
+		Type const rev{ arg.reverse() };
+		if (std::numeric_limits<double>::min() < magSq)
+		{
+			result = (1./magSq) * rev;
+		}
+	}
+	return result;
+}
+
+template <typename Type>
+inline
 double
 magnitude
 	( Type const & arg

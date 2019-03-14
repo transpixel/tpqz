@@ -372,6 +372,75 @@ ga_functions_test2
 	return oss.str();
 }
 
+//! check inverse()
+std::string
+ga_functions_test3
+	()
+{
+	std::ostringstream oss;
+
+	// check fundamental blades
+
+	ga::Scalar const sFwd(4.);
+	ga::Vector const vFwd(4., 2., -8.);
+	ga::BiVector const bFwd(-3., -2., 5.);
+	ga::TriVector const tFwd(4.);
+
+	ga::Scalar const sInv{ ga::inverse(sFwd) };
+	ga::Vector const vInv{ ga::inverse(vFwd) };
+	ga::BiVector const bInv{ ga::inverse(bFwd) };
+	ga::TriVector const tInv{ ga::inverse(tFwd) };
+
+	ga::Scalar const allExp(1.);
+	ga::Scalar const sGot{ sInv * sFwd };
+	ga::Scalar const vGot{ (vInv * vFwd).theS };
+	ga::Scalar const bGot{ (bInv * bFwd).theS };
+	ga::Scalar const tGot{ tInv * tFwd };
+
+	if (! sGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of scalar inversion test" << std::endl;
+		oss << dat::infoString(sGot, "sGot") << std::endl;
+	}
+	if (! vGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of vector inversion test" << std::endl;
+		oss << dat::infoString(vGot, "vGot") << std::endl;
+	}
+	if (! bGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of bivector inversion test" << std::endl;
+		oss << dat::infoString(bGot, "bGot") << std::endl;
+	}
+	if (! tGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of trivector inversion test" << std::endl;
+		oss << dat::infoString(tGot, "tGot") << std::endl;
+	}
+
+	// check multivector entities
+	ga::Spinor const spFwd(sFwd, bFwd);
+	ga::ImSpinor const imFwd(vFwd, tFwd);
+	ga::Spinor const spInv{ ga::inverse(spFwd) };
+	ga::ImSpinor const imInv{ ga::inverse(imFwd) };
+	ga::Scalar const spGot{ (spInv * spFwd).theS };
+	ga::Scalar const imGot{ (imInv * imFwd).theS };
+
+	if (! spGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of spinor inversion test" << std::endl;
+		oss << dat::infoString(spGot, "spGot") << std::endl;
+	}
+
+	if (! imGot.nearlyEquals(allExp))
+	{
+		oss << "Failure of im-spinor inversion test" << std::endl;
+		oss << dat::infoString(imGot, "imGot") << std::endl;
+	}
+
+	return oss.str();
+}
+
 
 }
 
@@ -390,6 +459,7 @@ main
 	oss << ga_functions_test1();
 	oss << ga_functions_test1a();
 	oss << ga_functions_test2();
+	oss << ga_functions_test3();
 
 	// check/report results
 	std::string const errMessages(oss.str());

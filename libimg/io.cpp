@@ -214,6 +214,10 @@ namespace
 		{
 			grid = convert::gridRgb8From(high, wide, imgdat);
 		}
+		if (imgdat)
+		{
+			stbi_image_free(imgdat);
+		}
 		return grid;
 	}
 }
@@ -258,6 +262,10 @@ loadFromPng8
 				, [] (unsigned char const & pix)
 					{ return static_cast<uint8_t>(pix); }
 				);
+		}
+		if (imgdat)
+		{
+			stbi_image_free(imgdat);
 		}
 	}
 	return grid;

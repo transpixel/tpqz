@@ -38,6 +38,9 @@
 
 #include "libdat/grid.h"
 #include "libdat/info.h"
+#include "libimg/convert.h"
+#include "libimg/io.h"
+#include "libimg/stats.h"
 
 #include <algorithm>
 #include <cassert>
@@ -49,19 +52,20 @@
 //! Structs and functions associated with OV5647 sensor chip raw data files.
 namespace raw10
 {
-	using WorkType = unsigned int; // probably more 'natural' for compiler
-	// using WorkType = uint16_t;
-
 	//! Data record
 	struct FourPix
 	{
 		std::array<uint8_t, 4u> theHiBytes;
 		uint8_t theLoBits;
+	};
 
-	private: // en/de-coding functions
+	namespace bitwork
+	{
+
+		using WorkType = unsigned int; // probably more 'natural' for compiler
+		// using WorkType = uint16_t;
 
 		//! Decode hiByte as largest component of full value
-		static
 		inline
 		WorkType
 		hiValue
@@ -78,54 +82,76 @@ namespace raw10
 		//! Active low bits associated with mask
 		inline
 		WorkType
-		loBits
-			( uint8_t const & mask
-			) const
+		onLoBits
+			( uint8_t const & loBits
+			, uint8_t const & mask
+			)
 		{
 			return
 				{ static_cast<WorkType>
-					( static_cast<WorkType>(theLoBits)
+					( static_cast<WorkType>(loBits)
 					& static_cast<WorkType>(mask)
 					)
 				};
 		} 
 
+		//! Value associated with (masked and shifted) loBit pattern
+		inline
+		WorkType
+		loValue
+			( uint8_t const & loBits
+			, uint8_t const & mask
+			, WorkType const & shift
+			)
+		{
+			return { static_cast<WorkType>(onLoBits(loBits, mask) >> shift) };
+		}
+
+		//! Value associated with (masked and UNshifted) loBit pattern
+		inline
+		WorkType
+		loValue
+			( uint8_t const & loBits
+			, uint8_t const & mask
+			)
+		{
+			return { onLoBits(loBits, mask) };
+		}
+
 		//! Decode member bit patterns into full values in working units
 		inline
 		std::array<WorkType, 4u>
 		workValues
-			() const
+			( FourPix const & quad
+			)
 		{
+			std::array<uint8_t, 4u> const & hiBytes = quad.theHiBytes;
+			uint8_t const & loBits = quad.theLoBits;
 			return std::array<WorkType, 4u>
 				{ static_cast<WorkType>
-					( hiValue(theHiBytes[0])
-					+ static_cast<WorkType>(loBits(0xC0) >> WorkType(6u))
+					( hiValue(hiBytes[0]) + loValue(loBits, 0xC0, 6u)
 					)
 				, static_cast<WorkType>
-					( hiValue(theHiBytes[1])
-					+ static_cast<WorkType>(loBits(0x30) >> WorkType(4u))
+					( hiValue(hiBytes[1]) + loValue(loBits, 0x30, 4u)
 					)
 				, static_cast<WorkType>
-					( hiValue(theHiBytes[2])
-					+ static_cast<WorkType>(loBits(0x0C) >> WorkType(2u))
+					( hiValue(hiBytes[2]) + loValue(loBits, 0x0C, 2u)
 					)
 				, static_cast<WorkType>
-					( hiValue(theHiBytes[3])
-					+ static_cast<WorkType>(loBits(0x03)                )
+					( hiValue(hiBytes[3]) + loValue(loBits, 0x0C)
 					)
 				};
 		}
-
-	public:
 
 		//! Full values converted to image pixel type
 		template <typename PixType>
 		inline
 		std::array<PixType, 4u>
 		pixelValues
-			() const
+			( FourPix const & quad
+			)
 		{
-			std::array<WorkType, 4u> const workVals{ workValues() };
+			std::array<WorkType, 4u> const workVals{ workValues(quad) };
 			return std::array<PixType, 4u>
 				{ static_cast<PixType>(workVals[0])
 				, static_cast<PixType>(workVals[1])
@@ -135,29 +161,33 @@ namespace raw10
 		}
 
 		//! Specialization for uint8_t pixel recovery (hi-bits only)
+		template <>
 		inline
-		std::array<uint8_t, 4u> const &
-		pixelValues
-			() const
+		std::array<uint8_t, 4u>
+		pixelValues<uint8_t>
+			( FourPix const & quad
+			)
 		{
-			return theHiBytes;
+			return { quad.theHiBytes };
 		}
 
-	};
+	} // bitwork
 
 	//! Values associated with raw10 binary file layout
 	namespace size
 	{
-		// File size - including unused data
-		// constexpr size_t const sExpNumRecs{ 1952u };
-		// constexpr size_t const sExpRowWide{ 3264u };
-
 		// Sensor active pixel size
 		constexpr size_t const sExpPixHigh{ 1944u };
 		constexpr size_t const sExpPixWide{ 2592u };
 
 		constexpr size_t const sExpQuadHigh{ sExpPixHigh };
 		constexpr size_t const sExpQuadWide{ sExpPixWide / 4u };
+
+		// File size - including unused data
+		// constexpr size_t const sExpFileHigh{ 1952u };
+		constexpr size_t const sExpFileWide{ 3264u };
+		constexpr size_t const sExpRowUsed{ (sExpPixWide * 10u) / 8u };
+		constexpr size_t const sExpRowJunk{ sExpFileWide - sExpRowUsed };
 	}
 
 	//! Extract contiguous data elements out of (padded) file content
@@ -174,20 +204,31 @@ namespace raw10
 			// allocate space
 			using namespace size;
 			grid = dat::grid<FourPix>(sExpQuadHigh, sExpQuadWide);
+			char junk[sExpRowJunk];
 
 			// load line by line
-			for (size_t row{0u} ; row < sExpQuadHigh ; ++row)
+			for (size_t row{0u} ; (row < sExpQuadHigh) && ifs.good() ; ++row)
 			{
+				// load active portion of file row
 				constexpr size_t expBytes{ sExpQuadWide * sizeof(FourPix) };
 				ifs.read((char * const)grid.beginRow(row), expBytes);
-				size_t const gotBytes(ifs.gcount());
-				if (! (gotBytes == expBytes))
+				size_t const gotBytes{ (size_t)ifs.gcount() };
+
+				// skip unused portion of row
+				ifs.read(junk, sExpRowJunk);
+				size_t const gotJunk{ (size_t)ifs.gcount() };
+
+				// check status so far
+				bool const okayData{ (gotBytes == expBytes) };
+				bool const okayJunk{ (gotJunk == sExpRowJunk) };
+				if (! (okayData && okayJunk))
 				{
 					// discard partial data
 					grid = dat::grid<FourPix>{};
 					break;
 				}
 			}
+			// skip unused rows (by stopping read at last active row)
 		}
 		return grid;
 	}
@@ -200,6 +241,11 @@ namespace raw10
 		( dat::grid<FourPix> const & quad
 		)
 	{
+io::out()
+	<< "calling pixelGridFor() for type: "
+	<< typeid(PixType).name()
+	<< std::endl;
+
 		dat::grid<PixType> pixels{};
 		if (dat::isValid(quad))
 		{
@@ -211,7 +257,12 @@ namespace raw10
 				itQuad{quad.begin()} ; quad.end() != itQuad ; ++itQuad)
 			{
 				std::array<PixType, 4u> const fourPix
-					{ itQuad->pixelValues<PixType>() };
+					{ bitwork::pixelValues<PixType>(*itQuad) };
+if (pixels.begin() == itPix)
+{
+io::out() << "fourPix: " << typeid(fourPix[0]).name() << std::endl;
+}
+
 				std::copy(fourPix.begin(), fourPix.end(), itPix);
 				itPix += fourPix.size();
 			}
@@ -266,12 +317,33 @@ main
 	int argnum(0);
 	std::string const pathraw(argv[++argnum]);
 
+io::out() << dat::infoString(pathraw, "pathraw") << std::endl;
+io::out() << std::endl;
+
 	// load data from disk and expand to requested pixel type
 	using PixType = uint8_t;
 	dat::grid<PixType> const pixGrid{ raw10::pixelGridFor<PixType>(pathraw) };
 
-io::out() << dat::infoString(pathraw, "pathraw") << std::endl;
+	// radiometrically scale image
+	dat::MinMax<PixType> const pixMinMax
+		{ img::stats::activeMinMax<PixType>(pixGrid.begin(), pixGrid.end()) };
+	bool const okayPix{ img::io::savePng(pixGrid, "pixGrid.png") };
+
 io::out() << dat::infoString(pixGrid, "pixGrid") << std::endl;
+io::out() << dat::infoString(pixMinMax, "pixMinMax") << std::endl;
+io::out() << dat::infoString(okayPix, "okayPix") << std::endl;
+io::out() << std::endl;
+
+	dat::grid<float> const fltGrid{ raw10::pixelGridFor<float>(pathraw) };
+	dat::MinMax<float> const fltMinMax
+		{ img::stats::activeMinMax<float>(fltGrid.begin(), fltGrid.end()) };
+
+	bool const okayFlt{ img::io::savePgmAutoScale(fltGrid, "fltGrid.pgm") };
+
+io::out() << dat::infoString(fltGrid, "fltGrid") << std::endl;
+io::out() << dat::infoString(fltMinMax, "fltMinMax") << std::endl;
+io::out() << dat::infoString(okayFlt, "okayFlt") << std::endl;
+io::out() << std::endl;
 
 	return 0;
 }

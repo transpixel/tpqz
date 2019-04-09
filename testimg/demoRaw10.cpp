@@ -42,6 +42,8 @@
 #include "libimg/io.h"
 #include "libimg/stats.h"
 
+#include "libapp/Timer.h"
+
 #include <algorithm>
 #include <cassert>
 #include <fstream>
@@ -286,11 +288,19 @@ namespace raw10
 		( std::string const & fpath
 		)
 	{
+		dat::grid<PixType> grid;
+app::Timer timer;
 		// load data from disk (in compacted form)
+timer.start("load.read");
 		dat::grid<FourPix> const quadGrid{ loadFourPixGrid(fpath) };
 
 		// expand to full pixels and return
-		return { pixelGridFor<PixType>(quadGrid) };
+timer.start("load.decode");
+//		return { pixelGridFor<PixType>(quadGrid) };
+		grid = { pixelGridFor<PixType>(quadGrid) };
+timer.stop();
+io::out() << dat::infoString(timer, "load.timer") << std::endl;
+		return grid;
 	}
 
 } // raw10
@@ -329,9 +339,13 @@ main
 io::out() << dat::infoString(pathraw, "pathraw") << std::endl;
 io::out() << std::endl;
 
+app::Timer timer;
+
+timer.start("load.Uint");
 	// load data from disk and expand to requested pixel type
 	using PixType = uint8_t;
 	dat::grid<PixType> const pixGrid{ raw10::pixelGridFor<PixType>(pathraw) };
+timer.stop();
 
 	// radiometrically scale image
 	dat::MinMax<PixType> const pixMinMax
@@ -343,7 +357,9 @@ io::out() << dat::infoString(pixMinMax, "pixMinMax") << std::endl;
 io::out() << dat::infoString(okayPix, "okayPix") << std::endl;
 io::out() << std::endl;
 
+timer.start("load.Float");
 	dat::grid<float> const fltGrid{ raw10::pixelGridFor<float>(pathraw) };
+timer.stop();
 	dat::MinMax<float> const fltMinMax
 		{ img::stats::activeMinMax<float>(fltGrid.begin(), fltGrid.end()) };
 
@@ -352,6 +368,9 @@ io::out() << std::endl;
 io::out() << dat::infoString(fltGrid, "fltGrid") << std::endl;
 io::out() << dat::infoString(fltMinMax, "fltMinMax") << std::endl;
 io::out() << dat::infoString(okayFlt, "okayFlt") << std::endl;
+io::out() << std::endl;
+
+io::out() << dat::infoString(timer, "main.timer") << std::endl;
 io::out() << std::endl;
 
 	return 0;

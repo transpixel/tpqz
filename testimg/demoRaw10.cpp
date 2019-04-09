@@ -141,10 +141,14 @@ main
 	bool const okayFlt{ img::io::savePgmAutoScale(fGrid, pathOutFlt) };
 	timer.stop();
 	timer.start("save.bands(pgm)");
-	bool const okayBand0{ img::io::savePgm(bands[0], "band0.pgm") };
-	bool const okayBand1{ img::io::savePgm(bands[1], "band1.pgm") };
-	bool const okayBand2{ img::io::savePgm(bands[2], "band2.pgm") };
-	bool const okayBand3{ img::io::savePgm(bands[3], "band3.pgm") };
+	std::array<std::string, 4u> const bandNames
+		{ "band0.pgm", "band1.pgm", "band2.pgm", "band3.pgm" };
+	std::array<bool, 4u> const okayBands
+		{ img::io::savePgm(bands[0], bandNames[0])
+		, img::io::savePgm(bands[1], bandNames[1])
+		, img::io::savePgm(bands[2], bandNames[2])
+		, img::io::savePgm(bands[3], bandNames[3])
+		};
 	timer.stop();
 
 	// report actions
@@ -159,15 +163,24 @@ main
 	io::out() << dat::infoString(fMinMax, "fMinMax") << '\n';
 	io::out() << '\n';
 
+	for (size_t nn{0u} ; nn < okayBands.size() ; ++nn)
+	{
+		dat::MinMax<uint8_t> const bMinMax
+			{ img::stats::activeMinMax<uint8_t>
+				(bands[nn].begin(), bands[nn].end())
+			};
+		io::out() << dat::infoString(bMinMax, "uBandMinMax") << '\n';
+	}
+
 	io::out() << dat::infoString(timer, "processing times") << '\n';
 	io::out() << std::endl;
 
 	reportSave(okayPix, pathOutPix);
 	reportSave(okayFlt, pathOutFlt);
-	reportSave(okayBand0, "band0.pgm");
-	reportSave(okayBand1, "band1.pgm");
-	reportSave(okayBand2, "band2.pgm");
-	reportSave(okayBand3, "band3.pgm");
+	reportSave(okayBands[0], bandNames[0]);
+	reportSave(okayBands[1], bandNames[1]);
+	reportSave(okayBands[2], bandNames[2]);
+	reportSave(okayBands[3], bandNames[3]);
 	io::out() << std::endl;
 
 	return 0;

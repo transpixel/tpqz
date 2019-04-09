@@ -52,13 +52,17 @@
 //! Structs and functions associated with OV5647 sensor chip raw data files.
 namespace raw10
 {
-	//! Data record
+	//! Data record associated with 4x,10-bit pixel values
 	struct FourPix
 	{
+		//! High 8-bits for each of four consecutive pixels
 		std::array<uint8_t, 4u> theHiBytes;
+
+		//! Low 2-bits for each of the four pixels
 		uint8_t theLoBits;
 	};
 
+	//! Functions for decoding data byte/bit patterns
 	namespace bitwork
 	{
 
@@ -176,6 +180,9 @@ namespace raw10
 	//! Values associated with raw10 binary file layout
 	namespace size
 	{
+		constexpr size_t const sExpHeadSize{ 32768u };
+		constexpr std::array<uint8_t, 4> const sMagic{ 'B', 'R', 'C', 'M' };
+
 		// Sensor active pixel size
 		constexpr size_t const sExpPixHigh{ 1944u };
 		constexpr size_t const sExpPixWide{ 2592u };
@@ -206,26 +213,37 @@ namespace raw10
 			grid = dat::grid<FourPix>(sExpQuadHigh, sExpQuadWide);
 			char junk[sExpRowJunk];
 
-			// load line by line
-			for (size_t row{0u} ; (row < sExpQuadHigh) && ifs.good() ; ++row)
+			// fetch and verify header
+			char hdr[sExpHeadSize];
+			ifs.read(hdr, sExpHeadSize);
+			size_t const gotHeadSize{ (size_t)ifs.gcount() };
+			bool const okayHead{ (gotHeadSize == sExpHeadSize) };
+			bool const okayMagic
+				{ std::equal(sMagic.begin(), sMagic.end(), hdr) };
+			if (okayHead && okayMagic)
 			{
-				// load active portion of file row
-				constexpr size_t expBytes{ sExpQuadWide * sizeof(FourPix) };
-				ifs.read((char * const)grid.beginRow(row), expBytes);
-				size_t const gotBytes{ (size_t)ifs.gcount() };
-
-				// skip unused portion of row
-				ifs.read(junk, sExpRowJunk);
-				size_t const gotJunk{ (size_t)ifs.gcount() };
-
-				// check status so far
-				bool const okayData{ (gotBytes == expBytes) };
-				bool const okayJunk{ (gotJunk == sExpRowJunk) };
-				if (! (okayData && okayJunk))
+				// load line by line
+				for (size_t
+					row{0u} ; (row < sExpQuadHigh) && ifs.good() ; ++row)
 				{
-					// discard partial data
-					grid = dat::grid<FourPix>{};
-					break;
+					// load active portion of file row
+					constexpr size_t expBytes{ sExpQuadWide * sizeof(FourPix) };
+					ifs.read((char * const)grid.beginRow(row), expBytes);
+					size_t const gotBytes{ (size_t)ifs.gcount() };
+
+					// skip unused portion of row
+					ifs.read(junk, sExpRowJunk);
+					size_t const gotJunk{ (size_t)ifs.gcount() };
+
+					// check status so far
+					bool const okayData{ (gotBytes == expBytes) };
+					bool const okayJunk{ (gotJunk == sExpRowJunk) };
+					if (! (okayData && okayJunk))
+					{
+						// discard partial data
+						grid = dat::grid<FourPix>{};
+						break;
+					}
 				}
 			}
 			// skip unused rows (by stopping read at last active row)
@@ -241,11 +259,6 @@ namespace raw10
 		( dat::grid<FourPix> const & quad
 		)
 	{
-io::out()
-	<< "calling pixelGridFor() for type: "
-	<< typeid(PixType).name()
-	<< std::endl;
-
 		dat::grid<PixType> pixels{};
 		if (dat::isValid(quad))
 		{
@@ -258,11 +271,6 @@ io::out()
 			{
 				std::array<PixType, 4u> const fourPix
 					{ bitwork::pixelValues<PixType>(*itQuad) };
-if (pixels.begin() == itPix)
-{
-io::out() << "fourPix: " << typeid(fourPix[0]).name() << std::endl;
-}
-
 				std::copy(fourPix.begin(), fourPix.end(), itPix);
 				itPix += fourPix.size();
 			}
@@ -286,6 +294,7 @@ io::out() << "fourPix: " << typeid(fourPix[0]).name() << std::endl;
 	}
 
 } // raw10
+
 
 //! Read a 'raw10' formated binary (e.g. from Raspberry Pi cameras)
 int

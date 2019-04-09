@@ -110,7 +110,36 @@ multiplexed
 	return pixels;
 }
 
+template <typename PixType>
+inline
+dat::grid<PixType>
+pixelGridFor
+	( dat::grid<raw10::FourPix> const & quad
+	)
+{
+	dat::grid<PixType> pixels{};
+	if (dat::isValid(quad))
+	{
+		// allocate space for output
+		pixels = dat::grid<PixType>(quad.high(), 4u*quad.wide());
+		typename dat::grid<PixType>::iterator itPix{ pixels.begin() };
+		// fill pixels by expanding all quads in this row
+		for (dat::grid<raw10::FourPix>::const_iterator
+			itQuad{quad.begin()} ; quad.end() != itQuad ; ++itQuad)
+		{
+			std::array<PixType, 4u> const fourPix
+				{ raw10::pixelValues<PixType>(*itQuad) };
+			std::copy(fourPix.begin(), fourPix.end(), itPix);
+			itPix += fourPix.size();
+		}
+	}
+	return pixels;
+}
+
+
 //======================================================================
-}
-}
+
+} // convert
+
+} // img
 

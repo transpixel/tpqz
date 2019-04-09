@@ -38,6 +38,7 @@
 #include "libdat/MinMax.h"
 #include "libdat/SubExtents.h"
 #include "libimg/img.h"
+#include "libimg/raw10.h"
 
 #include <array>
 
@@ -139,6 +140,14 @@ namespace convert
 	dat::grid<std::array<PixType, 3u> >
 	multiplexed
 		( std::array<dat::grid<PixType>, 3u> const & chans
+		);
+
+	//! Pixel values created by expanding (compacted) quad data
+	template <typename PixType>
+	inline
+	dat::grid<PixType>
+	pixelGridFor
+		( dat::grid<raw10::FourPix> const & quad
 		);
 
 }

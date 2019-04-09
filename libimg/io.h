@@ -34,10 +34,13 @@
 */
 
 
-#include "libimg/pixel.h"
 #include "libdat/grid.h"
+#include "libimg/convert.h"
+#include "libimg/pixel.h"
+#include "libimg/raw10.h"
 
 #include <array>
+#include <fstream>
 
 
 namespace img
@@ -80,6 +83,20 @@ namespace io
 	//! Load from floating point format - valid on success
 	dat::grid<float>
 	loadFromFloat
+		( std::string const & fpath
+		);
+
+	//! Extract contiguous data elements out of (padded) file content
+	dat::grid<raw10::FourPix>
+	loadFourPixGrid
+		( std::string const & fpath
+		);
+
+	//! Pixel decoded from raw file
+	template <typename PixType>
+	inline
+	dat::grid<PixType>
+	loadRaw10
 		( std::string const & fpath
 		);
 
@@ -147,7 +164,7 @@ namespace io
 }
 
 // Inline definitions
-// #include "libimg/io.inl"
+#include "libimg/io.inl"
 
 #endif // img_io_INCL_
 

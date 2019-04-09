@@ -39,18 +39,14 @@
 #include "libdat/grid.h"
 #include "libdat/info.h"
 
+#include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-namespace tmpImg
-{
-	using PixType = float;
-}
-
-
+//! Structs and functions associated with OV5647 sensor chip raw data files.
 namespace raw10
 {
 	using WorkType = unsigned int; // probably more 'natural' for compiler
@@ -123,13 +119,13 @@ namespace raw10
 	public:
 
 		//! Full values converted to image pixel type
+		template <typename PixType>
 		inline
-		std::array<tmpImg::PixType, 4u>
+		std::array<PixType, 4u>
 		pixelValues
 			() const
 		{
 			std::array<WorkType, 4u> const workVals{ workValues() };
-			using tmpImg::PixType;
 			return std::array<PixType, 4u>
 				{ static_cast<PixType>(workVals[0])
 				, static_cast<PixType>(workVals[1])
@@ -138,18 +134,31 @@ namespace raw10
 				};
 		}
 
+		//! Specialization for uint8_t pixel recovery (hi-bits only)
+		inline
+		std::array<uint8_t, 4u> const &
+		pixelValues
+			() const
+		{
+			return theHiBytes;
+		}
+
 	};
 
-	// File size - including unused data
-	// constexpr size_t const sExpNumRecs{ 1952u };
-	// constexpr size_t const sExpRowWide{ 3264u };
+	//! Values associated with raw10 binary file layout
+	namespace size
+	{
+		// File size - including unused data
+		// constexpr size_t const sExpNumRecs{ 1952u };
+		// constexpr size_t const sExpRowWide{ 3264u };
 
-	// Sensor active pixel size
-	constexpr size_t const sExpPixHigh{ 1944u };
-	constexpr size_t const sExpPixWide{ 2592u };
+		// Sensor active pixel size
+		constexpr size_t const sExpPixHigh{ 1944u };
+		constexpr size_t const sExpPixWide{ 2592u };
 
-	constexpr size_t const sExpQuadHigh{ sExpPixHigh };
-	constexpr size_t const sExpQuadWide{ sExpPixWide / 4u };
+		constexpr size_t const sExpQuadHigh{ sExpPixHigh };
+		constexpr size_t const sExpQuadWide{ sExpPixWide / 4u };
+	}
 
 	//! Extract contiguous data elements out of (padded) file content
 	dat::grid<FourPix>
@@ -163,6 +172,7 @@ namespace raw10
 		if (ifs.good())
 		{
 			// allocate space
+			using namespace size;
 			grid = dat::grid<FourPix>(sExpQuadHigh, sExpQuadWide);
 
 			// load line by line
@@ -182,7 +192,49 @@ namespace raw10
 		return grid;
 	}
 
-}
+	//! Pixel values created by expanding (compacted) quad data
+	template <typename PixType>
+	inline
+	dat::grid<PixType>
+	pixelGridFor
+		( dat::grid<FourPix> const & quad
+		)
+	{
+		dat::grid<PixType> pixels{};
+		if (dat::isValid(quad))
+		{
+			// allocate space for output
+			pixels = dat::grid<PixType>(quad.high(), 4u*quad.wide());
+			typename dat::grid<PixType>::iterator itPix{ pixels.begin() };
+			// fill pixels by expanding all quads in this row
+			for (dat::grid<FourPix>::const_iterator
+				itQuad{quad.begin()} ; quad.end() != itQuad ; ++itQuad)
+			{
+				std::array<PixType, 4u> const fourPix
+					{ itQuad->pixelValues<PixType>() };
+				std::copy(fourPix.begin(), fourPix.end(), itPix);
+				itPix += fourPix.size();
+			}
+		}
+		return pixels;
+	}
+
+	//! Pixel decoded from raw file
+	template <typename PixType>
+	inline
+	dat::grid<PixType>
+	pixelGridFor
+		( std::string const & fpath
+		)
+	{
+		// load data from disk (in compacted form)
+		dat::grid<FourPix> const quadGrid{ loadFourPixGrid(fpath) };
+
+		// expand to full pixels and return
+		return { pixelGridFor<PixType>(quadGrid) };
+	}
+
+} // raw10
 
 //! Read a 'raw10' formated binary (e.g. from Raspberry Pi cameras)
 int
@@ -214,10 +266,12 @@ main
 	int argnum(0);
 	std::string const pathraw(argv[++argnum]);
 
-	io::out() << dat::infoString(pathraw, "pathraw") << std::endl;
+	// load data from disk and expand to requested pixel type
+	using PixType = uint8_t;
+	dat::grid<PixType> const pixGrid{ raw10::pixelGridFor<PixType>(pathraw) };
 
-	dat::grid<raw10::FourPix> const quadGrid{ raw10::loadFourPixGrid(pathraw) };
-io::out() << dat::infoString(quadGrid, "quadGrid") << std::endl;
+io::out() << dat::infoString(pathraw, "pathraw") << std::endl;
+io::out() << dat::infoString(pixGrid, "pixGrid") << std::endl;
 
 	return 0;
 }

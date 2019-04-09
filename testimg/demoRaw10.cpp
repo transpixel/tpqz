@@ -62,14 +62,6 @@ namespace raw10
 		std::array<uint8_t, 4u> theHiBytes;
 		uint8_t theLoBits;
 
-		explicit
-		FourPix
-			( uint8_t const * const & beg
-			)
-			: theHiBytes{ *(beg), *(beg+1), *(beg+2), *(beg+3) }
-			, theLoBits{ *(beg+4) }
-		{ }
-
 	private: // en/de-coding functions
 
 		//! Decode hiByte as largest component of full value
@@ -157,6 +149,7 @@ namespace raw10
 	constexpr size_t const sExpNumPix{ sExpPixHigh * sExpPixWide };
 
 	constexpr size_t const sExpQuadWide{ sExpPixWide / 4u };
+	constexpr size_t const sExpNumQuad{ sExpNumPix / 4u };
 
 	//! Mirror file contents into memory
 	std::vector<uint8_t>
@@ -176,14 +169,6 @@ namespace raw10
 			{
 				buf.clear();
 			}
-		/*
-		io::out() << "ifs okay" << std::endl;
-		io::out() << dat::infoString(sExpNumRecs, "sExpNumRecs") << std::endl;
-		io::out() << dat::infoString(sExpRowWide, "sExpRowWide") << std::endl;
-		io::out() << dat::infoString(sExpNumBytes, "sExpNumBytes") << std::endl;
-		io::out() << dat::infoString(gotBytes, "gotBytes") << std::endl;
-		*/
-
 		}
 		return buf;
 	}
@@ -196,24 +181,25 @@ namespace raw10
 	{
 		std::vector<FourPix> quads;
 		assert(sExpNumBytes == rawBytes.size());
-		quads.reserve(sExpNumPix);
+		quads.reserve(sExpNumQuad);
 
-io::out() << dat::infoString(sExpNumBytes, "sExpNumBytes") << std::endl;
-io::out() << dat::infoString(rawBytes.size(), "rawBytes.size()") << std::endl;
-
-size_t numQuads{ 0u };
 		for (size_t row{0u} ; row < sExpPixHigh ; ++row)
 		{
 			uint8_t const * const begRow{ rawBytes.data() + row*sExpRowWide };
-			for (size_t col{0u} ; col < sExpQuadWide ; ++col)
+			for (size_t qCol{0u} ; qCol < sExpQuadWide ; ++qCol)
 			{
-				uint8_t const * const begQuad{ begRow + col*sizeof(FourPix) };
-				quads.push_back(FourPix(begQuad));
-++numQuads;
+				uint8_t const * const begQuad{ begRow + qCol*sizeof(FourPix) };
+			//	quads.push_back(FourPix(begQuad));
+				std::array<uint8_t, 4u> const hiBytes
+					{ *(begQuad), *(begQuad+1), *(begQuad+2), *(begQuad+3) };
+				uint8_t const loBits
+					{ *(begQuad+4) };
+				quads.push_back(FourPix{ hiBytes, loBits } );
 			}
 		}
-io::out() << dat::infoString(numQuads, "numQuads") << std::endl;
-io::out() << dat::infoString(4u*numQuads, "4u*numQuads") << std::endl;
+io::out() << dat::infoString(sExpNumPix, "sExpNumPix") << std::endl;
+io::out() << dat::infoString(sExpNumQuad, "sExpNumQuad") << std::endl;
+io::out() << dat::infoString(quads.size(), "quads.size()") << std::endl;
 		return quads;
 	}
 }

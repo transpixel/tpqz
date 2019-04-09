@@ -140,68 +140,48 @@ namespace raw10
 
 	};
 
-	constexpr size_t const sExpNumRecs{ 1952u };
-	constexpr size_t const sExpRowWide{ 3264u };
-	constexpr size_t const sExpNumBytes{ sExpNumRecs * sExpRowWide };
+	// File size - including unused data
+	// constexpr size_t const sExpNumRecs{ 1952u };
+	// constexpr size_t const sExpRowWide{ 3264u };
 
+	// Sensor active pixel size
 	constexpr size_t const sExpPixHigh{ 1944u };
 	constexpr size_t const sExpPixWide{ 2592u };
-	constexpr size_t const sExpNumPix{ sExpPixHigh * sExpPixWide };
 
+	constexpr size_t const sExpQuadHigh{ sExpPixHigh };
 	constexpr size_t const sExpQuadWide{ sExpPixWide / 4u };
-	constexpr size_t const sExpNumQuad{ sExpNumPix / 4u };
 
-	//! Mirror file contents into memory
-	std::vector<uint8_t>
-	loadAllBytes
+	//! Extract contiguous data elements out of (padded) file content
+	dat::grid<FourPix>
+	loadFourPixGrid
 		( std::string const & fpath
 		)
 	{
-		std::vector<uint8_t> buf;
+		dat::grid<FourPix> grid;
+
 		std::ifstream ifs(fpath, std::ios::binary);
 		if (ifs.good())
 		{
-			buf.resize(sExpNumBytes);
+			// allocate space
+			grid = dat::grid<FourPix>(sExpQuadHigh, sExpQuadWide);
 
-			ifs.read((char * const)buf.data(), sExpNumBytes);
-			size_t const gotBytes(ifs.gcount());
-			if (gotBytes != sExpNumBytes)
+			// load line by line
+			for (size_t row{0u} ; row < sExpQuadHigh ; ++row)
 			{
-				buf.clear();
+				constexpr size_t expBytes{ sExpQuadWide * sizeof(FourPix) };
+				ifs.read((char * const)grid.beginRow(row), expBytes);
+				size_t const gotBytes(ifs.gcount());
+				if (! (gotBytes == expBytes))
+				{
+					// discard partial data
+					grid = dat::grid<FourPix>{};
+					break;
+				}
 			}
 		}
-		return buf;
+		return grid;
 	}
 
-	//! Extract active FourPix data units from (padded) byte stream
-	std::vector<FourPix>
-	activeFourPixFrom
-		( std::vector<uint8_t> const & rawBytes
-		)
-	{
-		std::vector<FourPix> quads;
-		assert(sExpNumBytes == rawBytes.size());
-		quads.reserve(sExpNumQuad);
-
-		for (size_t row{0u} ; row < sExpPixHigh ; ++row)
-		{
-			uint8_t const * const begRow{ rawBytes.data() + row*sExpRowWide };
-			for (size_t qCol{0u} ; qCol < sExpQuadWide ; ++qCol)
-			{
-				uint8_t const * const begQuad{ begRow + qCol*sizeof(FourPix) };
-			//	quads.push_back(FourPix(begQuad));
-				std::array<uint8_t, 4u> const hiBytes
-					{ *(begQuad), *(begQuad+1), *(begQuad+2), *(begQuad+3) };
-				uint8_t const loBits
-					{ *(begQuad+4) };
-				quads.push_back(FourPix{ hiBytes, loBits } );
-			}
-		}
-io::out() << dat::infoString(sExpNumPix, "sExpNumPix") << std::endl;
-io::out() << dat::infoString(sExpNumQuad, "sExpNumQuad") << std::endl;
-io::out() << dat::infoString(quads.size(), "quads.size()") << std::endl;
-		return quads;
-	}
 }
 
 //! Read a 'raw10' formated binary (e.g. from Raspberry Pi cameras)
@@ -236,10 +216,8 @@ main
 
 	io::out() << dat::infoString(pathraw, "pathraw") << std::endl;
 
-	std::vector<uint8_t> const rawBytes{ raw10::loadAllBytes(pathraw) };
-	std::vector<raw10::FourPix> const rawQuads
-		{ raw10::activeFourPixFrom(rawBytes) };
-//	dat::grid<RawRecord> const rawGrid{ rawGridFrom(rawBytes) };
+	dat::grid<raw10::FourPix> const quadGrid{ raw10::loadFourPixGrid(pathraw) };
+io::out() << dat::infoString(quadGrid, "quadGrid") << std::endl;
 
 	return 0;
 }

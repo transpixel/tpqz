@@ -38,6 +38,7 @@
 
 #include "libdat/grid.h"
 #include "libdat/info.h"
+#include "libimg/cfa.h"
 #include "libimg/io.h"
 #include "libimg/raw10.h"
 #include "libimg/stats.h"
@@ -117,15 +118,34 @@ main
 		{ img::convert::pixelGridFor<float>(rawQuads) };
 	timer.stop();
 
+	// split into individual channels
+	timer.start("bands.split");
+	std::array<dat::grid<uint8_t>, 4u> const bands
+		{ img::cfa::channelsFromRGGB<uint8_t>(uGrid) };
+	timer.stop();
+
 	// compute statistics
+	timer.start("minmax.uint8");
 	dat::MinMax<uint8_t> const uMinMax
 		{ img::stats::activeMinMax<uint8_t>(uGrid.begin(), uGrid.end()) };
+	timer.stop();
+	timer.start("minmax.float");
 	dat::MinMax<float> const fMinMax
 		{ img::stats::activeMinMax<float>(fGrid.begin(), fGrid.end()) };
+	timer.stop();
 
 	// save to files
+	timer.start("save.uint8(png)");
 	bool const okayPix{ img::io::savePng(uGrid, pathOutPix) };
+	timer.start("save.float(pgm)");
 	bool const okayFlt{ img::io::savePgmAutoScale(fGrid, pathOutFlt) };
+	timer.stop();
+	timer.start("save.bands(pgm)");
+	bool const okayBand0{ img::io::savePgm(bands[0], "band0.pgm") };
+	bool const okayBand1{ img::io::savePgm(bands[1], "band1.pgm") };
+	bool const okayBand2{ img::io::savePgm(bands[2], "band2.pgm") };
+	bool const okayBand3{ img::io::savePgm(bands[3], "band3.pgm") };
+	timer.stop();
 
 	// report actions
 	io::out() << dat::infoString(pathRaw, "pathRaw") << '\n';
@@ -144,6 +164,10 @@ main
 
 	reportSave(okayPix, pathOutPix);
 	reportSave(okayFlt, pathOutFlt);
+	reportSave(okayBand0, "band0.pgm");
+	reportSave(okayBand1, "band1.pgm");
+	reportSave(okayBand2, "band2.pgm");
+	reportSave(okayBand3, "band3.pgm");
 	io::out() << std::endl;
 
 	return 0;

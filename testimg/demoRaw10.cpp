@@ -43,6 +43,9 @@
 #include "libimg/raw10.h"
 #include "libimg/stats.h"
 
+#include "libprob/CdfForward.h"
+#include "libprob/Frac9.h"
+
 #include "libapp/Timer.h"
 
 
@@ -163,14 +166,32 @@ main
 	io::out() << dat::infoString(fMinMax, "fMinMax") << '\n';
 	io::out() << '\n';
 
+	// Analyse invidiual band data
+	std::array<double, 4u> bMedians{};
 	for (size_t nn{0u} ; nn < okayBands.size() ; ++nn)
 	{
-		dat::MinMax<uint8_t> const bMinMax
-			{ img::stats::activeMinMax<uint8_t>
-				(bands[nn].begin(), bands[nn].end())
+		static dat::Range<double> const uRange{ 0., 255. };
+		static math::Partition const uPart(uRange, 256u);
+		prob::CdfForward const cdf
+			{ prob::CdfForward::fromSamps
+				(bands[nn].begin(), bands[nn].end(), uPart)
 			};
-		io::out() << dat::infoString(bMinMax, "uBandMinMax") << '\n';
+		prob::Frac9 const bFracs(cdf);
+		bMedians[nn] = bFracs.median();
+		//io::out() << dat::infoString(bFracs, "bFracs") << '\n';
 	}
+	constexpr double const bTgt{ 100. };
+	std::array<double, 4u> const bGains
+		{ bTgt/bMedians[0]
+		, bTgt/bMedians[1]
+		, bTgt/bMedians[2]
+		, bTgt/bMedians[3]
+		};
+	// create grayscale image
+//	grayFastFrom2x2(... need 2x2 generic gains ...);
+
+	io::out() << dat::infoString(bMedians, "bMedians") << '\n';
+	io::out() << dat::infoString(bGains, "bGains") << '\n';
 
 	io::out() << dat::infoString(timer, "processing times") << '\n';
 	io::out() << std::endl;

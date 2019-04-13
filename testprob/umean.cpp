@@ -64,83 +64,158 @@ prob_mean_test0
 	return oss.str();
 }
 
-//! Check several mean v
+//! Check error cases (involving negative numbers)
 std::string
 prob_mean_test1
 	()
 {
 	std::ostringstream oss;
 
-	// Check error cases (involving negative numbers)
+	// only arithmetic mean is defined if non positive values
+	std::vector<double> const mix{ 2., 1., -2., 3. };
+	double const expAri{ 1. };
+	double const expGeo{ dat::nullValue<double>() };
+	double const expHar{ dat::nullValue<double>() };
+	double const gotAri{ prob::mean::arithmetic(mix.begin(), mix.end()) };
+	double const gotGeo{ prob::mean::geometric(mix.begin(), mix.end()) };
+	double const gotHar{ prob::mean::harmonic(mix.begin(), mix.end()) };
+	if (! dat::nearlyEquals(gotAri, expAri))
 	{
-		// only arithmetic mean is defined if non positive values
-		std::vector<double> const mix{ 2., 1., -2., 3. };
-		double const expAri{ 1. };
-		double const expGeo{ dat::nullValue<double>() };
-		double const expHar{ dat::nullValue<double>() };
-		double const gotAri{ prob::mean::arithmetic(mix.begin(), mix.end()) };
-		double const gotGeo{ prob::mean::geometric(mix.begin(), mix.end()) };
-		double const gotHar{ prob::mean::harmonic(mix.begin(), mix.end()) };
-		if (! dat::nearlyEquals(gotAri, expAri))
-		{
-			oss << "Failure of arithmetic mean mixed data test" << std::endl;
-			oss << dat::infoString(expAri, "expAri") << std::endl;
-			oss << dat::infoString(gotAri, "gotAri") << std::endl;
-		}
-		if (dat::isValid(gotGeo))
-		{
-			oss << "Failure of geometric mean mixed data test" << std::endl;
-			oss << dat::infoString(expGeo, "expGeo") << std::endl;
-			oss << dat::infoString(gotGeo, "gotGeo") << std::endl;
-		}
-		if (dat::isValid(gotHar))
-		{
-			oss << "Failure of harmonic mean mixed data test" << std::endl;
-			oss << dat::infoString(expHar, "expHar") << std::endl;
-			oss << dat::infoString(gotHar, "gotHar") << std::endl;
-		}
+		oss << "Failure of arithmetic mean mixed data test" << std::endl;
+		oss << dat::infoString(expAri, "expAri") << std::endl;
+		oss << dat::infoString(gotAri, "gotAri") << std::endl;
 	}
-
-	// check standard case (all positive numbers)
+	if (dat::isValid(gotGeo))
 	{
-		std::vector<double> const pos{ 1., 2., 3., 4. };
-		std::vector<double> inv{ 1./pos[0], 1./pos[1], 1./pos[2], 1./pos[3] };
-		double const scale{ 1./double(pos.size()) };
-
-		using std::log;
-		double const expAri{ scale * (pos[0] + pos[1] + pos[2] + pos[3]) };
-		double const sumLogs
-			{ log(pos[0]) + log(pos[1]) + log(pos[2]) + log(pos[3]) };
-		double const expGeo{ std::exp(scale * sumLogs) };
-		// identify between HM and AM
-		double const ariOfInv{ scale * (inv[0] + inv[1] + inv[2] + inv[3]) };
-		double const expHar{ 1. / ariOfInv };
-		double const gotAri{ prob::mean::arithmetic(pos.begin(), pos.end()) };
-		double const gotGeo{ prob::mean::geometric(pos.begin(), pos.end()) };
-		double const gotHar{ prob::mean::harmonic(pos.begin(), pos.end()) };
-		if (! dat::nearlyEquals(gotAri, expAri))
-		{
-			oss << "Failure of arithmetic mean pos data test" << std::endl;
-			oss << dat::infoString(expAri, "expAri") << std::endl;
-			oss << dat::infoString(gotAri, "gotAri") << std::endl;
-		}
-		if (! dat::nearlyEquals(gotGeo, expGeo))
-		{
-			oss << "Failure of geometric mean pos data test" << std::endl;
-			oss << dat::infoString(expGeo, "expGeo") << std::endl;
-			oss << dat::infoString(gotGeo, "gotGeo") << std::endl;
-		}
-		if (! dat::nearlyEquals(gotHar, expHar))
-		{
-			oss << "Failure of harmonic mean pos data test" << std::endl;
-			oss << dat::infoString(expHar, "expHar") << std::endl;
-			oss << dat::infoString(gotHar, "gotHar") << std::endl;
-		}
+		oss << "Failure of geometric mean mixed data test" << std::endl;
+		oss << dat::infoString(expGeo, "expGeo") << std::endl;
+		oss << dat::infoString(gotGeo, "gotGeo") << std::endl;
+	}
+	if (dat::isValid(gotHar))
+	{
+		oss << "Failure of harmonic mean mixed data test" << std::endl;
+		oss << dat::infoString(expHar, "expHar") << std::endl;
+		oss << dat::infoString(gotHar, "gotHar") << std::endl;
 	}
 
 	return oss.str();
 }
 
+//! Check standard case (all positive numbers)
+std::string
+prob_mean_test2
+	()
+{
+	std::ostringstream oss;
+
+	std::vector<double> const pos{ 1., 2., 3., 4. };
+	std::vector<double> inv{ 1./pos[0], 1./pos[1], 1./pos[2], 1./pos[3] };
+	double const scale{ 1./double(pos.size()) };
+
+	using std::log;
+	double const expAri{ scale * (pos[0] + pos[1] + pos[2] + pos[3]) };
+	double const sumLogs
+		{ log(pos[0]) + log(pos[1]) + log(pos[2]) + log(pos[3]) };
+	double const expGeo{ std::exp(scale * sumLogs) };
+	// identify between HM and AM
+	double const ariOfInv{ scale * (inv[0] + inv[1] + inv[2] + inv[3]) };
+	double const expHar{ 1. / ariOfInv };
+	double const gotAri{ prob::mean::arithmetic(pos.begin(), pos.end()) };
+	double const gotGeo{ prob::mean::geometric(pos.begin(), pos.end()) };
+	double const gotHar{ prob::mean::harmonic(pos.begin(), pos.end()) };
+	if (! dat::nearlyEquals(gotAri, expAri))
+	{
+		oss << "Failure of arithmetic mean pos data test" << std::endl;
+		oss << dat::infoString(expAri, "expAri") << std::endl;
+		oss << dat::infoString(gotAri, "gotAri") << std::endl;
+	}
+	if (! dat::nearlyEquals(gotGeo, expGeo))
+	{
+		oss << "Failure of geometric mean pos data test" << std::endl;
+		oss << dat::infoString(expGeo, "expGeo") << std::endl;
+		oss << dat::infoString(gotGeo, "gotGeo") << std::endl;
+	}
+	if (! dat::nearlyEquals(gotHar, expHar))
+	{
+		oss << "Failure of harmonic mean pos data test" << std::endl;
+		oss << dat::infoString(expHar, "expHar") << std::endl;
+		oss << dat::infoString(gotHar, "gotHar") << std::endl;
+	}
+
+	return oss.str();
+}
+
+//! Check empty data cases
+std::string
+prob_mean_test3
+	()
+{
+	std::ostringstream oss;
+
+	std::vector<double> const data{};
+	double const expAri{ dat::nullValue<double>() };
+	double const expGeo{ dat::nullValue<double>() };
+	double const expHar{ dat::nullValue<double>() };
+	double const gotAri{ prob::mean::arithmetic(data.begin(), data.end()) };
+	double const gotGeo{ prob::mean::geometric(data.begin(), data.end()) };
+	double const gotHar{ prob::mean::harmonic(data.begin(), data.end()) };
+	if (dat::isValid(gotAri))
+	{
+		oss << "Failure of arithmetic mean empty data test" << std::endl;
+		oss << dat::infoString(expAri, "expAri") << std::endl;
+		oss << dat::infoString(gotAri, "gotAri") << std::endl;
+	}
+	if (dat::isValid(gotGeo))
+	{
+		oss << "Failure of geometric mean empty data test" << std::endl;
+		oss << dat::infoString(expGeo, "expGeo") << std::endl;
+		oss << dat::infoString(gotGeo, "gotGeo") << std::endl;
+	}
+	if (dat::isValid(gotHar))
+	{
+		oss << "Failure of harmonic mean empty data test" << std::endl;
+		oss << dat::infoString(expHar, "expHar") << std::endl;
+		oss << dat::infoString(gotHar, "gotHar") << std::endl;
+	}
+
+	return oss.str();
+}
+
+//! Check zero data cases
+std::string
+prob_mean_test4
+	()
+{
+	std::ostringstream oss;
+
+	std::vector<double> const zeros{ 0. };
+	double const expAri{ 0. };
+	double const expGeo{ 0. };
+	double const expHar{ dat::nullValue<double>() };
+	double const gotAri{ prob::mean::arithmetic(zeros.begin(), zeros.end()) };
+	double const gotGeo{ prob::mean::geometric(zeros.begin(), zeros.end()) };
+	double const gotHar{ prob::mean::harmonic(zeros.begin(), zeros.end()) };
+	if (! dat::nearlyEquals(gotAri, expAri))
+	{
+		oss << "Failure of arithmetic mean zero data test" << std::endl;
+		oss << dat::infoString(expAri, "expAri") << std::endl;
+		oss << dat::infoString(gotAri, "gotAri") << std::endl;
+	}
+	if (! dat::nearlyEquals(gotGeo, expGeo))
+	{
+		oss << "Failure of geometric mean zero data test" << std::endl;
+		oss << dat::infoString(expGeo, "expGeo") << std::endl;
+		oss << dat::infoString(gotGeo, "gotGeo") << std::endl;
+	}
+	if (dat::isValid(gotHar))
+	{
+		oss << "Failure of harmonic mean zero data test" << std::endl;
+		oss << dat::infoString(expHar, "expHar") << std::endl;
+		oss << dat::infoString(gotHar, "gotHar") << std::endl;
+	}
+
+	return oss.str();
+}
 
 }
 
@@ -156,6 +231,9 @@ main
 	// run tests
 	oss << prob_mean_test0();
 	oss << prob_mean_test1();
+	oss << prob_mean_test2();
+	oss << prob_mean_test3();
+	oss << prob_mean_test4();
 
 	// check/report results
 	std::string const errMessages(oss.str());

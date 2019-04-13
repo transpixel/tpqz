@@ -138,6 +138,14 @@ namespace raw10
 			, theExpRowJunk{ raspi.sExpFileWide - theExpRowUsed }
 		{ }
 
+		//! True if this instance has meaningful (non-zero) quad sizes
+		bool
+		isValid
+			() const
+		{
+			return { hwSizeQuads().isValid() };
+		}
+
 		//! High/Wide in FourPix quad units (each quad spans 5 bytes)
 		dat::Extents
 		hwSizeQuads

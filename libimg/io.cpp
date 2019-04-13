@@ -373,6 +373,7 @@ loadFourPixGrid
 {
 	dat::grid<raw10::FourPix> grid;
 
+	assert(raspiSizes.isValid());
 	std::ifstream ifs(fpath, std::ios::binary);
 	if (ifs.good())
 	{

@@ -191,7 +191,7 @@ prob_mean_test4
 	std::vector<double> const zeros{ 0. };
 	double const expAri{ 0. };
 	double const expGeo{ 0. };
-	double const expHar{ dat::nullValue<double>() };
+	double const expHar{ 0. };
 	double const gotAri{ prob::mean::arithmetic(zeros.begin(), zeros.end()) };
 	double const gotGeo{ prob::mean::geometric(zeros.begin(), zeros.end()) };
 	double const gotHar{ prob::mean::harmonic(zeros.begin(), zeros.end()) };
@@ -207,7 +207,7 @@ prob_mean_test4
 		oss << dat::infoString(expGeo, "expGeo") << std::endl;
 		oss << dat::infoString(gotGeo, "gotGeo") << std::endl;
 	}
-	if (dat::isValid(gotHar))
+	if (! dat::nearlyEquals(gotHar, expHar))
 	{
 		oss << "Failure of harmonic mean zero data test" << std::endl;
 		oss << dat::infoString(expHar, "expHar") << std::endl;

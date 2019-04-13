@@ -42,6 +42,7 @@
 #include "libimg/io.h"
 #include "libimg/raw10.h"
 #include "libimg/stats.h"
+#include "libprob/mean.h"
 
 #include "libprob/CdfForward.h"
 #include "libprob/Frac9.h"
@@ -66,31 +67,6 @@ namespace
 		{
 			io::err() << "ERROR: couldn't save to '" << pathOut << "'\n";
 		}
-	}
-
-	template <typename FwdIter>
-	double
-	geoMean
-		( FwdIter const & beg
-		, FwdIter const & end
-		)
-	{
-		double mean{ dat::nullValue<double>() };
-		double sumLogs{ 0. };
-		double count{ 0. };
-		for (FwdIter iter{beg} ; end != iter ; ++iter)
-		{
-			double const & value = *iter;
-			assert(0. < value);
-			sumLogs += std::log(value);
-			count += 1.;
-		}
-		if (0. < count)
-		{
-			double const aveLog{ (1./count) * sumLogs };
-			mean = std::exp(aveLog);
-		}
-		return mean;
 	}
 }
 
@@ -206,7 +182,8 @@ main
 		bMedians[nn] = bFracs.median();
 		//io::out() << dat::infoString(bFracs, "bFracs") << '\n';
 	}
-	double const bTgt{ geoMean(bMedians.begin(), bMedians.end()) };
+	double const bTgt
+		{ prob::mean::geometric(bMedians.begin(), bMedians.end()) };
 	std::array<double, 4u> const bGains
 		{ bTgt/bMedians[0]
 		, bTgt/bMedians[1]

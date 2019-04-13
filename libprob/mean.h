@@ -54,6 +54,10 @@ namespace prob
 
 namespace mean
 {
+	//
+	// Pythagorean Means
+	//
+
 	//! (Arithemetic) Average value of collection
 	template <typename FwdIter, typename DataType = double>
 	inline
@@ -63,8 +67,23 @@ namespace mean
 		, FwdIter const & end
 		);
 
-	// geometric
-	// harmonic
+	//! Geometric mean of values (or null if any are negative or zero)
+	template <typename FwdIter, typename DataType = double>
+	inline
+	DataType
+	geometric
+		( FwdIter const & beg //!< (*it) must be convertable to double
+		, FwdIter const & end
+		);
+
+	//! Harmonic mean of values (or null if any are negative or zero)
+	template <typename FwdIter, typename DataType = double>
+	inline
+	DataType
+	harmonic
+		( FwdIter const & beg //!< (*it) must be convertable to double
+		, FwdIter const & end
+		);
 
 } // mean
 

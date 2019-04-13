@@ -56,6 +56,73 @@ arithmetic
 	return mean;
 }
 
+template <typename FwdIter, typename DataType = double>
+inline
+DataType
+geometric
+	( FwdIter const & beg
+	, FwdIter const & end
+	)
+{
+	DataType mean(dat::nullValue<DataType>());
+	if (beg != end)
+	{
+		double sumLogs{ 0. };
+		double count{ 0. };
+		for (FwdIter iter{beg} ; end != iter ; ++iter)
+		{
+			double const & value = *iter;
+			if (! (0. < value))
+			{
+				count = 0u;
+				break;
+			}
+			sumLogs += std::log(value);
+			count += 1.;
+		}
+		if (0. < count)
+		{
+			double const aveLog{ (1./count) * sumLogs };
+			mean = std::exp(aveLog);
+		}
+	}
+	return mean;
+}
+
+template <typename FwdIter, typename DataType = double>
+inline
+DataType
+harmonic
+	( FwdIter const & beg
+	, FwdIter const & end
+	)
+{
+	DataType mean(dat::nullValue<DataType>());
+	if (beg != end)
+	{
+		double sumInvs{ 0. };
+		double count{ 0. };
+		for (FwdIter iter{beg} ; end != iter ; ++iter)
+		{
+			double const & value = *iter;
+			if (! (0. < value))
+			{
+				count = 0u;
+				break;
+			}
+			sumInvs += (1. / value);
+			count += 1.;
+		}
+		if (0. < count)
+		{
+			if (0. < sumInvs)
+			{
+				mean = count / sumInvs;
+			}
+		}
+	}
+	return mean;
+}
 
 } // mean
 

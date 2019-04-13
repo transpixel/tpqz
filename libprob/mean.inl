@@ -69,21 +69,36 @@ geometric
 	{
 		double sumLogs{ 0. };
 		double count{ 0. };
+		bool hitAnyZeros{ false };
 		for (FwdIter iter{beg} ; end != iter ; ++iter)
 		{
 			double const & value = *iter;
 			if (! (0. < value))
 			{
-				count = 0u;
-				break;
+				if (value < 0.)
+				{
+					count = 0u;
+					break;
+				}
+				else // == 0.
+				{
+					hitAnyZeros = true;
+				}
 			}
 			sumLogs += std::log(value);
 			count += 1.;
 		}
 		if (0. < count)
 		{
-			double const aveLog{ (1./count) * sumLogs };
-			mean = std::exp(aveLog);
+			if (hitAnyZeros)
+			{
+				mean = 0.;
+			}
+			else // all samples were positive
+			{
+				double const aveLog{ (1./count) * sumLogs };
+				mean = std::exp(aveLog);
+			}
 		}
 	}
 	return mean;

@@ -46,6 +46,7 @@ libpaths = \
  , '../libio/'
  , '../libmath/'
  , '../libdat/'
+ , '../libapp/'
 
  , '../extstb/'
  ]
@@ -56,6 +57,7 @@ linklibs = \
  , 'io'
  , 'math'
  , 'dat'
+ , 'app'
 
  , 'stb'
  ]
@@ -64,6 +66,7 @@ env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('demoRaw10.cpp')
 env.Program('ubrand.cpp')
 env.Program('ucolor.cpp')
 env.Program('uconvert.cpp')

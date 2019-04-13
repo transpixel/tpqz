@@ -42,10 +42,12 @@ namespace io
 	dat::grid<PixType>
 	loadRaw10
 		( std::string const & fpath
+		, raw10::Sizes const & raspiSizes
 		)
 	{
 		// load data from disk (in compacted form)
-		dat::grid<raw10::FourPix> const quadGrid{ loadFourPixGrid(fpath) };
+		dat::grid<raw10::FourPix> const quadGrid
+			{ loadFourPixGrid(fpath, raspiSizes) };
 
 		// expand to full pixels and return
 		return { convert::pixelGridFor<PixType>(quadGrid) };

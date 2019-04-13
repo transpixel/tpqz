@@ -105,8 +105,9 @@ main
 
 	// load file (active) data into memory
 	timer.start("load.quads");
+	img::raw10::Sizes const raspi(img::raw10::RasPiV2{});
 	dat::grid<img::raw10::FourPix> const rawQuads
-		{ img::io::loadFourPixGrid(pathRaw) };
+		{ img::io::loadFourPixGrid(pathRaw, raspi) };
 	timer.stop();
 
 	// convert to uint8 image

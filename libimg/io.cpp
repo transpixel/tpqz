@@ -368,6 +368,7 @@ loadFromFloat
 dat::grid<raw10::FourPix>
 loadFourPixGrid
 	( std::string const & fpath
+	, raw10::Sizes const & raspiSizes
 	)
 {
 	dat::grid<raw10::FourPix> grid;
@@ -376,9 +377,10 @@ loadFourPixGrid
 	if (ifs.good())
 	{
 		// allocate space
-		using namespace raw10::size;
-		grid = dat::grid<raw10::FourPix>(sExpQuadHigh, sExpQuadWide);
-		char junk[sExpRowJunk];
+		dat::Extents const hwQuad{ raspiSizes.hwSizeQuads() };
+
+		grid = dat::grid<raw10::FourPix>(hwQuad);
+		std::vector<uint8_t> junkBuf(raspiSizes.junkBuffer());
 
 		// fetch and verify header
 		img::raw10::HeadBRCM hdr{};
@@ -387,21 +389,24 @@ loadFourPixGrid
 		{
 			// load line by line
 			for (size_t
-				row{0u} ; (row < sExpQuadHigh) && ifs.good() ; ++row)
+				row{0u} ; (row < hwQuad.high()) && ifs.good() ; ++row)
 			{
 				// load active portion of file row
-				constexpr size_t expBytes
-					{ sExpQuadWide * sizeof(raw10::FourPix) };
+				size_t const expBytes{ raspiSizes.expRowQuadBytes() };
 				ifs.read((char * const)grid.beginRow(row), expBytes);
 				size_t const gotBytes{ (size_t)ifs.gcount() };
+				bool const okayData{ (gotBytes == expBytes) };
 
 				// skip unused portion of row
-				ifs.read(junk, sExpRowJunk);
-				size_t const gotJunk{ (size_t)ifs.gcount() };
+				bool okayJunk{ false };
+				if (! junkBuf.empty())
+				{
+					ifs.read((char * const)junkBuf.data(), junkBuf.size());
+					size_t const gotJunk{ (size_t)ifs.gcount() };
+					okayJunk = (gotJunk == junkBuf.size());
+				}
 
 				// check status so far
-				bool const okayData{ (gotBytes == expBytes) };
-				bool const okayJunk{ (gotJunk == sExpRowJunk) };
 				if (! (okayData && okayJunk))
 				{
 					// discard partial data

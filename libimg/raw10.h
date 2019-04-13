@@ -34,6 +34,8 @@
 */
 
 
+#include "libdat/Extents.h"
+
 #include <array>
 #include <cstddef>
 
@@ -90,25 +92,85 @@ namespace raw10
 			() const;
 	};
 
-	//! Values associated with raw10 binary file layout
-	namespace size
+	//! Quad data layout for RasPi with OV5647 imaging chip
+	struct RasPiV1
 	{
-		constexpr size_t const sExpHeadSize{ 32768u };
-		constexpr std::array<uint8_t, 4> const sMagic{ 'B', 'R', 'C', 'M' };
-
 		// Sensor active pixel size
-		constexpr size_t const sExpPixHigh{ 1944u };
-		constexpr size_t const sExpPixWide{ 2592u };
-
-		constexpr size_t const sExpQuadHigh{ sExpPixHigh };
-		constexpr size_t const sExpQuadWide{ sExpPixWide / 4u };
+		static constexpr size_t const sExpPixHigh{ 1944u };
+		static constexpr size_t const sExpPixWide{ 2592u };
 
 		// File size - including unused data
 		// constexpr size_t const sExpFileHigh{ 1952u };
-		constexpr size_t const sExpFileWide{ 3264u };
-		constexpr size_t const sExpRowUsed{ (sExpPixWide * 10u) / 8u };
-		constexpr size_t const sExpRowJunk{ sExpFileWide - sExpRowUsed };
-	}
+		static constexpr size_t const sExpFileWide{ 3264u };
+	};
+
+	//! Quad data layout for RasPi with IMX219PQ imaging chip
+	struct RasPiV2
+	{
+		// Sensor active pixel size
+		static constexpr size_t const sExpPixHigh{ 2464u };
+		static constexpr size_t const sExpPixWide{ 3280u };
+
+		// File size - including unused data
+		// constexpr size_t const sExpFileHigh{ 1952u };
+		static constexpr size_t const sExpFileWide{ 4128u };
+	};
+
+	//! Byte sizes for 'raw10' file format (quad)data layout configuration
+	class Sizes
+	{
+		size_t const theExpQuadHigh{};
+		size_t const theExpQuadWide{};
+		size_t const theExpRowUsed{};
+		size_t const theExpRowJunk{};
+
+	public:
+
+		//! Construct sizes to match Raspberry Pi camera type
+		template <typename RasPiType>
+		explicit
+		Sizes
+			( RasPiType const & raspi
+			)
+			: theExpQuadHigh{ raspi.sExpPixHigh }
+			, theExpQuadWide{ raspi.sExpPixWide / 4u }
+			, theExpRowUsed{ (raspi.sExpPixWide * 10u) / 8u }
+			, theExpRowJunk{ raspi.sExpFileWide - theExpRowUsed }
+		{ }
+
+		//! High/Wide in FourPix quad units (each quad spans 5 bytes)
+		dat::Extents
+		hwSizeQuads
+			() const
+		{
+			return dat::Extents{ theExpQuadHigh, theExpQuadWide };
+		}
+
+		//! Number of bytes used for active quad data in a row
+		size_t
+		expRowQuadBytes
+			() const
+		{
+			return { theExpQuadWide * sizeof(FourPix) };
+		}
+
+		//! Number of unused-bytes of data at end of valid row (quad)data
+		size_t
+		sizeRowJunk
+			() const
+		{
+			return { theExpRowJunk };
+		}
+
+		//! Number of bytes of unused data at end of each line
+		std::vector<uint8_t>
+		junkBuffer
+			() const
+		{
+			return std::vector<uint8_t>(sizeRowJunk());
+		}
+
+	};
 
 } // raw10
 

@@ -90,6 +90,7 @@ namespace io
 	dat::grid<raw10::FourPix>
 	loadFourPixGrid
 		( std::string const & fpath
+		, raw10::Sizes const & raspiSizes
 		);
 
 	//! Pixel decoded from raw file
@@ -98,6 +99,7 @@ namespace io
 	dat::grid<PixType>
 	loadRaw10
 		( std::string const & fpath
+		, raw10::Sizes const & raspiSizes
 		);
 
 	//! Save to floating point format - true on success

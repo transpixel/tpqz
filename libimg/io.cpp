@@ -381,13 +381,9 @@ loadFourPixGrid
 		char junk[sExpRowJunk];
 
 		// fetch and verify header
-		char hdr[sExpHeadSize];
-		ifs.read(hdr, sExpHeadSize);
-		size_t const gotHeadSize{ (size_t)ifs.gcount() };
-		bool const okayHead{ (gotHeadSize == sExpHeadSize) };
-		bool const okayMagic
-			{ std::equal(sMagic.begin(), sMagic.end(), hdr) };
-		if (okayHead && okayMagic)
+		img::raw10::HeadBRCM hdr{};
+		ifs.read((char * const)hdr.theHdr.begin(), hdr.theSize);
+		if (hdr.isValid())
 		{
 			// load line by line
 			for (size_t

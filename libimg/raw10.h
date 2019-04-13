@@ -67,6 +67,29 @@ namespace raw10
 		( FourPix const & quad
 		);
 
+	//! Header used by raspberry pi 'picamera' and 'raspistill' libraries
+	struct HeadBRCM
+	{
+		static constexpr size_t theSize = { 32768u };
+		std::array<uint8_t, theSize> theHdr{};
+
+		//! Magic string expected at start of header
+		inline
+		static
+		constexpr
+		std::array<uint8_t, 4>
+		magic
+			()
+		{
+			return { 'B', 'R', 'C', 'M' };
+		}
+		
+		//! True if 'valid' (e.g. magic number matches)
+		bool
+		isValid
+			() const;
+	};
+
 	//! Values associated with raw10 binary file layout
 	namespace size
 	{
@@ -86,63 +109,6 @@ namespace raw10
 		constexpr size_t const sExpRowUsed{ (sExpPixWide * 10u) / 8u };
 		constexpr size_t const sExpRowJunk{ sExpFileWide - sExpRowUsed };
 	}
-
-/*
-	//! Extract contiguous data elements out of (padded) file content
-	dat::grid<FourPix>
-	loadFourPixGrid
-		( std::string const & fpath
-		)
-	{
-		dat::grid<FourPix> grid;
-
-		std::ifstream ifs(fpath, std::ios::binary);
-		if (ifs.good())
-		{
-			// allocate space
-			using namespace size;
-			grid = dat::grid<FourPix>(sExpQuadHigh, sExpQuadWide);
-			char junk[sExpRowJunk];
-
-			// fetch and verify header
-			char hdr[sExpHeadSize];
-			ifs.read(hdr, sExpHeadSize);
-			size_t const gotHeadSize{ (size_t)ifs.gcount() };
-			bool const okayHead{ (gotHeadSize == sExpHeadSize) };
-			bool const okayMagic
-				{ std::equal(sMagic.begin(), sMagic.end(), hdr) };
-			if (okayHead && okayMagic)
-			{
-				// load line by line
-				for (size_t
-					row{0u} ; (row < sExpQuadHigh) && ifs.good() ; ++row)
-				{
-					// load active portion of file row
-					constexpr size_t expBytes{ sExpQuadWide * sizeof(FourPix) };
-					ifs.read((char * const)grid.beginRow(row), expBytes);
-					size_t const gotBytes{ (size_t)ifs.gcount() };
-
-					// skip unused portion of row
-					ifs.read(junk, sExpRowJunk);
-					size_t const gotJunk{ (size_t)ifs.gcount() };
-
-					// check status so far
-					bool const okayData{ (gotBytes == expBytes) };
-					bool const okayJunk{ (gotJunk == sExpRowJunk) };
-					if (! (okayData && okayJunk))
-					{
-						// discard partial data
-						grid = dat::grid<FourPix>{};
-						break;
-					}
-				}
-			}
-			// skip unused rows (by stopping read at last active row)
-		}
-		return grid;
-	}
-
-*/
 
 } // raw10
 

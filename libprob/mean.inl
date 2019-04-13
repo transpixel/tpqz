@@ -56,6 +56,104 @@ arithmetic
 	return mean;
 }
 
+namespace priv
+{
+	//! Generic sample accumulation and normalization
+	template
+		< typename FwdIter
+		, typename FuncFwd
+		, typename FuncInv
+		, typename DataType = double
+		>
+	inline
+	DataType
+	meanFor
+		( FwdIter const & beg
+		, FwdIter const & end
+		, FuncFwd const & fwdFunc
+		, FuncInv const & invFunc
+		)
+	{
+		DataType mean(dat::nullValue<DataType>());
+		if (beg != end)
+		{
+			double sumFwd{ 0u };
+			size_t count{ 0u };
+			bool hitAnyZeros{ false };
+			for (FwdIter iter{beg} ; end != iter ; ++iter)
+			{
+				double const & value = *iter;
+				if (! (0. < value))
+				{
+					if (value < 0.)
+					{
+						count = 0u;
+						break;
+					}
+					else // == 0.
+					{
+						hitAnyZeros = true;
+					}
+				}
+				sumFwd += fwdFunc(value);
+				++count;
+			}
+			if (0u < count)
+			{
+				if (hitAnyZeros)
+				{
+					mean = 0.;
+				}
+				else // all samples were positive
+				{
+					double const aveFwd{ (1./(double)count) * sumFwd };
+					mean = invFunc(aveFwd);
+				}
+			}
+		}
+		return mean;
+	}
+
+	//! Functions that define the geometric mean
+	namespace geo
+	{
+		//! Forward function is logarithm
+		inline
+		double
+		funcFwd
+			( double const & arg
+			)
+		{
+			return std::log(arg);
+		}
+
+		//! Inverse function is exponential
+		inline
+		double
+		funcInv
+			( double const & arg
+			)
+		{
+			return std::exp(arg);
+		}
+	}
+
+	//! Functions that define the harmonic mean
+	namespace har
+	{
+		//! Reciprocal is both forward and inverse function
+		inline
+		double
+		funcRecip
+			( double const & arg
+			)
+		{
+			return { 1. / arg };
+		}
+	}
+
+}
+
 template <typename FwdIter, typename DataType = double>
 inline
 DataType
@@ -64,44 +162,7 @@ geometric
 	, FwdIter const & end
 	)
 {
-	DataType mean(dat::nullValue<DataType>());
-	if (beg != end)
-	{
-		double sumLogs{ 0. };
-		double count{ 0. };
-		bool hitAnyZeros{ false };
-		for (FwdIter iter{beg} ; end != iter ; ++iter)
-		{
-			double const & value = *iter;
-			if (! (0. < value))
-			{
-				if (value < 0.)
-				{
-					count = 0u;
-					break;
-				}
-				else // == 0.
-				{
-					hitAnyZeros = true;
-				}
-			}
-			sumLogs += std::log(value);
-			count += 1.;
-		}
-		if (0. < count)
-		{
-			if (hitAnyZeros)
-			{
-				mean = 0.;
-			}
-			else // all samples were positive
-			{
-				double const aveLog{ (1./count) * sumLogs };
-				mean = std::exp(aveLog);
-			}
-		}
-	}
-	return mean;
+	return priv::meanFor(beg, end, priv::geo::funcFwd, priv::geo::funcInv);
 }
 
 template <typename FwdIter, typename DataType = double>
@@ -112,31 +173,7 @@ harmonic
 	, FwdIter const & end
 	)
 {
-	DataType mean(dat::nullValue<DataType>());
-	if (beg != end)
-	{
-		double sumInvs{ 0. };
-		double count{ 0. };
-		for (FwdIter iter{beg} ; end != iter ; ++iter)
-		{
-			double const & value = *iter;
-			if (! (0. < value))
-			{
-				count = 0u;
-				break;
-			}
-			sumInvs += (1. / value);
-			count += 1.;
-		}
-		if (0. < count)
-		{
-			if (0. < sumInvs)
-			{
-				mean = count / sumInvs;
-			}
-		}
-	}
-	return mean;
+	return priv::meanFor(beg, end, priv::har::funcRecip, priv::har::funcRecip);
 }
 
 } // mean

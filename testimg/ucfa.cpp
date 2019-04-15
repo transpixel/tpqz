@@ -65,6 +65,62 @@ img_cfa_test0
 	return oss.str();
 }
 
+
+namespace
+{
+	template <typename CellType>
+	dat::grid<CellType>
+	simCells
+		( dat::Extents const & cellSize
+		, CellType const & srcCell
+		)
+	{
+		dat::grid<CellType> cellGrid(cellSize);
+		std::fill(cellGrid.begin(), cellGrid.end(), srcCell);
+		return cellGrid;
+	}
+
+} // {}
+
+bool
+operator==
+	( img::cfa::Cell<float> const & cA
+	, img::cfa::Cell<float> const & cB
+	)
+{
+	return
+		(  dat::nearlyEquals(cA.theElems[0][0], cB.theElems[0][0])
+		&& dat::nearlyEquals(cA.theElems[0][1], cB.theElems[0][1])
+		&& dat::nearlyEquals(cA.theElems[1][0], cB.theElems[1][0])
+		&& dat::nearlyEquals(cA.theElems[1][1], cB.theElems[1][1])
+		);
+}
+
+template <typename CellType>
+bool
+areSame
+	( dat::grid<CellType> const & gridA
+	, dat::grid<CellType> const & gridB
+	)
+{
+	bool same{ gridA.hwSize() == gridB.hwSize() };
+	if (same)
+	{
+		using Iter = typename dat::grid<CellType>::const_iterator;
+		for (Iter itA{gridA.begin()}, itB{gridB.begin()}
+			; gridA.end() != itA ; ++itA, ++itB)
+		{
+			same &= (*itA == *itB);
+			if (! same)
+			{
+				break;
+			}
+		}
+	}
+	return same;
+}
+
+
 //! Check basic gain correction
 std::string
 img_cfa_test1
@@ -79,19 +135,22 @@ img_cfa_test1
 	CellType const cellGain{ 8., 4., 2., 1. };
 
 	// simulate a 'raw' image
+	dat::grid<CellType> const expCell{ simCells(cellSize, srcCell) };
 	dat::Extents const elemSize{ img::cfa::elemSizeFor(cellSize) };
 	dat::grid<CellType::value_type> expNorm(elemSize);
-	std::fill(expNorm.begin(), expNorm.end(), 8.);
+	std::fill(expNorm.begin(), expNorm.end(), 8.f);
 
 	// expand cells into a multiplexed full element grid
-	dat::grid<CellType> cellGrid(cellSize);
-	std::fill(cellGrid.begin(), cellGrid.end(), srcCell);
-	dat::grid<CellType::value_type> const elemGrid
-		{ img::cfa::elemGridFor(cellGrid) };
+	dat::grid<CellType::value_type> const expElem
+		{ img::cfa::elemGridFor(expCell) };
 
 	// normalize element grid by applying cell-specific gain factors
 	dat::grid<CellType::value_type> const gotNorm
-		{ img::cfa::grayGridFor(elemGrid, cellGain) };
+		{ img::cfa::grayGridFor(expElem, cellGain) };
+
+	// compact element data back into cell layout
+	dat::grid<CellType> const gotCell
+		{ img::cfa::cellGridFor<CellType>(expElem) };
 
 	// compare results
 	if (! dat::nearlyEquals(gotNorm.size(), expNorm.size()))
@@ -103,9 +162,18 @@ img_cfa_test1
 	if (! std::equal(gotNorm.begin(), gotNorm.end(), expNorm.begin()))
 	{
 		oss << "Failure of uniform output test" << std::endl;
-		oss << elemGrid.infoStringContents("elemGrid", "%9.3f") << std::endl;
 		oss << expNorm.infoStringContents("expNorm", "%9.3f") << std::endl;
 		oss << gotNorm.infoStringContents("gotNorm", "%9.3f") << std::endl;
+	}
+	if (! areSame(gotCell, expCell))
+	{
+		dat::grid<CellType::value_type> const expAsElem
+			{ img::cfa::elemGridFor(expCell) };
+		dat::grid<CellType::value_type> const gotAsElem
+			{ img::cfa::elemGridFor(gotCell) };
+		oss << "Failure of uniform output test" << std::endl;
+		oss << expAsElem.infoStringContents("expAsElem", "%9.3f") << std::endl;
+		oss << gotAsElem.infoStringContents("gotAsElem", "%9.3f") << std::endl;
 	}
 
 	return oss.str();

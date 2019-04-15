@@ -34,7 +34,9 @@
 */
 
 
+#include "libdat/array.h"
 #include "libdat/Extents.h"
+#include "libdat/ExtentsIterator.h"
 #include "libdat/grid.h"
 #include "libimg/img.h"
 
@@ -56,19 +58,34 @@ namespace cfa
 		std::array<RowPix, 2u> theElems;
 	};
 
-	//! Size in elements associated with cell
+	//! Size in elements associated with size in cells
 	inline
 	dat::Extents
 	elemSizeFor
 		( dat::Extents const & cellSize
 		);
 
-	//! Expanded values after multiplexing cell data into CFA layout
+	//! Size in cells associated with size in elements
+	inline
+	dat::Extents
+	cellSizeFor
+		( dat::Extents const & elemSize
+		);
+
+	//! Expanded values after demultiplexing cell data using Cell layout
 	template <typename CellType>
 	inline
 	dat::grid<typename CellType::value_type>
 	elemGridFor
 		( dat::grid<CellType> const & cellGrid
+		);
+
+	//! Compacted values after multiplexing into Cell layout
+	template <typename CellType>
+	inline
+	dat::grid<CellType>
+	cellGridFor
+		( dat::grid<typename CellType::value_type> const & elemGrid
 		);
 
 	//! Grid after applying cellGain factors to rawGrid

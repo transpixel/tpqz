@@ -46,6 +46,27 @@ elemSizeFor
 	return dat::Extents(2u*cellSize.high(), 2u*cellSize.wide());
 }
 
+inline
+dat::Extents
+cellSizeFor
+	( dat::Extents const & elemSize
+	)
+{
+	dat::Extents cellSize{};
+	if (elemSize.isValid())
+	{
+		if ( (0u == (elemSize.high() % 2u))
+		  && (0u == (elemSize.wide() % 2u))
+		   )
+		{
+			size_t const halfHigh{ elemSize.high() / 2u };
+			size_t const halfWide{ elemSize.wide() / 2u };
+			cellSize = dat::Extents(halfHigh, halfWide);
+		}
+	}
+	return cellSize;
+}
+
 template <typename CellType>
 inline
 dat::grid<typename CellType::value_type>
@@ -81,6 +102,43 @@ elemGridFor
 		}
 	}
 	return elemGrid;
+}
+
+template <typename CellType>
+inline
+dat::grid<CellType>
+cellGridFor
+	( dat::grid<typename CellType::value_type> const & elemGrid
+	)
+{
+	dat::grid<CellType> cellGrid;
+	if (elemGrid.isValid())
+	{
+		dat::Extents const cellSize{ cellSizeFor(elemGrid.hwSize()) };
+		cellGrid = dat::grid<CellType>(cellSize);
+
+		using ElemIter
+			= typename dat::grid<typename CellType::value_type>::const_iterator;
+		ElemIter itElem0{ elemGrid.begin() };
+		ElemIter itElem1{ elemGrid.begin() + elemGrid.wide() };
+		for (size_t cellRow{0u} ; cellRow < cellGrid.high() ; ++cellRow)
+		{
+			for (size_t cellCol{0u} ; cellCol < cellGrid.wide() ; ++cellCol)
+			{
+				CellType & cell = cellGrid(cellRow, cellCol);
+				// fill current cell with appropriate elements
+				cell.theElems[0][0] = *itElem0++;
+				cell.theElems[0][1] = *itElem0++;
+				cell.theElems[1][0] = *itElem1++;
+				cell.theElems[1][1] = *itElem1++;
+			}
+			// skip next row for both inputs
+			std::advance(itElem0, elemGrid.wide());
+			std::advance(itElem1, elemGrid.wide());
+		}
+
+	}
+	return cellGrid;
 }
 
 template <typename ElemType>

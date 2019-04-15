@@ -37,6 +37,113 @@ namespace img
 namespace cfa
 {
 
+inline
+dat::Extents
+elemSizeFor
+	( dat::Extents const & cellSize
+	)
+{
+	return dat::Extents(2u*cellSize.high(), 2u*cellSize.wide());
+}
+
+template <typename CellType>
+inline
+dat::grid<typename CellType::value_type>
+elemGridFor
+	( dat::grid<CellType> const & cellGrid
+	)
+{
+	using ElemType = typename CellType::value_type;
+	dat::grid<ElemType> elemGrid;
+	if (cellGrid.isValid())
+	{
+		// allocate space
+		elemGrid = dat::grid<ElemType>(elemSizeFor(cellGrid.hwSize()));
+		// multiplex data while copying
+		using CellIter = typename dat::grid<CellType>::const_iterator;
+		CellIter itCell{ cellGrid.begin() };
+		using ElemIter = typename dat::grid<ElemType>::iterator;
+		ElemIter itBeg0{ elemGrid.begin() };
+		ElemIter itBeg1{ itBeg0 + elemGrid.wide() };
+		for (size_t row{ 0u } ; row < cellGrid.high() ; ++row)
+		{
+			for (size_t col{0u} ; col < cellGrid.wide() ; ++col)
+			{
+				CellType const & cell = cellGrid(row, col);
+				*itBeg0++ = cell.theElems[0][0];
+				*itBeg0++ = cell.theElems[0][1];
+				*itBeg1++ = cell.theElems[1][0];
+				*itBeg1++ = cell.theElems[1][1];
+				++itCell;
+			}
+			std::advance(itBeg0, elemGrid.wide());
+			std::advance(itBeg1, elemGrid.wide());
+		}
+	}
+	return elemGrid;
+}
+
+template <typename ElemType>
+inline
+dat::grid<ElemType>
+grayGridFor
+	( dat::grid<ElemType> const & rawGrid
+	, img::cfa::Cell<ElemType> const & cellGain
+	)
+{
+	dat::grid<ElemType> outGrid;
+	if (rawGrid.isValid())
+	{
+		assert(0u == (rawGrid.high() % cellGain.theElems.size()));
+		assert(0u == (rawGrid.wide() % cellGain.theElems[0].size()));
+		size_t const wide{ rawGrid.wide() };
+
+		// expand gain values to cover two rows
+		assert(2u == cellGain.theElems.size());
+		assert(2u == cellGain.theElems[0].size());
+		std::vector<ElemType> gainEvens;
+		std::vector<ElemType> gainOdds;
+		gainEvens.reserve(wide);
+		gainOdds.reserve(wide);
+		for (size_t nn{0u} ; nn < wide ; nn += 2u)
+		{
+			gainEvens[nn+0] = cellGain.theElems[0][0];
+			gainEvens[nn+1] = cellGain.theElems[0][1];
+			gainOdds[nn+0] = cellGain.theElems[1][0];
+			gainOdds[nn+1] = cellGain.theElems[1][1];
+		}
+
+		// allocate space for output
+		outGrid = dat::grid<ElemType>(rawGrid.hwSize());
+
+		// scale data while copying
+		size_t const high{ outGrid.high() };
+		size_t row{0u};
+		while (row < high)
+		{
+			std::transform
+				( rawGrid.beginRow(row), rawGrid.endRow(row)
+				, gainEvens.begin()
+				, outGrid.beginRow(row)
+				, []
+					(ElemType const & raw, ElemType const & gain)
+					{ return (raw * gain); }
+				);
+			++row;
+			std::transform
+				( rawGrid.beginRow(row), rawGrid.endRow(row)
+				, gainOdds.begin()
+				, outGrid.beginRow(row)
+				, []
+					(ElemType const & raw, ElemType const & gain)
+					{ return (raw * gain); }
+				);
+			++row;
+		}
+	}
+	return outGrid;
+}
+
 template <typename Type>
 inline
 std::array<dat::grid<Type>, 4u>

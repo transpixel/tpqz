@@ -34,6 +34,7 @@
 */
 
 
+#include "libdat/Extents.h"
 #include "libdat/grid.h"
 #include "libimg/img.h"
 
@@ -45,6 +46,40 @@ namespace img
 //! Functions for handling image detector color filter arrays.
 namespace cfa
 {
+	//! An individual CFA cell (2x2)
+	template <typename ElemType>
+	struct Cell
+	{
+		using value_type = ElemType;
+
+		using RowPix = std::array<ElemType, 2u>;
+		std::array<RowPix, 2u> theElems;
+	};
+
+	//! Size in elements associated with cell
+	inline
+	dat::Extents
+	elemSizeFor
+		( dat::Extents const & cellSize
+		);
+
+	//! Expanded values after multiplexing cell data into CFA layout
+	template <typename CellType>
+	inline
+	dat::grid<typename CellType::value_type>
+	elemGridFor
+		( dat::grid<CellType> const & cellGrid
+		);
+
+	//! Grid after applying cellGain factors to rawGrid
+	template <typename ElemType>
+	inline
+	dat::grid<ElemType>
+	grayGridFor
+		( dat::grid<ElemType> const & rawGrid
+		, Cell<ElemType> const & cellGain
+		);
+
 	//! Extracts nearest samples on 2x2 grid
 	std::array<dat::grid<fpix_t>, 3u>
 	rgbFastFromRGGB

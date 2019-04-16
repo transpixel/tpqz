@@ -43,6 +43,7 @@
 #include "libimg/raw10.h"
 #include "libimg/stats.h"
 #include "libprob/mean.h"
+#include "libprob/SampleStats.h"
 
 #include "libprob/CdfForward.h"
 #include "libprob/Frac9.h"
@@ -225,6 +226,22 @@ main
 		, static_cast<float>(bTgt/bMedians[2])
 		, static_cast<float>(bTgt/bMedians[3])
 		};
+
+	dat::Range<double> const uRange{ 0., 256. };
+	math::Partition const histPart(uRange, 256u);
+	std::array<prob::SampleStats, 4u> const bStats
+		{ prob::SampleStats(bands[0].begin(), bands[0].end(), histPart)
+		, prob::SampleStats(bands[1].begin(), bands[1].end(), histPart)
+		, prob::SampleStats(bands[2].begin(), bands[2].end(), histPart)
+		, prob::SampleStats(bands[3].begin(), bands[3].end(), histPart)
+		};
+	std::array<double, 4u> const bEntrops
+		{ bStats[0].theEntropy.perElement()
+		, bStats[1].theEntropy.perElement()
+		, bStats[2].theEntropy.perElement()
+		, bStats[3].theEntropy.perElement()
+		};
+
 	// create grayscale image
 	dat::grid<float> const gGrid{ img::cfa::grayGridFor(fGrid, cellGains) };
 	std::array<dat::grid<float>, 4u> const gBands
@@ -236,6 +253,10 @@ main
 	io::out() << infoString(cellGains, "cellGains") << '\n';
 	io::out() << dat::infoString(bTgt, "bTgt") << '\n';
 	io::out() << dat::infoString(gMedians, "gMedians") << '\n';
+	io::out() << dat::infoString(bEntrops[0], "entropy[0]") << '\n';
+	io::out() << dat::infoString(bEntrops[1], "entropy[1]") << '\n';
+	io::out() << dat::infoString(bEntrops[2], "entropy[2]") << '\n';
+	io::out() << dat::infoString(bEntrops[3], "entropy[3]") << '\n';
 
 	io::out() << dat::infoString(timer, "processing times") << '\n';
 	io::out() << std::endl;

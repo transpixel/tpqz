@@ -76,6 +76,7 @@ env.Program('ugeo.cpp')
 env.Program('uimg.cpp')
 env.Program('uio.cpp')
 env.Program('urad.cpp')
+env.Program('uraw10.cpp')
 env.Program('usample.cpp')
 env.Program('ustats.cpp')
 

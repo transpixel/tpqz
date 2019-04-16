@@ -32,8 +32,10 @@
 
 
 #include "libimg/raw10.h"
+#include "libio/sprintf.h"
 
 #include <algorithm>
+#include <sstream>
 
 
 namespace img
@@ -49,6 +51,59 @@ HeadBRCM :: isValid
 	bool const okayMagic
 		{ std::equal(magi.begin(), magi.end(), theHdr.begin()) };
 	return okayMagic;
+}
+
+std::string
+infoString
+	( FourPix const & quad
+	, std::string const & title
+	)
+{
+	std::ostringstream oss;
+	if (! title.empty())
+	{
+		oss << title << " ";
+	}
+	std::array<uint16_t, 4u> const pixVals{ pixelValues<uint16_t>(quad) };
+	oss << std::endl;
+	oss
+		<< "HiBytes:"
+		<< " " << ::io::sprintf("0x%02X", quad.theHiBytes[0])
+		<< " " << ::io::sprintf("0x%02X", quad.theHiBytes[1])
+		<< " " << ::io::sprintf("0x%02X", quad.theHiBytes[2])
+		<< " " << ::io::sprintf("0x%02X", quad.theHiBytes[3])
+		<< " " << "LoBits:"
+		<< " " << ::io::sprintf("0x%01X", (quad.theLoBits & 0xC0) >> 6u)
+		<< " " << ::io::sprintf("0x%01X", (quad.theLoBits & 0x30) >> 4u)
+		<< " " << ::io::sprintf("0x%01X", (quad.theLoBits & 0x0C) >> 2u)
+		<< " " << ::io::sprintf("0x%01X", (quad.theLoBits & 0x03) >> 0u)
+		<< " " << "LoBits:"
+		<< " " << ::io::sprintf("%4d", pixVals[0])
+		<< " " << ::io::sprintf("%4d", pixVals[1])
+		<< " " << ::io::sprintf("%4d", pixVals[2])
+		<< " " << ::io::sprintf("%4d", pixVals[3])
+		;
+	std::array<uint8_t, 4u> const hiBytes{ pixelHiBytes(quad) };
+	std::array<uint8_t, 4u> const loBytes{ pixelLoBytes(quad) };
+	oss << std::endl;
+	oss
+		<< "HiBytes:"
+		<< " " << ::io::sprintf("0x%02X", hiBytes[0])
+		<< " " << ::io::sprintf("0x%02X", hiBytes[1])
+		<< " " << ::io::sprintf("0x%02X", hiBytes[2])
+		<< " " << ::io::sprintf("0x%02X", hiBytes[3])
+		<< " " << "LoBits:"
+		<< " " << ::io::sprintf("0x%01X", loBytes[0])
+		<< " " << ::io::sprintf("0x%01X", loBytes[1])
+		<< " " << ::io::sprintf("0x%01X", loBytes[2])
+		<< " " << ::io::sprintf("0x%01X", loBytes[3])
+		<< " " << "LoBits:"
+		<< " " << ::io::sprintf("%4d", pixVals[0])
+		<< " " << ::io::sprintf("%4d", pixVals[1])
+		<< " " << ::io::sprintf("%4d", pixVals[2])
+		<< " " << ::io::sprintf("%4d", pixVals[3])
+		;
+	return oss.str();
 }
 
 } // raw10

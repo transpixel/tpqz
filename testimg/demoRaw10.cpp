@@ -50,6 +50,8 @@
 
 #include "libapp/Timer.h"
 
+#include <bitset>
+
 
 namespace
 {
@@ -281,8 +283,19 @@ main
 	{
 		uint16_t const & sElem = *itS;
 		uint8_t & loElem = *itN;
-		loElem = (uint8_t)((sElem % 4) << 6u);
-	//	loElem = (uint8_t)((sElem & 0xFF00) >> 8u);
+		std::bitset<10u> const mask
+			{ 0u << 9u // lost to cast below
+			| 0u << 8u // lost to cast below
+			| 1u << 7u
+			| 1u << 6u
+			| 1u << 5u
+			| 1u << 4u
+			| 1u << 3u
+			| 1u << 2u
+			| 1u << 1u
+			| 1u << 0u
+			};
+		loElem = static_cast<uint8_t>((sElem & mask.to_ulong()));
 	}
 	img::io::savePng(loGrid, "loGrid.png");
 	io::out() << dat::infoString(sMinMax, "sMinMax") << '\n';

@@ -38,6 +38,7 @@
 
 #include <array>
 #include <cstddef>
+#include <string>
 
 
 namespace img
@@ -63,10 +64,32 @@ namespace raw10
 		uint8_t theLoBits;
 	};
 
+	//! Values for each of the four pixels (after expand/cast as appropriate)
 	template <typename PixType>
 	std::array<PixType, 4u>
 	pixelValues
 		( FourPix const & quad
+		);
+
+	//! Only the high bytes of the four pixels
+	inline
+	std::array<uint8_t, 4u>
+	pixelHiBytes
+		( FourPix const & quad
+		);
+
+	//! Only the low bytes of the four pixels
+	inline
+	std::array<uint8_t, 4u>
+	pixelLoBytes
+		( FourPix const & quad
+		);
+
+	//! Descriptive information about FourPix instance
+	std::string
+	infoString
+		( FourPix const & quad
+		, std::string const & title = {}
 		);
 
 	//! Header used by raspberry pi 'picamera' and 'raspistill' libraries

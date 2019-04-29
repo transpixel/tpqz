@@ -43,11 +43,14 @@
 #include "libimg/raw10.h"
 #include "libimg/stats.h"
 #include "libprob/mean.h"
+#include "libprob/SampleStats.h"
 
 #include "libprob/CdfForward.h"
 #include "libprob/Frac9.h"
 
 #include "libapp/Timer.h"
+
+#include <bitset>
 
 
 namespace
@@ -67,6 +70,52 @@ namespace
 		{
 			io::err() << "ERROR: couldn't save to '" << pathOut << "'\n";
 		}
+	}
+
+	//! Median values for each channel
+	template <typename PixType>
+	std::array<double, 4u>
+	bandMediansFrom
+		( std::array<dat::grid<PixType>, 4u> const bands
+		)
+	{
+		std::array<double, 4u> bMedians{};
+		for (size_t nn{0u} ; nn < bands.size() ; ++nn)
+		{
+			static dat::Range<double> const uRange{ 0., 255. };
+			static math::Partition const uPart(uRange, 256u);
+			prob::CdfForward const cdf
+				{ prob::CdfForward::fromSamps
+					(bands[nn].begin(), bands[nn].end(), uPart)
+				};
+			prob::Frac9 const bFracs(cdf);
+			bMedians[nn] = bFracs.median();
+			//io::out() << dat::infoString(bFracs, "bFracs") << '\n';
+		}
+		return bMedians;
+	}
+
+	//! Display cell contents
+	std::string
+	infoString
+		( img::cfa::Cell<float> const & cell
+		, std::string const & title = {}
+		)
+	{
+		std::ostringstream oss;
+		if (! title.empty())
+		{
+			oss << title << std::endl;
+		}
+		static std::string const pad{ "   " };
+		oss
+			<< pad << dat::infoString(cell.theElems[0][0], "cell[0][0]")
+			<< pad << dat::infoString(cell.theElems[0][0], "cell[0][0]")
+			<< std::endl
+			<< pad << dat::infoString(cell.theElems[1][0], "cell[1][0]")
+			<< pad << dat::infoString(cell.theElems[1][0], "cell[1][0]")
+			;
+		return oss.str();
 	}
 }
 
@@ -101,6 +150,7 @@ main
 	std::string const pathRaw(argv[++argnum]);
 	std::string const pathOutPix{ "uGrid.png" };
 	std::string const pathOutFlt{ "fGrid.pgm" };
+	std::string const pathOutGray{ "gGrid.pgm" };
 
 	app::Timer timer;
 
@@ -169,44 +219,86 @@ main
 	io::out() << '\n';
 
 	// Analyse invidiual band data
-	std::array<double, 4u> bMedians{};
-	for (size_t nn{0u} ; nn < okayBands.size() ; ++nn)
-	{
-		static dat::Range<double> const uRange{ 0., 255. };
-		static math::Partition const uPart(uRange, 256u);
-		prob::CdfForward const cdf
-			{ prob::CdfForward::fromSamps
-				(bands[nn].begin(), bands[nn].end(), uPart)
-			};
-		prob::Frac9 const bFracs(cdf);
-		bMedians[nn] = bFracs.median();
-		//io::out() << dat::infoString(bFracs, "bFracs") << '\n';
-	}
+	std::array<double, 4u> const bMedians{ bandMediansFrom(bands) };
 	double const bTgt
 		{ prob::mean::geometric(bMedians.begin(), bMedians.end()) };
-	std::array<double, 4u> const bGains
-		{ bTgt/bMedians[0]
-		, bTgt/bMedians[1]
-		, bTgt/bMedians[2]
-		, bTgt/bMedians[3]
+	img::cfa::Cell<float> cellGains
+		{ static_cast<float>(bTgt/bMedians[0])
+		, static_cast<float>(bTgt/bMedians[1])
+		, static_cast<float>(bTgt/bMedians[2])
+		, static_cast<float>(bTgt/bMedians[3])
 		};
+
+	dat::Range<double> const uRange{ 0., 256. };
+	math::Partition const histPart(uRange, 256u);
+	std::array<prob::SampleStats, 4u> const bStats
+		{ prob::SampleStats(bands[0].begin(), bands[0].end(), histPart)
+		, prob::SampleStats(bands[1].begin(), bands[1].end(), histPart)
+		, prob::SampleStats(bands[2].begin(), bands[2].end(), histPart)
+		, prob::SampleStats(bands[3].begin(), bands[3].end(), histPart)
+		};
+	std::array<double, 4u> const bEntrops
+		{ bStats[0].theEntropy.perElement()
+		, bStats[1].theEntropy.perElement()
+		, bStats[2].theEntropy.perElement()
+		, bStats[3].theEntropy.perElement()
+		};
+
 	// create grayscale image
-//	grayFastFrom2x2(... need 2x2 generic gains ...);
+	dat::grid<float> const gGrid{ img::cfa::grayGridFor(fGrid, cellGains) };
+	std::array<dat::grid<float>, 4u> const gBands
+		{ img::cfa::channelsFromRGGB<float>(gGrid) };
+	std::array<double, 4u> const gMedians{ bandMediansFrom(gBands) };
+	bool const okayGray{ img::io::savePgmAutoScale(gGrid, pathOutGray) };
 
 	io::out() << dat::infoString(bMedians, "bMedians") << '\n';
-	io::out() << dat::infoString(bGains, "bGains") << '\n';
+	io::out() << infoString(cellGains, "cellGains") << '\n';
 	io::out() << dat::infoString(bTgt, "bTgt") << '\n';
+	io::out() << dat::infoString(gMedians, "gMedians") << '\n';
+	io::out() << dat::infoString(bEntrops[0], "entropy[0]") << '\n';
+	io::out() << dat::infoString(bEntrops[1], "entropy[1]") << '\n';
+	io::out() << dat::infoString(bEntrops[2], "entropy[2]") << '\n';
+	io::out() << dat::infoString(bEntrops[3], "entropy[3]") << '\n';
 
 	io::out() << dat::infoString(timer, "processing times") << '\n';
 	io::out() << std::endl;
 
 	reportSave(okayPix, pathOutPix);
 	reportSave(okayFlt, pathOutFlt);
+	reportSave(okayGray, pathOutGray);
 	reportSave(okayBands[0], bandNames[0]);
 	reportSave(okayBands[1], bandNames[1]);
 	reportSave(okayBands[2], bandNames[2]);
 	reportSave(okayBands[3], bandNames[3]);
 	io::out() << std::endl;
+
+	dat::grid<uint16_t> const sGrid
+		{ img::convert::pixelGridFor<uint16_t>(rawQuads) };
+	dat::MinMax<uint16_t> const sMinMax
+		{ img::stats::activeMinMax<uint16_t>(sGrid.begin(), sGrid.end()) };
+	dat::grid<uint8_t> loGrid(sGrid.hwSize());
+	dat::grid<uint8_t>::iterator itN{ loGrid.begin() };
+	for (dat::grid<uint16_t>::const_iterator
+		itS{ sGrid.begin() } ; sGrid.end() != itS ; ++itS, ++itN)
+	{
+		uint16_t const & sElem = *itS;
+		uint8_t & loElem = *itN;
+		std::bitset<10u> const mask
+			{ 0u << 9u // lost to cast below
+			| 0u << 8u // lost to cast below
+			| 1u << 7u
+			| 1u << 6u
+			| 1u << 5u
+			| 1u << 4u
+			| 1u << 3u
+			| 1u << 2u
+			| 1u << 1u
+			| 1u << 0u
+			};
+		loElem = static_cast<uint8_t>((sElem & mask.to_ulong()));
+	}
+	img::io::savePng(loGrid, "loGrid.png");
+	io::out() << dat::infoString(sMinMax, "sMinMax") << '\n';
 
 	return 0;
 }

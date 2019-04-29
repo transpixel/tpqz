@@ -46,20 +46,6 @@ namespace bitwork
 	using WorkType = unsigned int; // probably more 'natural' for compiler
 	// using WorkType = uint16_t;
 
-	//! Decode hiByte as largest component of full value
-	inline
-	WorkType
-	hiValue
-		( uint8_t const & hiByte
-		)
-	{
-		// multiply to leave room for low 2 bits
-		return
-			{ static_cast<WorkType>
-				(static_cast<WorkType>(hiByte) << WorkType(2u))
-			};
-	}
-
 	//! Active low bits associated with mask
 	inline
 	WorkType
@@ -88,15 +74,35 @@ namespace bitwork
 		return { static_cast<WorkType>(onLoBits(loBits, mask) >> shift) };
 	}
 
-	//! Value associated with (masked and UNshifted) loBit pattern
+	//! Promote high values (bitshit left)
 	inline
-	WorkType
-	loValue
-		( uint8_t const & loBits
-		, uint8_t const & mask
+	std::array<WorkType, 4u>
+	hiValues
+		( FourPix const & quad
 		)
 	{
-		return { onLoBits(loBits, mask) };
+		return std::array<WorkType, 4u>
+			{ (static_cast<WorkType>(quad.theHiBytes[0]) << 2u)
+			, (static_cast<WorkType>(quad.theHiBytes[1]) << 2u)
+			, (static_cast<WorkType>(quad.theHiBytes[2]) << 2u)
+			, (static_cast<WorkType>(quad.theHiBytes[3]) << 2u)
+			};
+	}
+
+	//! Decode low byte bit patterns into working values
+	inline
+	std::array<WorkType, 4u>
+	loValues
+		( FourPix const & quad
+		)
+	{
+		uint8_t const & loBits = quad.theLoBits;
+		return std::array<WorkType, 4u>
+			{ static_cast<WorkType>(loValue(loBits, 0xC0, 6u))
+			, static_cast<WorkType>(loValue(loBits, 0x30, 4u))
+			, static_cast<WorkType>(loValue(loBits, 0x0C, 2u))
+			, static_cast<WorkType>(loValue(loBits, 0x03, 0u))
+			};
 	}
 
 	//! Decode member bit patterns into full values in working units
@@ -106,21 +112,13 @@ namespace bitwork
 		( FourPix const & quad
 		)
 	{
-		std::array<uint8_t, 4u> const & hiBytes = quad.theHiBytes;
-		uint8_t const & loBits = quad.theLoBits;
+		std::array<WorkType, 4u> const hiVals{ hiValues(quad) };
+		std::array<WorkType, 4u> const loVals{ loValues(quad) };
 		return std::array<WorkType, 4u>
-			{ static_cast<WorkType>
-				( hiValue(hiBytes[0]) + loValue(loBits, 0xC0, 6u)
-				)
-			, static_cast<WorkType>
-				( hiValue(hiBytes[1]) + loValue(loBits, 0x30, 4u)
-				)
-			, static_cast<WorkType>
-				( hiValue(hiBytes[2]) + loValue(loBits, 0x0C, 2u)
-				)
-			, static_cast<WorkType>
-				( hiValue(hiBytes[3]) + loValue(loBits, 0x0C)
-				)
+			{ hiVals[0] + loVals[0]
+			, hiVals[1] + loVals[1]
+			, hiVals[2] + loVals[2]
+			, hiVals[3] + loVals[3]
 			};
 	}
 
@@ -162,6 +160,37 @@ pixelValues
 {
 	return { bitwork::pixelValues<PixType>(quad) };
 }
+
+inline
+std::array<uint8_t, 4u>
+pixelHiBytes
+	( FourPix const & quad
+	)
+{
+	std::array<bitwork::WorkType, 4u> const hiVals{ bitwork::hiValues(quad) };
+	return std::array<uint8_t, 4u>
+		{ static_cast<uint8_t>(hiVals[0] >> 2u)
+		, static_cast<uint8_t>(hiVals[1] >> 2u)
+		, static_cast<uint8_t>(hiVals[2] >> 2u)
+		, static_cast<uint8_t>(hiVals[3] >> 2u)
+		};
+}
+
+inline
+std::array<uint8_t, 4u>
+pixelLoBytes
+	( FourPix const & quad
+	)
+{
+	std::array<bitwork::WorkType, 4u> const loVals{ bitwork::loValues(quad) };
+	return std::array<uint8_t, 4u>
+		{ static_cast<uint8_t>(loVals[0])
+		, static_cast<uint8_t>(loVals[1])
+		, static_cast<uint8_t>(loVals[2])
+		, static_cast<uint8_t>(loVals[3])
+		};
+}
+
 
 } // raw10
 

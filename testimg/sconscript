@@ -68,6 +68,7 @@ env.Append(LIBPATH=libpaths)
 
 env.Program('demoRaw10.cpp')
 env.Program('ubrand.cpp')
+env.Program('ucfa.cpp')
 env.Program('ucolor.cpp')
 env.Program('uconvert.cpp')
 env.Program('udilate.cpp')

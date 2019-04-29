@@ -34,6 +34,9 @@
 */
 
 
+#include "libdat/array.h"
+#include "libdat/Extents.h"
+#include "libdat/ExtentsIterator.h"
 #include "libdat/grid.h"
 #include "libimg/img.h"
 
@@ -45,6 +48,55 @@ namespace img
 //! Functions for handling image detector color filter arrays.
 namespace cfa
 {
+	//! An individual CFA cell (2x2)
+	template <typename ElemType>
+	struct Cell
+	{
+		using value_type = ElemType;
+
+		using RowPix = std::array<ElemType, 2u>;
+		std::array<RowPix, 2u> theElems;
+	};
+
+	//! Size in elements associated with size in cells
+	inline
+	dat::Extents
+	elemSizeFor
+		( dat::Extents const & cellSize
+		);
+
+	//! Size in cells associated with size in elements
+	inline
+	dat::Extents
+	cellSizeFor
+		( dat::Extents const & elemSize
+		);
+
+	//! Expanded values after demultiplexing cell data using Cell layout
+	template <typename CellType>
+	inline
+	dat::grid<typename CellType::value_type>
+	elemGridFor
+		( dat::grid<CellType> const & cellGrid
+		);
+
+	//! Compacted values after multiplexing into Cell layout
+	template <typename CellType>
+	inline
+	dat::grid<CellType>
+	cellGridFor
+		( dat::grid<typename CellType::value_type> const & elemGrid
+		);
+
+	//! Grid after applying cellGain factors to rawGrid
+	template <typename ElemType>
+	inline
+	dat::grid<ElemType>
+	grayGridFor
+		( dat::grid<ElemType> const & rawGrid
+		, Cell<ElemType> const & cellGain
+		);
+
 	//! Extracts nearest samples on 2x2 grid
 	std::array<dat::grid<fpix_t>, 3u>
 	rgbFastFromRGGB

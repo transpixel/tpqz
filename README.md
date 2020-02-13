@@ -34,6 +34,8 @@ http://nothings.org/stb
    Mozilla Public License (MPL2): Guennebaud and Beno, Jacob and others
   * Website: http://eigen.tuxfamily.org/index.php?title=Main_Page
 
+### For older TPQZ versions (but not currently)
+
 * OpenCV: BSD License: Many [Copyright Holders](https://github.com/opencv/opencv/blob/master/LICENSE) Including:
 Copyright (C) 2000-2016, Intel Corporation,,
 Copyright (C) 2009-2011, Willow Garage Inc.,,
@@ -84,17 +86,12 @@ Longer version:
 TPQZ is a compositie of the acronym "tpq" from TransPixel-Quantum with
 the "z" added to make it unique and easily pronouncable "Tip-Q-Zee".
 
-TransPixel is a (not-yet open source) software code base supporting high
-precision measurement from digital imaging systems. TransPixel's "Quantum"
-component provides a shared generic foundation which comprises
-various C++ utility constructs and which has been factored into TPQZ.
-
 
 ## What's TPQZ Good For?
 
-With certainty, it's useful as a code toolbox for its specific original
-proprietary purpose. Outside of that, and with varying degrees of 
-probable success, it may also be useful for other similar
+With certainty, it's useful for its specific original purpose as a
+code toolbox for a particular project. Outside of that, and with varying
+degrees of probable success, it may also be useful for other similar
 technical software development activities - or perhaps not so much.
 
  * provides a few general capabilities which extend standard C++ (without the
@@ -118,19 +115,26 @@ For an initial quicklook, browse the overview documentation here <:TODO>
 
 For a more detailed experience, download the source code and run a few
 unit tests. E.g.
-
 * download the source code
-* from top level directory, build via
-	$ cd <top-level-dirTODO>
-	$ scons
-* run unit tests via
-	$ cd <top>/build
-	$ sh RunUnitTests.sh
-* explore interesting concepts
-	* e.g. identify by test/class name (TODO inventory list?)
-	* read class/namespace/func comment (e.g. in code or via doxygen)
-	* if useage/args not clear, then read the corresponding
-	unit test code for concrete example of usage.
+* then...
+
+A docker container may be used to build the library. The Docker file,
+and a few linux bash script examples are available in
+* tpqz/containers/...
+Modify the scripts to mount appropriate local file system locations, then
+ssh to the docker container (via Connect.sh script). From the ssh term, do
+e.g.:
+* <localSystem>$ sh Connect.sh
+* cd /tpqz
+* scons --tpSnapshot --tpOptimize -j16
+* cd ./build
+* sh RunUnitTests.sh
+
+Then explore various other items, e.g.:
+* e.g. identify by test/class name (TODO inventory list?)
+* read class/namespace/func comment (e.g. in code or via doxygen)
+* if useage/args not clear, try the corresponding unit test code for 
+each concrete example of usage.
 
 The initial internal and generated documentation/comments
 are rather sparse. Therefore please do not hesitate to contact
@@ -145,7 +149,7 @@ TPQZ to be used in a new context.
 
 #### Environment:
 
-The code is intended to be environment agnostic, but is currently (2017.05)
+The code is intended to be environment agnostic, but is currently (2020.02)
 only exercised on linux/gcc environment.
 
 There are a few items of dormant code that are linux only. Such code

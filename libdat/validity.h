@@ -145,7 +145,10 @@ namespace dat
 	nullValue
 		()
 	{
-		return {{ dat::nullValue<size_t>(), dat::nullValue<size_t>() }};
+		return RowCol
+			{ std::numeric_limits<RowCol::value_type>::max()
+			, std::numeric_limits<RowCol::value_type>::max()
+			};
 	}
 
 	template <typename AType, EnableIf< std::is_same<AType, Spot> >...>
@@ -154,7 +157,10 @@ namespace dat
 	nullValue
 		()
 	{
-		return {{ dat::nullValue<double>(), dat::nullValue<double>() }};
+		return Spot
+			{ std::numeric_limits<Spot::value_type>::quiet_NaN()
+			, std::numeric_limits<Spot::value_type>::quiet_NaN()
+			};
 	}
 
 

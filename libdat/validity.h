@@ -165,10 +165,12 @@ namespace dat
 
 
 	//! Invalid float
-	constexpr float badFlt(nullValue<float>());
+	constexpr float badFlt
+		{ std::numeric_limits<float>::quiet_NaN() };
 
 	//! Invalid double
-	constexpr double badDub(nullValue<double>());
+	constexpr double badDub
+		{ std::numeric_limits<double>::quiet_NaN() };
 
 	//! Simple functor returning null value
 	template <typename OutType, typename InType>

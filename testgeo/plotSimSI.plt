@@ -27,7 +27,7 @@ pause -1;
 
 lm = 40
 set xrange[-lm/2.:lm/2.]
-set yrange[-1:lm]
+set yrange[-0:lm]
 set zrange[-lm:lm]
 
 set size square

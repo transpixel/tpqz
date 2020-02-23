@@ -52,20 +52,24 @@ namespace
 		ga::Vector const theExpPnt;
 		ga::Vector const theMidPnt;
 		double const theRange;
-		static constexpr double theSigSta{ 1./16. };
-		static constexpr double theSigDir{ 1./32. };
+		double const theSigSta{ 1./16. };
+		double const theSigDir{ 1./32. };
 
 		explicit
 		TestCase
 			( ga::Vector const & sta1
 			, ga::Vector const & sta2
 			, ga::Vector const & expPnt
+			, double const & sigSta
+			, double const & sigDir
 			)
 			: theSta1{ sta1 }
 			, theSta2{ sta2 }
 			, theExpPnt{ expPnt }
 			, theMidPnt{ .5 * (theSta2 + theSta1) }
 			, theRange{ ga::magnitude(theExpPnt - theMidPnt) }
+			, theSigSta{ sigSta }
+			, theSigDir{ sigDir }
 		{ }
 
 		geo::si::PointSoln
@@ -243,7 +247,9 @@ geo_si_demo
 	ga::Vector const expSta1{ -.5, .0,  0. };
 	ga::Vector const expSta2{  .5, .0,  0. };
 	ga::Vector const expPnt{ 0., 10., 0. };
-	TestCase const tcase(expSta1, expSta2, expPnt);
+	double const sigSta{ 1./16. };
+	double const sigDir{ 1./32. };
+	TestCase const tcase(expSta1, expSta2, expPnt, sigSta, sigDir);
 
 	// principal ray-ray intersection
 	ga::Vector const expDir1{ ga::unit(expPnt - expSta1) };

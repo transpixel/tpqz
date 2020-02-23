@@ -124,11 +124,11 @@ Plane :: infoString
 	}
 	if (isValid())
 	{
-		oss << dat::infoString(origin(), "origin()");
+		oss << dat::infoString(origin(), "pointOn");
 		oss << std::endl;
-		oss << dat::infoString(theNormVec, "theNormVec");
+		oss << dat::infoString(theNormVec, "normVec");
 		oss << std::endl;
-		oss << dat::infoString(theNormMag, "theNormMag");
+		oss << dat::infoString(theNormMag, "origDist");
 	}
 	else
 	{

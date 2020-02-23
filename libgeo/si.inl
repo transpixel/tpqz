@@ -37,6 +37,42 @@ namespace geo
 namespace si
 {
 
+//	struct Obs
+//	{
+
+template <typename GeoType>
+inline
+double
+Obs<GeoType> :: weight
+	( double const & nomRange
+	) const
+{
+	double const sigComposite
+		{ math::hypot((nomRange*theDirSigma), theStaSigma) };
+	assert(math::eps < sigComposite);
+	return { 1. / sigComposite };
+}
+
+template <typename GeoType>
+inline
+std::string
+Obs<GeoType> :: infoString
+	( std::string const & title
+	) const
+{
+	std::ostringstream oss;
+	oss << dat::infoString(theGeoItem, title);
+	oss << std::endl;
+	oss << "   Direction Uncertainty: ";
+	oss << dat::infoString(theDirSigma);
+	oss << std::endl;
+	oss << "    Location Uncertainty: ";
+	oss << dat::infoString(theStaSigma);
+	return oss.str();
+}
+
+//	}; // ObsRay
+
 template <typename Container>
 inline
 Dyadic

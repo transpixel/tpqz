@@ -39,48 +39,6 @@
 #include <sstream>
 
 
-namespace
-{
-	//! Observation data
-	template <typename GeoType>
-	struct Obs
-	{
-		GeoType theGeoItem;
-		double theDirSigma;
-		double theStaSigma;
-
-		//! Weight for this ray based on nominal range
-		double
-		weight
-			( double const & nomRange
-			) const
-		{
-			double const sigComposite
-				{ math::hypot((nomRange*theDirSigma), theStaSigma) };
-			assert(math::eps < sigComposite);
-			return { 1. / sigComposite };
-		}
-
-		//! Descriptive information about this instance
-		std::string
-		infoString
-			( std::string const & title = {}
-			) const
-		{
-			std::ostringstream oss;
-			oss << dat::infoString(theGeoItem, title);
-			oss << std::endl;
-			oss << "   Direction Uncertainty: ";
-			oss << dat::infoString(theDirSigma);
-			oss << std::endl;
-			oss << "    Location Uncertainty: ";
-			oss << dat::infoString(theStaSigma);
-			return oss.str();
-		}
-
-	}; // ObsRay
-}
-
 //! Demonstrate ray/plane intersection ala Thale's ship location technique.
 int
 main
@@ -103,13 +61,13 @@ main
 	// sea surface
 	constexpr double sigSeaSta{ .000 };
 	constexpr double sigSeaDir{ .001 };
-	Obs<geo::Plane> const obsSea
+	geo::si::Obs<geo::Plane> const obsSea
 		{ geo::Plane(ga::vZero, ga::E12), sigSeaDir, sigSeaSta };
 
 	// ray
 	constexpr double sigRaySta{ .500 };
 	constexpr double sigRayDir{ .010 };
-	Obs<geo::Ray> const obsRay
+	geo::si::Obs<geo::Ray> const obsRay
 		{ geo::Ray::fromToward(raySta, expPnt), sigRayDir, sigRaySta };
 
 	//

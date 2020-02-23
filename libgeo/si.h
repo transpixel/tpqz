@@ -56,6 +56,30 @@ namespace si
 	using WRay = std::pair<double, geo::Ray>;
 	using WPlane = std::pair<double, geo::Plane>;
 
+	//! Uncertain observation data
+	template <typename GeoType>
+	struct Obs
+	{
+		GeoType theGeoItem;
+		double theDirSigma;
+		double theStaSigma;
+
+		//! Weight for this ray based on nominal range
+		inline
+		double
+		weight
+			( double const & nomRange
+			) const;
+
+		//! Descriptive information about this instance
+		inline
+		std::string
+		infoString
+			( std::string const & title = {}
+			) const;
+
+	}; // ObsRay
+
 	//! Normal system singular geometry (e.g. inverse ellipsoid axes)
 	struct SemiAxis
 	{

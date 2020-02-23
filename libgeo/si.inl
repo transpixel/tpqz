@@ -182,6 +182,34 @@ PointSystem :: addWeightedRhs
 		+= (weightSq * (obsDyadic[6]*v0 + obsDyadic[7]*v1 + obsDyadic[8]*v2));
 }
 
+inline
+void
+PointSystem :: addWeightedRay
+	( WRay const & wray
+	)
+{
+	double const weightSq{ math::sq(wray.first) };
+	geo::Ray const & ray = wray.second;
+	Dyadic const obsDyadic{ rayDyadicFor(ray.theDir) };
+	addWeightedDyadic(weightSq, obsDyadic);
+	addWeightedRhs(weightSq, obsDyadic, ray.theStart);
+	++theNumRays;
+}
+
+inline
+void
+PointSystem :: addWeightedPlane
+	( WPlane const & wplane
+	)
+{
+	double const weightSq{ math::sq(wplane.first) };
+	geo::Plane const & plane = wplane.second;
+	Dyadic const obsDyadic{ planeDyadicFor(plane.unitNormal()) };
+	addWeightedDyadic(weightSq, obsDyadic);
+	addWeightedRhs(weightSq, obsDyadic, plane.origin());
+	++theNumPlanes;
+}
+
 } // si
 
 } // geo

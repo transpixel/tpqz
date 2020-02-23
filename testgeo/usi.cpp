@@ -152,6 +152,9 @@ geo_si_test2
 	double const sig0{ 8. };
 	double const root2{ std::sqrt(2.) };
 	std::array<double, 3u> const expSigs{ sig0, sig0, sig0/root2 }; // big->sml
+	constexpr size_t dofUsed{ 0u }; // propagation doesn't fit any parms
+	double const expRMS
+		{ math::rms<double>(expSigs.begin(), expSigs.end(), dofUsed) };
 
 	// measurement observations
 	geo::Ray const ray1{ geo::Ray::fromToward(sta1, expPnt) };
@@ -198,6 +201,16 @@ geo_si_test2
 		oss << "Failure of aposterior sigma estimate test" << std::endl;
 		oss << dat::infoString(expSigs, "expSigs") << std::endl;
 		oss << dat::infoString(gotSigs, "gotSigs") << std::endl;
+	}
+
+	// check rms computation
+	double const gotRMS
+		{ math::rms<double>(gotSigs.begin(), gotSigs.end(), dofUsed) };
+	if (! dat::nearlyEquals(gotRMS, expRMS))
+	{
+		oss << "Failure of RMS sigma estimate test" << std::endl;
+		oss << dat::infoString(expRMS, "expRMS") << std::endl;
+		oss << dat::infoString(gotRMS, "gotRMS") << std::endl;
 	}
 
 	constexpr bool show{ false };

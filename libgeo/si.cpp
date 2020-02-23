@@ -85,6 +85,29 @@ PointSoln :: kthLargestSemiAxis
 	return axis;
 }
 
+double
+PointSoln :: rmsAxisMagnitude
+	() const
+{
+	double rms{ dat::nullValue<double>() };
+	double sumSqs{ 0. };
+	double count{ 0. };
+	for (size_t kk{0u} ; kk < 3u ; ++kk)
+	{
+		double const & mag = theSemiAxes[kk].theMag;
+		if (dat::isValid(mag))
+		{
+			sumSqs += math::sq(mag);
+			count += 1.;
+		}
+	}
+	if (0. < count)
+	{
+		rms = std::sqrt(sumSqs / count);
+	}
+	return rms;
+}
+
 std::vector<ga::Vector>
 PointSoln :: ellipsoidTips
 	() const
@@ -138,12 +161,15 @@ PointSystem :: addWeightedRays
 {
 	for (WRay const & wray : wrays)
 	{
+		addWeightedRay(wray);
+		/*
 		double const weightSq{ math::sq(wray.first) };
 		geo::Ray const & ray = wray.second;
 		Dyadic const obsDyadic{ rayDyadicFor(ray.theDir) };
 		addWeightedDyadic(weightSq, obsDyadic);
 		addWeightedRhs(weightSq, obsDyadic, ray.theStart);
 		++theNumRays;
+		*/
 	}
 }
 
@@ -154,12 +180,15 @@ PointSystem :: addWeightedPlanes
 {
 	for (WPlane const & wplane : wplanes)
 	{
+		addWeightedPlane(wplane);
+		/*
 		double const weightSq{ math::sq(wplane.first) };
 		geo::Plane const & plane = wplane.second;
 		Dyadic const obsDyadic{ planeDyadicFor(plane.unitNormal()) };
 		addWeightedDyadic(weightSq, obsDyadic);
 		addWeightedRhs(weightSq, obsDyadic, plane.origin());
 		++theNumPlanes;
+		*/
 	}
 }
 

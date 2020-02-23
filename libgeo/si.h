@@ -118,6 +118,11 @@ namespace si
 			( size_t const & ndx  //!< 0,1,2: smallest to largest
 			) const;
 
+		//! Root-Mean-Square of axes magnitudes (only valid values included)
+		double
+		rmsAxisMagnitude
+			() const;
+
 		//! Coordinates for endpoints of semiaxes (6 pnts)
 		std::vector<ga::Vector>
 		ellipsoidTips
@@ -152,11 +157,7 @@ namespace si
 		size_t theNumRays{ 0u };
 		size_t theNumPlanes{ 0u };
 
-	public: // methods
-
-		//! Construct with fully zeroed accumulation buffers
-		PointSystem
-			();
+	private: // methods
 
 		//! Incorporate weighted dyadic observation into normal coeff matrix
 		inline
@@ -173,6 +174,26 @@ namespace si
 			( double const & weightSq
 			, Dyadic const & bigQ
 			, ga::Vector const & vec
+			);
+
+	public: // methods
+
+		//! Construct with fully zeroed accumulation buffers
+		PointSystem
+			();
+
+		//! Incorporate a collection of weighted ray observations
+		inline
+		void
+		addWeightedRay
+			( WRay const & wray
+			);
+
+		//! Incorporate a collection of weighted plane observations
+		inline
+		void
+		addWeightedPlane
+			( WPlane const & wplane
 			);
 
 		//! Incorporate a collection of weighted ray observations

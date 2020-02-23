@@ -150,7 +150,8 @@ geo_si_test2
 
 	ga::Vector const expPnt{ 0., 0., 0. };
 	double const sig0{ 8. };
-	std::array<double, 3u> const expSigs{ sig0, sig0, .5*sig0 }; // big->sml
+	double const root2{ std::sqrt(2.) };
+	std::array<double, 3u> const expSigs{ sig0, sig0, sig0/root2 }; // big->sml
 
 	// measurement observations
 	geo::Ray const ray1{ geo::Ray::fromToward(sta1, expPnt) };

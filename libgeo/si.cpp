@@ -36,6 +36,7 @@
 
 #include "libdat/info.h"
 #include "libla/eigen.h"
+#include "libmath/math.h"
 
 #include <algorithm>
 #include <sstream>
@@ -137,11 +138,11 @@ PointSystem :: addWeightedRays
 {
 	for (WRay const & wray : wrays)
 	{
-		double const & weight = wray.first;
+		double const weightSq{ math::sq(wray.first) };
 		geo::Ray const & ray = wray.second;
 		Dyadic const obsDyadic{ rayDyadicFor(ray.theDir) };
-		addWeightedDyadic(weight, obsDyadic);
-		addWeightedRhs(weight, obsDyadic, ray.theStart);
+		addWeightedDyadic(weightSq, obsDyadic);
+		addWeightedRhs(weightSq, obsDyadic, ray.theStart);
 		++theNumRays;
 	}
 }
@@ -153,11 +154,11 @@ PointSystem :: addWeightedPlanes
 {
 	for (WPlane const & wplane : wplanes)
 	{
-		double const & weight = wplane.first;
+		double const weightSq{ math::sq(wplane.first) };
 		geo::Plane const & plane = wplane.second;
 		Dyadic const obsDyadic{ planeDyadicFor(plane.unitNormal()) };
-		addWeightedDyadic(weight, obsDyadic);
-		addWeightedRhs(weight, obsDyadic, plane.origin());
+		addWeightedDyadic(weightSq, obsDyadic);
+		addWeightedRhs(weightSq, obsDyadic, plane.origin());
 		++theNumPlanes;
 	}
 }

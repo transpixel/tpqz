@@ -87,8 +87,8 @@ namespace
 
 			// collect observations of same classifications
 			std::vector<geo::si::WRay> const wrays
-				{ { obsRay1.weight(theRange), ray1 }
-				, { obsRay2.weight(theRange), ray2 }
+				{ { obsRay1.obsWeight(theRange), ray1 }
+				, { obsRay2.obsWeight(theRange), ray2 }
 				};
 
 			// compute intersection of collections

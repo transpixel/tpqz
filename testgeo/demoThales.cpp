@@ -76,10 +76,10 @@ main
 
 	// collect observations by classification
 	std::vector<geo::si::WRay> const wrays
-		{ { obsRay.weight(range), obsRay.theGeoItem }
+		{ { obsRay.obsWeight(range), obsRay.theGeoItem }
 		};
 	std::vector<geo::si::WPlane> const wplanes
-		{ { obsSea.weight(range), obsSea.theGeoItem }
+		{ { obsSea.obsWeight(range), obsSea.theGeoItem }
 		};
 
 	// create observation system

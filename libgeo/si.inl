@@ -43,7 +43,7 @@ namespace si
 template <typename GeoType>
 inline
 double
-Obs<GeoType> :: weight
+Obs<GeoType> :: obsWeight
 	( double const & nomRange
 	) const
 {
@@ -143,7 +143,7 @@ namespace priv
 inline
 void
 PointSystem :: addWeightedDyadic
-	( double const & weight
+	( double const & weightSq
 	, Dyadic const & obsDyadic
 	)
 {
@@ -151,9 +151,9 @@ PointSystem :: addWeightedDyadic
 		( std::begin(theNormCo), std::end(theNormCo)
 		, std::begin(obsDyadic)
 		, std::begin(theNormCo)
-		, [&weight]
+		, [&weightSq]
 			(double const & norm, double const & qq)
-			{ return weight*qq + norm; }
+			{ return weightSq*qq + norm; }
 		);
 	/*
 	io::out() << priv::infoMatrix(obsDyadic.begin(), "obsDyadic", 3u) << "\n";
@@ -165,7 +165,7 @@ PointSystem :: addWeightedDyadic
 inline
 void
 PointSystem :: addWeightedRhs
-	( double const & weight
+	( double const & weightSq
 	, Dyadic const & obsDyadic
 	, ga::Vector const & vec
 	)
@@ -175,11 +175,11 @@ PointSystem :: addWeightedRhs
 	double const & v2 = vec[2];
 	// combined tensor/vec contraction and weighted accumulation
 	theNormRhs[0]
-		+= (weight * (obsDyadic[0]*v0 + obsDyadic[1]*v1 + obsDyadic[2]*v2));
+		+= (weightSq * (obsDyadic[0]*v0 + obsDyadic[1]*v1 + obsDyadic[2]*v2));
 	theNormRhs[1]
-		+= (weight * (obsDyadic[3]*v0 + obsDyadic[4]*v1 + obsDyadic[5]*v2));
+		+= (weightSq * (obsDyadic[3]*v0 + obsDyadic[4]*v1 + obsDyadic[5]*v2));
 	theNormRhs[2]
-		+= (weight * (obsDyadic[6]*v0 + obsDyadic[7]*v1 + obsDyadic[8]*v2));
+		+= (weightSq * (obsDyadic[6]*v0 + obsDyadic[7]*v1 + obsDyadic[8]*v2));
 }
 
 } // si

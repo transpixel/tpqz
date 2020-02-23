@@ -53,8 +53,9 @@ namespace geo
 
 namespace si
 {
-	using WRay = std::pair<double, geo::Ray>;
-	using WPlane = std::pair<double, geo::Plane>;
+	using ObsWeight = double;
+	using WRay = std::pair<ObsWeight, geo::Ray>;
+	using WPlane = std::pair<ObsWeight, geo::Plane>;
 
 	//! Uncertain observation data
 	template <typename GeoType>
@@ -67,7 +68,7 @@ namespace si
 		//! Weight for this ray based on nominal range
 		inline
 		double
-		weight
+		obsWeight
 			( double const & nomRange
 			) const;
 
@@ -161,7 +162,7 @@ namespace si
 		inline
 		void
 		addWeightedDyadic
-			( double const & weight
+			( double const & weightSq
 			, Dyadic const & bigQ
 			);
 
@@ -169,7 +170,7 @@ namespace si
 		inline
 		void
 		addWeightedRhs
-			( double const & weight
+			( double const & weightSq
 			, Dyadic const & bigQ
 			, ga::Vector const & vec
 			);

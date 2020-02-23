@@ -72,7 +72,7 @@ geo_si_test1
 
 	constexpr double staH{ 50. }; // station height
 	constexpr double range{ 1000. }; // horizontal distance to target
-	ga::Vector const base{ ga::zero };
+	ga::Vector const base{ 0., 300., 10. };
 	constexpr double sigRay{ 2. };
 	constexpr double sigSea{ 1. };
 
@@ -127,6 +127,8 @@ geo_si_test1
 	if ((! okay) || show)
 	{
 		io::out() << "==== test data ====>" << std::endl;
+		io::out() << dat::infoString(base, "base") << std::endl;
+		io::out() << dat::infoString(raySta, "raySta") << std::endl;
 		io::out() << dat::infoString(sea, "sea") << std::endl;
 		io::out() << dat::infoString(ray, "ray") << std::endl;
 		io::out() << dat::infoString(pntSoln, "pntSoln") << std::endl;

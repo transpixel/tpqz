@@ -117,6 +117,11 @@ namespace si
 			( size_t const & ndx  //!< 0,1,2: smallest to largest
 			) const;
 
+		//! Coordinates for endpoints of semiaxes (6 pnts)
+		std::vector<ga::Vector>
+		ellipsoidTips
+			() const;
+
 	}; // PointSoln
 
 	using Dyadic = std::array<double, 9u>;

@@ -84,6 +84,21 @@ PointSoln :: kthLargestSemiAxis
 	return axis;
 }
 
+std::vector<ga::Vector>
+PointSoln :: ellipsoidTips
+	() const
+{
+	ga::Vector const & mid = theLoc;
+	return std::vector<ga::Vector>
+		{ mid + theSemiAxes[0].asVector()
+		, mid - theSemiAxes[0].asVector()
+		, mid + theSemiAxes[1].asVector()
+		, mid - theSemiAxes[1].asVector()
+		, mid + theSemiAxes[2].asVector()
+		, mid - theSemiAxes[2].asVector()
+		};
+}
+
 std::string
 PointSoln :: infoString
 	( std::string const & title
@@ -162,9 +177,9 @@ namespace
 
 		// weights are eigenValues which are sqrt(SingularValues)
 		std::array<double, 3u> const wVals
-			{ (vecS(0, 0))
-			, (vecS(1, 0))
-			, (vecS(2, 0))
+			{ std::sqrt(vecS(0, 0))
+			, std::sqrt(vecS(1, 0))
+			, std::sqrt(vecS(2, 0))
 			};
 
 		/*

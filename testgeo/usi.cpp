@@ -123,7 +123,7 @@ geo_si_test1
 	// check uncertainty
 	// (no prediction possible; single plane and one ray has exact soln)
 
-	constexpr bool show{ true };
+	constexpr bool show{ false };
 	if ((! okay) || show)
 	{
 		io::out() << "==== test data ====>" << std::endl;

@@ -1,0 +1,1828 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Space Intersection with Uncertainty Estimation
+\end_layout
+
+\begin_layout Author
+Dave Knopp
+\begin_inset Newline newline
+\end_inset
+
+Stellacore Corporation
+\end_layout
+
+\begin_layout Abstract
+This technical note describes a simple mathematical algorithm for performing
+ classic space intersection operations.
+ The algorithm accepts a generic representation of geometric rays in three
+ dimensional (3D) space and to computes a 
+\begin_inset Quotes eld
+\end_inset
+
+best fit
+\begin_inset Quotes erd
+\end_inset
+
+ 3D point position along with a simple but rigorous estimate of the geometric
+ uncertainty in the computed position.
+ The formulation exploits the dual nature of rays and planes in 3D space
+ so that both ray-ray and ray-plane intersection as supported in a unified
+ tensor framework.
+ Results of a simple simulation case are presented as an example.
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Intersect_FigThales.svg
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Thales'-method"
+
+\end_inset
+
+Thales' method for determining distance to ships at sea is a basic space
+ intersection process (here, ray intersection with the water surface).
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+instrument
+\begin_inset Quotes erd
+\end_inset
+
+ comprising a support and two sticks is arranged with one stick horizontal
+ and the sighting stick pointing toward an object of interest.
+ The sighting angle is measured by measuring the distance 
+\begin_inset Formula $d$
+\end_inset
+
+ in terms of units of 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ E.g.
+ if 
+\begin_inset Formula $h$
+\end_inset
+
+ is the width of hand, then measure 
+\begin_inset Formula $d$
+\end_inset
+
+ in the same units (e.g.
+ number of palms).
+ Space intersection is performed by exploiting the concept of similar triangles
+ by which the horizontal distance, 
+\begin_inset Formula $D$
+\end_inset
+
+, has the same proportion to 
+\begin_inset Formula $H$
+\end_inset
+
+.
+ This provides the distance to the ship specified in units of vantage point
+ height, 
+\begin_inset Formula $H$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+Space intersection (SI) is an classic survey and photogrammetry algorithm
+ that has its roots in basic triangulation concepts from antiquity.
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Thales'-method"
+
+\end_inset
+
+ illustrates the method used by Thales of Miletus to measure the distance
+ to ships at sea using 
+\begin_inset Quotes eld
+\end_inset
+
+rays
+\begin_inset Quotes erd
+\end_inset
+
+ produced by pointing a stick (e.g.
+ ref
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ThalesWiki"
+
+\end_inset
+
+).
+ While modern algebraic systems enable a number of improvements, overall,
+ this older technique capatures the fundamental ideas of space intersection.
+ I.e.
+ angles are recorded from observing stations and the concept of similar
+ triangles is utilized to determine object point locations.
+\end_layout
+
+\begin_layout Standard
+The following presents a general space intersection formulation that combines
+ multiple observations into a single least-squares style system of equations.
+ Supported observations include geometric rays (like Thales' direction sighting)
+ as well as observations of planar surfaces (e.g.
+ approximation to sea surface in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Thales'-method"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+In 3D space, rays and planes are geometric dual concepts.
+ I.e.
+ points on a ray span an algebraic subspace that is complementary to the
+ subspace spanned by points on a plane.
+ This allows expressing least-squares normal system components in a common
+ data structure so that any combination of ray and plane observations can
+ be handled in a unified manner.
+\end_layout
+
+\begin_layout Standard
+In the following, a basic geometric model is described with geometric vector
+ algebra.
+ Then the corresponding matrix representation is provided.
+ For this case, the matrices created are 2nd rank tensors (e.g.
+ properly behave as true tensors under coordinate transformations), however,
+ this property is not exploited.
+ Instead, the tensor representations are associated with 
+\begin_inset Quotes eld
+\end_inset
+
+layers
+\begin_inset Quotes erd
+\end_inset
+
+ in the least-square normal system.
+\end_layout
+
+\begin_layout Section
+Methodology
+\end_layout
+
+\begin_layout Subsection
+Math Model
+\end_layout
+
+\begin_layout Subsubsection
+Error Considerations
+\end_layout
+
+\begin_layout Standard
+In reality the ray observations are not perfect and therefore, the exact
+ intersection model is not actually satisfied.
+ In addition to the observation error, the observation measurements are
+ associated with an inherent uncertainty in the recorded value.
+ Note that the general uncertainty in the measurement is different from
+ the specific error in an individual measurement
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In more specific terms, measurement uncertainty is a statistical concept
+ associated with a random variable population variance, whereas measurement
+ error is a sample-specific realized value.
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In the following, the measurement errors are addressed by introducing a
+ least-squares criterion to specify a solution that minimizes the sum-square
+ of the measurement errors.
+ Measurement uncertainty considerations are addressed by including a generic
+ scalar weight parameter in the least square formulation.
+ However, techniques for assignment of weight values are only addressed
+ in passing.
+\end_layout
+
+\begin_layout Standard
+Assignment of meaningful weight values is generally an significant consideration
+ in that tends to be application specific.
+\end_layout
+
+\begin_layout Subsubsection
+Terminology
+\end_layout
+
+\begin_layout Standard
+The following abbreviations are utilized.
+\end_layout
+
+\begin_layout Description
+dof Degrees of freedom.
+ The number of free (scalar) parameters required to fully describe a situation.
+ E.g.
+ a point in space has 3 dof, a general line in space has 4 dof.
+\end_layout
+
+\begin_layout Description
+doc Degrees of constraint.
+ The number of dof that can be removed by a constraint relationship.
+ E.g.
+ requiring a point to lie on a planar surface introduces 1 doc, requiring
+ a point to lie on a line introduced 2 doc.
+\end_layout
+
+\begin_layout Description
+dom Degrees of measurement.
+ The amount of information provided by observation data.
+ E.g.
+ a scalar observation provides 1 dom, a vector observation 3 dom.
+\end_layout
+
+\begin_layout Description
+dor Degrees of redundancy.
+ The amount by which a system is over determined.
+ In general, dor = dom +
+\begin_inset space ~
+\end_inset
+
+doc -
+\begin_inset space ~
+\end_inset
+
+dof.
+\end_layout
+
+\begin_layout Subsubsection
+Least Squares Approach
+\end_layout
+
+\begin_layout Standard
+To support redundant observations a standard least squares formalism is
+ utilized.
+ This is important since even the simple and classic case of two intersecting
+ rays is a redundant space intersection problem (with residual errors associated
+ with 
+\begin_inset Quotes eld
+\end_inset
+
+misclosure
+\begin_inset Quotes erd
+\end_inset
+
+ at point of closest approach between skew rays).
+\end_layout
+
+\begin_layout Standard
+In a standard (matrix-based) least squares formulation, a normal system
+ is constructed which comprises a coefficient matrix and a 
+\begin_inset Quotes eld
+\end_inset
+
+right-hand-side
+\begin_inset Quotes erd
+\end_inset
+
+ (rhs) (column) matrix.
+ Mathematically, construction of the normal system can be written in a form
+ that represents the summation of a collection of partial coefficient and
+ rhs matrices.
+ Each of the individual items in this collection can be conceived as a 
+\begin_inset Quotes eld
+\end_inset
+
+layer
+\begin_inset Quotes erd
+\end_inset
+
+ of the overall system such that the final normal equation system is constructed
+ by summing all of the individual layers.
+\end_layout
+
+\begin_layout Standard
+Each layer is associated with a single observation.
+ For the present case, each layer corresponds with an individual 
+\begin_inset Quotes eld
+\end_inset
+
+point-on-ray
+\begin_inset Quotes erd
+\end_inset
+
+ or a 
+\begin_inset Quotes eld
+\end_inset
+
+point-on-plane
+\begin_inset Quotes erd
+\end_inset
+
+ observation.
+ Each observation (layer) can be individually weighted to reflect its significan
+ce.
+ 
+\end_layout
+
+\begin_layout Standard
+Solution of the full normal system, composed as the sum of all weighted
+ layers, provides a 
+\begin_inset Quotes eld
+\end_inset
+
+best
+\begin_inset Quotes erd
+\end_inset
+
+ (least-squares sense) estimate of the 3D position of the point that is
+ closest (least-squares sense) to all rays and planes introduced into the
+ system.
+ 
+\end_layout
+
+\begin_layout Standard
+Inversion of the full normal coefficient matrix provides a sensitivity matrix
+ that represents the sensitivity of the computed point location with respect
+ to the weighting introduced on the layers.
+ If the layer weights represent appropriately reduced observation covariance
+ information, then the sensitivity matrix can be interpreted as a covariance
+ matrix for the computed point intersection solution.
+ The sensitivity matrix can be represented as a 3D ellipsoid.
+\end_layout
+
+\begin_layout Subsection
+Parametric Geometry Models
+\end_layout
+
+\begin_layout Subsubsection
+Ray
+\end_layout
+
+\begin_layout Standard
+The position of a point in space relative to an observation ray may be expressed
+ in terms of a station point, a direction and a range value along that direction.
+ Let scalar, 
+\begin_inset Formula $\lambda$
+\end_inset
+
+, represent this free parameter, while vector, 
+\begin_inset Formula $s$
+\end_inset
+
+, represents the starting point from which the ray emanates, and unit vector,
+ 
+\begin_inset Formula $d$
+\end_inset
+
+, represents the direction of propagation.
+\end_layout
+
+\begin_layout Standard
+An arbitrary vector location, 
+\begin_inset Formula $x$
+\end_inset
+
+, lies on the ray if,
+\begin_inset Formula 
+\[
+x=s+\lambda d
+\]
+
+\end_inset
+
+This expresses the 
+\begin_inset Quotes eld
+\end_inset
+
+point-on-ray
+\begin_inset Quotes erd
+\end_inset
+
+ condition in terms of four unknown degrees of freedom, the three freedoms
+ of vector 
+\begin_inset Formula $x$
+\end_inset
+
+, and the one freedom for scalar range value, 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Using the GA vector wedge product
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This is analogous to involving each side in a cross product with 
+\begin_inset Formula $d$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ from the left by 
+\begin_inset Formula $d$
+\end_inset
+
+, noting that 
+\begin_inset Formula $d\wedge d=0$
+\end_inset
+
+, this may be expressed as
+\begin_inset Formula 
+\begin{equation}
+d\wedge x=d\wedge s\label{eq:Collinearity}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a bivector valued expression of collinearity.
+\end_layout
+
+\begin_layout Standard
+Equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Collinearity"
+
+\end_inset
+
+ expresses the 
+\begin_inset Quotes eld
+\end_inset
+
+point-on-ray
+\begin_inset Quotes erd
+\end_inset
+
+ condition in terms of the three unknown components of object space point,
+ 
+\begin_inset Formula $x$
+\end_inset
+
+, and the ray station, 
+\begin_inset Formula $s$
+\end_inset
+
+, and propagation (unitary) direction, 
+\begin_inset Formula $d$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Plane
+\end_layout
+
+\begin_layout Standard
+The location of an arbitrary point in a plane may be expressed in terms
+ of two free parameters relative to a specific plane.
+ Let scalars, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu$
+\end_inset
+
+, represent these two free parameters, while vector, 
+\begin_inset Formula $p$
+\end_inset
+
+, represents a point known to be contained in the plane.
+ A parametric representation for vector location, 
+\begin_inset Formula $x$
+\end_inset
+
+, that lies in the plane, is,
+\begin_inset Formula 
+\[
+x=p+\mu u+\nu v
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are two unit vectors assumed to also be orthogonal to each other.
+\end_layout
+
+\begin_layout Standard
+Using the GA vector wedge product from the left, first by 
+\begin_inset Formula $v$
+\end_inset
+
+, then by 
+\begin_inset Formula $u$
+\end_inset
+
+, yields,
+\begin_inset Formula 
+\[
+v\wedge x=v\wedge p+\mu v\wedge u
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+u\wedge v\wedge x=u\wedge v\wedge p
+\]
+
+\end_inset
+
+Introduce unitary biivector, 
+\begin_inset Formula $D$
+\end_inset
+
+, to represent the direction of this plane, via
+\begin_inset Formula 
+\[
+D\equiv u\wedge v
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The condition that location, 
+\begin_inset Formula $x$
+\end_inset
+
+, is contained in the plane may therefore be expressed in terms of the bivector-
+vector wedge product,
+\begin_inset Formula 
+\begin{equation}
+D\wedge x=D\wedge p\label{eq:Coplanarity}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a trivector-valued expression of coplanarity.
+\end_layout
+
+\begin_layout Standard
+Equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Coplanarity"
+
+\end_inset
+
+ expresses the 
+\begin_inset Quotes eld
+\end_inset
+
+point-on-plane
+\begin_inset Quotes erd
+\end_inset
+
+ condition in terms of the three unknown components of object point location
+ vector, 
+\begin_inset Formula $x$
+\end_inset
+
+, and the parameters that describe the plane, a point, 
+\begin_inset Formula $p$
+\end_inset
+
+, that lies in the plane, and the unit bivector direction, 
+\begin_inset Formula $D$
+\end_inset
+
+, of the planar surface.
+\end_layout
+
+\begin_layout Subsection
+Tensor Formulation
+\end_layout
+
+\begin_layout Subsubsection
+Rays
+\end_layout
+
+\begin_layout Standard
+This collinearity condition for an individual ray may be represented in
+ matrix notation as
+\begin_inset Formula 
+\[
+\mathsf{R}\mathsf{x}=\mathsf{R}\mathsf{s}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mathsf{R}=\left[\begin{array}{ccc}
+0 & -d_{3} & d_{2}\\
+d_{3} & 0 & -d_{1}\\
+-d_{2} & d_{1} & 0
+\end{array}\right]
+\]
+
+\end_inset
+
+This may be associated with a single layer in the least squares normal system
+ of the form
+\begin_inset Formula 
+\[
+\left(\mathsf{R}^{t}\mathsf{R}\right)\mathsf{x}=\left(\mathsf{R}^{t}\mathsf{R}\right)\mathsf{s}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\left(\mathsf{R}^{t}\mathsf{R}\right)$
+\end_inset
+
+ is the layer coefficient matrix and 
+\begin_inset Formula $\left(\mathsf{R}^{t}\mathsf{R}\right)\mathsf{s}$
+\end_inset
+
+ is the layer rhs.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+Forwhere
+\begin_inset Formula 
+\[
+\mathsf{R}=\left[\begin{array}{ccc}
+0 & -d_{3} & d_{2}\\
+d_{3} & 0 & -d_{1}\\
+-d_{2} & d_{1} & 0
+\end{array}\right]\,,\,\mathsf{R}\mathsf{s}=\left[\begin{array}{c}
+s_{2}d_{3}-s_{3}d_{2}\\
+s_{3}d_{1}-s_{1}d_{3}\\
+s_{1}d_{2}-s_{2}d_{1}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula $\mathsf{R}^{t}=\left[\begin{array}{ccc}
+0 & d_{3} & -d_{2}\\
+-d_{3} & 0 & d_{1}\\
+d_{2} & -d_{1} & 0
+\end{array}\right]$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathsf{R}^{t}\mathsf{R}=\left[\begin{array}{ccc}
+d_{3}^{2}+d_{2}^{2} & -d_{1}d_{2} & -d_{3}d_{1}\\
+-d_{1}d_{2} & d_{3}^{2}+d_{1}^{2} & -d_{2}d_{3}\\
+-d_{1}d_{3} & -d_{2}d_{3} & d_{2}^{2}+d_{1}^{2}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathsf{R}^{t}\mathsf{R}=\left[\begin{array}{ccc}
+d_{3}^{2}+d_{2}^{2}+d_{1}^{2}-d_{1}^{2} & -d_{1}d_{2} & -d_{3}d_{1}\\
+-d_{1}d_{2} & d_{3}^{2}+d_{1}^{2}+d_{2}^{2}-d_{2}^{2} & -d_{2}d_{3}\\
+-d_{1}d_{3} & -d_{2}d_{3} & d_{2}^{2}+d_{1}^{2}+d_{3}^{2}-d_{3}^{2}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathsf{R}^{t}\mathsf{R}=\left[\begin{array}{ccc}
+\left(1-d_{1}^{2}\right) & -d_{1}d_{2} & -d_{3}d_{1}\\
+-d_{1}d_{2} & \left(1-d_{2}^{2}\right) & -d_{2}d_{3}\\
+-d_{1}d_{3} & -d_{2}d_{3} & \left(1-d_{3}^{2}\right)
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Normal Layer
+\end_layout
+
+\begin_layout Standard
+For the 
+\begin_inset Formula $i$
+\end_inset
+
+-th normal system layer, when it involves a ray, define second rank tensor,
+ 
+\begin_inset Formula $\mathsf{Q}_{i}$
+\end_inset
+
+, as
+\begin_inset Formula 
+\[
+\mathsf{Q}_{i}\equiv\mathsf{R}^{t}\mathsf{R}
+\]
+
+\end_inset
+
+Noting, the structure of 
+\begin_inset Formula $\mathsf{R}^{t}\mathsf{R}$
+\end_inset
+
+, this may also be expressed as
+\begin_inset Formula 
+\[
+\mathsf{Q}_{i}=\mathsf{I}-\mathsf{d}_{i}\otimes\mathsf{d}_{i}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathsf{I}$
+\end_inset
+
+ is the (3x3) identity matrix the 
+\begin_inset Formula $\mathsf{d}_{i}\otimes\mathsf{d}_{i}$
+\end_inset
+
+ is the dyadic product associated with the ray (unit) direction vector,
+ 
+\begin_inset Formula $d$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This contributes an individual normal system layer,
+\begin_inset Formula 
+\[
+\mathsf{Q}_{i}\mathsf{x}=\mathsf{Q}_{i}\mathsf{s}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In practice this layer is accumulated into the overall normal system in
+ proportion to the significance (certainty) of this 
+\begin_inset Formula $i$
+\end_inset
+
+-th particular ray.
+ This significance is represented as a weight factor and each layer is multiplie
+d by its weight factor before being incorporated into the full normal system.
+ I.e.
+ the layer is modified by weight factor, 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+, and the weighted layer for accumulation is expressed as,
+\begin_inset Formula 
+\[
+\omega_{i}^{2}\mathsf{Q}_{i}\mathsf{x}=\omega_{i}^{2}\mathsf{Q}_{i}\mathsf{s}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the weight is introduced into the layer as a squared quantity.
+ This convention is useful since 
+\begin_inset Formula $\mathsf{Q}_{i}$
+\end_inset
+
+ is a quadratic entity relative to the order of the observation quantities
+ (here 
+\begin_inset Formula $d$
+\end_inset
+
+).
+ A simple method for weight factor estimation is described in appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Weighting-Rays"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Planes
+\end_layout
+
+\begin_layout Standard
+This coplanarity condition for an individual point represented in matrix
+ notation as
+\begin_inset Formula 
+\[
+\mathsf{P}\mathsf{x}=\mathsf{P}\mathsf{s}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mathsf{P}=\left[\begin{array}{ccc}
+D_{1} & D_{2} & D_{3}\end{array}\right]
+\]
+
+\end_inset
+
+The least squares layer is
+\begin_inset Formula 
+\[
+\mathsf{P}^{t}\mathsf{P}=\mathsf{D}\otimes\mathsf{D}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Normal Layer
+\end_layout
+
+\begin_layout Standard
+For the 
+\begin_inset Formula $i$
+\end_inset
+
+-th plane, define second rank tensor, 
+\begin_inset Formula $\mathsf{Q}_{i}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathsf{Q}_{i}\equiv\mathsf{D}_{i}\otimes\mathsf{D}_{i}=\mathsf{P}^{t}\mathsf{P}
+\]
+
+\end_inset
+
+Where the 
+\begin_inset Formula $\mathsf{D}_{i}\otimes\mathsf{D}_{i}$
+\end_inset
+
+ is the dyadic product associated with the components of the plane's (unit)
+ direction bivector, 
+\begin_inset Formula $D_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This tensor contributes an individual normal system layer of the form,
+\begin_inset Formula 
+\[
+\omega_{i}^{2}\mathsf{Q}_{i}\mathsf{x}=\omega_{i}^{2}\mathsf{Q}_{i}\mathsf{s}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A simple method for determining the plane weighting factor, 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+, is described in appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Weighting-Planes"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Least Squares Solution
+\end_layout
+
+\begin_layout Standard
+Here, assume that index, 
+\begin_inset Formula $i$
+\end_inset
+
+, is identifying the 
+\begin_inset Formula $i$
+\end_inset
+
+-th observation irrespective whether the 
+\begin_inset Formula $i$
+\end_inset
+
+-th observation is a ray or a plane.
+\end_layout
+
+\begin_layout Subsubsection
+Normal System
+\end_layout
+
+\begin_layout Standard
+The full normal system is the sum of available observation layers,
+\begin_inset Formula 
+\[
+\left(\sum\omega_{i}^{2}\mathsf{Q}_{i}\right)\tilde{\mathsf{x}}=\left(\sum\omega_{i}^{2}\mathsf{Q}_{i}\mathsf{s}_{i}\right)
+\]
+
+\end_inset
+
+The scalar value, 
+\begin_inset Formula $\omega_{i}^{2}$
+\end_inset
+
+, is the layer-specific weighting factor, in terms of the direct observation
+ weight of 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Determination of specific weight factor values, 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+, is generally application specific (e.g.
+ what data are available, what specific measurements are utilized to construct
+ each ray and plane observation.
+ However, it is common to use a weight factor that is the inverse of observation
+ covariance or uncertainty representations.
+ e.g.
+\begin_inset Formula 
+\[
+\omega_{i}=\sigma_{i}^{-1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\sigma_{i}$
+\end_inset
+
+ is a representation of uncertainty in the 
+\begin_inset Formula $i$
+\end_inset
+
+-th observation (layer).
+\end_layout
+
+\begin_layout Standard
+Here, the observation uncertainty and hence, layer weighting, are represented
+ by scalar values.
+ For systems of equations, 
+\begin_inset Formula $w_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma_{i}$
+\end_inset
+
+, are replaced by corresponding (equivalent-equation) weight and (equivalent-equ
+ation) covariance matrices.
+\end_layout
+
+\begin_layout Standard
+The full normal system may be expressed in terms of the layer uncertainty
+ (e.g.
+ observation covariance), 
+\begin_inset Formula $\sigma_{i}^{2}$
+\end_inset
+
+, as
+\begin_inset Formula 
+\[
+\left(\sum\sigma_{i}^{-2}\mathsf{Q}_{i}\right)\tilde{\mathsf{x}}=\left(\sum\sigma_{i}^{-2}\mathsf{Q}_{i}\mathsf{s}_{i}\right)
+\]
+
+\end_inset
+
+The normal matrix (coefficient on 
+\begin_inset Formula $\tilde{\mathsf{x}}$
+\end_inset
+
+) is a symmetric, positive-definite, 3x3 matrix while the right-hand-side
+ is a 3x1 column matrix.
+\end_layout
+
+\begin_layout Standard
+The (LS-
+\begin_inset Quotes erd
+\end_inset
+
+best
+\begin_inset Quotes erd
+\end_inset
+
+) solution point location, 
+\begin_inset Formula $\check{x}$
+\end_inset
+
+, is determined in standard fashion via,
+\begin_inset Formula 
+\[
+\check{x}=\left(\sum\sigma_{i}^{-2}\mathsf{Q}_{i}\right)^{-1}\left(\sum\sigma_{i}^{-2}\mathsf{Q}_{i}\mathsf{s}_{i}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Solution Point Uncertainty
+\end_layout
+
+\begin_layout Standard
+Uncertainty in the computed solution point location can be estimated from
+ the inverse normal matrix, 
+\begin_inset Formula $\mathsf{C}_{x}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\mathsf{C}_{x}=\left(\sum\sigma_{i}^{-2}\mathsf{Q}_{i}\right)^{-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $\sigma_{i}^{2}$
+\end_inset
+
+ is a statistically meaningful estimate of observation variance, then 
+\begin_inset Formula $\mathsf{C}_{x}$
+\end_inset
+
+ is a formal covariance estimate of uncertainty in the intersection point
+ location, 
+\begin_inset Formula $\check{x}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The eigenvectors and square-root of associated eigenvalues of 
+\begin_inset Formula $\mathsf{C}_{x}$
+\end_inset
+
+ describe the semi axes of a standard error ellipsoid about the point location.
+\end_layout
+
+\begin_layout Subsection
+Solution Representation
+\end_layout
+
+\begin_layout Standard
+An often convenient expression for the 3D point location solution is to
+ consider the important elements:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\check{x}$
+\end_inset
+
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+best
+\begin_inset Quotes erd
+\end_inset
+
+ estimate of 3D location
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\sigma_{a}a$
+\end_inset
+
+ Relative vector offset to tip of uncertainty ellipsoid primary semi axis
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\sigma_{b}b$
+\end_inset
+
+ Relative vector offset to tip of uncertainty ellipsoid secondary semi axis
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\sigma_{c}c$
+\end_inset
+
+ Relative vector offset to tip of uncertainty ellipsoid tertiary semi axis
+\end_layout
+
+\begin_layout Standard
+Here, the three scalars, 
+\begin_inset Formula $\sigma_{a}$
+\end_inset
+
+, 
+\begin_inset Formula $\sigma_{b}$
+\end_inset
+
+, 
+\begin_inset Formula $\sigma_{c}$
+\end_inset
+
+, are the magnitudes of the uncertainty ellipsoid semi-axes.
+ While unit vectors, 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $b$
+\end_inset
+
+, 
+\begin_inset Formula $c$
+\end_inset
+
+, are the corresponding directions of these axes.
+ Note that the axes directions are mutually orthogonal.
+\end_layout
+
+\begin_layout Standard
+The point location is readily encoded as three components of a vector.
+ However, there are a couple options for encoding the ellipse uncertainty.
+\end_layout
+
+\begin_layout Subsubsection
+Minimal parameter representation:
+\end_layout
+
+\begin_layout Standard
+Encode the uncertainty as collection of three 
+\begin_inset Quotes eld
+\end_inset
+
+axis
+\begin_inset Quotes erd
+\end_inset
+
+ values, 
+\begin_inset Formula $\left\{ \sigma_{a},\sigma_{b},\sigma_{c}\right\} $
+\end_inset
+
+ directly, then separately encode the attitude associated with the attitude
+ of the uncertainty ellipse.
+ E.g.
+ the attitude can be encoded as a bivector angle, 
+\begin_inset Formula $\Theta$
+\end_inset
+
+, expressing alignment of the ellipse axes with respect to underlying reference
+ frame.
+ This representation requires the minimum number of 6 scalar values to represent
+ the full uncertainty ellipsoid.
+ As minimum parameter representation this is generally the most compact
+ form and is free from potential inconsistency of redundant data storage.
+ However, extracting various derived geometry characteristics (e.g.
+ end points of ellipse axes) can require some computation.
+\end_layout
+
+\begin_layout Subsubsection
+Redundant storage:
+\end_layout
+
+\begin_layout Standard
+A direct way to store the uncertainty information is using three full vectors,
+ 
+\begin_inset Formula $\left\{ \left(\sigma_{a}a\right),\left(\sigma_{b}b\right),\left(\sigma_{c}c\right)\right\} $
+\end_inset
+
+ - i.e.
+ 9 scalar values.
+ This is often useful for quickly generating shapes for 3D graphics (e.g.
+ polygon outline) to represent the ellipsoid.
+ A variation is to store the axes magnitudes and axes directions separately,
+ requiring even more space (12 scalar values) but sometimes being convenient
+ for use cases that benefit from having the magnitude/direction decomposition
+ already available.
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Box Boxed
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Intersect_FigResult.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Numeric-results"
+
+\end_inset
+
+Numeric results from unit test representing Thales' experiment illustrated
+ in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Thales'-method"
+
+\end_inset
+
+.
+ Refer to text for description of the values.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above method has been implemented within the TPQZ software library.
+ As an example, this implementation is applied to the Thales' example in
+ figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Thales'-method"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For this example, approximate the sea surface as a flat plane at zero elevation.
+ I.e.
+ 
+\begin_inset Formula $p=0$
+\end_inset
+
+, and 
+\begin_inset Formula $D=E_{12}$
+\end_inset
+
+.
+ Assume the observing station is at the top of a cliff with a height 
+\begin_inset Formula $\eta=150$
+\end_inset
+
+ as measured form base of cliff which is at base location, 
+\begin_inset Formula $300$
+\end_inset
+
+ units north of a coordinate origin, 
+\begin_inset Formula $b=300e_{2}$
+\end_inset
+
+ (with all linear distances in arbitrary units, but e.g.
+ meters).
+ The ray observing stations may be expressed as, 
+\begin_inset Formula $s=b+\eta e_{3}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Also assume that observing a ship from the clifftop produces a sighting
+ direction for which slope has a rise of, 
+\begin_inset Formula $.148$
+\end_inset
+
+ and a run of 
+\begin_inset Formula $.989$
+\end_inset
+
+), e.g.
+\begin_inset Formula 
+\[
+d=-.989e_{1}-.148e_{3}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For observation weights, arbitrarily assume that the sea surface plane has
+ very low direction uncertainty, 
+\begin_inset Formula $\sigma_{sd}=.001$
+\end_inset
+
+, and zero location uncertainty since it defines zero elevation (ignoring
+ Earth curvature) so that 
+\begin_inset Formula $\sigma_{sp}=0$
+\end_inset
+
+.
+ Assume the ray has pointing direction uncertainty of 
+\begin_inset Formula $\sigma_{rd}=.010$
+\end_inset
+
+ (about half the angle subtended by a finger tip finger at arms length).
+ Assume the station location uncertainty of 
+\begin_inset Formula $\sigma_{rs}=.5$
+\end_inset
+
+.
+ Use the formula in appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Weight-Estimation"
+
+\end_inset
+
+ to compute the associated weights.
+\end_layout
+
+\begin_layout Standard
+Introduction of these numeric values into the demonstration program, produces
+ the output displayed in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Numeric-results"
+
+\end_inset
+
+.
+ The intersection result determines the location of the ship 
+\begin_inset Formula $\check{x}=-1067e_{1}+300e_{2}$
+\end_inset
+
+, and also estimates the uncertainty.
+\end_layout
+
+\begin_layout Standard
+The uncertainty estimate is represented by the ellipsoid semi-axes (last
+ three lines of the figure).
+ The axes directions are strongly, but not entirely coupled, with the oblique
+ ray direction (although they are the same to precision of the three significant
+ digits shown in the figure).
+\end_layout
+
+\begin_layout Standard
+From the semi-axis magnitude values, note that the elevation is best determined
+ (first axis is nearly vertical).
+ This is relatively well determined since the directions of the plane and
+ oblique ray tend to reinforce determination of the intersection point elevation.
+ The range direction is least well determined (nominally horizontal axis)
+ and uncertainty in the range direction (last ellipsoid axis) is dominant.
+ Uncertainty in the orthogonal third direction (e.g.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+north
+\begin_inset Quotes erd
+\end_inset
+
+) is determined primarily by uncertainty in the ray direction.
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Appendices
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Weight-Estimation"
+
+\end_inset
+
+Weight Estimation
+\end_layout
+
+\begin_layout Standard
+The following presents a simple (but fairly effective) technique for estimating
+ weight factors for ray and plane observations.
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Weighting-Rays"
+
+\end_inset
+
+Weighting Rays
+\end_layout
+
+\begin_layout Standard
+The certainty (weight) of a ray may be expressed in terms of inverse uncertainty.
+ A simple expression for overall ray uncertainty is the root-mean-square
+ (RMS) value of the contributing uncertainties in station and direction.
+ The direction uncertainty can be converted to a linear uncertainty by multiplyi
+ng with the range distance.
+ Overall, a scalar ray uncertainty can be represented as
+\begin_inset Formula 
+\[
+\sigma_{i}=\sqrt{\left(\lambda_{i}\sigma_{di}\right)^{2}+\sigma_{si}^{2}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\sigma_{di}$
+\end_inset
+
+ is the perpendicular uncertainty in the direction vector, and 
+\begin_inset Formula $\sigma_{si}$
+\end_inset
+
+ is the spherical uncertainty in the station point of the 
+\begin_inset Formula $i$
+\end_inset
+
+-th ray.
+\end_layout
+
+\begin_layout Standard
+The inverse of this uncertainty may be used as the weight factor for this
+ ray,
+\begin_inset Formula 
+\[
+\omega_{i}=\sigma_{i}^{-1}
+\]
+
+\end_inset
+
+or as
+\begin_inset Formula 
+\[
+\omega_{i}^{2}=\frac{1}{\lambda_{i}^{2}\sigma_{di}^{2}+\sigma_{si}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The scalar range distance, 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+, may be estimated from nominal values (or prior iterative solution), 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+, via, 
+\begin_inset Formula $\lambda_{i}=\left|\tilde{x}-s_{i}\right|$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Weighting-Planes"
+
+\end_inset
+
+Weighting Planes
+\end_layout
+
+\begin_layout Standard
+Weighting the observation layer can follow the same methodology as for rays,
+ with analogous result,
+\begin_inset Formula 
+\[
+\omega_{i}^{2}=\frac{1}{\mu^{2}\sigma_{Di}^{2}+\sigma_{pi}^{2}}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\sigma_{Di}$
+\end_inset
+
+ is the perpendicular uncertainty in the direction bivector, 
+\begin_inset Formula $D_{i}$
+\end_inset
+
+, 
+\begin_inset Formula $\sigma_{pi}$
+\end_inset
+
+ is the spherical uncertainty in the anchor point for the 
+\begin_inset Formula $i$
+\end_inset
+
+-th plane, and scalar, 
+\begin_inset Formula $\mu_{i}$
+\end_inset
+
+, is the distance from the anchor point for the current observation.
+ The distance, 
+\begin_inset Formula $\mu_{i}$
+\end_inset
+
+, may be estimated from nominal values (or prior iterative solution), 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+, via, 
+\begin_inset Formula $\mu_{i}=\left|\tilde{x}-p_{i}\right|$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "GA-Cambridge"
+
+\end_inset
+
+University of Cambridge, 
+\begin_inset Quotes eld
+\end_inset
+
+geometric algebra
+\begin_inset Quotes erd
+\end_inset
+
+, website, http://www.mrao.cam.ac.uk/%7Eclifford/
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "ThalesWiki"
+
+\end_inset
+
+wikipedia, 
+\begin_inset Quotes eld
+\end_inset
+
+Thales of Miletus
+\begin_inset Quotes erd
+\end_inset
+
+, https://en.wikipedia.org/wiki/Thales_of_Miletus#Geometry
+\end_layout
+
+\end_body
+\end_document

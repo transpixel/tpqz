@@ -968,6 +968,18 @@ Note that the weight is introduced into the layer as a squared quantity.
 \end_inset
 
 ).
+ A simple method for weight factor estimation is described in appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Weighting-Rays"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1047,6 +1059,25 @@ This tensor contributes an individual normal system layer of the form,
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+A simple method for determining the plane weighting factor, 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+, is described in appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Weighting-Planes"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -1480,28 +1511,40 @@ For this example, approximate the sea surface as a flat plane at zero elevation.
 
 .
  Assume the observing station is at the top of a cliff with a height 
-\begin_inset Formula $\eta=50$
+\begin_inset Formula $\eta=150$
 \end_inset
 
-, so that the station location may be expressed as, 
-\begin_inset Formula $s=50e_{3}$
+ as measured form base of cliff which is at base location, 
+\begin_inset Formula $300$
 \end_inset
 
- (with linear distances in arbitrary units, but e.g.
+ units north of a coordinate origin, 
+\begin_inset Formula $b=300e_{2}$
+\end_inset
+
+ (with all linear distances in arbitrary units, but e.g.
  meters).
- Also assume that observing a ship from the clifftop produces a sighting
+ The ray observing stations may be expressed as, 
+\begin_inset Formula $s=b+\eta e_{3}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Also assume that observing a ship from the clifftop produces a sighting
  direction for which slope has a rise of, 
-\begin_inset Formula $.050$
+\begin_inset Formula $.148$
 \end_inset
 
  and a run of 
-\begin_inset Formula $.999$
+\begin_inset Formula $.989$
 \end_inset
 
 ), e.g.
 \begin_inset Formula 
 \[
-d=-.999e_{1}-.050e_{3}
+d=-.989e_{1}-.148e_{3}
 \]
 
 \end_inset
@@ -1510,40 +1553,44 @@ d=-.999e_{1}-.050e_{3}
 \end_layout
 
 \begin_layout Standard
-For numerical completeness, assume all locations are repressed relative
- to a base location at the bottom of the cliff face and acting as coordinate
- system origin, 
-\begin_inset Formula $b=0$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
 For observation weights, arbitrarily assume that the sea surface plane has
- uncertainty, 
-\begin_inset Formula $\sigma_{s}=1$
+ very low direction uncertainty, 
+\begin_inset Formula $\sigma_{sd}=.001$
 \end_inset
 
-, and that the ray has twice the uncertainty, 
-\begin_inset Formula $\sigma_{r}=2$
-\end_inset
-
-.
- The respective weights are therefore, 
-\begin_inset Formula $\omega_{s}=1$
-\end_inset
-
- and 
-\begin_inset Formula $\omega_{r}=\frac{1}{2}$
+, and zero location uncertainty since it defines zero elevation (ignoring
+ Earth curvature) so that 
+\begin_inset Formula $\sigma_{sp}=0$
 \end_inset
 
 .
+ Assume the ray has pointing direction uncertainty of 
+\begin_inset Formula $\sigma_{rd}=.010$
+\end_inset
+
+ (about half the angle subtended by a finger tip finger at arms length).
+ Assume the station location uncertainty of 
+\begin_inset Formula $\sigma_{rs}=.5$
+\end_inset
+
+.
+ Use the formula in appendix
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Weight-Estimation"
+
+\end_inset
+
+ to compute the associated weights.
 \end_layout
 
 \begin_layout Standard
-Introduction of these numeric values into a unit test case, produces the
- output displayed in figure
+Introduction of these numeric values into the demonstration program, produces
+ the output displayed in figure
 \begin_inset space ~
 \end_inset
 
@@ -1556,7 +1603,7 @@ reference "fig:Numeric-results"
 
 .
  The intersection result determines the location of the ship 
-\begin_inset Formula $\check{x}=-999e_{1}$
+\begin_inset Formula $\check{x}=-1067e_{1}+300e_{2}$
 \end_inset
 
 , and also estimates the uncertainty.
@@ -1566,13 +1613,179 @@ reference "fig:Numeric-results"
 The uncertainty estimate is represented by the ellipsoid semi-axes (last
  three lines of the figure).
  The axes directions are strongly, but not entirely coupled, with the oblique
- ray direction.
- From the semi-axis magnitude values, note that the elevation is best determined
- (first axis is nearly vertical), while the range direction is least well
- determined (nominally horizontal axis).
- For this particular case, uncertainty in the range direction (largest ellipsoid
- axis) is dominant (in fact, the uncertainty is larger than range value
- itself).
+ ray direction (although they are the same to precision of the three significant
+ digits shown in the figure).
+\end_layout
+
+\begin_layout Standard
+From the semi-axis magnitude values, note that the elevation is best determined
+ (first axis is nearly vertical).
+ This is relatively well determined since the directions of the plane and
+ oblique ray tend to reinforce determination of the intersection point elevation.
+ The range direction is least well determined (nominally horizontal axis)
+ and uncertainty in the range direction (last ellipsoid axis) is dominant.
+ Uncertainty in the orthogonal third direction (e.g.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+north
+\begin_inset Quotes erd
+\end_inset
+
+) is determined primarily by uncertainty in the ray direction.
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Appendices
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Weight-Estimation"
+
+\end_inset
+
+Weight Estimation
+\end_layout
+
+\begin_layout Standard
+The following presents a simple (but fairly effective) technique for estimating
+ weight factors for ray and plane observations.
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Weighting-Rays"
+
+\end_inset
+
+Weighting Rays
+\end_layout
+
+\begin_layout Standard
+The certainty (weight) of a ray may be expressed in terms of inverse uncertainty.
+ A simple expression for overall ray uncertainty is the root-mean-square
+ (RMS) value of the contributing uncertainties in station and direction.
+ The direction uncertainty can be converted to a linear uncertainty by multiplyi
+ng with the range distance.
+ Overall, a scalar ray uncertainty can be represented as
+\begin_inset Formula 
+\[
+\sigma_{i}=\sqrt{\left(\lambda_{i}\sigma_{di}\right)^{2}+\sigma_{si}^{2}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\sigma_{di}$
+\end_inset
+
+ is the perpendicular uncertainty in the direction vector, and 
+\begin_inset Formula $\sigma_{si}$
+\end_inset
+
+ is the spherical uncertainty in the station point of the 
+\begin_inset Formula $i$
+\end_inset
+
+-th ray.
+\end_layout
+
+\begin_layout Standard
+The inverse of this uncertainty may be used as the weight factor for this
+ ray,
+\begin_inset Formula 
+\[
+\omega_{i}=\sigma_{i}^{-1}
+\]
+
+\end_inset
+
+or as
+\begin_inset Formula 
+\[
+\omega_{i}^{2}=\frac{1}{\lambda_{i}^{2}\sigma_{di}^{2}+\sigma_{si}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The scalar range distance, 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+, may be estimated from nominal values (or prior iterative solution), 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+, via, 
+\begin_inset Formula $\lambda_{i}=\left|\tilde{x}-s_{i}\right|$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Weighting-Planes"
+
+\end_inset
+
+Weighting Planes
+\end_layout
+
+\begin_layout Standard
+Weighting the observation layer can follow the same methodology as for rays,
+ with analogous result,
+\begin_inset Formula 
+\[
+\omega_{i}^{2}=\frac{1}{\mu^{2}\sigma_{Di}^{2}+\sigma_{pi}^{2}}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\sigma_{Di}$
+\end_inset
+
+ is the perpendicular uncertainty in the direction bivector, 
+\begin_inset Formula $D_{i}$
+\end_inset
+
+, 
+\begin_inset Formula $\sigma_{pi}$
+\end_inset
+
+ is the spherical uncertainty in the anchor point for the 
+\begin_inset Formula $i$
+\end_inset
+
+-th plane, and scalar, 
+\begin_inset Formula $\mu_{i}$
+\end_inset
+
+, is the distance from the anchor point for the current observation.
+ The distance, 
+\begin_inset Formula $\mu_{i}$
+\end_inset
+
+, may be estimated from nominal values (or prior iterative solution), 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+, via, 
+\begin_inset Formula $\mu_{i}=\left|\tilde{x}-p_{i}\right|$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Bibliography

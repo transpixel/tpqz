@@ -122,6 +122,7 @@ OptionCppFlags = \
 # Paths to include files
 incPath = \
  [ '../'
+ , '/usr/include/eigen3/Eigen/'
  ]
 
 # General compilation flags for all builds

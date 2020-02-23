@@ -77,5 +77,6 @@ env.Program('uLineSeg.cpp')
 env.Program('uPlane.cpp')
 env.Program('uProbRay.cpp')
 env.Program('uRay.cpp')
+env.Program('usi.cpp')
 env.Program('ustats.cpp')
 

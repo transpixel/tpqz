@@ -75,6 +75,10 @@
 Camera Calibration with Paper Tube
 \end_layout
 
+\begin_layout After Title Text
+Stellacore Document ID: GITHASHKEY GITDATEKEY
+\end_layout
+
 \begin_layout Author
 Dave Knopp
 \begin_inset Newline newline
@@ -86,8 +90,12 @@ Stellacore Corporation
 \begin_layout Abstract
 In general photogrammetry work it is often useful to be able to quickly
  estimate a nominal value for the principal distance of a camera.
- This technical note describes a quick simple process to estimate camera
- principal distance using a photograph acquired through a paper tube.
+ This technical note describes a simple and quick process to estimate camera
+ principal distance using a single photograph acquired through a paper tube.
+ The process is quick and easy yet produces estimated values of fairly reasonabl
+e quality with relative precision in the range of a fraction of a percent
+ at a given focal setting, and within a couple percent for a variable focus
+ system.
 \end_layout
 
 \begin_layout Section
@@ -95,27 +103,38 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-It is often useful to have a quick and simple method for estimating the
- principal distance of a camera device.
- E.g.
- for proforma configuration analysis, network design estimation, or simply
- as starting values for various iterative solution techniques.
- The following describes a simple process for obtaining a reasonable quality
- estimate for camera principal distance that is good to within a percent
- or so.
+It is often useful to have a quick and simple, yet reliable and accurate,
+ method for estimating the principal distance of a camera system.
+ For example, when trial fitting new lenses on a camera sensor, or for use
+ in performing general configuration analysis, network design estimation,
+ or to provide good initial values to iterative numerical solution techniques.
 \end_layout
 
 \begin_layout Standard
-Process includes:
+The following describes a simple process for obtaining a reasonable quality
+ estimate for camera principal distance.
+ The overall process includes:
 \end_layout
 
 \begin_layout Itemize
-Obtain a cylindrical tube (e.g.
- core of many rolled paper products)
+Obtain a cylindrical tube such as the core from a rolled-paper product (cf
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Cardboard-tube-used"
+
+\end_inset
+
+), or perhaps use a section of metal or plastic pipe.
 \end_layout
 
 \begin_layout Itemize
-Characterize its dimensions (in relative units) including
+Characterize its relative dimensions.
+ Use any convenient units, since only ratios are needed.
 \end_layout
 
 \begin_deeper
@@ -133,16 +152,35 @@ thickness (for extra precision)
 
 \end_deeper
 \begin_layout Itemize
-Acquire a photo with tube placed over camera lens
+Acquire a photo with camera looking down the inside of the tube.
+ E.g.
+ with tube placed in front of camera lens (cf.
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Cross-section-illustration"
+
+\end_inset
+
+).
+ If automated techniques will be used to make image measurements, then consider
+ controlling the lighting and/or scene content in order to facilitate image
+ feature automation (e.g.
+ use a dark cloth background would provide a high contrast with a light
+ colored tube).
 \end_layout
 
 \begin_layout Itemize
 Utilize image processing (manual or automated) to measure pixel area of
- far end of tube
+ far end of tube.
 \end_layout
 
 \begin_layout Itemize
-Compute principal distance using formula presented below.
+Compute camera principal distance using formula presented below.
 \end_layout
 
 \begin_layout Section
@@ -153,11 +191,11 @@ Methodology
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename RollCalibration_FigTube.png
+	filename TubeCalibration_FigTube.png
 	width 100col%
 
 \end_inset
@@ -173,8 +211,19 @@ name "fig:Cardboard-tube-used"
 \end_inset
 
 Cardboard tube used to acquire sample images.
- Dimensions are 98mm length, 134 mm circumference and wall thikness of approxima
-tely 1mm.
+ Dimensions are 98
+\begin_inset space ~
+\end_inset
+
+mm length, 134
+\begin_inset space ~
+\end_inset
+
+mm circumference and a wall thickness of approximately 1
+\begin_inset space ~
+\end_inset
+
+mm.
 \end_layout
 
 \end_inset
@@ -191,11 +240,11 @@ tely 1mm.
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename RollCalibration_FigProfile.svg
+	filename TubeCalibration_FigProfile.svg
 	width 100col%
 
 \end_inset
@@ -246,6 +295,29 @@ reference "fig:Cross-section-illustration"
  for example case below the tube was held with one end flat against the
  face of a smartphone and arranged so that image preview shows the other
  end of the tube in center of display.
+ Examples of acquired imagery are shown in Figures
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Close-focus-image"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Working-distance-focus"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -395,28 +467,164 @@ and substituting values for
 
  above to obtain,
 \begin_inset Formula 
-\[
-h=2\frac{L\pi}{C}\sqrt{\frac{a}{\pi}}
-\]
+\begin{equation}
+h=2\frac{L\pi}{C}\sqrt{\frac{a}{\pi}}\label{eq:hFuncOfMany}
+\end{equation}
 
 \end_inset
 
 
 \end_layout
 
+\begin_layout Standard
+Note that this provides a direct relationship between the desired principal
+ distance value, 
+\begin_inset Formula $h$
+\end_inset
+
+, and the observed area, 
+\begin_inset Formula $a$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Tube Constant
+\end_layout
+
+\begin_layout Standard
+The constants involved in the principal distance expression equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:hFuncOfMany"
+
+\end_inset
+
+ are mosly associated with the tube and remain the same for any exposures
+ acquired through it.
+ Therefore, reduce the expression as follows.
+\end_layout
+
+\begin_layout Standard
+The formula for principal distance may be expressed as
+\begin_inset Formula 
+\[
+h=2\frac{L}{C}\sqrt{\pi a}
+\]
+
+\end_inset
+
+Define dimensionless scalar ratio, 
+\begin_inset Formula $\rho$
+\end_inset
+
+, as
+\begin_inset Formula 
+\[
+\rho\equiv2\frac{L}{C}\sqrt{\pi}
+\]
+
+\end_inset
+
+and us it to express the principal distance as
+\begin_inset Formula 
+\begin{equation}
+h=\rho\sqrt{a}\label{eq:hFuncRhoArea}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This provides a simple expression in which the principal distance is expressed
+ as a simple scalar multiple of the square root of the observed area.
+\end_layout
+
+\begin_layout Standard
+From a practical perspective, if the principal distance is to be determined
+ for many lenses or many cameras, then this provides the basis for a very
+ simple process.
+ E.g.:
+\end_layout
+
+\begin_layout Itemize
+Characterize the available tube(s) by their 
+\begin_inset Quotes eld
+\end_inset
+
+tube constant(s)
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Formula $\rho$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Then, to determine principal distance for any camera lens combination:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+snap a photo through the tube
+\end_layout
+
+\begin_layout Itemize
+measure area of tube end opening (e.g.
+ can automated with simple flood fill) to obtain, 
+\begin_inset Formula $a$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+estimate principal distance via formula of equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:hFuncRhoArea"
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Wall Thickness Correction
 \end_layout
 
 \begin_layout Standard
-The above process describes measuring the outside circumference of the tube
- while an image acquired through the tube is observing the inside diameter.
- If, in addition to length and outside circumference, the thickness of the
- tube, 
+The above process describes measuring the outside circumference of the tube.
+ However, the acquired image, which is looking through the inside of the
+ tube, is observing an inside diameter of the end opening.
+ If, the thickness of the tube, 
 \begin_inset Formula $T$
 \end_inset
 
-, is also measured, then the inside tube diameter can be computed as follows.
+, is also measured in addition to the lenght, 
+\begin_inset Formula $L$
+\end_inset
+
+, and circumference, 
+\begin_inset Formula $C$
+\end_inset
+
+, then the inside tube diameter can be computed as follows.
 \end_layout
 
 \begin_layout Standard
@@ -451,13 +659,13 @@ h=\frac{L}{D}d=2\frac{L}{\frac{C}{\pi}-2T}\sqrt{\frac{a}{\pi}}
 or
 \begin_inset Formula 
 \[
-h=\left(\frac{1}{1-\frac{2T\pi}{C}}\right)2\frac{L}{C}\sqrt{\pi a}
+h=\left(1-\frac{2T\pi}{C}\right)^{-1}2\frac{L}{C}\sqrt{\pi a}
 \]
 
 \end_inset
 
-The leading factor in parenthesis represents a wall thickness correction
- that may be applied to the value computed without this correction.
+The leading factor represents a wall thickness correction that may be applied
+ to the value computed above without this correction.
 \end_layout
 
 \begin_layout Section
@@ -468,11 +676,11 @@ Result
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename RollCalibration_FigCalClose.jpg
+	filename TubeCalibration_FigCalClose.jpg
 	width 100col%
 
 \end_inset
@@ -513,11 +721,11 @@ Close focus image (focus on tube interior).
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename RollCalibration_FigCalTree.jpg
+	filename TubeCalibration_FigCalTree.jpg
 	width 100col%
 
 \end_inset
@@ -551,35 +759,36 @@ Working distance focus (focus on tree in scene).
 \end_layout
 
 \begin_layout Standard
-The formula for principal distance is
-\begin_inset Formula 
-\[
-h=2\frac{L}{C}\sqrt{\pi a}
-\]
-
-\end_inset
-
-Define dimensionless scalar ratio, 
-\begin_inset Formula $\rho$
-\end_inset
-
-, as
-\begin_inset Formula 
-\[
-\rho\equiv2\frac{L}{C}\sqrt{\pi}
-\]
-
-\end_inset
-
-to express the principal distance as
-\begin_inset Formula 
-\[
-h=\rho\sqrt{a}
-\]
-
+For the experiment here, images were acquired with the forward camera of
+ a Nokia 4.2 smart phone.
+ According to specs reported by GSM Arena
+\begin_inset space ~
 \end_inset
 
 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GSMArena"
+
+\end_inset
+
+, this camera's specifications include the following.
+\end_layout
+
+\begin_layout Itemize
+13 MP: (Image sizes are 4160x3120)
+\end_layout
+
+\begin_layout Itemize
+1.12µm (pixel size)
+\end_layout
+
+\begin_layout Subsection
+Measurements
+\end_layout
+
+\begin_layout Subsubsection
+Tube Measurement
 \end_layout
 
 \begin_layout Standard
@@ -611,7 +820,11 @@ For the tube used here,
 
 \end_inset
 
-and the wall thickness correction is
+
+\end_layout
+
+\begin_layout Standard
+The wall thickness correction is
 \begin_inset Formula 
 \[
 \frac{1}{1-\frac{2T\pi}{C}}\simeq\frac{1}{1-.05}=1.05
@@ -622,16 +835,108 @@ and the wall thickness correction is
 
 \end_layout
 
+\begin_layout Subsubsection
+Image Area Measurements
+\end_layout
+
+\begin_layout Standard
+The image area for the end of the tube is determined by using an available
+ image processing program to count the number of pixels within the image
+ of the open end of the tube.
+ For present work, this was done with the 
+\begin_inset Quotes eld
+\end_inset
+
+GIMP
+\begin_inset Quotes erd
+\end_inset
+
+ image processing program
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GIMP"
+
+\end_inset
+
+ and a procedure including:
+\end_layout
+
+\begin_layout Itemize
+Use selection tool to define a selection area around the image of the end
+ of the tube:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+Intelligent scissors
+\begin_inset Quotes erd
+\end_inset
+
+ which follows a radiometric image contour between manually suggested points
+\end_layout
+
+\begin_layout Itemize
+Manual tracing of the edge.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Use the 
+\begin_inset Quotes eld
+\end_inset
+
+info-histogram
+\begin_inset Quotes erd
+\end_inset
+
+ dialog to display how many pixels are in the selection area.
+\end_layout
+
 \begin_layout Subsection
-Close-Focus Case
+Computed Results
 \end_layout
 
 \begin_layout Subsubsection
+Close-Focus Case
+\end_layout
+
+\begin_layout Standard
+These first trials utilize an image acquired with camera set to close focus.
+ The source image is shown in Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Close-focus-image"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
 Trial #1
 \end_layout
 
 \begin_layout Standard
-For this case, 
+For this case, the image area was defined using an 
+\begin_inset Quotes eld
+\end_inset
+
+intelligent scissors
+\begin_inset Quotes erd
+\end_inset
+
+ image processing algorithm which produced area measurement, 
 \begin_inset Formula $a\simeq1.385\cdot10^{6}$
 \end_inset
 
@@ -661,12 +966,13 @@ After correction by wall thickness factor of
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Trial #2
 \end_layout
 
 \begin_layout Standard
-For this case, 
+For this case, manual tracing of the tube end area produced an area of,
+ 
 \begin_inset Formula $a\simeq1.391\cdot10^{6}$
 \end_inset
 
@@ -692,16 +998,32 @@ After wall thickness correction
 
 \end_layout
 
-\begin_layout Subsection
-Working-Focus Case
+\begin_layout Subsubsection
+Working-Distance Focus Case
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Standard
+For this trial, an image was acquired with the camera focused on a distance
+ scene visible through the end of the tube - ref Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Working-distance-focus"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
 Trial #1
 \end_layout
 
 \begin_layout Standard
-For this case, 
+The measured area is, 
 \begin_inset Formula $a\simeq1.348\cdot10^{6}$
 \end_inset
 
@@ -725,11 +1047,31 @@ After wall thickness correction
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Lens formula and Object Sensitivity
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset Note Comment
 status collapsed
 
 \begin_layout Subsection
-Estimate Distance to Tree
+Order Magnitude Estimate: Distance to Tree
 \end_layout
 
 \begin_layout Plain Layout
@@ -815,7 +1157,11 @@ Assume the lens changes focus by moving and does not change configuration
 
 \end_inset
 
-Solve for working object distance,
+
+\end_layout
+
+\begin_layout Plain Layout
+Solve this for the working object distance,
 \begin_inset Formula 
 \[
 o_{w}=\left(\frac{1}{o_{c}}+\frac{1}{\mu h_{c}}-\frac{1}{\mu h_{w}}\right)^{-1}
@@ -824,49 +1170,17 @@ o_{w}=\left(\frac{1}{o_{c}}+\frac{1}{\mu h_{c}}-\frac{1}{\mu h_{w}}\right)^{-1}
 \end_inset
 
 
-\begin_inset Formula 
-\[
-o_{w}=\left(\frac{1}{\mu}\left(\frac{\mu}{o_{c}}+\left(\frac{1}{h_{c}}-\frac{1}{h_{w}}\right)\right)\right)^{-1}
-\]
+\end_layout
 
+\begin_layout Plain Layout
+Introduce scalar, 
+\begin_inset Formula $\psi$
 \end_inset
 
-
+, defined as
 \begin_inset Formula 
 \[
-o_{w}=\mu\left(\frac{\mu}{o_{c}}+\left(\frac{1}{h_{c}}-\frac{1}{h_{w}}\right)\right)^{-1}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-o_{w}=\mu\left(\frac{\mu}{o_{c}}+x\right)^{-1}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-o_{w}=\mu\left(\frac{\mu+o_{c}x}{o_{c}}\right)^{-1}
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-o_{w}=\mu\frac{o_{c}}{\mu+o_{c}x}=\left(\frac{1}{1+\mu^{-1}o_{c}x}\right)o_{c}
-\]
-
-\end_inset
-
-or
-\begin_inset Formula 
-\[
-o_{w}=\frac{\mu o_{c}h_{c}h_{w}}{\mu h_{c}h_{w}+o_{c}h_{w}-o_{c}h_{c}}
+\psi=\frac{1}{\mu h_{c}}-\frac{1}{\mu h_{w}}
 \]
 
 \end_inset
@@ -875,18 +1189,34 @@ o_{w}=\frac{\mu o_{c}h_{c}h_{w}}{\mu h_{c}h_{w}+o_{c}h_{w}-o_{c}h_{c}}
 \end_layout
 
 \begin_layout Plain Layout
-In order to evaluate the object distance, it is 
-\begin_inset Formula 
-\[
-o_{w}=\frac{\mu}{\mu+o_{c}\left(\frac{1}{h_{c}}-\frac{1}{h_{w}}\right)}o_{c}
-\]
-
+From
+\begin_inset space ~
 \end_inset
 
 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GSMArena"
+
+\end_inset
+
+, the pixel scale is approximately, 
+\begin_inset Formula $\mu=.00112$
+\end_inset
+
+ mm, so that
+\begin_inset Formula 
+\begin{align*}
+\mu h_{c} & \simeq.00112\left(3216.\right)\simeq3.60\,\left[\text{mm}\right]\\
+\mu h_{w} & \simeq.00112\left(3170.\right)\simeq3.55\,\left[\text{mm}\right]
+\end{align*}
+
+\end_inset
+
+and
 \begin_inset Formula 
 \[
-\frac{1}{h_{c}}-\frac{1}{h_{w}}=\frac{1}{3216}-\frac{1}{3170}\simeq-4.5\cdot10^{-6}
+\psi\simeq-.0040\,\left[\text{mm}^{-1}\right]
 \]
 
 \end_inset
@@ -894,9 +1224,173 @@ o_{w}=\frac{\mu}{\mu+o_{c}\left(\frac{1}{h_{c}}-\frac{1}{h_{w}}\right)}o_{c}
 
 \end_layout
 
+\begin_layout Plain Layout
+The object distance is then
+\begin_inset Formula 
+\begin{align*}
+o_{w}=\left(\frac{1}{o_{c}}+\psi\right)^{-1} & \simeq\left(\frac{1}{200}-.0040\right)^{-1}\\
+ & \simeq\left(.005-.0040\right)^{-1}\\
+ & \simeq1000\,\left[\text{mm}\right]
+\end{align*}
+
 \end_inset
 
 
+\end_layout
+
+\begin_layout Plain Layout
+The actual distance is approximately 10m (10000 mm).
+\end_layout
+
+\begin_layout Plain Layout
+The discrepancy is not surprising since change in focus is most sensitive
+ for distances near the focal length of the lens.
+ As object distance increases, image distance changes become increasingly
+ insensitive to increasing object distance.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Subsubsection
+Sensitivity
+\end_layout
+
+\begin_layout Plain Layout
+Express the object working distance case as,
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+o_{w}=\left(o_{c}^{-1}+\psi\right)^{-1}
+\]
+
+\end_inset
+
+ The sensitivity with respect to the measured distance, 
+\begin_inset Formula $h_{w}$
+\end_inset
+
+, can be approximated by the derivative,
+\begin_inset Formula 
+\[
+\frac{\partial o_{w}}{\partial h_{w}}=-\left(o_{c}^{-1}+\psi\right)^{-2}\frac{\partial\psi}{\partial h_{w}}
+\]
+
+\end_inset
+
+with
+\begin_inset Formula 
+\[
+\frac{\partial\psi}{\partial h_{w}}=-\frac{1}{\mu}\left(-h_{w}^{-2}\right)
+\]
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\[
+\frac{\partial o_{w}}{\partial h_{w}}=-\left(o_{c}^{-1}+\psi\right)^{-2}\frac{1}{\mu}h_{w}^{-2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Using the values above,
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial o_{w}}{\partial h_{w}} & =-\left(.001\right)^{-2}\frac{1}{.00112}\left(3216\right)^{-2}\\
+ & \simeq-\frac{1}{3.216^{2}\cdot.00112}\simeq-86.
+\end{align*}
+
+\end_inset
+
+I.e.
+ the recovered object space distance can be expected to change nearly 100x
+ faster than the measured principal distance change.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Precision Estimation
+\end_layout
+
+\begin_layout Standard
+The precision of the image measurement process can be estimated by comparing
+ the results between the two close-distance cases.
+ E.g.
+ the relative precision, 
+\begin_inset Formula $\sigma_{r}$
+\end_inset
+
+, in the result may be estimated from the mean, 
+\begin_inset Formula $\overline{h}_{c}$
+\end_inset
+
+, defined as
+\begin_inset Formula 
+\[
+\sigma_{r}=\frac{3219-3213}{\frac{1}{2}\left(3219+3213\right)}\simeq.09\%
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Precision of measurement related to positioning of the tube was not evaluated
+ specifically.
+ However, as an outside limit, consider the difference in results between
+ the close-distance focus and the working-distance focus cases.
+ E.g.
+ treat this as if focus is being ignored.
+ In that case, an extremely pessimistic error bound, 
+\begin_inset Formula $\epsilon_{*}$
+\end_inset
+
+, might be estimated as the difference between the working-distance case
+ and the (average of the two) close-distance case,
+\begin_inset Formula 
+\[
+\epsilon_{*}=\frac{3216-3170}{\frac{1}{2}\left(3216+3170\right)}\simeq1.4\%
+\]
+
+\end_inset
+
+However, it should be emphasized that this includes a significant amount
+ of focus motion.
+ As such, it is more an estimate of the magnitude of 
+\begin_inset Quotes eld
+\end_inset
+
+what error to expect if focus setting is completely ignored
+\begin_inset Quotes erd
+\end_inset
+
+ (for this camera), vs an estimate of the error in the 
+\begin_inset Quotes eld
+\end_inset
+
+calibraiton
+\begin_inset Quotes erd
+\end_inset
+
+ process itself.
 \end_layout
 
 \begin_layout Subsection
@@ -959,20 +1453,7 @@ Observations
 
 \begin_layout Standard
 The results seem reasonable in terms of general experience and also in qualitati
-ve
-\begin_inset Foot
-status open
-
-\begin_layout Plain Layout
-Quantitative evaluation of the change in principal distance with change
- in focus requires knowing the detector pixel size in order to convert pixel
- units to object space units.
- However, the physical pixel size is unavailable for this camera.
-\end_layout
-
-\end_inset
-
- terms.
+ve terms.
  E.g.
  The principal distance computed when focused on the farther distance tree,
  is slightly smaller than that obtained with a close-in focus as expected
@@ -980,14 +1461,64 @@ Quantitative evaluation of the change in principal distance with change
 \end_layout
 
 \begin_layout Standard
-Interesting to note the relative insensitivity of area measurement (sensitivity
- reduced by square root process).
- Suggests, that using quadratic area features (instead of linear features
- or points), might be worth considering in a general calibration process.
+Interesting to note that the results are relatively insensitive to the method
+ of area measurement (sensitivity reduced by square root process).
+ This suggests, it might be worth incorporating area features into more
+ general calibration processes (e.g.
+ as supplement to point and linear features).
 \end_layout
 
 \begin_layout Standard
-###
+Equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:hFuncRhoArea"
+
+\end_inset
+
+ provides a simple proportional relationship with which to determine principal
+ distance for multiple camera systems.
+ In practice, one might gather a collection of various sized tubes and determine
+ the tube constant, 
+\begin_inset Formula $\rho$
+\end_inset
+
+, for each.
+ Then for a given tube, a single snapshot and simple area measurement (e.g.
+ a flood-fill type operation) provide sufficient data to estimate principal
+ distance with a simple multiplication operation.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "GIMP"
+
+\end_inset
+
+GIMP, 
+\begin_inset Quotes eld
+\end_inset
+
+Gnu Image Manipulation Program
+\begin_inset Quotes erd
+\end_inset
+
+, gimp.org.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "GSMArena"
+
+\end_inset
+
+GSM Arena, https://www.gsmarena.com/nokia_4_2-9603.php
 \end_layout
 
 \end_body

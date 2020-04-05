@@ -72,6 +72,15 @@ SubExtents :: fullRowColFor
 }
 
 inline
+bool
+SubExtents :: includes
+	( dat::RowCol const & fullRowCol
+	) const
+{
+	return theSize.includes(subRowColFor(fullRowCol));
+}
+
+inline
 dat::Spot
 SubExtents :: fullSpotFor
 	( dat::Spot const & relSpot

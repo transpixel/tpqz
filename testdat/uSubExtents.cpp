@@ -292,6 +292,46 @@ dat_SubExtents_test2
 	return oss.str();
 }
 
+//! Check inclusion test
+std::string
+dat_SubExtents_test3
+	()
+{
+	std::ostringstream oss;
+
+	dat::Extents const fullSize(1000u, 2000u);
+	dat::Extents const partSize(100u, 200u);
+	dat::RowCol const ul{ 101u, 201u };
+	dat::SubExtents const sub(ul, partSize);
+	dat::RowCol const outUL{ 100u, 200u };
+	dat::RowCol const inUL{ 101u, 201u };
+	dat::RowCol const inBR{ 200u, 300u };
+	dat::RowCol const outBR{ 201u, 301u };
+	std::vector<std::pair<dat::RowCol, bool> > const inCases
+		{ { outUL, false }
+		, { inUL, true }
+		, { inBR, true }
+		, { outBR, false }
+		};
+	for (std::pair<dat::RowCol, bool> const & inCase : inCases)
+	{
+		dat::RowCol const & rowcol = inCase.first;
+		bool const & expIn = inCase.second;
+		bool const gotIn{ sub.includes(rowcol) };
+		if (! (gotIn == expIn))
+		{
+			oss << "Failure of includes() test" << std::endl;
+			oss << dat::infoString(expIn, "expIn") << std::endl;
+			oss << dat::infoString(gotIn, "gotIn") << std::endl;
+			oss << dat::infoString(rowcol, "rowcol") << std::endl;
+			oss << dat::infoString(sub, "sub") << std::endl;
+		}
+	}
+
+
+	return oss.str();
+}
+
 
 }
 
@@ -308,6 +348,7 @@ main
 	oss << dat_SubExtents_test0();
 	oss << dat_SubExtents_test1();
 	oss << dat_SubExtents_test2();
+	oss << dat_SubExtents_test3();
 
 	// check/report results
 	std::string const errMessages(oss.str());

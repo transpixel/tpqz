@@ -53,7 +53,7 @@ physicalAngleBetween
 	, BiVector const & planeForPi
 	)
 {
-	ga::Spinor const spin{ between(dirFrom, dirInto) };
+	ga::Spinor const spin{ between(dirFrom, dirInto, planeForPi) };
 	return physicalAngleFrom(spin, planeForPi);
 }
 

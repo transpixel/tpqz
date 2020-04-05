@@ -79,8 +79,8 @@ public: // methods
 	//! Descriptive information about this instance.
 	std::string
 	infoString
-		( std::string const & title = std::string()
-//		, std::string const & fmt = std::string("%12.6f")
+		( std::string const & title = {}
+//		, std::string const & fmt = { std::string("%12.6f") }
 		) const
 	{
 		std::ostringstream oss;

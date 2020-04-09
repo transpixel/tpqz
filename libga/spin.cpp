@@ -46,6 +46,17 @@ namespace spin
 {
 //======================================================================
 
+BiVector
+physicalAngleBetween
+	( Vector const & dirFrom
+	, Vector const & dirInto
+	, BiVector const & planeForPi
+	)
+{
+	ga::Spinor const spin{ between(dirFrom, dirInto, planeForPi) };
+	return physicalAngleFrom(spin, planeForPi);
+}
+
 // spinor utilities
 
 Spinor

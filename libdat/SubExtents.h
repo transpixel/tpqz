@@ -158,6 +158,13 @@ public: // methods
 		( dat::RowCol const & subRowCol
 		) const;
 
+	//! True if fullRowCol is included within this subArea
+	inline
+	bool
+	includes
+		( dat::RowCol const & fullRowCol
+		) const;
+
 	//! Location w.r.t. the domain on which this instance is defined
 	inline
 	dat::Spot

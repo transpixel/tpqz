@@ -41,6 +41,13 @@ namespace ga
 //! spinor utilities
 namespace spin
 {
+	//! Physical angle that turns dirFrom to dirInto
+	BiVector
+	physicalAngleBetween
+		( Vector const & dirFrom //!< Unit vector
+		, Vector const & dirInto //!< Unit vector
+		, BiVector const & planeForPi = {} //!< Unit plane
+		);
 
 	//! Determine spinor: into = spin * from * spin.rev
 	Spinor

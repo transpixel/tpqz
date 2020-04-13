@@ -538,9 +538,9 @@ ly limited.
 In particular, this means that the cosine cannot assume a negative value.
  A more stringent condition may be expressed as,
 \begin_inset Formula 
-\[
-0<\left(\cos\alpha=\cos\beta\right)<1
-\]
+\begin{equation}
+0<\left(\cos\alpha=\cos\beta\right)<1\label{eq:cosAngleLimits}
+\end{equation}
 
 \end_inset
 
@@ -637,37 +637,22 @@ For the simple camera model in use here, the principal point components,
 
 \begin_layout Standard
 Represent this measurement construct with scalar value, 
-\begin_inset Formula $\tilde{\rho_{j}}^{2}$
+\begin_inset Formula $\rho_{j}^{2}$
 \end_inset
 
 , defined in terms of detector row and column location measurements, as
 \begin_inset Formula 
-\begin{equation}
-\tilde{\rho_{j}}^{2}\equiv\tilde{m}_{jr}\eta_{r}+\tilde{m}_{jc}\eta_{c}\label{eq:MeaProjection}
-\end{equation}
+\[
+\rho_{j}^{2}\equiv m_{j}\cdot h
+\]
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Note Comment
-status collapsed
-
-\begin_layout Plain Layout
-For use below, consider the relationship
+which evaluates as,
 \begin_inset Formula 
-\begin{align*}
-\tilde{m}_{j}^{2}-2\tilde{\rho}_{j}^{2} & =\tilde{m}_{jr}\tilde{m}_{jr}+\tilde{m}_{jc}\tilde{m}_{jc}-2\tilde{m}_{jr}\eta_{r}-2\tilde{m}_{jc}\eta_{c}\\
- & =\tilde{m}_{jr}\left(\tilde{m}_{jr}-2\eta_{r}\right)+\tilde{m}_{jc}\left(\tilde{m}_{jc}-2\eta_{c}\right)\\
- & =\tilde{m}_{jr}\left(\tilde{m}_{jr}-\eta_{r}\right)+\tilde{m}_{jc}\left(\tilde{m}_{jc}-\eta_{c}\right)-\tilde{\rho}_{j}^{2}
-\end{align*}
-
-\end_inset
-
-
-\end_layout
+\begin{equation}
+\rho_{j}^{2}=m_{jr}\eta_{r}+m_{jc}\eta_{c}\label{eq:MeaProjection}
+\end{equation}
 
 \end_inset
 
@@ -695,6 +680,18 @@ d\equiv x_{2}-x_{1}
 
 \end_inset
 
+and
+\begin_inset Formula 
+\[
+d^{2}=x_{2}^{2}-2x_{2}\cdot x_{1}+x_{1}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 The entry angle magnitude, 
 \begin_inset Formula $\alpha$
 \end_inset
@@ -708,7 +705,7 @@ d^{2}=\lambda_{1}^{2}+\lambda_{2}^{2}-2\lambda_{1}\lambda_{2}\cos\alpha
 
 \end_inset
 
-which may also be expressed as,
+which may also be expressed,
 \begin_inset Formula 
 \[
 \cos\alpha=\frac{\lambda_{1}^{2}+\lambda_{2}^{2}-d^{2}}{2\lambda_{1}\lambda_{2}}
@@ -737,6 +734,18 @@ r\equiv m_{2}-m_{1}
 
 \end_inset
 
+and
+\begin_inset Formula 
+\begin{equation}
+r^{2}=m_{2}^{2}-2m_{2}\cdot m_{1}+m_{1}^{2}\label{eq:Def_rSq}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 The exit angle magnitude, 
 \begin_inset Formula $\beta$
 \end_inset
@@ -803,31 +812,81 @@ reference "eq:RefDists"
 \end_inset
 
 .
- Let 
-\begin_inset Formula $\tilde{\gamma}$
+\end_layout
+
+\begin_layout Standard
+Introduce the scalar, 
+\begin_inset Formula $\gamma$
 \end_inset
 
- denote the result of evaluation using measured values (which are subject
- to measurement error), and express this relationship as
+, to represent this common value.
+ For calibration purposes here, it is particularly useful to associate 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ with the object space quantity on the left, i.e.
+ define
 \begin_inset Formula 
 \[
-\mu_{1}\mu_{2}\tilde{\gamma}=\mu_{1}^{2}+\mu_{2}^{2}-r^{2}
+\gamma\equiv\frac{\lambda_{1}^{2}+\lambda_{2}^{2}-d^{2}}{\lambda_{1}\lambda_{2}}
 \]
+
+\end_inset
+
+and express the coangularity condition as
+\begin_inset Formula 
+\begin{equation}
+\mu_{1}\mu_{2}\gamma=\mu_{1}^{2}+\mu_{2}^{2}-r^{2}\label{eq:CoAngleInMu}
+\end{equation}
 
 \end_inset
 
 
 \end_layout
 
+\begin_layout Subsubsection
+Squared Relationships
+\end_layout
+
 \begin_layout Standard
-Square both sides of this relationship to obtain
+Square both sides of equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CoAngleInMu"
+
+\end_inset
+
+ to obtain
 \begin_inset Formula 
 \begin{equation}
-\mu_{1}^{2}\mu_{2}^{2}\tilde{\gamma}^{2}=\left(\mu_{1}^{2}+\mu_{2}^{2}\right)^{2}-2\left(\mu_{1}^{2}+\mu_{2}^{2}\right)r^{2}+r^{4}\label{eq:SqSqs}
+\mu_{1}^{2}\mu_{2}^{2}\gamma^{2}=\left(\mu_{1}^{2}+\mu_{2}^{2}\right)^{2}-2\left(\mu_{1}^{2}+\mu_{2}^{2}\right)r^{2}+r^{4}\label{eq:SqSqs}
 \end{equation}
 
 \end_inset
 
+Since both the 
+\begin_inset Formula $\mu_{j}$
+\end_inset
+
+ are inherently positive, the original roots are preserved.
+ I.e.
+ it preserves the inverse process of determining an unambiguous value of,
+ 
+\begin_inset Formula $\mu_{j}$
+\end_inset
+
+, from 
+\begin_inset Formula $\mu_{j}^{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 Square both sides of equation
 \begin_inset space ~
 \end_inset
@@ -849,8 +908,7 @@ reference "eq:DetDists"
 
 \end_inset
 
-After introducing measurement values, note that the middle term on the right
- may be expressed in terms of relationship
+The middle term on the right may be expressed in terms of relationship
 \begin_inset space ~
 \end_inset
 
@@ -864,7 +922,7 @@ reference "eq:MeaProjection"
 , so that
 \begin_inset Formula 
 \[
-\tilde{\mu}_{j}^{2}=\tilde{m}_{j}^{2}-2\tilde{\rho_{j}}^{2}+h^{2}
+\mu_{j}^{2}=m_{j}^{2}-2\rho_{j}^{2}+h^{2}
 \]
 
 \end_inset
@@ -873,20 +931,84 @@ reference "eq:MeaProjection"
 \end_layout
 
 \begin_layout Standard
-Use these interior slant range values to express the product
+Employ this interior distance relationship for each point to express the
+ product
 \begin_inset Formula 
 \begin{align*}
-\mu_{1}^{2}\mu_{2}^{2} & =\left(\left(\tilde{m}_{1}^{2}-2\tilde{\rho}_{1}^{2}\right)+h^{2}\right)\left(\left(\tilde{m}_{2}^{2}-2\tilde{\rho}_{2}^{2}\right)+h^{2}\right)
+\mu_{1}^{2}\mu_{2}^{2} & =\left(\left(m_{1}^{2}-2\rho_{1}^{2}\right)+h^{2}\right)\left(\left(m_{2}^{2}-2\rho_{2}^{2}\right)+h^{2}\right)
 \end{align*}
 
 \end_inset
 
-Expand the multiplication to yield
+
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+Check as
+\begin_inset Formula 
+\[
+y_{j}\equiv m_{j}^{2}-2\rho_{j}^{2}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mu_{1}\mu_{2}=\left(y_{1}+h^{2}\right)\left(y_{2}+h^{2}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mu_{1}\mu_{2}=y_{1}y_{2}+\left(y_{1}+y_{2}\right)h^{2}+h^{4}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+y_{1}y_{2} & =m_{1}^{2}\left(m_{2}^{2}-2\rho_{2}^{2}\right)-2\rho_{1}^{2}\left(m_{2}^{2}-2\rho_{2}^{2}\right)\\
+ & =m_{1}^{2}m_{2}^{2}-2m_{1}^{2}\rho_{2}^{2}+-2\rho_{1}^{2}m_{2}^{2}--2\rho_{1}^{2}2\rho_{2}^{2}\\
+ & =m_{1}^{2}m_{2}^{2}-2m_{1}^{2}\rho_{2}^{2}-2\rho_{1}^{2}m_{2}^{2}+4\rho_{1}^{2}\rho_{2}^{2}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+y_{1}+y_{2} & =m_{1}^{2}-2\rho_{1}^{2}+m_{2}^{2}-2\rho_{2}^{2}\\
+ & =m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\mu_{1}\mu_{2} & =h^{4}\\
+ & +\left(m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\right)h^{2}\\
+ & +m_{1}^{2}m_{2}^{2}-2m_{1}^{2}\rho_{2}^{2}-2\rho_{1}^{2}m_{2}^{2}+4\rho_{1}^{2}\rho_{2}^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Distribute the multiplications to yield
 \begin_inset Formula 
 \begin{align*}
 \mu_{1}^{2}\mu_{2}^{2} & =h^{4}\\
- & +\left[\tilde{m}_{1}^{2}+\tilde{m}_{2}^{2}-2\left(\tilde{\rho}_{1}^{2}+\tilde{\rho}_{2}^{2}\right)\right]h^{2}\\
- & +\left[\left(\tilde{m}_{1}^{2}-2\tilde{\rho}_{1}^{2}\right)\left(\tilde{m}_{2}^{2}-2\tilde{\rho}_{2}^{2}\right)\right]
+ & +\left[m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\right]h^{2}\\
+ & +\left[\left(m_{1}^{2}-2\rho_{1}^{2}\right)\left(m_{2}^{2}-2\rho_{2}^{2}\right)\right]
 \end{align*}
 
 \end_inset
@@ -896,33 +1018,33 @@ Expand the multiplication to yield
 
 \begin_layout Standard
 Introduce intermediate scalar, 
-\begin_inset Formula $\tilde{\nu}^{2}$
+\begin_inset Formula $\nu^{2}$
 \end_inset
 
 , defined as,
 \begin_inset Formula 
-\[
-\tilde{\nu}^{2}\equiv\tilde{m}_{1}^{2}+\tilde{m}_{2}^{2}-2\left(\tilde{\rho}_{1}^{2}+\tilde{\rho}_{2}^{2}\right)
-\]
+\begin{equation}
+\nu^{2}\equiv m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\label{eq:DefNuSq}
+\end{equation}
 
 \end_inset
 
 and scalar, 
-\begin_inset Formula $\tilde{\omega}^{2}$
+\begin_inset Formula $\omega^{2}$
 \end_inset
 
 , defined as
 \begin_inset Formula 
 \[
-\tilde{\omega}^{2}\equiv\left(\tilde{m}_{1}^{2}-2\tilde{\rho}_{1}^{2}\right)\left(\tilde{m}_{2}^{2}-2\tilde{\rho}_{2}^{2}\right)
+\omega^{2}\equiv\left(m_{1}^{2}-2\rho_{1}^{2}\right)\left(m_{2}^{2}-2\rho_{2}^{2}\right)
 \]
 
 \end_inset
 
-to express the range product as,
+to express the product of interior distance values as,
 \begin_inset Formula 
 \begin{align}
-\mu_{1}^{2}\mu_{2}^{2} & =h^{4}+\tilde{\nu}^{2}h^{2}+\tilde{\omega}^{2}\label{eq:ProdSqMu1Mu2}
+\mu_{1}^{2}\mu_{2}^{2} & =h^{4}+\nu^{2}h^{2}+\omega^{2}\label{eq:ProdSqMu1Mu2}
 \end{align}
 
 \end_inset
@@ -931,10 +1053,10 @@ to express the range product as,
 \end_layout
 
 \begin_layout Standard
-The sum of squared interior slant range values may be expressed as
+The sum of squared interior distance values may be expressed as
 \begin_inset Formula 
 \[
-\left(\mu_{1}^{2}+\mu_{2}^{2}\right)=\tilde{m}_{1}^{2}+\tilde{m}_{2}^{2}-2\left(\tilde{\rho}_{1}^{2}+\tilde{\rho}_{2}^{2}\right)+2h^{2}
+\left(\mu_{1}^{2}+\mu_{2}^{2}\right)=m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)+2h^{2}
 \]
 
 \end_inset
@@ -946,20 +1068,40 @@ In terms of intermediate value,
 , as
 \begin_inset Formula 
 \begin{equation}
-\left(\mu_{1}^{2}+\mu_{2}^{2}\right)=\tilde{\nu}^{2}+2h^{2}\label{eq:SumSqMu1Mu2}
+\left(\mu_{1}^{2}+\mu_{2}^{2}\right)=\nu^{2}+2h^{2}\label{eq:SumSqMu1Mu2}
 \end{equation}
 
 \end_inset
 
-for which,
+
+\end_layout
+
+\begin_layout Standard
+Square this to obtain,
 \begin_inset Formula 
 \[
-\left(\mu_{1}^{2}+\mu_{2}^{2}\right)^{2}=\tilde{\nu}^{4}+2\tilde{\nu}^{2}h^{2}+h^{4}
+\left(\mu_{1}^{2}+\mu_{2}^{2}\right)^{2}=\nu^{4}+4\nu^{2}h^{2}+h^{4}
 \]
 
 \end_inset
 
+Again, since all the original values are positive (
+\begin_inset Formula $\mu_{j}^{2}$
+\end_inset
 
+, 
+\begin_inset Formula $\nu^{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $h^{2}$
+\end_inset
+
+) this operation does not introduce any extraneous roots.
+\end_layout
+
+\begin_layout Subsubsection
+Return to Coangularity
 \end_layout
 
 \begin_layout Standard
@@ -999,9 +1141,64 @@ reference "eq:SqSqs"
  as,
 \begin_inset Formula 
 \begin{align*}
-\left(h^{4}+\tilde{\nu}^{2}h^{2}+\tilde{\omega}^{2}\right)\tilde{\gamma}^{2} & =\tilde{\nu}^{4}+2\tilde{\nu}^{2}h^{2}+h^{4}\\
- & -2\left(\tilde{\nu}^{2}+2h^{2}\right)r^{2}+r^{4}
+\left(h^{4}+\nu^{2}h^{2}+\omega^{2}\right)\gamma^{2} & =\nu^{4}+4\nu^{2}h^{2}+h^{4}\\
+ & -2\left(\nu^{2}+2h^{2}\right)r^{2}+r^{4}
 \end{align*}
+
+\end_inset
+
+
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+e.g.
+\begin_inset Formula 
+\begin{align*}
+\left(h^{4}+\nu^{2}h^{2}+\omega^{2}\right)\gamma^{2} & =+4\nu^{2}h^{2}+h^{4}\\
+ & +\nu^{4}-2\left(\nu^{2}+2h^{2}\right)r^{2}+r^{4}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\left(h^{4}+\nu^{2}h^{2}+\omega^{2}\right)\gamma^{2} & =+4\nu^{2}h^{2}-4h^{2}r^{2}+h^{4}\\
+ & +\nu^{4}-2\nu^{2}+r^{4}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\gamma^{2}h^{4}+\nu^{2}\gamma^{2}h^{2}+\omega^{2}\gamma^{2} & =h^{4}+4\nu^{2}h^{2}-4h^{2}r^{2}\\
+ & +\nu^{4}-2\nu^{2}+r^{4}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\gamma^{2}h^{4} & =h^{4}\\
++\nu^{2}\gamma^{2}h^{2} & =+4\nu^{2}h^{2}-4h^{2}r^{2}\\
++\omega^{2}\gamma^{2} & =+\nu^{4}-2\nu^{2}+r^{4}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(1-\gamma^{2}\right)h^{4}+4\left(\nu^{2}-r^{2}-\frac{1}{4}\nu^{2}\gamma^{2}\right)h^{2}+\left(\left(\nu^{2}-r^{2}\right)^{2}-\omega^{2}\gamma^{2}\right)=0
+\]
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -1014,21 +1211,90 @@ Rearrange and gather terms similar in powers of
 \end_inset
 
 , to express this as
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+as
 \begin_inset Formula 
 \begin{align*}
-0 & =\left[1-\tilde{\gamma}^{2}\right]h^{4}\\
- & +\left[2\tilde{\nu}^{2}-\tilde{\nu}^{2}\tilde{\gamma}^{2}-4r^{2}\right]h^{2}\\
- & +\left[\tilde{\nu}^{4}-2\tilde{\nu}^{2}r^{2}+r^{4}-\tilde{\omega}^{2}\tilde{\gamma}^{2}\right]
+\left(h^{4}+\nu^{2}h^{2}+\omega^{2}\right)\gamma^{2} & =\nu^{4}+4\nu^{2}h^{2}+h^{4}\\
+ & -2\left(\nu^{2}+2h^{2}\right)r^{2}+r^{4}
 \end{align*}
 
 \end_inset
 
-Or as,
+
 \begin_inset Formula 
 \begin{align*}
-0 & =\left[1-\tilde{\gamma}^{2}\right]h^{4}\\
- & +\left[\tilde{\nu}^{2}\left(1-\tilde{\gamma}^{2}\right)+\left(\tilde{\nu}^{2}-4r^{2}\right)\right]h^{2}\\
- & +\left[\left(\tilde{\nu}^{2}-r^{2}\right)^{2}-\tilde{\omega}^{2}\tilde{\gamma}^{2}\right]
+0 & =\nu^{4}+4\nu^{2}h^{2}+h^{4}\\
+ & -\gamma^{2}h^{4}-\nu^{2}\gamma^{2}h^{2}-\omega^{2}\gamma^{2}\\
+ & -2\left(\nu^{2}+2h^{2}\right)r^{2}+r^{4}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+0 & =\nu^{4}+4\nu^{2}h^{2}+h^{4}\\
+ & -\gamma^{2}h^{4}-\nu^{2}\gamma^{2}h^{2}-\omega^{2}\gamma^{2}\\
+ & -2\nu^{2}r^{2}-4r^{2}h^{2}+r^{4}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+0 & =+h^{4}-\gamma^{2}h^{4}\\
+ & +4\nu^{2}h^{2}-\nu^{2}\gamma^{2}h^{2}-4r^{2}h^{2}\\
+ & +\nu^{4}-\omega^{2}\gamma^{2}-2\nu^{2}r^{2}+r^{4}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+0 & =\left(1-\gamma^{2}\right)h^{4}\\
+ & +\left(4\nu^{2}-\nu^{2}\gamma^{2}-4r^{2}\right)h^{2}\\
+ & +\left(\nu^{4}-\omega^{2}\gamma^{2}-2\nu^{2}r^{2}+r^{4}\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+0 & =\left(1-\gamma^{2}\right)h^{4}\\
+ & +\left(4\left(\nu^{2}-r^{2}\right)-\nu^{2}\gamma^{2}\right)h^{2}\\
+ & +\left(\nu^{4}-2\nu^{2}r^{2}+r^{4}-\omega^{2}\gamma^{2}\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+0 & =\left(1-\gamma^{2}\right)h^{4}\\
+ & +\left(4\left(\nu^{2}-r^{2}\right)-\nu^{2}\gamma^{2}\right)h^{2}\\
+ & +\left(\left(\nu^{2}-r^{2}\right)^{2}-\omega^{2}\gamma^{2}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+0 & =\left(1-\gamma^{2}\right)h^{4}\\
+ & +\left(4\left(\nu^{2}-r^{2}\right)-\nu^{2}\gamma^{2}\right)h^{2}\\
+ & +\left(\left(\nu^{2}-r^{2}\right)^{2}-\omega^{2}\gamma^{2}\right)
 \end{align*}
 
 \end_inset
@@ -1037,7 +1303,7 @@ Since
 \begin_inset Formula $\gamma=\cos\alpha$
 \end_inset
 
-, the the difference, 
+, the difference, 
 \begin_inset Formula $1-\gamma^{2}$
 \end_inset
 
@@ -1046,7 +1312,7 @@ Since
 \end_inset
 
 .
- However, there is not particular advantage in doing that here.
+ However, there is no particular advantage in doing that here.
 \end_layout
 
 \begin_layout Standard
@@ -1067,19 +1333,9 @@ This is a quadratic expression in terms of
 where
 \begin_inset Formula 
 \begin{align*}
-\kappa_{a} & \equiv\left(1-\tilde{\gamma}^{2}\right)\\
-\kappa_{b} & \equiv\tilde{\nu}^{2}\left(1-\tilde{\gamma}^{2}\right)+\left(\tilde{\nu}^{2}-4r^{2}\right)\\
-\kappa_{c} & \equiv\left(\tilde{\nu}^{2}-r^{2}\right)^{2}-\tilde{\omega}^{2}\tilde{\gamma}^{2}
-\end{align*}
-
-\end_inset
-
-With intermediate values from above
-\begin_inset Formula 
-\begin{align*}
-\tilde{\gamma} & =\frac{\tilde{\lambda}_{1}^{2}+\tilde{\lambda}_{2}^{2}-\tilde{d}^{2}}{\tilde{\lambda}_{1}\tilde{\lambda}_{2}}\\
-\tilde{\nu}^{2} & \equiv\tilde{m}_{1}^{2}+\tilde{m}_{2}^{2}-2\left(\tilde{\rho}_{1}^{2}+\tilde{\rho}_{2}^{2}\right)\\
-\tilde{\omega}^{2} & \equiv\left(\tilde{m}_{1}^{2}-2\tilde{\rho}_{1}^{2}\right)\left(\tilde{m}_{2}^{2}-2\tilde{\rho}_{2}^{2}\right)
+\kappa_{a} & \equiv1-\gamma^{2}\\
+\kappa_{b} & \equiv2\left(\nu^{2}-r^{2}\right)-\frac{1}{2}\nu^{2}\gamma^{2}\\
+\kappa_{c} & \equiv\left(\nu^{2}-r^{2}\right)^{2}-\omega^{2}\gamma^{2}
 \end{align*}
 
 \end_inset
@@ -1088,11 +1344,189 @@ With intermediate values from above
 \end_layout
 
 \begin_layout Standard
-The solution values for 
-\begin_inset Formula $h^{2}$
+Equations
+\begin_inset space ~
 \end_inset
 
-, may be computed immediately from the quadratic formula,
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:DefNuSq"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Def_rSq"
+
+\end_inset
+
+ may be combined to evaluate, 
+\begin_inset Formula $\left(\nu^{2}-r^{2}\right)$
+\end_inset
+
+, in terms of measured values,
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\nu^{2}-r^{2} & =m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\\
+ & -\left(m_{2}^{2}-2m_{2}\cdot m_{1}+m_{1}^{2}\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\nu^{2}-r^{2} & =m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\\
+ & -m_{2}^{2}+2m_{2}\cdot m_{1}-m_{1}^{2}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\nu^{2}-r^{2} & =+2m_{2}\cdot m_{1}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\\
+ & +m_{1}^{2}+m_{2}^{2}-m_{2}^{2}-m_{1}^{2}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\nu^{2}-r^{2} & =2m_{2}\cdot m_{1}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\nu^{2}-r^{2} & =2\left(m_{2}\cdot m_{1}-\rho_{1}^{2}-\rho_{2}^{2}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\nu^{2}-r^{2} & =2\left(m_{2}\cdot m_{1}-\rho_{1}^{2}-\rho_{2}^{2}\right)
+\end{align*}
+
+\end_inset
+
+where the 
+\begin_inset Formula $\rho_{j}^{2}$
+\end_inset
+
+ values are evaluated with equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:MeaProjection"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+For origin at the corner of the detector, the components of 
+\begin_inset Formula $m_{j}$
+\end_inset
+
+ are all non-negative.
+ Also, since the detector occupies a single quadrant, then 
+\begin_inset Formula $0\le m_{2}\cdot m_{1}$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\[
+\rho_{1}^{2}+\rho_{2}^{2}=\left(m_{1r}+m_{2r}\right)\eta_{r}+\left(m_{1c}+m_{2c}\right)\eta_{c}
+\]
+
+\end_inset
+
+If 
+\begin_inset Formula $m_{1}\perp m_{2}$
+\end_inset
+
+, then
+\begin_inset Formula 
+\[
+\nu^{2}-r^{2}\underset{\perp}{=}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)
+\]
+
+\end_inset
+
+If 
+\begin_inset Formula $m_{1}\parallel m_{2}$
+\end_inset
+
+, then, let, 
+\begin_inset Formula $m_{2}=\sigma m_{1}$
+\end_inset
+
+, so that
+\begin_inset Formula 
+\begin{align*}
+\rho_{1}^{2}+\rho_{2}^{2} & \underset{\parallel}{=}\left(m_{1}+\sigma m_{1}\right)\cdot h\\
+ & =\left(1+\sigma\right)m_{1}\cdot h
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\nu^{2}-r^{2} & \underset{\parallel}{=}2\left(\sigma m_{1}m_{1}-\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\right)\\
+ & =2\left(\sigma\left|m_{1}\right|^{2}-\left(1+\sigma\right)\left|m_{1}\right|\hat{m_{1}}\cdot h\right)\\
+ & =2\left|m_{1}\right|\left(-\left(\hat{m_{1}}\cdot h\right)-\sigma\left(\left(\hat{m_{1}}\cdot h\right)-\left|m_{1}\right|\right)\right)\\
+ & =-2\left|m_{1}\right|\left(\hat{m_{1}}\cdot h+\sigma\left(\hat{m_{1}}\cdot h-\hat{m_{1}}\cdot m_{1}\right)\right)\\
+ & =-2\left|m_{1}\right|\left(\hat{m_{1}}\cdot h+\sigma\left(\hat{m_{1}}\cdot\left(h-m_{1}\right)\right)\right)
+\end{align*}
+
+\end_inset
+
+Probably is generally negative.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Two candidate solution values, 
+\begin_inset Formula $\check{h}_{\pm}^{2}$
+\end_inset
+
+, may be computed immediately from the quadratic formula.
+ I.e.,
 \begin_inset Formula 
 \[
 \check{h}_{\pm}^{2}=-\frac{\kappa_{b}}{\kappa_{a}}\pm\sqrt{\left(\frac{\kappa_{b}}{\kappa_{a}}\right)^{2}-\frac{\kappa_{c}}{\kappa_{a}}}
@@ -1100,12 +1534,208 @@ The solution values for
 
 \end_inset
 
-for
+where,
 \begin_inset Formula 
 \begin{align*}
-\frac{\kappa_{b}}{\kappa_{a}} & =\tilde{\nu}^{2}+\frac{\left(\tilde{\nu}^{2}-4r^{2}\right)}{\left(1-\tilde{\gamma}^{2}\right)}\\
-\frac{\kappa_{c}}{\kappa_{a}} & =\frac{\left(\tilde{\nu}^{2}-r^{2}\right)^{2}-\tilde{\omega}^{2}\tilde{\gamma}^{2}}{\left(1-\tilde{\gamma}^{2}\right)}
+\frac{\kappa_{b}}{\kappa_{a}} & =\frac{2\left(\nu^{2}-r^{2}\right)-\frac{1}{2}\nu^{2}\gamma^{2}}{1-\gamma^{2}}\\
+\frac{\kappa_{c}}{\kappa_{a}} & =\frac{\left(\nu^{2}-r^{2}\right)^{2}-\omega^{2}\gamma^{2}}{1-\gamma^{2}}
 \end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO - consider signs here...
+ E.g.
+ is 
+\begin_inset Formula $\kappa_{b}$
+\end_inset
+
+ negative maybe? or is radical always larger magnitude?
+\end_layout
+
+\begin_layout Standard
+To obtain a solution for principal vector, 
+\begin_inset Formula $h$
+\end_inset
+
+, note that
+\begin_inset Formula 
+\[
+h^{2}=\eta_{r}^{2}+\eta_{c}^{2}+\eta^{2}
+\]
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\[
+\eta=\sqrt{\check{h}_{\pm}^{2}-\eta_{r}^{2}-\eta_{c}^{2}}
+\]
+
+\end_inset
+
+Here, only the positive root is relevant based on physical considerations.
+\end_layout
+
+\begin_layout Subsection
+Summary
+\end_layout
+
+\begin_layout Standard
+Initial values
+\end_layout
+
+\begin_layout Itemize
+Use detector size width and height to determine , 
+\begin_inset Formula $\left(\eta_{r},\eta_{c}\right)$
+\end_inset
+
+, the row and column coordinates of the detector center (in [pix] units).
+ For this simplified camera model, this center location is assumed to be
+ the principal point of autocolimation.
+\end_layout
+
+\begin_layout Itemize
+Establish the inter-point distance, 
+\begin_inset Formula $\sqrt{d^{2}}$
+\end_inset
+
+ , and range from station distances, 
+\begin_inset Formula $\lambda_{1}$
+\end_inset
+
+, and 
+\begin_inset Formula $\lambda_{2}$
+\end_inset
+
+ (expressed in [Ref] units).
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+One approach is to use survey techniques (e.g.
+ via GNSS) to establish 3D Ref frame coordinates for camera station vector,
+ 
+\begin_inset Formula $t$
+\end_inset
+
+, and the two object point vectors, 
+\begin_inset Formula $x_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{2}$
+\end_inset
+
+, then compute distances via,
+\begin_inset Formula 
+\begin{align*}
+d^{2} & =\left(x_{2}-x_{1}\right)^{2}\\
+\lambda_{j} & =\sqrt{\left(x_{j}-t\right)^{2}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Alternatively, measure the distances, 
+\begin_inset Formula $\sqrt{d^{2}}$
+\end_inset
+
+, 
+\begin_inset Formula $\lambda_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{2}$
+\end_inset
+
+, directly (e.g.
+ via laser range finder)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Obtain, 
+\begin_inset Formula $m_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{2}$
+\end_inset
+
+, by directly measuring the two image points of interest in detector coordinates
+ (e.g.
+ in [pix] units)
+\end_layout
+
+\begin_layout Itemize
+Compute observation parameter reductions,
+\begin_inset Formula 
+\begin{align*}
+\gamma & =\frac{\lambda_{1}^{2}+\lambda_{2}^{2}-d^{2}}{2\lambda_{1}\lambda_{2}}\\
+r^{2} & =\left(m_{2}-m_{1}\right)^{2}\\
+\rho_{j}^{2} & =m_{jr}\eta_{r}+m_{jc}\eta_{c}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Then, compute intermediate parameter values
+\begin_inset Formula 
+\begin{align*}
+\nu^{2} & =m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\\
+\omega^{2} & =\left(m_{1}^{2}-2\rho_{1}^{2}\right)\left(m_{2}^{2}-2\rho_{2}^{2}\right)\\
+\left(\nu^{2}-r^{2}\right) & =2\left(\left(m_{2}\cdot m_{1}\right)-\left(\rho_{1}^{2}+\rho_{2}^{2}\right)\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Use these to evaluate quadratic coefficients
+\begin_inset Formula 
+\begin{align*}
+\kappa_{a} & \equiv1-\gamma^{2}\\
+\kappa_{b} & \equiv2\left(\nu^{2}-r^{2}\right)-\frac{1}{2}\nu^{2}\gamma^{2}\\
+\kappa_{c} & \equiv\left(\nu^{2}-r^{2}\right)^{2}-\omega^{2}\gamma^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Solve the quadratic to obtain intermediate root candidates via an appropriate
+ expression (e.g.
+ numerically stable variant) of the general quadratic formula,
+\begin_inset Formula 
+\[
+\check{h}_{\pm}^{2}=\frac{-\kappa_{b}\pm\sqrt{\kappa_{b}^{2}-\kappa_{a}\kappa_{c}}}{\kappa_{a}}
+\]
+
+\end_inset
+
+TODO - how to resolve the two cases??
+\end_layout
+
+\begin_layout Itemize
+As the last step, estimate the principal distance via,
+\begin_inset Formula 
+\[
+\eta=\sqrt{\check{h}_{\pm}^{2}-\eta_{r}^{2}-\eta_{c}^{2}}
+\]
 
 \end_inset
 

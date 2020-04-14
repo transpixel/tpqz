@@ -58,6 +58,7 @@ env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
 env.Program('uCamera.cpp')
+env.Program('ufit.cpp')
 env.Program('uio.cpp')
 env.Program('uPinHole.cpp')
 env.Program('uXRefSpots.cpp')

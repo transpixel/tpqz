@@ -147,6 +147,13 @@ public: // methods
 	lookDir
 		() const;
 
+	//! True if this camera is same as other (within tol)
+	bool
+	nearlyEquals
+		( Camera const & other
+		, double const & tol = { math::eps }
+		) const;
+
 	//! Descriptive information about this instance.
 	std::string
 	infoString

@@ -57,9 +57,16 @@ PinHole :: PinHole
 {
 }
 
-// copy constructor -- compiler provided
-// assignment operator -- compiler provided
-// destructor -- compiler provided
+bool
+PinHole :: nearlyEquals
+	( PinHole const & other
+	, double const & tol
+	) const
+{
+	return
+		{  dat::nearlyEquals(thePD, other.thePD, tol)
+		};
+}
 
 std::string
 PinHole :: infoString

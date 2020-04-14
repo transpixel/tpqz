@@ -34,8 +34,9 @@
 */
 
 
-#include "libga/ga.h"
 #include "libdat/dat.h"
+#include "libga/ga.h"
+#include "libmath/math.h"
 
 #include <string>
 
@@ -99,6 +100,13 @@ public: // methods
 	ga::Vector
 	directionOf
 		( dat::Spot const & imgspot
+		) const;
+
+	//! True if this instance and other are same within tolerance
+	bool
+	nearlyEquals
+		( PinHole const & other
+		, double const & tol = { math::eps }
 		) const;
 
 	//! Descriptive information about this instance.

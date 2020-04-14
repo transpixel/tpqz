@@ -1583,6 +1583,103 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
+	filename AngleCalibration_FigTorus.png
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Toroidal-surface"
+
+\end_inset
+
+Perspective representation of example toroidal surface determined by two
+ detector locations and the exit angle magnitude.
+ The checkerboard represents the detector surface, while the blue cylinder
+ is the optical system exit axis which, for simple camera here, is assumed
+ to be orthogonal to the detector surface.
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Domains-for-solution"
+
+\end_inset
+
+ (left) illustrates the cross section view where torus intersects detector
+ surface, for the 
+\begin_inset Quotes eld
+\end_inset
+
+four-solutions
+\begin_inset Quotes erd
+\end_inset
+
+ case, two of which are above and two below the detector surface.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Toroidal-surface"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Box Boxed
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
 	filename AngleCalibration_FigSolns.png
 	lyxscale 50
 	width 100col%
@@ -1637,8 +1734,20 @@ Domains for solution values,
  the torus such that the optical axis pierces the torus only twice (once
  above and once below the detector plane).
  The four-solution domains correspond to the principal point being outside
- the torus, while the optical axis enters and leaves the torus volume both
- above and below the detector surface.
+ the torus (cf.
+ figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Toroidal-surface"
+
+\end_inset
+
+), while the optical axis enters and leaves the torus volume both above
+ and below the detector surface.
  The case on the left corresponds with an accute angle, 
 \begin_inset Formula $\beta$
 \end_inset

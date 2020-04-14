@@ -40,6 +40,14 @@
 namespace geo
 {
 
+// explicit
+Wedge :: Wedge
+	( ga::Vector const & vert
+	, std::pair<ga::Vector, ga::Vector> const & locPair
+	)
+	: theTriangle(locPair.first, vert, locPair.second)
+{ }
+
 std::string
 Wedge :: infoString
 	( std::string const & title

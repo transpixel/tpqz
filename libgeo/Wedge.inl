@@ -35,14 +35,6 @@
 namespace geo
 {
 
-// explicit
-Wedge :: Wedge
-	( ga::Vector const & vert
-	, std::pair<ga::Vector, ga::Vector> const & locPair
-	)
-	: theTriangle(locPair.first, vert, locPair.second)
-{ }
-
 inline
 bool
 Wedge :: isValid

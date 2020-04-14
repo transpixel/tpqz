@@ -184,7 +184,7 @@ Geometric Configuration
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Box Boxed
@@ -206,15 +206,14 @@ backgroundcolor "none"
 status open
 
 \begin_layout Plain Layout
-put
-\end_layout
+\begin_inset Graphics
+	filename AngleCalibration_FigRefFrame.svg
+	lyxscale 50
+	width 100col%
 
-\begin_layout Plain Layout
-figure
-\end_layout
+\end_inset
 
-\begin_layout Plain Layout
-here
+
 \end_layout
 
 \end_inset
@@ -229,7 +228,23 @@ name "fig:Exterior-space-angle"
 
 \end_inset
 
-Exterior space angle defined by two object points relative to camera station.
+Exterior space angle, 
+\begin_inset Formula $\alpha=\left|A\right|$
+\end_inset
+
+, defined by two object points at 
+\begin_inset Formula $x_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{2}$
+\end_inset
+
+ relative to camera station at 
+\begin_inset Formula $t$
+\end_inset
+
+.
  The camera station is the location of the optical system entrance pupil
  as expressed in the exterior reference frame.
 \end_layout
@@ -248,7 +263,7 @@ Exterior space angle defined by two object points relative to camera station.
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Box Boxed
@@ -270,15 +285,14 @@ backgroundcolor "none"
 status open
 
 \begin_layout Plain Layout
-put
-\end_layout
+\begin_inset Graphics
+	filename AngleCalibration_FigDetFrame.svg
+	lyxscale 50
+	width 100col%
 
-\begin_layout Plain Layout
-figure
-\end_layout
+\end_inset
 
-\begin_layout Plain Layout
-here
+
 \end_layout
 
 \end_inset
@@ -293,10 +307,32 @@ name "fig:Interior-space-angle"
 
 \end_inset
 
-Interior space angle defined by two detector locations relative to optical
- system exit pupil.
- The measurement locations and exit pupil location are expressed in the
- detector reference frame.
+Interior space angle defined by two detector locations, 
+\begin_inset Formula $m_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{2}$
+\end_inset
+
+, relative to optical system exit pupil at location, 
+\begin_inset Formula $h$
+\end_inset
+
+, expressed in the detector reference frame.
+ The detector locations are a distance, 
+\begin_inset Formula $\mu_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu_{2}$
+\end_inset
+
+ from the pupil, subtend the angle, 
+\begin_inset Formula $\beta=\left|B\right|$
+\end_inset
+
+.
 \end_layout
 
 \end_inset
@@ -1521,6 +1557,110 @@ Probably is generally negative.
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Box Boxed
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigSolns.png
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Domains-for-solution"
+
+\end_inset
+
+Domains for solution values, 
+\begin_inset Formula $\check{h}_{\pm}^{2}$
+\end_inset
+
+.
+ Detector-plane cross section view of the toroidal solution surface.
+ The line segment between points 
+\begin_inset Formula $m_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{2}$
+\end_inset
+
+ form the axis of revolution about which a circle arc is revolved.
+ The (poloidal) radius of the arc is defined by locus of detector locations
+ from which points 
+\begin_inset Formula $m_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{2}$
+\end_inset
+
+ subtend angle 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ The two solution domain correspond with the principal point being inside
+ the torus such that the optical axis pierces the torus only twice (once
+ above and once below the detector plane).
+ The four-solution domains correspond to the principal point being outside
+ the torus, while the optical axis enters and leaves the torus volume both
+ above and below the detector surface.
+ The case on the left corresponds with an accute angle, 
+\begin_inset Formula $\beta$
+\end_inset
+
+, while the case on the right corresponds with an obtuse angle 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
 Two candidate solution values, 
 \begin_inset Formula $\check{h}_{\pm}^{2}$
 \end_inset
@@ -1547,13 +1687,30 @@ where,
 \end_layout
 
 \begin_layout Standard
-TODO - consider signs here...
- E.g.
- is 
-\begin_inset Formula $\kappa_{b}$
+If there are two real positive solutions, then the two values of 
+\begin_inset Formula $\check{h}_{\pm}^{2}$
 \end_inset
 
- negative maybe? or is radical always larger magnitude?
+ will subsequently produce two solutions that are slightly closer or further
+ from the detector.
+ These situation can be understood geometrically as the intersection of
+ the optical axis with a toroid of revolution as described in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Domains-for-solution"
+
+\end_inset
+
+.
+ Since both solutions are associated with the same angle, 
+\begin_inset Formula $\beta$
+\end_inset
+
+, additional information is needed to select which of the solutions to use.
 \end_layout
 
 \begin_layout Standard
@@ -1727,7 +1884,10 @@ Solve the quadratic to obtain intermediate root candidates via an appropriate
 
 \end_inset
 
-TODO - how to resolve the two cases??
+If there are two (real valued) solutions, additional information is needed
+ to resolve which one to use.
+ E.g.
+ which one produces the expected camera look direction, etc.
 \end_layout
 
 \begin_layout Itemize

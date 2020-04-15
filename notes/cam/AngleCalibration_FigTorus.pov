@@ -49,7 +49,7 @@ box
 {
 	// <right, up, away>
 	<0., 0., 0.>, <2., .05, 3.>
-	pigment { checker color Black, color Gray75 scale .05 }
+	pigment { checker color Gray70, color White scale .05 }
 }
 
 // camera

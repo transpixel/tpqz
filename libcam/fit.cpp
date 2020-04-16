@@ -66,7 +66,7 @@ namespace normalized
 		   )
 		{
 			// compute various intermediate quantities
-			double const gam{ std::cos(angleMag) };
+			double const gam{ 2. * std::cos(angleMag) };
 			double const gamSq{ math::sq(gam) };
 
 			dat::Spot const & m1 = meaPair.first;

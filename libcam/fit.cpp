@@ -50,6 +50,55 @@ namespace fit
 
 namespace normalized
 {
+	//! Compare solution values for consistency with input data
+	struct Checker
+	{
+		std::pair<dat::Spot, dat::Spot> const & theMeaPair;
+		double const & theExpGam;
+		dat::Spot const & theDetCenter;
+
+		//! Angle indicator: gamma = 2*cos(beta)
+		double
+		gammaFor
+			( double const & gotPD
+			) const
+		{
+			double gam{ dat::nullValue<double>() };
+			if (math::eps < gotPD) // consider only positive values
+			{
+				using dat::operator-;
+				double const radSq1
+					{ dat::magSq(theMeaPair.first - theDetCenter) };
+				double const radSq2
+					{ dat::magSq(theMeaPair.second - theDetCenter) };
+				double const pdSq{ math::sq(gotPD) };
+				double const muSq1{ pdSq + radSq1 };
+				double const muSq2{ pdSq + radSq2 };
+				double const delSq
+					{ dat::magSq(theMeaPair.second - theMeaPair.first) };
+				// delSq = muSq1 + muSq2 - mu1*mu2*(2.*cosBeta)
+				// gamma = 2*cosBeta
+				// delSq - muSq1 - muSq2 = - mu1*mu2*gamma
+				// (-delSq + muSq1 + muSq2)/(mu1*mu2) = gamma
+				gam = (muSq1 + muSq2 - delSq) / std::sqrt(muSq1 * muSq2);
+			}
+			return gam;
+		}
+
+		//! True if gotPD produces vertex angle of theExpGam within tol
+		bool
+		isConsistent
+			( double const & gotPD
+			, double const & tol = { math::eps }
+			) const
+		{
+			double const & expGam = theExpGam;
+			double const gotGam{ gammaFor(gotPD) };
+			return dat::nearlyEquals(gotGam, expGam, tol);
+		}
+
+	}; // Checker
+
 	//! Perform detailed computations (assuming data are reasonably normalized)
 	std::vector<double>
 	principalDistanceFor
@@ -102,6 +151,7 @@ namespace normalized
 			if (! hSqs.empty())
 			{
 				fitPDs.reserve(hSqs.size());
+				Checker const config{ meaPair, gam, detCenter };
 				for (double const & hSq : hSqs)
 				{
 					// extract component perpendicular to detector
@@ -110,7 +160,11 @@ namespace normalized
 					double const etaSq{ hSq - detRadSq };
 					if (0. < etaSq)
 					{
-						fitPDs.emplace_back(std::sqrt(etaSq));
+						double const gotPD{ std::sqrt(etaSq) };
+						if (config.isConsistent(gotPD, tol))
+						{
+							fitPDs.emplace_back(gotPD);
+						}
 					}
 				}
 			}

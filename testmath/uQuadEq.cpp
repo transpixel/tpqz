@@ -166,6 +166,83 @@ math_QuadEq_test1
 	return oss.str();
 }
 
+//! Check multiple root handling
+std::string
+math_QuadEq_test2
+	()
+{
+	std::ostringstream oss;
+
+	// double root
+	{
+		// 2*(x-1)*(x-1) = 2x^2 -4x +2
+		double const expRoot{ 1. };
+		math::QuadEq const quad(2., -4., 2.);
+		std::vector<double> const roots{ quad.realUniqueRoots() };
+		if (! (1u == roots.size()))
+		{
+			oss << "Failure of multiroot test case: double-root" << std::endl;
+		}
+		else
+		{
+			double const & gotRoot = roots.front();
+			if (! dat::nearlyEquals(gotRoot, expRoot))
+			{
+				oss << "Failure to get correct multiple root" << std::endl;
+				oss << dat::infoString(expRoot, "expRoot") << std::endl;
+				oss << dat::infoString(gotRoot, "gotRoot") << std::endl;
+			}
+		}
+	}
+
+	// no roots
+	{
+		// 2*x^2 + 4 = 0
+		math::QuadEq const quad(2., 0., 4.);
+		std::vector<double> const roots{ quad.realUniqueRoots() };
+		if (! (0u == roots.size()))
+		{
+			oss << "Failure of multiroot test case: no-real root" << std::endl;
+			for (double const & root : roots)
+			{
+				oss << dat::infoString(root, "... gotRoot") << std::endl;
+			}
+		}
+	}
+
+	// unique roots
+	{
+		// 2*(x-1)*(x+3) = 2x^2 +4x -6
+		double const expRoot1{ -3. }; // expect in numeric order
+		double const expRoot2{  1. };
+		math::QuadEq const quad(2., 4., -6.);
+		std::vector<double> const roots{ quad.realUniqueRoots() };
+		if (! (2u == roots.size()))
+		{
+			oss << "Failure of multiroot test case: unique roots" << std::endl;
+		}
+		else
+		{
+			double const & gotRoot1 = roots[0];
+			if (! dat::nearlyEquals(gotRoot1, expRoot1))
+			{
+				oss << "root1:" << std::endl;
+				oss << dat::infoString(expRoot1, "expRoot1") << std::endl;
+				oss << dat::infoString(gotRoot1, "gotRoot1") << std::endl;
+			}
+			double const & gotRoot2 = roots[1];
+			if (! dat::nearlyEquals(gotRoot2, expRoot2))
+			{
+				oss << "root2:" << std::endl;
+				oss << dat::infoString(expRoot2, "expRoot2") << std::endl;
+				oss << dat::infoString(gotRoot2, "gotRoot2") << std::endl;
+			}
+		}
+	}
+
+	return oss.str();
+}
+
 
 }
 
@@ -181,6 +258,7 @@ main
 	// run tests
 	oss << math_QuadEq_test0();
 	oss << math_QuadEq_test1();
+	oss << math_QuadEq_test2();
 
 	// check/report results
 	std::string const errMessages(oss.str());

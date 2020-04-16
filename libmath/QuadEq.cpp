@@ -131,6 +131,46 @@ QuadEq :: realRootMax
 	return root;
 }
 
+std::vector<double>
+QuadEq :: realUniqueRoots
+	( double const & tol
+	) const
+{
+	std::vector<double> roots;
+	if (dat::isValid(theDelta)) // real roots
+	{
+		roots.reserve(2u);
+		double const root1{ realRootMin() };
+		double const root2{ realRootMax() };
+		if (dat::nearlyEquals(theDelta, 0., tol)) // repeated root
+		{
+			// average to mitigate any rounding error
+			// (since roots may be computed with different formulae)
+			double const rootAve{ .5 * (root1 + root2) };
+			roots.emplace_back(rootAve);
+		}
+		else
+		{
+			if (dat::isValid(root1))
+			{
+				roots.emplace_back(root1);
+			}
+			if (dat::isValid(root2))
+			{
+				roots.emplace_back(root2);
+			}
+			if (1u < roots.size())
+			{
+				if (roots[1] < roots[0])
+				{
+					std::swap(roots[1], roots[0]);
+				}
+			}
+		}
+	}
+	return roots;
+}
+
 namespace
 {
 	inline

@@ -38,6 +38,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 
 namespace math
@@ -88,6 +89,12 @@ public: // methods
 	double
 	realRootMax
 		() const;
+
+	//! All roots: returns either: 0)empty, 1)averageMinMax, 2){min,max}
+	std::vector<double>
+	realUniqueRoots
+		( double const & tol = math::eps
+		) const;
 
 	//! The smallest non-negative root (or null)
 	double

@@ -41,6 +41,7 @@ libpaths = \
 
  , '../libgeo/'
  , '../libga/'
+ , '../libmath/'
  , '../libdat/'
  , '../libio/'
  ]
@@ -50,6 +51,7 @@ linklibs = \
 
  , 'geo'
  , 'ga'
+ , 'math'
  , 'dat'
  , 'io'
  ]

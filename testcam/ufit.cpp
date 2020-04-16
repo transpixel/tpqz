@@ -33,13 +33,16 @@
 
 #include "libcam/fit.h"
 
-#include "libgeo/Triangle.h" // move
+#include "libga/spin.h"
+#include "libgeo/VertGangle.h"
 
 #include "libdat/info.h"
+#include "libdat/ops.h"
 #include "libdat/validity.h"
 #include "libio/stream.h"
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -64,169 +67,6 @@ cam_fit_test0
 	return oss.str();
 }
 
-namespace
-{
-	//! Generalized 3D vertex angle.
-	struct Wedge
-	{
-		geo::Triangle theTriangle;
-
-		//! Value construction.
-		explicit
-		Wedge
-			( ga::Vector const & vert
-			, std::pair<ga::Vector, ga::Vector> const & locPair
-			)
-			: theTriangle(locPair.first, vert, locPair.second)
-		{ }
-
-		//! True if this instance is valid
-		inline
-		bool
-		isValid
-			() const
-		{
-			return dat::isValid(theTriangle);
-		}
-
-		//! Vector edge from vert to first location
-		inline
-		ga::Vector
-		edge1
-			() const
-		{
-			return { theTriangle[0] - theTriangle[1] };
-		}
-
-		//! Vector edge from vert to second location
-		inline
-		ga::Vector
-		edge2
-			() const
-		{
-			return { theTriangle[2] - theTriangle[1] };
-		}
-
-		/*! Generalized (G2-subspace) angle second location w.r.t. first.
-		 *
-		 * For b=edge2(), a=edge1(), then b=vertGangle()*a
-		 */
-		ga::Spinor
-		vertGangle
-			() const
-		{
-			ga::Vector const inv1{ ga::inverse(edge1()) };
-			return { ga::logG2(edge2() * inv1) };
-		}
-
-		//! Descriptive information about this instance
-		std::string
-		infoString
-			( std::string const & title = {}
-			) const
-		{
-			std::ostringstream oss;
-			if (! title.empty())
-			{
-				oss << title << std::endl;
-			}
-			if (isValid())
-			{
-				oss << dat::infoString(theTriangle, "theTriangle");
-				oss << std::endl;
-				oss << dat::infoString(vertGangle(), "vertGangle");
-			}
-			else
-			{
-				oss << " <null>";
-			}
-			return oss.str();
-		}
-
-	}; // Wedge
-
-	//! Generalized 3D vertex angle.
-	struct VertGangle
-	{
-		ga::Spinor const theGangle;
-
-		//! Generalized angle at vertex from first toward second
-		explicit
-		VertGangle
-			( ga::Vector const & vert
-			, std::pair<ga::Vector, ga::Vector> const & locPair
-			)
-			: theGangle{ Wedge(vert, locPair).vertGangle() }
-		{
-		}
-
-		//! True if this instance is valid
-		inline
-		bool
-		isValid
-			() const
-		{
-			return dat::isValid(theGangle);
-		}
-
-		//! Scalar magnitude of scalar part of vertGangle()
-		inline
-		double
-		ratioMag
-			() const
-		{
-			return { ga::magnitude(theGangle.theS) };
-		}
-
-		//! Scalar magnitude of bivector part of vertGangle()
-		inline
-		double
-		angleMag
-			() const
-		{
-			return { theGangle.theS.theValue };
-		}
-
-		//! Descriptive information about this instance
-		std::string
-		infoString
-			( std::string const & title = {}
-			) const
-		{
-			std::ostringstream oss;
-			if (! title.empty())
-			{
-				oss << title << std::endl;
-			}
-			if (isValid())
-			{
-				oss
-					<< dat::infoString(theGangle, "theGangle")
-					<< " angleMag: " << dat::infoString(angleMag())
-					<< " ratioMag: " << dat::infoString(ratioMag())
-					;
-			}
-			else
-			{
-				oss << " <null>";
-			}
-			return oss.str();
-		}
-
-	}; // VertGangle
-
-	cam::Camera
-	fitTo
-		( VertGangle const & objVertGangle
-		, dat::Extents const & detSize
-		)
-	{
-io::out() << dat::infoString(objVertGangle, "objVertGangle") << std::endl;
-
-		return {};
-	}
-}
-
 //! Check principal distance calibration
 std::string
 cam_fit_test1
@@ -234,25 +74,45 @@ cam_fit_test1
 {
 	std::ostringstream oss;
 
+	// simulate a detector
 	dat::Extents const detSize{ 2000u, 3000u };
-	constexpr double expPD{ 3456. };
+	dat::Spot const rcCenter{ dat::centerOf(detSize) };
+	ga::Vector const center{ rcCenter[0], rcCenter[1], 0. };
 
-	ga::Vector const locRefSta{ 100., 200., 300. };
-	ga::Vector const locRefX1{ locRefSta + 100.*ga::e1 };
-	ga::Vector const locRefX2{ locRefSta + 100.*(ga::e1 + ga::e2) };
-	VertGangle const objVertGangle
-		{ locRefSta, std::make_pair(locRefX1, locRefX2) };
+	dat::Spot const meaRowCol1{  500., 2300. };
+	dat::Spot const meaRowCol2{ 1500., 1700. };
+	double const expPD{ 137. };
 
-	cam::Camera const expCam{ expPD, detSize };
-	cam::Camera const gotCam{ fitTo(objVertGangle, detSize) };
-	if (! gotCam.nearlyEquals(expCam))
+	std::pair<dat::Spot, dat::Spot> const meaPair{ meaRowCol1, meaRowCol2 };
+	ga::Vector const vecMea1{ meaRowCol1[0], meaRowCol1[1], 0. };
+	ga::Vector const vecMea2{ meaRowCol2[0], meaRowCol2[1], 0. };
+	ga::Vector const vecPD{ center + expPD * ga::e3 };
+
+	geo::VertGangle const imgGangle{ vecPD, std::make_pair(vecMea1, vecMea2) };
+	double const beta{ imgGangle.angleMag() };
+	std::vector<double> const gotPDs
+		{ cam::fit::principalDistanceFor(meaPair, beta, detSize) };
+
+	bool okay{ false };
+	for (double const & gotPD : gotPDs)
 	{
-		oss << "Failure of simple calibration test" << std::endl;
-		oss << dat::infoString(expCam, "expCam") << std::endl;
-		oss << dat::infoString(gotCam, "gotCam") << std::endl;
+		if (dat::nearlyEquals(gotPD, expPD))
+		{
+			okay = true;
+		}
 	}
 
-oss << "Failure: implement this test!" << std::endl;
+	if (! okay)
+	{
+		oss << "Failure to recover principal distance test" << std::endl;
+		oss << dat::infoString(expPD, "expPD") << std::endl;
+		oss << dat::infoString(gotPDs.begin(), gotPDs.end(), "gotPDs")
+			<< std::endl;
+		oss << dat::infoString(meaRowCol1, "meaRowCol1") << std::endl;
+		oss << dat::infoString(meaRowCol2, "meaRowCol2") << std::endl;
+
+	}
+
 	return oss.str();
 }
 

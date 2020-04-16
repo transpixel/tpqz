@@ -33,6 +33,8 @@
 
 #include "libmath/QuadEq.h"
 
+#include "libio/sprintf.h"
+
 #include <limits>
 #include <sstream>
 
@@ -60,6 +62,13 @@ namespace
 		if (0. <= descrim)
 		{
 			delta = std::sqrt(descrim);
+		}
+		else // allow for a bit of numeric slop
+		{
+			if (-.25*math::eps < descrim)
+			{
+				delta = 0.;
+			}
 		}
 		return delta;
 	}
@@ -234,7 +243,8 @@ QuadEq :: infoString
 			;
 		oss << std::endl;
 		oss << "descrm:"
-			<< " " << dat::infoString(theDescrim);
+			<< " " << io::sprintf("%12.5e", theDescrim);
+			// dat::infoString(theDescrim);
 		oss << std::endl;
 		oss << "middle:"
 			<< " " << dat::infoString(midRoot);

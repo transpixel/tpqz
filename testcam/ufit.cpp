@@ -98,24 +98,86 @@ namespace
 			return geo::VertGangle{ vecPD, std::make_pair(vecMea1, vecMea2) };
 		}
 
-		void
-		showData
-			( std::pair<dat::Spot, dat::Spot> const & meaPair
+		double
+		beta
+			( double const & pd
+			, std::pair<dat::Spot, dat::Spot> const & meaPair
 			) const
 		{
-			for (double pd{0.} ; pd < 250. ; pd += 10.)
+			return gangleFor(pd, meaPair).angleMag();
+		}
+
+		std::string
+		infoProfile
+			( std::pair<dat::Spot, dat::Spot> const & meaPair
+			, double const & minPD = 0.
+			, double const & maxPD = 250.
+			, double const & delPD = 10.
+			) const
+		{
+			std::ostringstream oss;
+			for (double pd{minPD} ; (! (maxPD < pd)) ; pd += delPD)
 			{
 				geo::VertGangle const gangle{ gangleFor(pd, meaPair) };
-				io::out()
+				oss
 					<< " pd: " << dat::infoString(pd)
 					<< " gangle: " << dat::infoString(gangle)
 					<< std::endl;
 			}
+			return oss.str();
 		}
 
 
 	}; // Interior
 
+	using MeaPair = std::pair<dat::Spot, dat::Spot>;
+
+	//! Spots covering detector size
+	std::vector<dat::Spot>
+	detSpots
+		( dat::Extents const & detSize
+		, size_t const & delta = { 100u }
+		)
+	{
+		std::vector<dat::Spot> spots;
+		for (size_t row{0u} ; row < detSize.high() ; row += delta)
+		{
+			for (size_t col{0u} ; col < detSize.wide() ; col += delta)
+			{
+				dat::Spot const spot{ (double)row, (double)col };
+				spots.emplace_back(spot);
+			}
+		}
+		return spots;
+	}
+
+	//! Combinatorial pairing of spots
+	std::vector<MeaPair>
+	detPairs
+		( std::vector<dat::Spot> const & spots
+		)
+	{
+		std::vector<MeaPair> pairs;
+		pairs.reserve(math::sq(spots.size()));
+		for (dat::Spot const & spot1 : spots)
+		{
+			for (dat::Spot const & spot2 : spots)
+			{
+				pairs.emplace_back(std::make_pair(spot1, spot2));
+			}
+		}
+		return pairs;
+	}
+
+	//! Vector with first two components set to spot coordinates
+	inline
+	ga::Vector
+	detVecFor
+		( dat::Spot const & spot
+		)
+	{
+		return ga::Vector{ spot[0], spot[1], 0. };
+	}
 }
 
 //! Check principal distance calibration
@@ -130,57 +192,112 @@ cam_fit_test1
 	dat::Spot const rcCenter{ dat::centerOf(detSize) };
 	ga::Vector const center{ rcCenter[0], rcCenter[1], 0. };
 
-	double const expPD{ 100. };
-	double const delta{ expPD };
-	using dat::operator+;
-	using dat::operator-;
-	dat::Spot const meaRowCol1{ rcCenter + dat::Spot{ delta, 500. } };
-	dat::Spot const meaRowCol2{ rcCenter - dat::Spot{ delta, 500. } };
+	double const expPD{ 1000. };
 
-	std::pair<dat::Spot, dat::Spot> const meaPair{ meaRowCol1, meaRowCol2 };
-	ga::Vector const vecMea1{ meaRowCol1[0], meaRowCol1[1], 0. };
-	ga::Vector const vecMea2{ meaRowCol2[0], meaRowCol2[1], 0. };
-	ga::Vector const vecPD{ center + expPD * ga::e3 };
-
-	geo::VertGangle const imgGangle{ vecPD, std::make_pair(vecMea1, vecMea2) };
-	double const beta{ imgGangle.angleMag() };
-	std::vector<double> const gotPDs
-		{ cam::fit::principalDistanceFor(meaPair, beta, detSize) };
-
-	// display all solutions
-	io::out() << dat::infoString(gotPDs.begin(), gotPDs.end(), "expPD") << '\n';
-	io::out() << dat::infoString(beta, "beta") << '\n';
-	for (double const & gotPD : gotPDs)
+	std::vector<MeaPair> const meaPairs{ detPairs(detSpots(detSize, 123u)) };
+	size_t count{ 0u };
+	for (MeaPair const & meaPair : meaPairs)
 	{
-		io::out() << io::sprintf("... %25.18f", gotPD) << std::endl;
-	}
+		Interior const inner(detSize); // for test comparisons
+		double const tol{ dat::diagonalMag(detSize) * std::sqrt(math::eps) };
 
-	// display expected profile
-	Interior const inner(detSize);
-	inner.showData(meaPair);
+		// compute interior angle magnitude for test case
+		ga::Vector const vecMea1{ detVecFor(meaPair.first) };
+		ga::Vector const vecMea2{ detVecFor(meaPair.second) };
+		ga::Vector const vecPD{ center + expPD * ga::e3 };
+		geo::VertGangle const imgGangle
+			{ vecPD, std::make_pair(vecMea1, vecMea2) };
+		double const beta{ imgGangle.angleMag() };
 
-	bool okay{ false };
-	double const tol{ dat::diagonalMag(detSize) * math::eps };
-	for (double const & gotPD : gotPDs)
-	{
-		if (dat::nearlyEquals(gotPD, expPD, tol))
+		// fit principal distance to this angle
+		std::vector<double> const gotPDs
+			{ cam::fit::principalDistanceFor(meaPair, beta, detSize) };
+
+		// if same point, expect no solution
+		if (dat::nearlyEquals(meaPair.first, meaPair.second))
 		{
-			okay = true;
+			if (! gotPDs.empty())
+			{
+				oss << "Failure of empty return for zero angle test" << '\n';
+			}
+		}
+		else
+		{
+			// check that solution(s) reproduce interior angle
+			for (double const & gotPD : gotPDs)
+			{
+				double const expBeta{ inner.beta(expPD, meaPair) };
+				double const gotBeta{ inner.beta(gotPD, meaPair) };
+				if (! dat::nearlyEquals(gotBeta, expBeta, tol))
+				{
+					oss << "Failure of angle beta test" << std::endl;
+				}
+			}
+
+			// check that at least one of the solutions is correct
+			bool okay{ false };
+			for (double const & gotPD : gotPDs)
+			{
+				if (dat::nearlyEquals(gotPD, expPD, tol))
+				{
+					okay = true;
+				}
+			}
+			if (! okay)
+			{
+				oss << "Failure to recover principal distance test" << '\n';
+			}
+		}
+
+		// if error encountered, display diagnostic info
+		if (! oss.str().empty())
+		{
+			oss << dat::infoString(expPD, "expPD") << std::endl;
+			oss << dat::infoString(vecMea1, "vecMea1") << std::endl;
+			oss << dat::infoString(vecMea2, "vecMea2") << std::endl;
+			oss << dat::infoString(beta, "beta") << std::endl;
+
+			// display angle info for solution(s)
+			double const expBeta{ inner.beta(expPD, meaPair) };
+			if (gotPDs.empty())
+			{
+				oss << "<empty solutions>" << std::endl;
+			}
+			for (double const & gotPD : gotPDs)
+			{
+				double const gotBeta{ inner.beta(gotPD, meaPair) };
+				double const difBeta{ gotBeta - expBeta };
+				double const difPD{ gotPD - expPD };
+				oss
+					<< "...   expPD: " << io::sprintf("%12.6f", expPD)
+					<< "   gotPD: " << io::sprintf("%12.6f", gotPD)
+					<< "   difPD: " << io::sprintf("%12.5e", difPD)
+					<< "   tol: " << io::sprintf("%12.5e", tol)
+					<< std::endl;
+				oss
+					<< "... expBeta: " << io::sprintf("%12.6f", expBeta)
+					<< " gotBeta: " << io::sprintf("%12.6f", gotBeta)
+					<< " difBeta: " << io::sprintf("%12.5e", difBeta)
+					<< "   tol: " << io::sprintf("%12.5e", tol)
+					<< std::endl;
+			}
+
+			// display expected profile
+			oss << inner.infoProfile(meaPair, 0., 2000., 100.) << std::endl;
+
+			break;
+		}
+		else
+		{
+			++count;
 		}
 	}
 
-	if (! okay)
+	if (count < 100u)
 	{
-		oss << "Failure to recover principal distance test" << std::endl;
-		oss << dat::infoString(expPD, "expPD") << std::endl;
-		for (double const & gotPD : gotPDs)
-		{
-			oss << io::sprintf("... %25.18f", gotPD) << std::endl;
-		}
-		oss << dat::infoString(meaRowCol1, "meaRowCol1") << std::endl;
-		oss << dat::infoString(meaRowCol2, "meaRowCol2") << std::endl;
-		oss << dat::infoString(beta, "beta") << std::endl;
+		oss << "Failure to consider enough cases: count = " << count << '\n';
 	}
+	// io::out() << count << std::endl;
 
 	return oss.str();
 }

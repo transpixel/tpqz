@@ -67,6 +67,57 @@ cam_fit_test0
 	return oss.str();
 }
 
+namespace
+{
+	//! Interior geometry for particular test case
+	struct Interior
+	{
+		dat::Extents const theDetSize;
+		dat::Spot const theCenterRC;
+		ga::Vector const theCenterVec;
+
+		Interior
+			( dat::Extents const & detSize
+			)
+			: theDetSize{ detSize }
+			, theCenterRC{ dat::centerOf(theDetSize) }
+			, theCenterVec{ theCenterRC[0], theCenterRC[1], 0. }
+		{ }
+
+		geo::VertGangle
+		gangleFor
+			( double const & pd
+			, std::pair<dat::Spot, dat::Spot> const & meaPair
+			) const
+		{
+			dat::Spot const & meaRowCol1 = meaPair.first;
+			dat::Spot const & meaRowCol2 = meaPair.second;
+			ga::Vector const vecMea1{ meaRowCol1[0], meaRowCol1[1], 0. };
+			ga::Vector const vecMea2{ meaRowCol2[0], meaRowCol2[1], 0. };
+			ga::Vector const vecPD{ theCenterVec + pd * ga::e3 };
+			return geo::VertGangle{ vecPD, std::make_pair(vecMea1, vecMea2) };
+		}
+
+		void
+		showData
+			( std::pair<dat::Spot, dat::Spot> const & meaPair
+			) const
+		{
+			for (double pd{0.} ; pd < 250. ; pd += 10.)
+			{
+				geo::VertGangle const gangle{ gangleFor(pd, meaPair) };
+				io::out()
+					<< " pd: " << dat::infoString(pd)
+					<< " gangle: " << dat::infoString(gangle)
+					<< std::endl;
+			}
+		}
+
+
+	}; // Interior
+
+}
+
 //! Check principal distance calibration
 std::string
 cam_fit_test1
@@ -79,9 +130,12 @@ cam_fit_test1
 	dat::Spot const rcCenter{ dat::centerOf(detSize) };
 	ga::Vector const center{ rcCenter[0], rcCenter[1], 0. };
 
-	dat::Spot const meaRowCol1{  500., 2300. };
-	dat::Spot const meaRowCol2{ 1500., 1700. };
-	double const expPD{ 137. };
+	double const expPD{ 100. };
+	double const delta{ expPD };
+	using dat::operator+;
+	using dat::operator-;
+	dat::Spot const meaRowCol1{ rcCenter + dat::Spot{ delta, 500. } };
+	dat::Spot const meaRowCol2{ rcCenter - dat::Spot{ delta, 500. } };
 
 	std::pair<dat::Spot, dat::Spot> const meaPair{ meaRowCol1, meaRowCol2 };
 	ga::Vector const vecMea1{ meaRowCol1[0], meaRowCol1[1], 0. };
@@ -93,10 +147,23 @@ cam_fit_test1
 	std::vector<double> const gotPDs
 		{ cam::fit::principalDistanceFor(meaPair, beta, detSize) };
 
-	bool okay{ false };
+	// display all solutions
+	io::out() << dat::infoString(gotPDs.begin(), gotPDs.end(), "expPD") << '\n';
+	io::out() << dat::infoString(beta, "beta") << '\n';
 	for (double const & gotPD : gotPDs)
 	{
-		if (dat::nearlyEquals(gotPD, expPD))
+		io::out() << io::sprintf("... %25.18f", gotPD) << std::endl;
+	}
+
+	// display expected profile
+	Interior const inner(detSize);
+	inner.showData(meaPair);
+
+	bool okay{ false };
+	double const tol{ dat::diagonalMag(detSize) * math::eps };
+	for (double const & gotPD : gotPDs)
+	{
+		if (dat::nearlyEquals(gotPD, expPD, tol))
 		{
 			okay = true;
 		}
@@ -106,11 +173,13 @@ cam_fit_test1
 	{
 		oss << "Failure to recover principal distance test" << std::endl;
 		oss << dat::infoString(expPD, "expPD") << std::endl;
-		oss << dat::infoString(gotPDs.begin(), gotPDs.end(), "gotPDs")
-			<< std::endl;
+		for (double const & gotPD : gotPDs)
+		{
+			oss << io::sprintf("... %25.18f", gotPD) << std::endl;
+		}
 		oss << dat::infoString(meaRowCol1, "meaRowCol1") << std::endl;
 		oss << dat::infoString(meaRowCol2, "meaRowCol2") << std::endl;
-
+		oss << dat::infoString(beta, "beta") << std::endl;
 	}
 
 	return oss.str();

@@ -64,7 +64,7 @@ struct VertGangle
 	 */
 	static
 	ga::Spinor
-	vertGangleFor
+	spinGangleFor
 		( Wedge const & wedge
 		);
 
@@ -77,6 +77,12 @@ struct VertGangle
 	VertGangle
 		( ga::Vector const & vert
 		, std::pair<ga::Vector, ga::Vector> const & locPair
+		);
+
+	//! Generalized angle associated with wedge vertex
+	explicit
+	VertGangle
+		( Wedge const & wedge
 		);
 
 	//! True if this instance is valid

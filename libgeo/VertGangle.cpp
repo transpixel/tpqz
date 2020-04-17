@@ -42,7 +42,7 @@ namespace geo
 
 // static
 ga::Spinor
-VertGangle :: vertGangleFor
+VertGangle :: spinGangleFor
 	( Wedge const & wedge
 	)
 {
@@ -55,7 +55,15 @@ VertGangle :: VertGangle
 	( ga::Vector const & vert
 	, std::pair<ga::Vector, ga::Vector> const & locPair
 	)
-	: theGangle{ vertGangleFor(geo::Wedge(vert, locPair)) }
+	: theGangle{ spinGangleFor(geo::Wedge(vert, locPair)) }
+{
+}
+
+// explicit
+VertGangle :: VertGangle
+	( Wedge const & wedge
+	)
+	: theGangle{ spinGangleFor(wedge) }
 {
 }
 

@@ -33,6 +33,7 @@
 
 #include "libcam/fit.h"
 
+#include "libcam/InnerVertex.h"
 #include "libga/spin.h"
 #include "libgeo/VertGangle.h"
 
@@ -69,66 +70,28 @@ cam_fit_test0
 
 namespace
 {
-	//! Interior geometry for particular test case
-	struct Interior
+	//! String of angle values associated with principal distance sampling
+	std::string
+	infoProfile
+		( cam::InnerVertex const & inner
+		, std::pair<dat::Spot, dat::Spot> const & meaPair
+		, double const & minPD = 0.
+		, double const & maxPD = 250.
+		, double const & delPD = 10.
+		)
 	{
-		dat::Extents const theDetSize;
-		dat::Spot const theCenterRC;
-		ga::Vector const theCenterVec;
-
-		Interior
-			( dat::Extents const & detSize
-			)
-			: theDetSize{ detSize }
-			, theCenterRC{ dat::centerOf(theDetSize) }
-			, theCenterVec{ theCenterRC[0], theCenterRC[1], 0. }
-		{ }
-
-		geo::VertGangle
-		gangleFor
-			( double const & pd
-			, std::pair<dat::Spot, dat::Spot> const & meaPair
-			) const
+		std::ostringstream oss;
+		for (double pd{minPD} ; (! (maxPD < pd)) ; pd += delPD)
 		{
-			dat::Spot const & meaRowCol1 = meaPair.first;
-			dat::Spot const & meaRowCol2 = meaPair.second;
-			ga::Vector const vecMea1{ meaRowCol1[0], meaRowCol1[1], 0. };
-			ga::Vector const vecMea2{ meaRowCol2[0], meaRowCol2[1], 0. };
-			ga::Vector const vecPD{ theCenterVec + pd * ga::e3 };
-			return geo::VertGangle{ vecPD, std::make_pair(vecMea1, vecMea2) };
+			geo::VertGangle const gangle{ inner.gangleFor(pd, meaPair) };
+			oss
+				<< " pd: " << dat::infoString(pd)
+				<< " gangle: " << dat::infoString(gangle)
+				<< std::endl;
 		}
+		return oss.str();
+	}
 
-		double
-		beta
-			( double const & pd
-			, std::pair<dat::Spot, dat::Spot> const & meaPair
-			) const
-		{
-			return gangleFor(pd, meaPair).angleMag();
-		}
-
-		std::string
-		infoProfile
-			( std::pair<dat::Spot, dat::Spot> const & meaPair
-			, double const & minPD = 0.
-			, double const & maxPD = 250.
-			, double const & delPD = 10.
-			) const
-		{
-			std::ostringstream oss;
-			for (double pd{minPD} ; (! (maxPD < pd)) ; pd += delPD)
-			{
-				geo::VertGangle const gangle{ gangleFor(pd, meaPair) };
-				oss
-					<< " pd: " << dat::infoString(pd)
-					<< " gangle: " << dat::infoString(gangle)
-					<< std::endl;
-			}
-			return oss.str();
-		}
-
-
-	}; // Interior
 
 	using MeaPair = std::pair<dat::Spot, dat::Spot>;
 
@@ -198,7 +161,7 @@ cam_fit_test1
 	size_t count{ 0u };
 	for (MeaPair const & meaPair : meaPairs)
 	{
-		Interior const inner(detSize); // for test comparisons
+		cam::InnerVertex const inner(detSize); // for test comparisons
 		double const tol{ dat::diagonalMag(detSize) * std::sqrt(math::eps) };
 
 		// compute interior angle magnitude for test case
@@ -226,8 +189,8 @@ cam_fit_test1
 			// check that solution(s) reproduce interior angle
 			for (double const & gotPD : gotPDs)
 			{
-				double const expBeta{ inner.beta(expPD, meaPair) };
-				double const gotBeta{ inner.beta(gotPD, meaPair) };
+				double const expBeta{ inner.angleMag(expPD, meaPair) };
+				double const gotBeta{ inner.angleMag(gotPD, meaPair) };
 				if (! dat::nearlyEquals(gotBeta, expBeta, tol))
 				{
 					oss << "Failure of angle beta test" << std::endl;
@@ -258,14 +221,14 @@ cam_fit_test1
 			oss << dat::infoString(beta, "beta") << std::endl;
 
 			// display angle info for solution(s)
-			double const expBeta{ inner.beta(expPD, meaPair) };
+			double const expBeta{ inner.angleMag(expPD, meaPair) };
 			if (gotPDs.empty())
 			{
 				oss << "<empty solutions>" << std::endl;
 			}
 			for (double const & gotPD : gotPDs)
 			{
-				double const gotBeta{ inner.beta(gotPD, meaPair) };
+				double const gotBeta{ inner.angleMag(gotPD, meaPair) };
 				double const difBeta{ gotBeta - expBeta };
 				double const difPD{ gotPD - expPD };
 				oss
@@ -283,7 +246,7 @@ cam_fit_test1
 			}
 
 			// display expected profile
-			oss << inner.infoProfile(meaPair, 0., 2000., 100.) << std::endl;
+			oss << infoProfile(inner, meaPair, 0., 2000., 100.) << std::endl;
 
 			break;
 		}

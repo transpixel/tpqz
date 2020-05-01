@@ -105,7 +105,8 @@ if not tpSnapshot :
  (spVerOut, spVerErr) = spVer.communicate()
  swID = spVerOut.rstrip()
 
-optSwVersion = "-D " + 'SCM_VERSION_ID=' + '\\"' + swID + '\\"'
+quote = str('\\"')
+optSwVersion = str('-D SCM_VERSION_ID=') + quote + str(swID) + quote
 
 # Enable assert()
 if tpNoAssert :
@@ -173,20 +174,20 @@ linkflags = \
 #
 
 if not tpBeSilent :
- print "Top-level Sconstruct file:"
+ print("Top-level Sconstruct file:")
 
 # Configure construction environment for use by modules
 if tpOptimize :
  if not tpBeSilent :
-  print "... setting optimize environment"
+  print("... setting optimize environment")
  env = Environment \
   ( CCFLAGS = compFlagsOptimize
   , CPPFLAGS = OptionCppFlags
   )
 else :
  if not tpBeSilent :
-  print "... setting default environment"
-  print "... setting debug environment"
+  print("... setting default environment")
+  print("... setting debug environment")
  env = Environment \
   ( CCFLAGS = compFlagsDebug
   , CPPFLAGS = OptionCppFlags
@@ -207,13 +208,13 @@ cmdout = os.popen("find . -name sconscript").read()
 scfiles = cmdout.split()
 
 if not tpBeSilent :
- print "Default build commands include ..."
- print "... swVer: ", optSwVersion
- print "... CPPPATH: ", env.subst('$CPPPATH')
- print "... CCCOM: ", env.subst('$CCCOM')
- print "... LINKCOM: ", env.subst('$LINKCOM')
- print "... LIBPATH: ", env.subst('$LIBPATH')
- print "... LIBS: ", env.subst('$LIBS')
+ print("Default build commands include ...")
+ print("... swVer: ", optSwVersion)
+ print("... CPPPATH: ", env.subst('$CPPPATH'))
+ print("... CCCOM: ", env.subst('$CCCOM'))
+ print("... LINKCOM: ", env.subst('$LINKCOM'))
+ print("... LIBPATH: ", env.subst('$LIBPATH'))
+ print("... LIBS: ", env.subst('$LIBS'))
 
 def moduleNameFrom(path) :
  modname = None
@@ -222,16 +223,16 @@ def moduleNameFrom(path) :
  if 3 < len(fields) :
   modname = fields[2]
  if tpVerbose :
-  print "Inside Func: fields", fields
-  print "Inside Func: modname", modname
+  print("Inside Func: fields", fields)
+  print("Inside Func: modname", modname)
  return modname
 
 if tpVerbose :
- print "================="
+ print("=================")
 
 for scfile in scfiles :
  if tpVerbose :
-  print "... Module:", scfile
+  print("... Module:", scfile)
  if not tpDryRun :
   modname = moduleNameFrom(scfile)
   Export('scfile')
@@ -241,6 +242,6 @@ for scfile in scfiles :
   SConscript(scfile, exports='env')
 
 if tpVerbose :
- print "================="
+ print("=================")
 
 

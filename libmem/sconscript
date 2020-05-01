@@ -33,7 +33,7 @@ Import('modname')
 
 Import('showSconsProgress')
 if showSconsProgress :
- print "-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile
+ print("-------- Incorporating Module ", "'"+modname+"'", "Via: ", scfile)
 
 env = env.Clone() # allow module to change anything it wants
 env.StaticLibrary (modname, Glob('*.cpp'))

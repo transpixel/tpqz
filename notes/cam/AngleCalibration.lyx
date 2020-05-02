@@ -2417,10 +2417,24 @@ As a last step, estimate the principal distance value(s) via,
 Results
 \end_layout
 
+\begin_layout Subsection
+Formula Verification
+\end_layout
+
 \begin_layout Standard
 The recipe and formulae described in the previous section have been implemented
  in a computer program and verified with simulated numeric data.
  The simulation results verify that the various formulae are correct.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Real-Photo-Calibration"
+
+\end_inset
+
+Real Photo Calibration
 \end_layout
 
 \begin_layout Standard
@@ -2663,11 +2677,7 @@ reference "tab:Detector-Properties"
 \begin_inset Float table
 wide false
 sideways false
-status collapsed
-
-\begin_layout Plain Layout
-
-\end_layout
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
@@ -2816,11 +2826,7 @@ Uncertainty [pix]
 \begin_inset Float table
 wide false
 sideways false
-status collapsed
-
-\begin_layout Plain Layout
-
-\end_layout
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
@@ -3846,6 +3852,421 @@ The precision estimate, computed using actual experiment uncertainties,
 \end_inset
 
 or about one part in 200.
+\end_layout
+
+\begin_layout Subsection
+3D Object Measurement Validation
+\end_layout
+
+\begin_layout Standard
+Although the camera calibration results discussed above are consistent with
+ expectation, it's useful to check the calibration with an independent process.
+ To this end, the same smartphone camera was utilized in a simple 3D (three-dime
+nsional) object reconstruction (aka structure from motion) project.
+\end_layout
+
+\begin_layout Standard
+The results of the photogrammetric reconstruction (using the camera calibration
+ described above) are compared with independent field measurements acquired
+ with a retractable steel tape.
+ This comparison provides an independent assessment of the quality of the
+ calibration, since the validation imagery, validation image feature measurement
+s and the reconstruction processing software are distinct from that used
+ in the calibration process.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigTablePair.png
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Stereo-pair-used"
+
+\end_inset
+
+Stereo pair used for 3D object geometry reconstruction.
+ The indicated image features, in conjunction with the camera calibration
+ determined in section
+\begin_inset space ~
+\end_inset
+
+TODO, were utilized to compute a 3D stereo module using a standard relative
+ orientation algorithm.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigTableChk.png
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Check-distances-used"
+
+\end_inset
+
+Check distances used to assess 3D object reconstruction quality.
+ The heavy lines identify the individual pairs of 3D points used to define
+ check distances.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigTableResid.png
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Residual-erros-in"
+
+\end_inset
+
+Residual erros in object reconstruction associated with the check distances
+ identified in annotation of figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Check-distances-used"
+
+\end_inset
+
+.
+ The model distances are computed by relative orientation algorithm and
+ expressed in an arbitrary coordinate frame and 
+\begin_inset Quotes eld
+\end_inset
+
+model units [mu]
+\begin_inset Quotes erd
+\end_inset
+
+.
+ A scale factor (computed using a single measurement of one diagonal across
+ he table top) is applied to express distances in meters in the second 
+\begin_inset Quotes eld
+\end_inset
+
+Model Distance
+\begin_inset Quotes erd
+\end_inset
+
+ column.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+Ref Dist
+\begin_inset Quotes erd
+\end_inset
+
+ values were measured using a retractable steel tape.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+Resid
+\begin_inset Quotes erd
+\end_inset
+
+ column displays residual values (RefDist less ModelDist).
+ The summary 
+\begin_inset Quotes eld
+\end_inset
+
+AbsDev
+\begin_inset Quotes erd
+\end_inset
+
+ value (i.e.
+ 
+\begin_inset Formula $9$
+\end_inset
+
+ millimeters) is the average absolute deviation of the residuals and is
+ entirely consistent with the a prior uncertainty of object distance measurement
+s utilized during camera calibration (cf.
+ table
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Object-Distance-Measurements"
+
+\end_inset
+
+).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The validation project consists of the following steps:
+\end_layout
+
+\begin_layout Enumerate
+Acquire imagery in a classic 
+\begin_inset Quotes eld
+\end_inset
+
+convergent stereo pair
+\begin_inset Quotes erd
+\end_inset
+
+ configuration.
+\end_layout
+
+\begin_layout Enumerate
+Measure (fairly arbitrary) corresponding image feature locations in each
+ image of the pair.
+\end_layout
+
+\begin_layout Enumerate
+Compute a the 
+\begin_inset Quotes eld
+\end_inset
+
+relative orientation
+\begin_inset Quotes erd
+\end_inset
+
+ (RO) between the two image exposures (using available custom software).
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Treat camera as a 
+\begin_inset Quotes eld
+\end_inset
+
+metric camera
+\begin_inset Quotes erd
+\end_inset
+
+ using the camera model with values as determined in section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Real-Photo-Calibration"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Estimate values for the five parameters representing general RO degrees
+ of freedom
+\end_layout
+
+\begin_layout Enumerate
+Compute 3D point coordinates via space intersection (using the RO solution).
+ Note that all 3D model points are expressed in arbitrary 
+\begin_inset Quotes eld
+\end_inset
+
+model units
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+[mu]
+\begin_inset Quotes erd
+\end_inset
+
+ (model scale is defined such that stereo baseline is exactly one [mu]).
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Compute model scale factor
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Measure one of the table top diagonals (top103 to top104) using the steel
+ tape to obtain the diagonal in Ref units (of meters).
+\end_layout
+
+\begin_layout Enumerate
+Compute scale factor as ratio of the Ref distance (in [m]) with the correspondin
+g model distance (in [mu]).
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Field measure check distances
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Use steel table and record values between pairs of points of interest that;
+ can be measured with a steel tape (e.g.
+ not having to pass through solid objects); and are representative of the
+ full 3D shape of the table
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Compute corresponding check distances
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Compute distance between appropriate model points to obtain model distances
+ in the model frame (in [mu]).
+\end_layout
+
+\begin_layout Enumerate
+Apply scale factor to express these check distances in Ref units (in [m]).
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Compare the computed distances with field measured one, report differences
+ and statistics.
+\end_layout
+
+\begin_layout Standard
+Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Stereo-pair-used"
+
+\end_inset
+
+ presents the two images that form the stereo pair used for 3D object reconstruc
+tion.
+ The image measurements visible in this figure were used as tie points for
+ relative orientation computation.
+\end_layout
+
+\begin_layout Standard
+Since the relative orientation solution immediately provides 3D coordinates
+ for these points, the tie points are associated with features that can
+ also be used to define check distance measurements.
+ The annotation in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Check-distances-used"
+
+\end_inset
+
+ identifies which inter-point distances are included in the check distance
+ evaluation process.
+\end_layout
+
+\begin_layout Standard
+The computed check distances, field measured check distance measurements
+ and a comparison of the two are presented in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Residual-erros-in"
+
+\end_inset
+
+.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Residual-erros-in"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section

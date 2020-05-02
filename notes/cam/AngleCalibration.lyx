@@ -88,7 +88,29 @@ Stellacore Corporation
 \end_layout
 
 \begin_layout Abstract
-This note....
+This brief technical note describes a simple algebraic solution for determinatio
+n of a camera's principal distance value.
+ The approach is based on single photograph which may be acquired free of
+ any restraint on location or attitude.
+ Scene information is introduced by measuring three object space distances
+ that form a triangle with the camera station at one vertex.
+ This simple technique is valid for cameras with optical systems that approximat
+e rectilinear image formation - i.e.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+normal
+\begin_inset Quotes erd
+\end_inset
+
+ optical designs with relatively low distortion.
+ The simplicity and validity of the technique are demonstrated using a single
+ image of stairwell acquired from a smart phone.
+\end_layout
+
+\begin_layout Keywords
+Photogrammetry, Camera Calibration
 \end_layout
 
 \begin_layout Section
@@ -96,35 +118,27 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-It is often useful to have a quick and simple, yet reliable and accurate,
+It is often useful to have a quick and simple, yet reliable and accurate
  method for estimating the principal distance of a camera system.
- For example, when fitting a new lenses to an image sensor, to support network
- design computations, obtain approximate (but reasonably good) 3D reconstruction
- solutions, or simply as initial values with which to bootstrap iterative
- numerical solution techniques.
+ For example to obtain nominal camera calibration values when fitting a
+ new lens to an image sensor or to obtain reasonably good initial values
+ with which to bootstrap iterative numerical solution techniques.
 \end_layout
 
 \begin_layout Standard
-Terminology:
+This technical note describes a simple method that recovers the camera principal
+ distance given detector position image measurements and a known object
+ space entrance angle.
+ The method provides an algebraic expression for solution values in terms
+ of the roots of quadratic equations.
 \end_layout
 
 \begin_layout Standard
-Ref: Reference (aka exterior, or world coordinate) frame.
-\end_layout
-
-\begin_layout Standard
-Det: Detector (aka interior, or camera) frame.
-\end_layout
-
-\begin_layout Standard
-Reference frame 3D orthonormal dextral.
- Det also OND.
- Planar detector surface.
- Square pixels.
-\end_layout
-
-\begin_layout Standard
-Describe vector basis for detector frame
+When the geometric configuration is sufficient to determine a unique it
+ is easily identified by dismissing negative values and physically unrealistic.
+ However, certain geometric configurations are associated with multiple
+ physically meaningful roots, in which case, both of the physically viable
+ solutions are provided.
 \end_layout
 
 \begin_layout Section
@@ -132,7 +146,68 @@ Methodology
 \end_layout
 
 \begin_layout Standard
-TODO...
+The formulation presented herein is expressed in terms that include the
+ relationship between multiple coordinate systems:
+\end_layout
+
+\begin_layout Description
+Ref An arbitrary 
+\begin_inset Quotes eld
+\end_inset
+
+Reference
+\begin_inset Quotes erd
+\end_inset
+
+ coordinate frame (e.g an 
+\begin_inset Quotes eld
+\end_inset
+
+object space
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+world frame
+\begin_inset Quotes erd
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Description
+Det The 
+\begin_inset Quotes eld
+\end_inset
+
+Detector
+\begin_inset Quotes erd
+\end_inset
+
+ surface of an image sensor associated with the camera (e.g.
+ the coordinate frame associated with a CMOS or CCD array)
+\end_layout
+
+\begin_layout Standard
+The mathematical formulation below touches on a few concepts from geometric
+ algebra (GA)
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hestenes,Laurinolli"
+
+\end_inset
+
+ such as use of simple algebraic operations to manipulate vectors, and suggestin
+g that the optical angles are better represented as bivector entities.
+ However, the fundamental operations and results are easily understood in
+ terms of real algebra and basic plane trigonometry.
 \end_layout
 
 \begin_layout Subsection
@@ -142,7 +217,7 @@ Simple Camera Model
 \begin_layout Standard
 For ideal central perspective image formation a camera model can be associated
  with the following conditions representing extreme limit cases of a more
- general model such as
+ general model such as in
 \begin_inset space ~
 \end_inset
 
@@ -168,12 +243,13 @@ Exit angle equals entrance angle (i.e.
 
 \begin_layout Enumerate
 Exit pupil is approximated as a point with location fixed relative to the
- optical system (or camera body)
+ optical system (and camera body)
 \end_layout
 
 \begin_layout Enumerate
-Detector is positioned such that its extent is centered on the optical system
- exit axis and its (assumed planar) surface is orthogonal to the exit axis.
+Detector is positioned such that the extent of its active surface is centered
+ on the optical system exit axis and the (assumed to be planar) sensor surface
+ is orthogonal to the exit axis.
 \end_layout
 
 \begin_layout Subsection
@@ -393,7 +469,18 @@ Let vector,
 
 \end_inset
 
+The relevant geometric relationships are illustrated in figure
+\begin_inset space ~
+\end_inset
 
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Exterior-space-angle"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -473,7 +560,18 @@ Let vector,
 
 \end_inset
 
+These relationships are illustrated in figure
+\begin_inset space ~
+\end_inset
 
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Interior-space-angle"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -507,7 +605,7 @@ where the scalar value components,
 \end_layout
 
 \begin_layout Subsubsection
-Paremeter Domains
+Parameter Domains
 \end_layout
 
 \begin_layout Standard
@@ -560,7 +658,25 @@ The principal distance,
 
 \begin_layout Standard
 For a (ideal case of) central perspective projection onto a flat, and finite,
- image surface, the exit angle is limited in magnitude.
+ image surface, the exit angle is limited in magnitude
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This is a limitation of the pinhole / central perspective projection model
+ and not a limitation of actual optical systems (e.g.
+ lenses exit with larger than 180-deg full field of view).
+ The fact that real optical systems exceed this limit, demonstrates that
+ the simple perspective projection model is a simplifying approximation
+ only valid is over a restricted domain of actual optical systems (generally,
+ validity improves with increasingly telephoto optical systems, and degrades
+ with increasingly wider angular ones and failing completely with non-rectilinea
+r designs such as fisheye optical systems).
+\end_layout
+
+\end_inset
+
+.
  By virtue of the distortion free condition, the entrance angle is corresponding
 ly limited.
  This conditions may be expressed as
@@ -660,11 +776,12 @@ For the simple camera model in use here, the principal point components,
 \end_inset
 
 , is completely determined.
- In particular, the value of 
+ In particular, for this assumed simple camera model, the scalar value,
+ 
 \begin_inset Formula $m_{j}\cdot h$
 \end_inset
 
- is entirely independent of the principal distance, 
+, is entirely independent of the principal distance, 
 \begin_inset Formula $\eta$
 \end_inset
 
@@ -716,7 +833,7 @@ d\equiv x_{2}-x_{1}
 
 \end_inset
 
-and
+and square each side of this relationship to obtain,
 \begin_inset Formula 
 \[
 d^{2}=x_{2}^{2}-2x_{2}\cdot x_{1}+x_{1}^{2}
@@ -728,12 +845,11 @@ d^{2}=x_{2}^{2}-2x_{2}\cdot x_{1}+x_{1}^{2}
 \end_layout
 
 \begin_layout Standard
-The entry angle magnitude, 
+Simultaneously, the entry angle magnitude, 
 \begin_inset Formula $\alpha$
 \end_inset
 
-, satisfies the Ref space triangle relationship (law of cosines component),
- via
+, satisfies the Ref space triangle law of cosines relationship, via
 \begin_inset Formula 
 \[
 d^{2}=\lambda_{1}^{2}+\lambda_{2}^{2}-2\lambda_{1}\lambda_{2}\cos\alpha
@@ -743,9 +859,9 @@ d^{2}=\lambda_{1}^{2}+\lambda_{2}^{2}-2\lambda_{1}\lambda_{2}\cos\alpha
 
 which may also be expressed,
 \begin_inset Formula 
-\[
-\cos\alpha=\frac{\lambda_{1}^{2}+\lambda_{2}^{2}-d^{2}}{2\lambda_{1}\lambda_{2}}
-\]
+\begin{equation}
+\cos\alpha=\frac{\lambda_{1}^{2}+\lambda_{2}^{2}-d^{2}}{2\lambda_{1}\lambda_{2}}\label{eq:CosineExterior}
+\end{equation}
 
 \end_inset
 
@@ -770,7 +886,7 @@ r\equiv m_{2}-m_{1}
 
 \end_inset
 
-and
+and square each side to obtain,
 \begin_inset Formula 
 \begin{equation}
 r^{2}=m_{2}^{2}-2m_{2}\cdot m_{1}+m_{1}^{2}\label{eq:Def_rSq}
@@ -795,11 +911,11 @@ r^{2}=\mu_{1}^{2}+\mu_{2}^{2}-2\mu_{1}\mu_{2}\cos\beta
 
 \end_inset
 
-or as
+or, as
 \begin_inset Formula 
-\[
-\cos\beta=\frac{\mu_{1}^{2}+\mu_{2}^{2}-r^{2}}{2\mu_{1}\mu_{2}}
-\]
+\begin{equation}
+\cos\beta=\frac{\mu_{1}^{2}+\mu_{2}^{2}-r^{2}}{2\mu_{1}\mu_{2}}\label{eq:CosineInternal}
+\end{equation}
 
 \end_inset
 
@@ -815,7 +931,7 @@ The ideal perspective condition may be expressed as
 \begin_inset Formula $\beta=\alpha$
 \end_inset
 
-, which then requires that
+, which also requires that
 \begin_inset Formula 
 \[
 \cos\beta=\cos\alpha
@@ -823,7 +939,30 @@ The ideal perspective condition may be expressed as
 
 \end_inset
 
-and therefore also, that
+This equivalence may be expressed in terms of the above triangle relationships
+ from equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CosineExterior"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CosineInternal"
+
+\end_inset
+
+,
 \begin_inset Formula 
 \[
 \frac{\lambda_{1}^{2}+\lambda_{2}^{2}-d^{2}}{\lambda_{1}\lambda_{2}}=\frac{\mu_{1}^{2}+\mu_{2}^{2}-r^{2}}{\mu_{1}\mu_{2}}
@@ -835,8 +974,8 @@ and therefore also, that
 \end_layout
 
 \begin_layout Standard
-The left hand side, may be evaluated in terms of measured object point locations
- and camera station location via relationship
+The left hand side, may be evaluated in terms of measured object point Ref
+ coordinate frame locations and the camera station location via relationship
 \begin_inset space ~
 \end_inset
 
@@ -851,17 +990,24 @@ reference "eq:RefDists"
 \end_layout
 
 \begin_layout Standard
-Introduce the scalar, 
+Introduce a new scalar parameter, 
 \begin_inset Formula $\gamma$
 \end_inset
 
-, to represent this common value.
- For calibration purposes here, it is particularly useful to associate 
+, that is proportional to the common value in this equivalence.
+ For calibration purposes, it is particularly useful to associate 
 \begin_inset Formula $\gamma$
 \end_inset
 
- with the object space quantity on the left, i.e.
- define
+ more closely with the object space quantity on the left and to 
+\emph on
+define
+\emph default
+ the parameter, 
+\begin_inset Formula $\gamma$
+\end_inset
+
+, as
 \begin_inset Formula 
 \[
 \gamma\equiv\frac{\lambda_{1}^{2}+\lambda_{2}^{2}-d^{2}}{\lambda_{1}\lambda_{2}}=2\cos\beta
@@ -869,7 +1015,7 @@ Introduce the scalar,
 
 \end_inset
 
-and express the coangularity condition as
+This allows expressing the coangularity condition as
 \begin_inset Formula 
 \begin{equation}
 \mu_{1}\mu_{2}\gamma=\mu_{1}^{2}+\mu_{2}^{2}-r^{2}\label{eq:CoAngleInMu}
@@ -922,37 +1068,30 @@ ntly change the underlying relationship.
 \begin_inset Formula $\gamma$
 \end_inset
 
- can be either positive or negative, the squaring operations conflates the
- two cases, and introduces a secondary solution.
- I.e.
- this squared relationship, represents the true physical configuration associate
-d with 
+ can be either positive or negative, the squaring operation conflates the
+ two cases, which introduces a possible secondary solution.
+\end_layout
+
+\begin_layout Standard
+I.e.
+ this squared relationship, still represents the true physical configuration
+ associated with 
 \begin_inset Formula $\gamma=2\cos\beta$
 \end_inset
 
-, but it also allows an artificial solution associated with the vertex angle
- supplement, 
+, but the squaring operation also introduces an artificial solution associated
+ with the vertex angle supplement, 
 \begin_inset Formula $-\gamma=2\cos\left(\pi-\beta\right)$
 \end_inset
 
 .
- Thus, any process of inverting relationships established from equation
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:SqSqs"
-
-\end_inset
-
-, can be expected to require also a disambiguation step.
+ Thus, any process of inverting this relationship is expected to also require
+ some mathematical disambiguation step.
 \end_layout
 
 \begin_layout Standard
-To expand this relationship in terms of principal distance parameters, start
- by squaring both sides of equation
+To evaluate this relationship in terms of the (unknown) principal distance
+ parameter, begin by squaring both sides of equation
 \begin_inset space ~
 \end_inset
 
@@ -986,9 +1125,9 @@ reference "eq:MeaProjection"
 
 , so that
 \begin_inset Formula 
-\[
-\mu_{j}^{2}=m_{j}^{2}-2\rho_{j}^{2}+h^{2}
-\]
+\begin{equation}
+\mu_{j}^{2}=m_{j}^{2}-2\rho_{j}^{2}+h^{2}\label{eq:MuSquared_j}
+\end{equation}
 
 \end_inset
 
@@ -1147,7 +1286,22 @@ reference "eq:SqSqs"
 \end_inset
 
  to principal distance parameters, express the sum of squared interior distance
- values as
+ values by adding equation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:MuSquared_j"
+
+\end_inset
+
+ for 
+\begin_inset Formula $j=1,2$
+\end_inset
+
+ to yield
 \begin_inset Formula 
 \[
 \left(\mu_{1}^{2}+\mu_{2}^{2}\right)=m_{1}^{2}+m_{2}^{2}-2\left(\rho_{1}^{2}+\rho_{2}^{2}\right)+2h^{2}
@@ -1155,7 +1309,7 @@ reference "eq:SqSqs"
 
 \end_inset
 
-In terms of intermediate value, 
+Which may also be expressed in terms of intermediate parameter, 
 \begin_inset Formula $\nu^{2}$
 \end_inset
 
@@ -1171,7 +1325,7 @@ In terms of intermediate value,
 \end_layout
 
 \begin_layout Standard
-Square this to obtain,
+Next, square this relationship to obtain,
 \begin_inset Formula 
 \begin{equation}
 \left(\mu_{1}^{2}+\mu_{2}^{2}\right)^{2}=4\left(\nu^{4}+2\nu^{2}h^{2}+h^{4}\right)\label{eq:SqSumSqMu1Mu2}
@@ -1785,7 +1939,18 @@ If there are two real positive solutions, then the two values of
  will subsequently produce two solutions that are slightly closer or further
  from the detector.
  These situation can be understood geometrically as the intersection of
- the optical axis with a toroid of revolution as described in figure
+ the optical axis with a toroid of revolution as visualized in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Toroidal-surface"
+
+\end_inset
+
+ and illustrated in figure
 \begin_inset space ~
 \end_inset
 
@@ -1798,10 +1963,18 @@ reference "fig:Domains-for-solution"
 
 .
  In the case of dual solutions, additional information is needed to select
- which of the solutions to use.
+ which of the 
+\begin_inset Formula $\check{h}_{\pm}^{2}$
+\end_inset
+
+ solutions is appropriate to the application at hand.
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
 TODO - but what are the two distinct values of 
 \begin_inset Formula $\check{h}_{\pm}^{2}$
 \end_inset
@@ -1815,6 +1988,18 @@ TODO - but what are the two distinct values of
 \end_inset
 
  values along the way?
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Toroidal-surface"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1993,17 +2178,20 @@ Summary
 \end_layout
 
 \begin_layout Standard
-Initial values
+The preceding developments and equations may be summarized in as a computational
+ recipe:
 \end_layout
 
 \begin_layout Itemize
-Use detector size width and height to determine , 
+Use detector size width and height to determine the row and column coordinates
+ of the detector center 
 \begin_inset Formula $\left(\eta_{r},\eta_{c}\right)$
 \end_inset
 
-, the row and column coordinates of the detector center (in [pix] units).
- For this simplified camera model, this center location is assumed to be
- the principal point of autocolimation.
+ expressed in terms of interior with values expressed in Det units (e.g.
+ [pix]).
+ For the current simplified camera model, this location represents the (assumed)
+ principal point of autocolimation.
 \end_layout
 
 \begin_layout Itemize
@@ -2019,12 +2207,29 @@ Establish the inter-point distance,
 \begin_inset Formula $\lambda_{2}$
 \end_inset
 
- (expressed in [Ref] units).
+ with values expressed in [Ref] units.
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-One approach is to use survey techniques (e.g.
+One approach is to measure the distances, 
+\begin_inset Formula $\sqrt{d^{2}}$
+\end_inset
+
+, 
+\begin_inset Formula $\lambda_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{2}$
+\end_inset
+
+, directly (e.g.
+ via steel tape measure or laser range finder)
+\end_layout
+
+\begin_layout Itemize
+An alternative is to use survey techniques (e.g.
  via GNSS) to establish 3D Ref frame coordinates for camera station vector,
  
 \begin_inset Formula $t$
@@ -2051,20 +2256,10 @@ d^{2} & =\left(x_{2}-x_{1}\right)^{2}\\
 \end_layout
 
 \begin_layout Itemize
-Alternatively, measure the distances, 
-\begin_inset Formula $\sqrt{d^{2}}$
-\end_inset
-
-, 
-\begin_inset Formula $\lambda_{1}$
-\end_inset
-
- and 
-\begin_inset Formula $\lambda_{2}$
-\end_inset
-
-, directly (e.g.
- via laser range finder)
+Another approach is to observe the object space angle directly by acquiring
+ an image with camera positioned at the vertex of an object with known apex
+ angle (e.g.
+ from top of a gravel pile having a known angle of repose).
 \end_layout
 
 \end_deeper
@@ -2077,11 +2272,13 @@ Obtain,
 \begin_inset Formula $m_{2}$
 \end_inset
 
-, by directly measuring the two image points of interest in detector coordinates
- (e.g.
- in [pix] units)
+, by directly measuring the two image points of interest in Det frame coordinate
+s (e.g.
+ [pix] units).
+ Use these values to compute intermediate parameters
 \end_layout
 
+\begin_deeper
 \begin_layout Itemize
 Compute observation parameter reductions,
 \begin_inset Formula 
@@ -2124,10 +2321,11 @@ Use these to evaluate quadratic coefficients
 
 \end_layout
 
+\end_deeper
 \begin_layout Itemize
 Solve the quadratic to obtain intermediate root candidates via an appropriate
- expression (e.g.
- numerically stable variant) of the general quadratic formula,
+ expression for (e.g.
+ the appropriate, numerically stable variant of) the general quadratic formula,
 \begin_inset Formula 
 \[
 \check{h}_{\pm}^{2}=\frac{-\kappa_{b}\pm\sqrt{\kappa_{b}^{2}-\kappa_{a}\kappa_{c}}}{\kappa_{a}}
@@ -2136,13 +2334,15 @@ Solve the quadratic to obtain intermediate root candidates via an appropriate
 \end_inset
 
 If there are two (real valued) solutions, additional information is needed
- to resolve which one to use.
- E.g.
- which one produces the expected camera look direction, etc.
+ to resolve which of the 
+\begin_inset Formula $\pm$
+\end_inset
+
+ expressions to use.
 \end_layout
 
 \begin_layout Itemize
-As the last step, estimate the principal distance via,
+As a last step, estimate the principal distance value(s) via,
 \begin_inset Formula 
 \[
 \eta=\sqrt{\check{h}_{\pm}^{2}-\eta_{r}^{2}-\eta_{c}^{2}}
@@ -2157,8 +2357,1235 @@ As the last step, estimate the principal distance via,
 Results
 \end_layout
 
+\begin_layout Standard
+The recipe and formulae described in the previous section have been implemented
+ in a computer program and verified with simulated numeric data.
+ The simulation results verify that the various formulae are correct.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigDoorPhoto.png
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Source-photo"
+
+\end_inset
+
+Source photo after simple edge-detection to emphasize features of interest
+ around the door frame.
+ Barely visible on left of image is the a stairway rail with top end near
+ left edge about 1/3 way from top and bottom end appearing near the lower
+ left corner of the door frame.
+ The camera lens was held close to the top corner of the rail within approximate
+ly [cm].
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To assess the method with actual imagery, a photo was acquired from a smart
+ phone camera looking down a short flight of stairs and capturing the corners
+ of a standard door.
+ The camera lens was held close to the corner of the rail on the stairs
+ in order to provide an easily identified camera station location.
+ Figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Source-photo"
+
+\end_inset
+
+ shows the source photo after image processing to emphasize edge features
+ of calibration relevance.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Camera Characteristics
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Value [pix]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Format
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $3120$
+\end_inset
+
+ x 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $4160$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\eta_{r}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1560$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\eta_{c}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2080$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+The camera characteristics are summarized in table
+\begin_inset space ~
+\end_inset
+
+TODO.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Measured-Object-Distances"
+
+\end_inset
+
+Measured Object Distances
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Distance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Best [cm]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-Uncertainty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
++Uncertainty
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{TL}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $238.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-.0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $+1.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{BR}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $328.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-.0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $+1.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{d_{D}^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $230.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-.5$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $+.5$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigDoorAnnotate.png
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Annotation-on-top"
+
+\end_inset
+
+Annotation on top of (edge detect) image to identify which object distances
+ are measured.
+ The camera was held with lens entrance near top of stair rail at left edge
+ of image.
+ The object point range distances to top and bottom of door are indicated
+ as is the door diagonal used for computations.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+Distances were measured using a standard retractable steel tape.
+ The measured distances correspond to those indicated by the lines drawn
+ in figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Annotation-on-top"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\lambda_{TL}$
+\end_inset
+
+ Distance from rail corner (camera station) to top left (TL) corner of door
+ frame
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\lambda_{BR}$
+\end_inset
+
+ Distance from rail corner (camera station) to bottom right (BR) corner
+ of door frame
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\left|d_{D}\right|$
+\end_inset
+
+ Distance along diagonal of door frame
+\end_layout
+
+\begin_layout Standard
+Measured values presented in table
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Measured-Object-Distances"
+
+\end_inset
+
+ along with approximate measurement uncertainty estimates.
+\end_layout
+
+\begin_layout Standard
+With this example configuration, the object space diagonal, 
+\begin_inset Formula $d$
+\end_inset
+
+, traces a line that crosses the image format near the detector center with
+ one point on either side of the center.
+ This is a reasonably strong geometry case.
+ Indeed the solution process returns only one valid root.
+ 
+\end_layout
+
+\begin_layout Standard
+Using the measurements from table
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Measured-Object-Distances"
+
+\end_inset
+
+, the best estimated principal distance is
+\begin_inset Formula 
+\begin{align*}
+\eta & =3112\,\text{\left[pix\right]}
+\end{align*}
+
+\end_inset
+
+The uncertainty distribution may be estimated numerically.
+ A simple Monty Carlo style simulation was conducted using the same configuratio
+n as the observed data with two different pseudo-random error models, case
+ 
+\begin_inset Quotes eld
+\end_inset
+
+A
+\begin_inset Quotes erd
+\end_inset
+
+ and case 
+\begin_inset Quotes eld
+\end_inset
+
+B
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Simulation case 
+\begin_inset Quotes eld
+\end_inset
+
+A
+\begin_inset Quotes erd
+\end_inset
+
+ is computed with values representative of the actual measurement errors
+ associated with measurements described above which was conducted hastily
+ with little care in the measurement process.
+ Simulation case 
+\begin_inset Quotes eld
+\end_inset
+
+B
+\begin_inset Quotes erd
+\end_inset
+
+ parameters values are more typical of what can be expected if measurements
+ are made with reasonable care.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:MontyCarlo-Values"
+
+\end_inset
+
+Values used for Monty Carlo Simulation
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-Sigma-A
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-Sigma-B
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(row,col) [pix]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[pix]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[pix]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $m_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\left(162.,2683.\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $5.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $m_{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\left(2542.,1739.\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $5.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[cm]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[cm]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[cm]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{TL}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $238.5$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $.75$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $.3$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda_{BR}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $328.5$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $.75$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $.3$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{d_{D}^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $230.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $.5$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $.3$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigTLBR_CaseA.png
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:SimCaseA"
+
+\end_inset
+
+Distribution of principal distance values for simulation case 
+\begin_inset Quotes eld
+\end_inset
+
+A
+\begin_inset Quotes erd
+\end_inset
+
+ representing the actual test case including relatively careless measurement
+ gathering.
+ The mean and 1-sigma values for a normal distribution fit are 
+\begin_inset Formula $3117.7$
+\end_inset
+
+ and
+\begin_inset Formula $14.4$
+\end_inset
+
+ [pix].
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename AngleCalibration_FigTLBR_CaseB.png
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:SimCaseB"
+
+\end_inset
+
+Distribution of principal distance values for simulation case 
+\begin_inset Quotes eld
+\end_inset
+
+B
+\begin_inset Quotes erd
+\end_inset
+
+ representing a hypothetical situation in which reasonable care is taken
+ during measuring operations.
+ The mean and 1-sigma values for a normal curve fit are 
+\begin_inset Formula $3117.7$
+\end_inset
+
+ and 
+\begin_inset Formula $4.9$
+\end_inset
+
+ [pix].
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the Monty Carlo simulation, the measurements are represented by samples
+ drawn from pseudo-random normal probability distributions configured with
+ the mean and dispersion values presented in table
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:MontyCarlo-Values"
+
+\end_inset
+
+.
+ The resulting principal distance distributions are presented in figures
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:SimCaseA"
+
+\end_inset
+
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:SimCaseB"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
-Observations
+Conclusions
+\end_layout
+
+\begin_layout Standard
+The results demonstrate that the calibration process is effective.
+ It is capable of providing reasonable quality approximation of a camera's
+ principal distance values using a single photo and only a few easy-to-acquire
+ object measurements.
+\end_layout
+
+\begin_layout Standard
+There is no need to align the single photo with any object features such
+ as required when computing principal distance from a simple photo scale
+ relationships (i.e.
+ using the camera standoff distance and measuring an object distance on
+ a surface oriented perpendicular the image plane and standoff measurement).
+\end_layout
+
+\begin_layout Standard
+The precision of the results may seem poor by engineering grade photogrammetry
+ standards which often report results with precision expressed in fractions
+ of a pixel.
+ 
 \end_layout
 
 \begin_layout Bibliography
@@ -2168,7 +3595,7 @@ key "Entry"
 
 \end_inset
 
-Dave Knopp, 
+Knopp, D., 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2182,11 +3609,48 @@ Entrance Pupil Displacement Model
 \begin_layout Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
+key "Hestenes"
+
+\end_inset
+
+Hestenes, D., 
+\begin_inset Quotes eld
+\end_inset
+
+New Foundations for Classical Mechanics
+\begin_inset Quotes erd
+\end_inset
+
+, Second Ed., Springer Netherlands, 1999.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Laurinolli"
+
+\end_inset
+
+Laurinolli, T., 
+\begin_inset Quotes eld
+\end_inset
+
+What is geometric algebra
+\begin_inset Quotes erd
+\end_inset
+
+, https://lyseo.edu.ouka.fi/cms7/sites/default/files/geometric_algebra-tl.pdf,
+ Visited 2020.05.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
 key "Optics"
 
 \end_inset
 
-Dave Knopp, 
+Knopp, D., 
 \begin_inset Quotes eld
 \end_inset
 

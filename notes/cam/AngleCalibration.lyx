@@ -90,8 +90,8 @@ Stellacore Corporation
 \begin_layout Abstract
 This brief technical note describes a simple algebraic solution for determinatio
 n of a camera's principal distance value.
- The approach is based on single photograph which may be acquired free of
- any restraint on location or attitude.
+ The approach is based on a single photograph which may be acquired free
+ of any restraint on location or attitude.
  Scene information is introduced by measuring three object space distances
  that form a triangle with the camera station at one vertex.
  This simple technique is valid for cameras with optical systems that approximat
@@ -106,11 +106,11 @@ normal
 
  optical designs with relatively low distortion.
  The simplicity and validity of the technique are demonstrated using a single
- image of stairwell acquired from a smart phone.
+ image acquired from a smart phone.
 \end_layout
 
 \begin_layout Keywords
-Photogrammetry, Camera Calibration
+Photogrammetry, Computer Vision, Camera Calibration
 \end_layout
 
 \begin_layout Section
@@ -120,25 +120,25 @@ Introduction
 \begin_layout Standard
 It is often useful to have a quick and simple, yet reliable and accurate
  method for estimating the principal distance of a camera system.
- For example to obtain nominal camera calibration values when fitting a
- new lens to an image sensor or to obtain reasonably good initial values
- with which to bootstrap iterative numerical solution techniques.
+ Such is the case, for example to obtain nominal camera calibration values
+ after fitting a new lens to an image sensor or to obtain reasonably good
+ initial values with which to bootstrap iterative numerical solution techniques.
 \end_layout
 
 \begin_layout Standard
-This technical note describes a simple method that recovers the camera principal
- distance given detector position image measurements and a known object
- space entrance angle.
- The method provides an algebraic expression for solution values in terms
- of the roots of quadratic equations.
+The simple method, described herein, allows recovering the camera principal
+ distance given only two detector image position measurements and a known
+ object space angle which can be determined quickly and easily with three
+ distance measurements.
+ The method provides an algebraic expression for principal distance value
+ in terms of the roots of quadratic equations.
 \end_layout
 
 \begin_layout Standard
-When the geometric configuration is sufficient to determine a unique it
- is easily identified by dismissing negative values and physically unrealistic.
- However, certain geometric configurations are associated with multiple
- physically meaningful roots, in which case, both of the physically viable
- solutions are provided.
+When the geometric configuration is sufficient to determine a unique physical
+ solution, the presented method provides a unique solution.
+ For weak geometric configurations, two physically meaningful solutions
+ are possible and the method provides both.
 \end_layout
 
 \begin_layout Section
@@ -146,8 +146,43 @@ Methodology
 \end_layout
 
 \begin_layout Standard
-The formulation presented herein is expressed in terms that include the
- relationship between multiple coordinate systems:
+The mathematical formulation below touches on a few concepts from geometric
+ algebra (GA)
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hestenes,Laurinolli"
+
+\end_inset
+
+ including use of simple algebraic operations to manipulate vectors, and
+ suggesting that the optical angles are better represented as bivector entities.
+ However, the fundamental operations and results are easily understood in
+ terms of real algebra and basic plane trigonometry.
+\end_layout
+
+\begin_layout Standard
+The notation employed herein follows that of Hestenes
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hestenes"
+
+\end_inset
+
+, in which scalars are represented with lower case Greek letters, vectors
+ with lower case Roman letters, and bivectors with upper case Roman letters.
+\end_layout
+
+\begin_layout Standard
+Geometric concepts are expressed in terms of the relationship between two
+ coordinate systems:
 \end_layout
 
 \begin_layout Description
@@ -192,25 +227,22 @@ Detector
 \end_layout
 
 \begin_layout Standard
-The mathematical formulation below touches on a few concepts from geometric
- algebra (GA)
-\begin_inset space ~
+For computational purposes, each of these coordinate system can be associated
+ with a collection of mutually orthogonal, dextral, unit basis vectors denoted
+ as 
+\begin_inset Formula $\left\{ e_{1},e_{2},e_{3}\right\} $
 \end_inset
 
-
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Hestenes,Laurinolli"
-
-\end_inset
-
- such as use of simple algebraic operations to manipulate vectors, and suggestin
-g that the optical angles are better represented as bivector entities.
- However, the fundamental operations and results are easily understood in
- terms of real algebra and basic plane trigonometry.
+.
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Simple-Camera-Model"
+
+\end_inset
+
 Simple Camera Model
 \end_layout
 
@@ -221,7 +253,7 @@ For ideal central perspective image formation a camera model can be associated
 \begin_inset space ~
 \end_inset
 
- 
+
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Entry,Optics"
@@ -229,6 +261,15 @@ key "Entry,Optics"
 \end_inset
 
 .
+ For the simple 
+\begin_inset Quotes eld
+\end_inset
+
+pinhole
+\begin_inset Quotes erd
+\end_inset
+
+ camera model,
 \end_layout
 
 \begin_layout Enumerate
@@ -237,6 +278,12 @@ Entrance pupil may be approximated as a point with location that is fixed
 \end_layout
 
 \begin_layout Enumerate
+\begin_inset CommandInset label
+LatexCommand label
+name "enu:Exit-angle-equals"
+
+\end_inset
+
 Exit angle equals entrance angle (i.e.
  assume no distortion or other aberrations)
 \end_layout
@@ -247,7 +294,13 @@ Exit pupil is approximated as a point with location fixed relative to the
 \end_layout
 
 \begin_layout Enumerate
-Detector is positioned such that the extent of its active surface is centered
+\begin_inset CommandInset label
+LatexCommand label
+name "enu:DetectorOrthoToAxis"
+
+\end_inset
+
+Detector is positioned such that the bondary of its active surface is centered
  on the optical system exit axis and the (assumed to be planar) sensor surface
  is orthogonal to the exit axis.
 \end_layout
@@ -342,34 +395,10 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Box Boxed
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "100col%"
-special "none"
-height "1in"
-height_special "totalheight"
-thickness "0.4pt"
-separation "3pt"
-shadowsize "4pt"
-framecolor "black"
-backgroundcolor "none"
-status open
-
-\begin_layout Plain Layout
 \begin_inset Graphics
 	filename AngleCalibration_FigDetFrame.svg
 	lyxscale 50
 	width 100col%
-
-\end_inset
-
-
-\end_layout
 
 \end_inset
 
@@ -422,7 +451,18 @@ Interior space angle defined by two detector locations,
 \end_layout
 
 \begin_layout Standard
-Let vector, 
+Referring to figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Exterior-space-angle"
+
+\end_inset
+
+, let vector, 
 \begin_inset Formula $t$
 \end_inset
 
@@ -437,7 +477,7 @@ Let vector,
 
 , represent two arbitrary but distinct locations with values expressed also
  in the Ref frame.
- Denote the range distances from 
+ Denote the target range distances from 
 \begin_inset Formula $t$
 \end_inset
 
@@ -469,18 +509,7 @@ Let vector,
 
 \end_inset
 
-The relevant geometric relationships are illustrated in figure
-\begin_inset space ~
-\end_inset
 
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Exterior-space-angle"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -517,7 +546,30 @@ Let bivector,
 
 \end_inset
 
-and express the central perspective condition as
+and express the central perspective condition as (ref.
+ section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Simple-Camera-Model"
+
+\end_inset
+
+ assumption
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "enu:Exit-angle-equals"
+
+\end_inset
+
+)
 \begin_inset Formula 
 \begin{equation}
 \beta=\alpha\label{eq:AngleEquiv}
@@ -575,8 +627,31 @@ reference "fig:Interior-space-angle"
 \end_layout
 
 \begin_layout Standard
-The detector positioning restrictions (relative to the optical system exit
- axis) may be summarized by expressing the principal vector, 
+The detector positioning relationship relative to the optical system exit
+ axis (ref.
+ section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Simple-Camera-Model"
+
+\end_inset
+
+ assumption
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "enu:DetectorOrthoToAxis"
+
+\end_inset
+
+) may be summarized by expressing the principal vector, 
 \begin_inset Formula $h$
 \end_inset
 
@@ -601,7 +676,19 @@ where the scalar value components,
 \begin_inset Formula $\eta$
 \end_inset
 
- is the principal distance.
+ is the principal distance value of present interest (cf.
+ figure
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Interior-space-angle"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsubsection
@@ -657,21 +744,22 @@ The principal distance,
 \end_layout
 
 \begin_layout Standard
-For a (ideal case of) central perspective projection onto a flat, and finite,
+For the ideal case of central perspective projection onto a flat, and finite,
  image surface, the exit angle is limited in magnitude
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
 This is a limitation of the pinhole / central perspective projection model
- and not a limitation of actual optical systems (e.g.
- lenses exit with larger than 180-deg full field of view).
+ and not a limitation of actual optical systems.
+ Physical lenses exist with larger than 180-deg full field of view.
  The fact that real optical systems exceed this limit, demonstrates that
  the simple perspective projection model is a simplifying approximation
- only valid is over a restricted domain of actual optical systems (generally,
- validity improves with increasingly telephoto optical systems, and degrades
- with increasingly wider angular ones and failing completely with non-rectilinea
-r designs such as fisheye optical systems).
+ that is only valid over a restricted subset of actual optical systems.
+ In general, validity of the approximation is improves with increasingly
+ more telephoto optical systems, and degrades with increasingly wider angle
+ ones while failing completely on non-rectilinear designs such as fish-eye
+ and other extreme optical systems.
 \end_layout
 
 \end_inset
@@ -679,7 +767,7 @@ r designs such as fisheye optical systems).
 .
  By virtue of the distortion free condition, the entrance angle is corresponding
 ly limited.
- This conditions may be expressed as
+ This condition may be expressed as
 \begin_inset Formula 
 \[
 \left(\left|\alpha\right|=\left|\beta\right|\right)<\frac{\pi}{2}
@@ -696,7 +784,7 @@ In particular, this means that the cosine cannot assume a negative value.
 
 \end_inset
 
-in which the rightmost inequality requires also avoiding the zero-angle
+in which the left hard inequality requires also avoiding the zero-angle
  condition associated with a physical configuration in which object locations,
  
 \begin_inset Formula $x_{1}$
@@ -711,6 +799,10 @@ in which the rightmost inequality requires also avoiding the zero-angle
 \end_inset
 
  are collinear.
+\end_layout
+
+\begin_layout Subsubsection
+Detector-Axis Relationship
 \end_layout
 
 \begin_layout Standard
@@ -766,7 +858,8 @@ For the simple camera model in use here, the principal point components,
 \begin_inset Formula $\eta_{c}$
 \end_inset
 
-, are fixed (at the center of the detector) and readily known.
+, are fixed (at the center of the detector) and readily known in terms of
+ the overall image size.
  Therefore, given a specific measurement, 
 \begin_inset Formula $m_{j}$
 \end_inset
@@ -974,23 +1067,13 @@ reference "eq:CosineInternal"
 \end_layout
 
 \begin_layout Standard
-The left hand side, may be evaluated in terms of measured object point Ref
- coordinate frame locations and the camera station location via relationship
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:RefDists"
-
-\end_inset
-
-.
+The left hand side, may be evaluated in terms of measured object space distances
+, while evaluation of the right hand side requires knowledge of camera interior
+ parameters including the principal distance.
 \end_layout
 
 \begin_layout Standard
-Introduce a new scalar parameter, 
+For convenience of notation, introduce a new scalar parameter, 
 \begin_inset Formula $\gamma$
 \end_inset
 
@@ -1062,14 +1145,14 @@ Since both the
 \begin_inset Formula $r$
 \end_inset
 
- are inherently positive, squaring these quantities does not introduce significa
-ntly change the underlying relationship.
+ are inherently positive, squaring these quantities does not significantly
+ change the underlying relationship.
  However, since 
 \begin_inset Formula $\gamma$
 \end_inset
 
- can be either positive or negative, the squaring operation conflates the
- two cases, which introduces a possible secondary solution.
+ can be either positive or negative, the squaring operation conflates two
+ cases and thereby introduces a possible secondary solution.
 \end_layout
 
 \begin_layout Standard
@@ -1085,8 +1168,8 @@ I.e.
 \end_inset
 
 .
- Thus, any process of inverting this relationship is expected to also require
- some mathematical disambiguation step.
+ Thus, any inversion process can be expected also to require a disambiguation
+ step.
 \end_layout
 
 \begin_layout Standard
@@ -1262,7 +1345,7 @@ and scalar,
 
 \end_inset
 
-to express the product of interior distance values as,
+to express the product of squared interior distance values as,
 \begin_inset Formula 
 \begin{align}
 \mu_{1}^{2}\mu_{2}^{2} & =h^{4}+2\nu^{2}h^{2}+\omega^{4}\label{eq:ProdSqMu1Mu2}
@@ -1297,7 +1380,7 @@ reference "eq:MuSquared_j"
 
 \end_inset
 
- for 
+ for the two cases of 
 \begin_inset Formula $j=1,2$
 \end_inset
 
@@ -1309,7 +1392,7 @@ reference "eq:MuSquared_j"
 
 \end_inset
 
-Which may also be expressed in terms of intermediate parameter, 
+This may be expressed in terms of intermediate parameter, 
 \begin_inset Formula $\nu^{2}$
 \end_inset
 
@@ -1909,17 +1992,7 @@ Two candidate solution values,
 
 \end_inset
 
-where,
-\begin_inset Formula 
-\begin{align*}
-\kappa_{a} & \equiv4-\gamma^{2}\\
-\kappa_{b} & \equiv4\nu^{2}-\nu^{2}\gamma^{2}-2r^{2}\\
-\kappa_{c} & \equiv4\nu^{4}-4\nu^{2}r^{2}+r^{4}-\omega^{4}\gamma^{2}
-\end{align*}
-
-\end_inset
-
-
+with,
 \begin_inset Formula 
 \begin{align*}
 \frac{\kappa_{b}}{\kappa_{a}} & =\frac{4\nu^{2}-\nu^{2}\gamma^{2}-2r^{2}}{4-\gamma^{2}}\\
@@ -1950,7 +2023,7 @@ reference "fig:Toroidal-surface"
 
 \end_inset
 
- and illustrated in figure
+ with a detector plane cross-section diagramed in figure
 \begin_inset space ~
 \end_inset
 
@@ -1971,40 +2044,12 @@ reference "fig:Domains-for-solution"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Note Comment
-status open
-
-\begin_layout Plain Layout
-TODO - but what are the two distinct values of 
-\begin_inset Formula $\check{h}_{\pm}^{2}$
-\end_inset
-
-?? Probably? introduced in squaring the 
-\begin_inset Formula $\mu_{1}$
-\end_inset
-
- and 
-\begin_inset Formula $\mu_{2}$
-\end_inset
-
- values along the way?
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Toroidal-surface"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 For a given solution, 
 \begin_inset Formula $\check{h}^{2}$
+\end_inset
+
+, representing one of the 
+\begin_inset Formula $\check{h}_{\pm}^{2}$
 \end_inset
 
 , equation
@@ -2142,7 +2187,16 @@ so that
 
 \end_inset
 
-Here, only the positive root is relevant based on physical considerations.
+Here, only the positive root is relevant based on physical considerations
+ (the negative solution corresponds with optical system 
+\begin_inset Quotes eld
+\end_inset
+
+behind
+\begin_inset Quotes erd
+\end_inset
+
+ the detector).
 \end_layout
 
 \begin_layout Paragraph
@@ -2174,11 +2228,17 @@ which may be expressed as
 \end_layout
 
 \begin_layout Subsection
-Summary
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Computational-Summary"
+
+\end_inset
+
+Computational Summary
 \end_layout
 
 \begin_layout Standard
-The preceding developments and equations may be summarized in as a computational
+The preceding developments and equations may be summarized as a computational
  recipe:
 \end_layout
 
@@ -2389,11 +2449,10 @@ name "fig:Source-photo"
 
 Source photo after simple edge-detection to emphasize features of interest
  around the door frame.
- Barely visible on left of image is the a stairway rail with top end near
- left edge about 1/3 way from top and bottom end appearing near the lower
- left corner of the door frame.
- The camera lens was held close to the top corner of the rail within approximate
-ly [cm].
+ Barely visible as the featureless region to left side of image is the stairway
+ rail having top end near left edge (about 1/3 way from top_ and bottom
+ end appearing near (and occluding) the lower left corner of the door frame.
+ The camera lens was held close to the top corner of the rail as practical.
 \end_layout
 
 \end_inset
@@ -2445,7 +2504,13 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Camera Characteristics
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Detector-Properties"
+
+\end_inset
+
+Detector Size Characteristics
 \end_layout
 
 \end_inset
@@ -2580,18 +2645,25 @@ Format
 
 \end_inset
 
-The camera characteristics are summarized in table
+The camera detector properties are summarized in table
 \begin_inset space ~
 \end_inset
 
-TODO.
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Detector-Properties"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -2603,11 +2675,164 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "tab:Measured-Object-Distances"
+name "tab:Image-Feature-Measurements"
 
 \end_inset
 
-Measured Object Distances
+Image Feature Measurements
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(row,col) [pix]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uncertainty [pix]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $m_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\left(162.,2683.\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $5.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $m_{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\left(2542.,1739.\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $5.$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Object-Distance-Measurements"
+
+\end_inset
+
+Object Distance Measurements
 \end_layout
 
 \end_inset
@@ -2865,7 +3090,7 @@ Annotation on top of (edge detect) image to identify which object distances
 \end_inset
 
 Distances were measured using a standard retractable steel tape.
- The measured distances correspond to those indicated by the lines drawn
+ The measured distances correspond to those indicated by the annotations
  in figure
 \begin_inset space ~
 \end_inset
@@ -2911,22 +3136,35 @@ Measured values presented in table
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "tab:Measured-Object-Distances"
+reference "tab:Object-Distance-Measurements"
 
 \end_inset
 
  along with approximate measurement uncertainty estimates.
+ The corresponding image features were measured by recording detector row
+ and column locations as presented in table
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Image-Feature-Measurements"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-With this example configuration, the object space diagonal, 
+With this experiment configuration, the object space diagonal, 
 \begin_inset Formula $d$
 \end_inset
 
-, traces a line that crosses the image format near the detector center with
- one point on either side of the center.
- This is a reasonably strong geometry case.
- Indeed the solution process returns only one valid root.
+, traces a line that crossing the image format near the detector center
+ with one end on either side of the center.
+ This is a particularly strong geometry for calibration.
+ Indeed the solution process returns only one valid root which is well defined.
  
 \end_layout
 
@@ -2938,11 +3176,33 @@ Using the measurements from table
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "tab:Measured-Object-Distances"
+reference "tab:Object-Distance-Measurements"
 
 \end_inset
 
-, the best estimated principal distance is
+ and
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Image-Feature-Measurements"
+
+\end_inset
+
+ in the formulae of section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Computational-Summary"
+
+\end_inset
+
+ produces a principal distance estimated value,
 \begin_inset Formula 
 \begin{align*}
 \eta & =3112\,\text{\left[pix\right]}
@@ -2950,10 +3210,15 @@ reference "tab:Measured-Object-Distances"
 
 \end_inset
 
-The uncertainty distribution may be estimated numerically.
- A simple Monty Carlo style simulation was conducted using the same configuratio
-n as the observed data with two different pseudo-random error models, case
- 
+
+\end_layout
+
+\begin_layout Standard
+Uncertainty in this value may be estimated numerically.
+ A simple Monty Carlo style simulation using the same geometric configuration
+ as for the observed data allows assessing the overall solution sensitivity
+ and precision.
+ The simulation includes two cases, 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2969,8 +3234,7 @@ B
 \begin_inset Quotes erd
 \end_inset
 
-.
- 
+, associated with different magnitudes of pseudo-random error.
 \end_layout
 
 \begin_layout Standard
@@ -2983,9 +3247,9 @@ A
 \end_inset
 
  is computed with values representative of the actual measurement errors
- associated with measurements described above which was conducted hastily
- with little care in the measurement process.
- Simulation case 
+ associated with the trial measurement process conducted hastily without
+ great care.
+ The error model for simulation case 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2993,8 +3257,8 @@ B
 \begin_inset Quotes erd
 \end_inset
 
- parameters values are more typical of what can be expected if measurements
- are made with reasonable care.
+ is more typical of what can be expected when measurements are completed
+ with reasonable care.
 \end_layout
 
 \begin_layout Standard
@@ -3447,7 +3711,7 @@ A
 \begin_inset Formula $3117.7$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $14.4$
 \end_inset
 
@@ -3562,14 +3826,37 @@ reference "fig:SimCaseB"
 .
 \end_layout
 
+\begin_layout Standard
+The precision estimate, computed using actual experiment uncertainties,
+ indicates a standard uncertainty a bit better than 
+\begin_inset Formula $15$
+\end_inset
+
+ pixels.
+ Given the principal distance value of about 
+\begin_inset Formula $3100$
+\end_inset
+
+ pixels, this is a relative precision on the order of
+\begin_inset Formula 
+\[
+\frac{\sigma_{\eta}}{\eta}\simeq.5\,\text{\%}
+\]
+
+\end_inset
+
+or about one part in 200.
+\end_layout
+
 \begin_layout Section
 Conclusions
 \end_layout
 
 \begin_layout Standard
-The results demonstrate that the calibration process is effective.
+The physical trial case results demonstrate that the calibration process
+ is effective.
  It is capable of providing reasonable quality approximation of a camera's
- principal distance values using a single photo and only a few easy-to-acquire
+ principal distance values using a single photo and a few easy-to-acquire
  object measurements.
 \end_layout
 
@@ -3585,7 +3872,54 @@ There is no need to align the single photo with any object features such
 The precision of the results may seem poor by engineering grade photogrammetry
  standards which often report results with precision expressed in fractions
  of a pixel.
- 
+ However, these results are obtained from only five observations (two image
+ points and three object distances).
+ Nonetheless, the quality of the results is good enough for initialization
+ uses such as bootstrapping high precision iterative algorithms (e.g.
+ fully rigorous bundle adjustment methods), and may be good enough for any
+ number of applications which are satisfied by solution precision values
+ better than a percent or so.
+\end_layout
+
+\begin_layout Standard
+The demonstration case has a strong geometric configuration and produces
+ a unique solution with relatively good precision.
+ However, for weak imaging geometry, there can be a physically real ambiguity
+ in computed solution values.
+ In the weak geometry cases, the ambiguity is associated with attempting
+ calibration when not enough information is available from a single object
+ space angle.
+\end_layout
+
+\begin_layout Standard
+The best way to deal with potential solution ambiguity is to avoid the weak
+ imaging geometry when attempting calibration.
+ Acquiring imagery with a strong geometry, provides a solution that is unique
+ and also relatively precise.
+\end_layout
+
+\begin_layout Standard
+For situations in which calibration must be attempted with weak imaging
+ geometry, then additional information is necessary to obtain a unique solution.
+ This information could come from various sources.
+ One obvious remediation approach is to observe an additional angle relationship
+(s) within the same photo by measuring additional object distances.
+\end_layout
+
+\begin_layout Standard
+However, if calibration is an initial goal, then in practice, some minimal
+ care should be taken to observe an object angle in which the corresponding
+ image features appear on approximately opposite sides relative to the center
+ of the image detector.
+\end_layout
+
+\begin_layout Standard
+To guarantee a unique principal distance solution, the detector center location
+ should project (perpendicularly) onto the line segment joining the two
+ image features.
+ The computed solution will be most precise and least sensitive to noise,
+ the closer the projection point is to the center of the line segment between
+ image features.
 \end_layout
 
 \begin_layout Bibliography

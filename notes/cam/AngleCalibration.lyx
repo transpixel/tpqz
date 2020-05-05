@@ -88,25 +88,29 @@ Stellacore Corporation
 \end_layout
 
 \begin_layout Abstract
-This brief technical note describes a simple algebraic solution for determinatio
-n of a camera's principal distance value.
- The approach is based on a single photograph which may be acquired free
- of any restraint on location or attitude.
- Scene information is introduced by measuring three object space distances
- that form a triangle with the camera station at one vertex.
- This simple technique is valid for cameras with optical systems that approximat
-e rectilinear image formation - i.e.
- 
+Camera calibration is a concept fundamental in photogrammetry and computer
+ vision applications and it is often helpful to be able to estimate the
+ most important calibration parameter values reliably and easily.
+ This technical note describes a simple and practical technique for determining
+ a camera's 
 \begin_inset Quotes eld
 \end_inset
 
-normal
+principal
 \begin_inset Quotes erd
 \end_inset
 
- optical designs with relatively low distortion.
- The simplicity and validity of the technique are demonstrated using a single
- image acquired from a smart phone.
+ calibration values by using a single image exposure and three scene distance
+ measurements.
+ The overall calibration process can be completed in a few minutes time
+ and requires only simple algebraic computations that can be performed easily
+ with an arithmetic calculator or spreadsheet application.
+ The simplicity and effectiveness of the technique are demonstrated by estimatin
+g the principal distance for a smart phone camera.
+ Results of the calibration are validated by utilizing the computed calibration
+ values in a three-dimensional (3D) scene reconstruction.
+ Evaluation of the calibration result precision and assessment of the subsequent
+ reconstruction test results both indicate that the proposed method is effective.
 \end_layout
 
 \begin_layout Keywords
@@ -118,6 +122,55 @@ Introduction
 \end_layout
 
 \begin_layout Standard
+Camera calibration is a concept fundamental to photogrammetry and computer
+ vision applications.
+ The calibration model may be expressed implicitly as part of a more general
+ image formation model or the camera may be represented explicitly by its
+ own model.
+ In the later case, it is typically necessary to determine numeric values
+ for the various parameters that represent the explicit camera model.
+ Sometimes, this determination is part of a larger process as an initial
+ step in a more sophisticated data refinement for high accuracy demanding
+ applications.
+ In other cases, a simple camera model may be completely sufficient for
+ a particular application niche.
+\end_layout
+
+\begin_layout Standard
+The fundamental properties of most camera systems can be approximated by
+ a simple camera obscura
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Historically, a camera obscura is associated with a darkened room inside
+ of which an observer sits.
+ The room is light tight with the exception of a small hole in one wall
+ that emits light from an outdoor scene.
+ Light entering the room though this hole strikes the far wall of the room
+ and produces a faint (inverted) image observable by the person inside -
+ cf.
+ https://en.wikipedia.org/wiki/Camera_obscura
+\end_layout
+
+\end_inset
+
+ model in which the camera comprises a small, 
+\begin_inset Quotes eld
+\end_inset
+
+pinhole
+\begin_inset Quotes erd
+\end_inset
+
+, aperture located some distance in front of a geometrically flat image
+ plane.
+ Even for advanced applications involving sophisticated mathematical camera
+ models, it is frequently useful to be able to quickly estimate the characterist
+ics of an equivalent pinhole camera model.
+\end_layout
+
+\begin_layout Standard
 It is often useful to have a quick and simple, yet reliable and accurate
  method for estimating the principal distance of a camera system.
  Such is the case, for example to obtain nominal camera calibration values
@@ -126,23 +179,159 @@ It is often useful to have a quick and simple, yet reliable and accurate
 \end_layout
 
 \begin_layout Standard
+Also, it is often convenient if the computations can be done with simple
+ algebra and arithmetic so that results can be computed with a simple calculator
+ or spreadsheet application without having to resort to complex data fitting
+ tools and processes.
+\end_layout
+
+\begin_layout Standard
 The simple method, described herein, allows recovering the camera principal
  distance given only two detector image position measurements and a known
  object space angle which can be determined quickly and easily with three
  distance measurements.
- The method provides an algebraic expression for principal distance value
- in terms of the roots of quadratic equations.
+ The overall calibration process can be completed in a few minutes time
+ requiring only simple algebraic computations that can be performed easily
+ with an arithmetic calculator or spreadsheet application.
 \end_layout
 
 \begin_layout Standard
-When the geometric configuration is sufficient to determine a unique physical
+The method provides an algebraic expression for principal distance value
+ in terms of the roots of quadratic equations.
+ When the geometric configuration is sufficient to determine a unique physical
  solution, the presented method provides a unique solution.
  For weak geometric configurations, two physically meaningful solutions
- are possible and the method provides both.
+ are possible for which the described method provides both.
+\end_layout
+
+\begin_layout Standard
+The technique is valid for cameras with optical systems that approximate
+ rectilinear image formation: i.e.
+ for 
+\begin_inset Quotes eld
+\end_inset
+
+normal
+\begin_inset Quotes erd
+\end_inset
+
+ optical system designs with relatively low distortion characteristics.
+ The pinhole perspective model applies to the vast majority of consumer
+ device, surveillance, and industrial use camera systems.
+ Notable exceptions are ultra- wide angle and various fish-eye optics.
+\end_layout
+
+\begin_layout Standard
+The simplicity and effectiveness of the technique are demonstrated by describing
+ calibration of a smart phone camera by measuring two features on a single
+ image and recording three object distances measured with a retractable
+ steel tape.
+ The validity of the computed calibration result is assessed by performing
+ a subsequent test in which three-dimensional (3D) object coordinates are
+ reconstructed from a pair of additional photographs taken with the same
+ camera.
 \end_layout
 
 \begin_layout Section
 Methodology
+\end_layout
+
+\begin_layout Subsection
+Camera Concepts
+\end_layout
+
+\begin_layout Standard
+The geometric characteristics of a camera obscura (aka 
+\begin_inset Quotes eld
+\end_inset
+
+pinhole camera
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+central perspective projection camera
+\begin_inset Quotes erd
+\end_inset
+
+) are concerned with the location of the light admitting aperture relative
+ to the plane on which the image is formed.
+\end_layout
+
+\begin_layout Standard
+For a typical modern camera, the image plane is the surface of a light sensitive
+ semi-conductor devics (generally a CMOS or CCD).
+ The detector cells (aka 
+\begin_inset Quotes eld
+\end_inset
+
+pixels
+\begin_inset Quotes erd
+\end_inset
+
+) on the device form a natural coordinate system, in terms of 
+\begin_inset Quotes eld
+\end_inset
+
+row
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+column
+\begin_inset Quotes erd
+\end_inset
+
+ directions.
+ For modern manufacturing techniques, the surface of the detector is highly
+ isotropic with equal and uniform pixel spacing in both row and column direction
+s.
+ In addition, the detector surface is generally very flat and may be considered
+ planar for present purposes.
+ Thus, the physical detector construction itself provides a natural two-dimensio
+nal (2D) Cartesian coordinate frame.
+\end_layout
+
+\begin_layout Standard
+The 2D detector coordinates can be extended mathematically into a three-dimensio
+nal (3D) Cartesian coordinate frame.
+ This is done by defining a direction that is orthogonal to both the row
+ and column directions on the detector and associated with the same units
+ of measurement.
+ 
+\end_layout
+
+\begin_layout Standard
+The 3D coordinate frame tied to the detector is the camera's 
+\begin_inset Quotes eld
+\end_inset
+
+interior
+\begin_inset Quotes erd
+\end_inset
+
+ coordinate frame.
+ The simple 
+\begin_inset Quotes eld
+\end_inset
+
+pinhole-model
+\begin_inset Quotes erd
+\end_inset
+
+ camera calibration is associated by the location of the entrance aperture.
+ This location may be represented as a vector that is expressed in the camera's
+ interior detector coordinate frame.
+\end_layout
+
+\begin_layout Subsection
+Mathematics Formulation
 \end_layout
 
 \begin_layout Standard
@@ -300,7 +489,7 @@ name "enu:DetectorOrthoToAxis"
 
 \end_inset
 
-Detector is positioned such that the bondary of its active surface is centered
+Detector is positioned such that the boundary of its active surface is centered
  on the optical system exit axis and the (assumed to be planar) sensor surface
  is orthogonal to the exit axis.
 \end_layout
@@ -3969,9 +4158,33 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\begin_inset Box Boxed
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
 \begin_inset Graphics
 	filename AngleCalibration_FigTableResid.png
 	width 100col%
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -4081,7 +4294,12 @@ The validation project consists of the following steps:
 \end_layout
 
 \begin_layout Enumerate
-Acquire imagery in a classic 
+Acquire and measure imagery
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Collected here as a classic 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4093,12 +4311,13 @@ convergent stereo pair
 \end_layout
 
 \begin_layout Enumerate
-Measure (fairly arbitrary) corresponding image feature locations in each
- image of the pair.
+Measure row/column locations for various (arbitrary) corresponding image
+ feature locations in each image of the pair.
 \end_layout
 
+\end_deeper
 \begin_layout Enumerate
-Compute a the 
+Compute a 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4106,7 +4325,8 @@ relative orientation
 \begin_inset Quotes erd
 \end_inset
 
- (RO) between the two image exposures (using available custom software).
+ (RO) relationship between the two image exposures (using available custom
+ software).
 \end_layout
 
 \begin_deeper
@@ -4130,17 +4350,13 @@ reference "subsec:Real-Photo-Calibration"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Enumerate
-Estimate values for the five parameters representing general RO degrees
+ and estimate values for the five parameters representing general RO degrees
  of freedom
 \end_layout
 
 \begin_layout Enumerate
-Compute 3D point coordinates via space intersection (using the RO solution).
- Note that all 3D model points are expressed in arbitrary 
+Compute 3D point coordinates via space intersection using the RO solution.
+ At this point all 3D model points are expressed in arbitrary 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4156,12 +4372,13 @@ model units
 \begin_inset Quotes erd
 \end_inset
 
- (model scale is defined such that stereo baseline is exactly one [mu]).
+ (the model scale is determined such that stereo baseline is exactly one
+ [mu]).
 \end_layout
 
 \end_deeper
 \begin_layout Enumerate
-Compute model scale factor
+Compute a model scale factor
 \end_layout
 
 \begin_deeper
@@ -4171,8 +4388,8 @@ Measure one of the table top diagonals (top103 to top104) using the steel
 \end_layout
 
 \begin_layout Enumerate
-Compute scale factor as ratio of the Ref distance (in [m]) with the correspondin
-g model distance (in [mu]).
+Compute scale factor as ratio of the Ref distance (expressed in [m]) with
+ the corresponding model distance (expressed in [mu]).
 \end_layout
 
 \end_deeper
@@ -4190,23 +4407,25 @@ Use steel table and record values between pairs of points of interest that;
 
 \end_deeper
 \begin_layout Enumerate
-Compute corresponding check distances
+Compute and analyze check distance results
 \end_layout
 
 \begin_deeper
 \begin_layout Enumerate
-Compute distance between appropriate model points to obtain model distances
- in the model frame (in [mu]).
+Evaluate distances between appropriate combinations of model points to obtain
+ model distances in the model frame (in [mu]) for each of the field measured
+ distances.
 \end_layout
 
 \begin_layout Enumerate
-Apply scale factor to express these check distances in Ref units (in [m]).
+Apply scale factor to express these the computed check distances in Ref
+ frame units (in [m]).
 \end_layout
 
 \end_deeper
 \begin_layout Enumerate
-Compare the computed distances with field measured one, report differences
- and statistics.
+Compare the computed check distance values with the corresponding field
+ measured values to report differences and statistics.
 \end_layout
 
 \begin_layout Standard
@@ -4224,13 +4443,25 @@ reference "fig:Stereo-pair-used"
  presents the two images that form the stereo pair used for 3D object reconstruc
 tion.
  The image measurements visible in this figure were used as tie points for
- relative orientation computation.
+ relative orientation computation, along with camera calibration values
+ determined in section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Real-Photo-Calibration"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
 Since the relative orientation solution immediately provides 3D coordinates
- for these points, the tie points are associated with features that can
- also be used to define check distance measurements.
+ for all tie points, the tie points were placed on feature locations convenient
+ to use for check distances.
  The annotation in figure
 \begin_inset space ~
 \end_inset
@@ -4266,7 +4497,24 @@ reference "fig:Residual-erros-in"
 
 \end_inset
 
+.
+\end_layout
 
+\begin_layout Standard
+Overall the 3D object reconstruction validation process is entirely consistent
+ with estimates and expectations developed in conjunction with the camera
+ calibration.
+ I.e.
+ the 
+\begin_inset Formula $9$
+\end_inset
+
+ mm table reconstruction average error magnitude compares well with the
+ approximate 
+\begin_inset Formula $1$
+\end_inset
+
+ cm uncertainty in the measured distances used for camera calibration.
 \end_layout
 
 \begin_layout Section
@@ -4343,22 +4591,10 @@ To guarantee a unique principal distance solution, the detector center location
  image features.
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "Entry"
-
-\end_inset
-
-Knopp, D., 
-\begin_inset Quotes eld
-\end_inset
-
-Entrance Pupil Displacement Model
-\begin_inset Quotes erd
-\end_inset
-
-, Stellacore document, DocID:TODO, Revised edition ca 2020.
+\begin_layout Standard
+Evaluation of the precision of the computed calibration and of the results
+ of the 3D reconstruction validation process indicate that the proposed
+ method is effective.
 \end_layout
 
 \begin_layout Bibliography
@@ -4382,20 +4618,19 @@ New Foundations for Classical Mechanics
 \begin_layout Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
-key "Laurinolli"
+key "Entry"
 
 \end_inset
 
-Laurinolli, T., 
+Knopp, D., 
 \begin_inset Quotes eld
 \end_inset
 
-What is geometric algebra
+Entrance Pupil Displacement Model
 \begin_inset Quotes erd
 \end_inset
 
-, https://lyseo.edu.ouka.fi/cms7/sites/default/files/geometric_algebra-tl.pdf,
- Visited 2020.05.
+, Stellacore document, Revised 2020.04.
 \end_layout
 
 \begin_layout Bibliography
@@ -4413,7 +4648,26 @@ General Optical Distortion Model
 \begin_inset Quotes erd
 \end_inset
 
-, Stellacore document, DocID, Revised edition ca 2020.
+, Stellacore document, Revised 2020.04.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Laurinolli"
+
+\end_inset
+
+Laurinolli, T., 
+\begin_inset Quotes eld
+\end_inset
+
+What is geometric algebra
+\begin_inset Quotes erd
+\end_inset
+
+, https://lyseo.edu.ouka.fi/cms7/sites/default/files/geometric_algebra-tl.pdf,
+ Visited 2020.05.
 \end_layout
 
 \end_body

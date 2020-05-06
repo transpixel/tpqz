@@ -403,8 +403,8 @@ struct TriVector
 //! Element of even sub-algrebra
 struct Spinor
 {
-	Scalar theS;
-	BiVector theB;
+	Scalar theS{};
+	BiVector theB{};
 
 	//! An instance which is not valid
 	static
@@ -487,8 +487,8 @@ struct Spinor
 //! An 'imaginary' spinor - dual to Spinor
 struct ImSpinor
 {
-	Vector theV;
-	TriVector theT;
+	Vector theV{};
+	TriVector theT{};
 
 	//! An instance which is not valid
 	static

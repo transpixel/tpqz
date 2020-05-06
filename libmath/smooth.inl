@@ -56,7 +56,8 @@ namespace priv
 
 		// configure for interpolation
 		size_t const & ndxMax(weights.size() - 1u);
-		std::pair<double, double> const ndxRange(0., (double)(halfSize + 1u));
+		std::pair<double, double> const ndxRange
+			{ 0., static_cast<double>(halfSize + 1u) };
 		static std::pair<double, double> const wRange(0., 1.);
 
 		// fill weights with relative values
@@ -64,7 +65,7 @@ namespace priv
 		for (size_t kk(0u) ; kk < halfSize ; ++kk)
 		{
 			double const weight
-				(interp::linear(ndxRange, (double)(kk+1u), wRange));
+				(interp::linear(ndxRange, static_cast<double>(kk+1u), wRange));
 			weights[kk] = weight;
 			weights[ndxMax-kk] = weight;
 		}

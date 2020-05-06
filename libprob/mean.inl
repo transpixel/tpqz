@@ -51,7 +51,7 @@ arithmetic
 		DataType const sum
 			(std::accumulate(beg, end, static_cast<DataType>(0)));
 		size_t const numSamps(std::distance(beg, end));
-		mean = (1./(double)numSamps) * sum;
+		mean = (1./static_cast<double>(numSamps)) * sum;
 	}
 	return mean;
 }
@@ -106,7 +106,8 @@ namespace priv
 				}
 				else // all samples were positive
 				{
-					double const aveFwd{ (1./(double)count) * sumFwd };
+					double const aveFwd
+						{ (1./static_cast<double>(count)) * sumFwd };
 					mean = invFunc(aveFwd);
 				}
 			}

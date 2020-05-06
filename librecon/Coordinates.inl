@@ -44,7 +44,7 @@ Coordinates :: addPoints
 	)
 {
 	// update reserved size
-	size_t const moreSize{ (size_t)std::distance(beg, end) };
+	size_t const moreSize{ static_cast<size_t>(std::distance(beg, end)) };
 	size_t const nextSize{ theComps[0].size() + moreSize };
 	theComps[0].reserve(nextSize);
 	theComps[1].reserve(nextSize);

@@ -55,7 +55,9 @@ namespace
 {
 	//! MinMax for 8-bit output
 	static dat::MinMax<float> const sOutMinMax8
-		((float)u8pixMinValid, (float)u8pixMaxValid);
+		( static_cast<float>(u8pixMinValid)
+		, static_cast<float>(u8pixMaxValid)
+		);
 
 	//! True if span is large enough for meaningful division (and positive)
 	bool
@@ -218,7 +220,8 @@ namespace
 			double outVal(theOutMean);
 			if (theIsValid)
 			{
-				outVal = math::interp::linear(theIn, (double)fIn, theOut);
+				outVal = math::interp::linear
+					(theIn, static_cast<double>(fIn), theOut);
 			}
 			return outVal;
 		}
@@ -433,7 +436,7 @@ downMappedLinear
 			else
 			if (img::isActive(inPix))
 			{
-				oPix = (uint8_t)(std::floor(xform(inPix)));
+				oPix = static_cast<uint8_t>(std::floor(xform(inPix)));
 			}
 			else
 			{
@@ -512,9 +515,9 @@ downMappedLinear
 			   )
 			{
 				// valid input
-				oPix0 = (uint8_t)(std::floor(xform(inPix0)));
-				oPix1 = (uint8_t)(std::floor(xform(inPix1)));
-				oPix2 = (uint8_t)(std::floor(xform(inPix2)));
+				oPix0 = static_cast<uint8_t>(std::floor(xform(inPix0)));
+				oPix1 = static_cast<uint8_t>(std::floor(xform(inPix1)));
+				oPix2 = static_cast<uint8_t>(std::floor(xform(inPix2)));
 			}
 			else
 			{
@@ -617,9 +620,9 @@ downMappedLinear
 			   )
 			{
 				// valid input
-				oPix0 = (uint8_t)(std::floor(xform(inPix0)));
-				oPix1 = (uint8_t)(std::floor(xform(inPix1)));
-				oPix2 = (uint8_t)(std::floor(xform(inPix2)));
+				oPix0 = static_cast<uint8_t>(std::floor(xform(inPix0)));
+				oPix1 = static_cast<uint8_t>(std::floor(xform(inPix1)));
+				oPix2 = static_cast<uint8_t>(std::floor(xform(inPix2)));
 			}
 			else
 			{

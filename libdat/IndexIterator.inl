@@ -89,7 +89,7 @@ bool
 IndexIterator :: isValid
 	() const
 {
-	return ((bool)(*this));
+	return (static_cast<bool>(*this));
 }
 
 }

@@ -223,7 +223,9 @@ namespace priv
 	{
 		if (ptSpots)
 		{
-			ptSpots->push_back( dat::Spot{{ (double)row, (double)col }} );
+			ptSpots->push_back
+				( dat::Spot
+				  {{ static_cast<double>(row), static_cast<double>(col )}} );
 		}
 	}
 }

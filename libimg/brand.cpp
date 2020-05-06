@@ -182,17 +182,17 @@ namespace
 			oss
 				<< "theMem.theBytes"
 				<< std::dec
-				<< ": " << (int)(theMem.theBytes[0])
-				<< ", " << (int)(theMem.theBytes[1])
-				<< ", " << (int)(theMem.theBytes[2])
-				<< ", " << (int)(theMem.theBytes[3])
+				<< ": " << static_cast<int>(theMem.theBytes[0])
+				<< ", " << static_cast<int>(theMem.theBytes[1])
+				<< ", " << static_cast<int>(theMem.theBytes[2])
+				<< ", " << static_cast<int>(theMem.theBytes[3])
 				<< '\n'
 				<< std::hex
 				<< "            hex"
-				<< ": " << (int)(theMem.theBytes[0])
-				<< ", " << (int)(theMem.theBytes[1])
-				<< ", " << (int)(theMem.theBytes[2])
-				<< ", " << (int)(theMem.theBytes[3])
+				<< ": " << static_cast<int>(theMem.theBytes[0])
+				<< ", " << static_cast<int>(theMem.theBytes[1])
+				<< ", " << static_cast<int>(theMem.theBytes[2])
+				<< ", " << static_cast<int>(theMem.theBytes[3])
 				;
 			return oss.str();
 		}
@@ -249,13 +249,17 @@ writeToColumns
 		// write header into image
 		Header const head(static_cast<uint32_t>(text.size()), bConfig.theMagic);
 		assert(head.isValid(bConfig.theMagic));
-		SetImage putHeader{ptImage, (uint8_t const * const)(&head)};
+		SetImage putHeader
+			{ ptImage
+			, reinterpret_cast<uint8_t const * const>(&head)
+			};
 		action(head.size(), rowAt, col0, imgSize, putHeader);
 
 		rowAt += head.size();
 
 		// write bytes into image pixels from string
-		uint8_t * bytes = (uint8_t *)text.data();
+		uint8_t const * const bytes
+			= reinterpret_cast<uint8_t const * const>(text.data());
 		SetImage putMessage{ptImage, bytes};
 		action(text.size(), rowAt, col0, imgSize, putMessage);
 	}
@@ -307,12 +311,15 @@ readFromColumns
 
 		// read header size
 		Header head(bConfig.theMagic);
-		SetText putHeader{ (uint8_t * const)(&head), &image };
+		SetText putHeader
+			{ reinterpret_cast<uint8_t * const>(&head)
+			, &image
+			};
 		action(head.size(), rowAt, col0, image.hwSize(), putHeader);
 
 		if (head.isValid(bConfig.theMagic))
 		{
-			size_t const numBytes((size_t)head.theMem.theWord);
+			size_t const numBytes(static_cast<size_t>(head.theMem.theWord));
 			rowAt += head.size();
 
 			// read bytes into string from image pixels

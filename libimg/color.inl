@@ -160,8 +160,8 @@ namespace color
 			double stdLum(0.);
 
 			double const fndx(theLinPart.interpIndexFor(linLum));
-			size_t const ndx((size_t)std::floor(fndx + .5));
-			// clin is know (well should be) in range [0, 1.]
+			size_t const ndx(static_cast<size_t>(std::floor(fndx + .5)));
+			// clin is known (well should be) in range [0, 1.]
 			if (ndx < sLutSize)
 			{
 				stdLum = theValues[ndx];
@@ -238,14 +238,17 @@ toXYZfromLRGB8
 	FPix fXYZ;
 
 	// cast to standard types (for speed and intermediate precision)
-	double const red((double)uLRGB8[0]);
-	double const grn((double)uLRGB8[1]);
-	double const blu((double)uLRGB8[2]);
+	double const red(static_cast<double>(uLRGB8[0]));
+	double const grn(static_cast<double>(uLRGB8[1]));
+	double const blu(static_cast<double>(uLRGB8[2]));
 
 	// normalizing values for 8-bit RGB
-	fXYZ[0] = (fpix_t)(0.001921579*red + 0.001215686*grn + 0.000784314*blu);
-	fXYZ[1] = (fpix_t)(0.000694000*red + 0.003185882*grn + 0.000041686*blu);
-	fXYZ[2] = (fpix_t)(0.000000000*red + 0.000039216*grn + 0.003882353*blu);
+	fXYZ[0] = static_cast<fpix_t>
+		(0.001921579*red + 0.001215686*grn + 0.000784314*blu);
+	fXYZ[1] = static_cast<fpix_t>
+		(0.000694000*red + 0.003185882*grn + 0.000041686*blu);
+	fXYZ[2] = static_cast<fpix_t>
+		(0.000000000*red + 0.000039216*grn + 0.003882353*blu);
 
 	// standard values
 //	fXYZ[0] = (fpix_t)(2.76883*red + 1.75171*grn + 1.13014*blu);
@@ -268,18 +271,18 @@ toXYZfromYxy
 	//   X = Y * (smlx / smly)
 	//   Z = Y * (smlz / smly) = Y * ((1 - smlx - smly) / smly)
 
-	float const iY((float)fYxy[0]);
+	float const iY(static_cast<float>(fYxy[0]));
 	if (0. < iY) // if true, then cy is also not zero (for valid RGB gamut)
 	{
-		float const cx((float)fYxy[1]);
-		float const cy((float)fYxy[2]);
+		float const cx(static_cast<float>(fYxy[1]));
+		float const cy(static_cast<float>(fYxy[2]));
 		if (std::numeric_limits<fpix_t>::epsilon() < cy)
 		{
 			float const cz(1.f - cx - cy);
 			float const scale(iY / cy);
-			fXYZ[0] = (fpix_t)(scale * cx);
+			fXYZ[0] = static_cast<fpix_t>(scale * cx);
 			fXYZ[1] = fYxy[0];
-			fXYZ[2] = (fpix_t)(scale * cz);
+			fXYZ[2] = static_cast<fpix_t>(scale * cz);
 		}
 	}
 	else
@@ -329,13 +332,17 @@ toYxyFromXYZ
 	)
 {
 	FPix fYxy(0.f, 0.f, 0.f);
-	float const sum((float)fXYZ[0] + (float)fXYZ[1] + (float)fXYZ[2]);
+	float const sum
+		{ static_cast<float>(fXYZ[0])
+		+ static_cast<float>(fXYZ[1])
+		+ static_cast<float>(fXYZ[2])
+		};
 	if (0. < sum)
 	{
 		fpix_t const & fY = fXYZ[1];
-		float const fx((float)fXYZ[0] / sum);
-		float const fy((float)fXYZ[1] / sum);
-		fYxy = FPix(fY, (fpix_t)fx, (fpix_t)fy);
+		float const fx(static_cast<float>(fXYZ[0]) / sum);
+		float const fy(static_cast<float>(fXYZ[1]) / sum);
+		fYxy = FPix(fY, static_cast<fpix_t>(fx), static_cast<fpix_t>(fy));
 	}
 	return fYxy;
 }
@@ -380,9 +387,9 @@ toLfromLRGB8
 	)
 {
 	// cast to standard types (for speed and intermediate precision)
-	double const red((double)uLRGB8[0]);
-	double const grn((double)uLRGB8[1]);
-	double const blu((double)uLRGB8[2]);
+	double const red(static_cast<double>(uLRGB8[0]));
+	double const grn(static_cast<double>(uLRGB8[1]));
+	double const blu(static_cast<double>(uLRGB8[2]));
 
 	// compute only 'Y' component of XYZ
 	double const fXYZ_1(0.000694000*red + 0.003185882*grn + 0.000041686*blu);
@@ -412,9 +419,9 @@ toLRGB8fromXYZ
 	{
 		// cast to standard types (for speed and intermediate precision)
 		// while forcing into valid limits (to address possible round off)
-		double const iX(dClamp(0., (double)fXYZ[0], 1.));
-		double const iY(dClamp(0., (double)fXYZ[1], 1.));
-		double const iZ(dClamp(0., (double)fXYZ[2], 1.));
+		double const iX(dClamp(0., static_cast<double>(fXYZ[0]), 1.));
+		double const iY(dClamp(0., static_cast<double>(fXYZ[1]), 1.));
+		double const iZ(dClamp(0., static_cast<double>(fXYZ[2]), 1.));
 
 		// restored values for 8-bit RGB
 		double const red( 602.976531*iX - 228.617846*iY - 119.358685*iZ);
@@ -427,9 +434,12 @@ toLRGB8fromXYZ
 	//	double const blu(  .00092090*iX - .00254980*iY + .17860000*iZ);
 
 		// ensure output values are in proper valid range
-		upix[0] = (uint8_t)img::uClamp(0u, (unsigned int)red, 255u);
-		upix[1] = (uint8_t)img::uClamp(0u, (unsigned int)grn, 255u);
-		upix[2] = (uint8_t)img::uClamp(0u, (unsigned int)blu, 255u);
+		upix[0] = static_cast<uint8_t>
+			(img::uClamp(0u, static_cast<unsigned int>(red), 255u));
+		upix[1] = static_cast<uint8_t>
+			(img::uClamp(0u, static_cast<unsigned int>(grn), 255u));
+		upix[2] = static_cast<uint8_t>
+			(img::uClamp(0u, static_cast<unsigned int>(blu), 255u));
 
 		okay = true;
 	}
@@ -500,9 +510,9 @@ toSRGB8fromXYZ
 	{
 		// cast to standard types (for speed and intermediate precision)
 		// while forcing into valid limits (to address possible round off)
-		double const iX(dClamp(0., (double)fXYZ[0], 1.));
-		double const iY(dClamp(0., (double)fXYZ[1], 1.));
-		double const iZ(dClamp(0., (double)fXYZ[2], 1.));
+		double const iX(dClamp(0., static_cast<double>(fXYZ[0]), 1.));
+		double const iY(dClamp(0., static_cast<double>(fXYZ[1]), 1.));
+		double const iZ(dClamp(0., static_cast<double>(fXYZ[2]), 1.));
 
 		// temporary linear transform variables
 		// Note difference from linear transform parms
@@ -515,9 +525,12 @@ toSRGB8fromXYZ
 		double const bluS(sFwdSRGB(bluL));
 
 		// ensure output values are in proper valid range
-		upix[0] = (uint8_t)img::uClamp(0u, (unsigned int)redS, 255u);
-		upix[1] = (uint8_t)img::uClamp(0u, (unsigned int)grnS, 255u);
-		upix[2] = (uint8_t)img::uClamp(0u, (unsigned int)bluS, 255u);
+		upix[0] = static_cast<uint8_t>
+			(img::uClamp(0u, static_cast<unsigned int>(redS), 255u));
+		upix[1] = static_cast<uint8_t>
+			(img::uClamp(0u, static_cast<unsigned int>(grnS), 255u));
+		upix[2] = static_cast<uint8_t>
+			(img::uClamp(0u, static_cast<unsigned int>(bluS), 255u));
 
 		okay = true;
 	}
@@ -582,9 +595,12 @@ toSRGB8fromLRGB
 		double const bluS(outMaxLimit * sFwdSRGB(bluL));
 
 		// ensure output values are in proper valid range
-		srgb[0] = (float)dClamp(outRange.first, redS, outRange.second);
-		srgb[1] = (float)dClamp(outRange.first, grnS, outRange.second);
-		srgb[2] = (float)dClamp(outRange.first, bluS, outRange.second);
+		srgb[0] = static_cast<float>
+			(dClamp(outRange.first, redS, outRange.second));
+		srgb[1] = static_cast<float>
+			(dClamp(outRange.first, grnS, outRange.second));
+		srgb[2] = static_cast<float>
+			(dClamp(outRange.first, bluS, outRange.second));
 	}
 	else
 	if ((isUnder(ulred) || isUnder(ulgrn) || isUnder(ulblu)))

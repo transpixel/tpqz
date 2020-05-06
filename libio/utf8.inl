@@ -41,7 +41,7 @@ io :: sequenceLength8
 {
 	unsigned len(0);
 
-	unsigned char const uch((unsigned char)ch);
+	unsigned char const uch(static_cast<unsigned char>(ch));
 
 	if (uch < 0x80)
 	{

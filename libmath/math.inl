@@ -193,7 +193,8 @@ rms
 	size_t const size{ static_cast<size_t>(std::distance(beg, end)) };
 	if (dofUsed < size)
 	{
-		TmpType const dof{(TmpType)size - (TmpType)dofUsed};
+		TmpType const dof
+			{ static_cast<TmpType>(size) - static_cast<TmpType>(dofUsed) };
 		TmpType const tmp(std::sqrt(sse / dof));
 		result = static_cast<Type>(tmp);
 	}

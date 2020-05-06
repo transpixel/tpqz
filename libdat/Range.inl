@@ -207,8 +207,8 @@ Type
 Range<Type> :: middle
 	() const
 {
-	double const x1((double)min());
-	double const x2((double)max());
+	double const x1(static_cast<double>(min()));
+	double const x2(static_cast<double>(max()));
 	double const ave(.5 * (x1 + x2));
 	return static_cast<Type>(ave);
 }

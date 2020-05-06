@@ -72,7 +72,8 @@ prob_Stats_test1
 		std::array<int, 3u> const data{{ 5, 7, -6 }};
 		prob::Stats stats;
 		stats.add(data[0]);
-		if (! dat::nearlyEquals(stats.medianValue(), (double)data[0]))
+		if (! dat::nearlyEquals
+			(stats.medianValue(), static_cast<double>(data[0])))
 		{
 			oss << "Failure of single value median test" << std::endl;
 		}

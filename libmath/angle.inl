@@ -351,11 +351,11 @@ indexForValidAngle
 
 	// quantize to index step-size
 	assert(1u < dataSize);
-	double const anglePerIndex(math::twoPi / (double)(dataSize));
+	double const anglePerIndex(math::twoPi / static_cast<double>(dataSize));
 	double const fndx(std::floor(delta / anglePerIndex));
 
 	// compute index
-	return ((size_t)fndx % dataSize);
+	return (static_cast<size_t>(fndx) % dataSize);
 }
 
 inline
@@ -388,8 +388,8 @@ angleForIndexValid
 	)
 {
 	assert(1u < dataSize);
-	double const anglePerIndex(math::twoPi / (double)(dataSize));
-	double const deltaAngle(anglePerIndex * (double)index);
+	double const anglePerIndex(math::twoPi / static_cast<double>(dataSize));
+	double const deltaAngle(anglePerIndex * static_cast<double>(index));
 	return principalAngle(angleAt0 + deltaAngle);
 }
 

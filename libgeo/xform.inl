@@ -61,7 +61,8 @@ namespace xform
 		)
 	{
 		std::vector<geo::Triangle> trianglesInB;
-		size_t const numTri{ (size_t)std::distance(triBeg, triEnd) };
+		size_t const numTri
+			{ static_cast<size_t>(std::distance(triBeg, triEnd)) };
 		trianglesInB.reserve(numTri);
 		for (FwdIter iter{triBeg} ; triEnd != iter ; ++iter)
 		{

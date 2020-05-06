@@ -169,7 +169,7 @@ app::Usage :: argStatus
 		{
 			ValidFunc const & func = theValidFuncs[index];
 
-			if ((ValidFunc)nullptr != func)
+			if (nullptr != func)
 			{
 				std::string const & arg = args[index];
 				if (! func(arg))

@@ -259,7 +259,7 @@ montageOf
 		size_t const itemWide{ exWide.theExVal.wide() + gap };
 
 		// allocate space for the full montage - and init to backValue
-		size_t const numItems{ (size_t)std::distance(beg, end) };
+		size_t const numItems{ static_cast<size_t>(std::distance(beg, end)) };
 		size_t const numRows{ rowsToFit(numItems, numCols) };
 
 		montage = PixGrid(numRows * itemHigh, numCols * itemWide);

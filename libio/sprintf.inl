@@ -261,7 +261,7 @@ io :: formatThousands
 
 	do
 	{
-		vals.push_back((int)(aval % 1000));
+		vals.push_back(static_cast<int>(aval % 1000));
 		aval /= 1000;
 	} while (aval != 0);
 

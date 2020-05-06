@@ -63,7 +63,7 @@ namespace ga
 				(std::min_element(mags.begin(), mags.end()));
 
 			// compute offset
-			ndx = (size_t)(itMin - mags.begin());
+			ndx = static_cast<size_t>(itMin - mags.begin());
 
 			return ndx;
 		}

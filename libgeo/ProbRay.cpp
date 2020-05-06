@@ -240,7 +240,7 @@ ProbRay :: probDensityAt
 	if (isValid() && dat::isValid(distAlong))
 	{
 		double const fndx{ thePart.interpIndexFor(distAlong) };
-		size_t const ndxLo{ (size_t)std::floor(fndx) };
+		size_t const ndxLo{ static_cast<size_t>(std::floor(fndx)) };
 		size_t const ndxHi{ ndxLo + 1u };
 		if ((0u < ndxLo) && (ndxHi < theAccums.size()))
 		{

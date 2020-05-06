@@ -184,12 +184,13 @@ dat_algorithm_test0
 			double delta(value - 70.);
 			if (0. <= delta)
 			{
-				ndxLo = std::min((size_t)std::floor(delta), ndxMax);
+				ndxLo = std::min
+					(static_cast<size_t>(std::floor(delta)), ndxMax);
 			}
 
 			if (value < theData[ndxMax])
 			{
-				ndxHi = (size_t)std::max(0., std::ceil(delta));
+				ndxHi = static_cast<size_t>(std::max(0., std::ceil(delta)));
 			}
 
 			if (ndxLo == ndxHi)

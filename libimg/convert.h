@@ -81,7 +81,9 @@ namespace convert
 			= dat::MinMax<float>() //!< If null, compute lrgbs min/max
 		, dat::MinMax<float> const & sMinMax
 			= dat::MinMax<float>
-			((float)u8pixMinValid, (float)u8pixMaxValid)
+			( static_cast<float>(u8pixMinValid)
+			, static_cast<float>(u8pixMaxValid)
+			)
 		);
 
 	//! Convert deep-grid to standard rgb space
@@ -92,7 +94,9 @@ namespace convert
 			= dat::MinMax<float>() //!< If null, compute lrgbs min/max
 		, dat::MinMax<float> const & sMinMax
 			= dat::MinMax<float>
-			((float)u8pixMinValid, (float)u8pixMaxValid)
+			( static_cast<float>(u8pixMinValid)
+			, static_cast<float>(u8pixMaxValid)
+			)
 		);
 
 	//! Subgrid of intensity values extracted from fullGrid

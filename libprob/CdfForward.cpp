@@ -77,7 +77,8 @@ CdfForward :: dataProbs
 	dps.reserve(numElem);
 	for (size_t nn(0u) ; nn < numElem ; ++nn)
 	{
-		double const dataValue(theDataPart.interpValueFor((double)nn));
+		double const dataValue
+			{ theDataPart.interpValueFor(static_cast<double>(nn)) };
 		double const cdfValue(theFracValues[nn]);
 		dps.push_back(std::make_pair(dataValue, cdfValue));
 	}

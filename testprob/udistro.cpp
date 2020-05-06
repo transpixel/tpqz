@@ -79,7 +79,8 @@ prob_distro_test0
 		std::array<double, 256u> pdf;
 		for (size_t nn(0u) ; nn < pdf.size() ; ++nn)
 		{
-			double const frac((double)nn / (double)pdf.size());
+			double const frac
+				{ static_cast<double>(nn) / static_cast<double>(pdf.size()) };
 			pdf[nn] = 2. - prob::distro::unitHumpProb(frac);
 		}
 		pdf = prob::pdf::normalized(pdf);
@@ -106,7 +107,7 @@ prob_distro_test0
 			double const fndx(dataPart.interpIndexFor(samp));
 			assert(0. <= fndx);
 			assert(fndx < 256.);
-			size_t const ndx((size_t)std::floor(fndx));
+			size_t const ndx{ static_cast<size_t>(std::floor(fndx)) };
 			pdf[ndx] += 1.;
 		}
 

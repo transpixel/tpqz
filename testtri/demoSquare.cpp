@@ -657,7 +657,7 @@ main
 	rpt << dat::infoString(numElems, "numElems(M)") << '\n';
 	rpt << dat::infoString(strPoolType, "strPoolType") << '\n';
 	rpt << dat::infoString(numNodeInDom, "numNodeInDom")
-		<< "  of " << dat::infoString((size_t)apxNumNodes)
+		<< "  of " << dat::infoString(static_cast<size_t>(apxNumNodes))
 		<< '\n';
 	rpt << dat::infoString(numElemInDom, "numElemInDom")
 		<< "  of " << dat::infoString(gridSize.size())

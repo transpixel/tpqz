@@ -55,11 +55,11 @@ namespace priv
 		)
 	{
 		size_t const numElem
-			{ (size_t)std::distance(beg, end) };
+			{ static_cast<size_t>(std::distance(beg, end)) };
 		size_t const gotElemSize
 			{ sizeof(typename std::iterator_traits<FwdIter>::value_type) };
 		std::streamsize const numBytes
-			{ (std::streamsize)(gotElemSize * numElem) };
+			{ static_cast<std::streamsize>(gotElemSize * numElem) };
 		return numBytes;
 	}
 }
@@ -77,7 +77,7 @@ saveBinary
 	if (ostrm.good())
 	{
 		std::streamsize const numBytes{ priv::numBytesFor<FwdIter>(beg, end) };
-		ostrm.write((char const *)beg, numBytes);
+		ostrm.write(reinterpret_cast<char const * const>(beg), numBytes);
 		okay = (! ostrm.fail());
 	}
 	else
@@ -105,7 +105,7 @@ loadBinary
 	if (istrm.good())
 	{
 		std::streamsize const expBytes{ priv::numBytesFor<FwdIter>(beg, end) };
-		istrm.read((char*)beg, expBytes);
+		istrm.read(reinterpret_cast<char * const>(beg), expBytes);
 		std::streamsize const gotBytes{ istrm.gcount() };
 		if (gotBytes == expBytes)
 		{

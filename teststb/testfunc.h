@@ -78,7 +78,11 @@ namespace testfunc
 				size_t const red{   0u + delta };
 				size_t const grn{ 100u + delta };
 				size_t const blu{ 200u + delta };
-				PixRGB const pix{ (uint8_t)red, (uint8_t)grn, (uint8_t)blu };
+				PixRGB const pix
+					{ static_cast<uint8_t>(red)
+					, static_cast<uint8_t>(grn)
+					, static_cast<uint8_t>(blu)
+					};
 				grid(row,col) = pix;
 			}
 		}
@@ -106,8 +110,16 @@ namespace testfunc
 		)
 	{
 		using IPix = std::array<int, 3>;
-		IPix const ipA{ (int)pixA[0], (int)pixA[1], (int)pixA[2] };
-		IPix const ipB{ (int)pixB[0], (int)pixB[1], (int)pixB[2] };
+		IPix const ipA
+			{ static_cast<int>(pixA[0])
+			, static_cast<int>(pixA[1])
+			, static_cast<int>(pixA[2])
+			};
+		IPix const ipB
+			{ static_cast<int>(pixB[0])
+			, static_cast<int>(pixB[1])
+			, static_cast<int>(pixB[2])
+			};
 		using dat::operator-;
 		IPix const idiff{ ipA - ipB };
 		int const maxAbs
@@ -168,7 +180,7 @@ namespace testfunc
 		else
 		{
 			bool okaySizes{ true };
-			int const expDeep{ (int)PixRGB{}.size() };
+			int const expDeep{ static_cast<int>(PixRGB{}.size()) };
 			if (! (gotDeep == expDeep))
 			{
 				okaySizes = false;

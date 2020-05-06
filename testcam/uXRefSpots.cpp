@@ -196,11 +196,13 @@ cam_XRefSpots_test2
 		{
 			++badMea;
 		}
-		if (! dat::nearlyEquals((size_t)(gotSpot[0]), gotMea.thePntNdx))
+		if (! dat::nearlyEquals
+			(static_cast<size_t>(gotSpot[0]), gotMea.thePntNdx))
 		{
 			++badPnt;
 		}
-		if (! dat::nearlyEquals((size_t)(gotSpot[1]), gotMea.theAcqNdx))
+		if (! dat::nearlyEquals
+			(static_cast<size_t>(gotSpot[1]), gotMea.theAcqNdx))
 		{
 			++badAcq;
 		}

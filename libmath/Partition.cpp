@@ -57,7 +57,7 @@ namespace
 		, size_t const & size
 		)
 	{
-		return ((max - min) / (double)size);
+		return ((max - min) / static_cast<double>(size));
 	}
 }
 

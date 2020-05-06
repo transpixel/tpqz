@@ -68,7 +68,7 @@ countsForUint8
 		double const value(static_cast<double>(*iter));
 		if ((0. <= value) && (value < 256.))
 		{
-			size_t const bin((size_t)value);
+			size_t const bin(static_cast<size_t>(value));
 			++hist[bin];
 		}
 	}
@@ -86,7 +86,7 @@ minBinNotZero
 		(std::find_if(hist.begin(), hist.end(), nonZero));
 	if (hist.end() != iter)
 	{
-		bin = (size_t)std::distance(hist.begin(), iter);
+		bin = static_cast<size_t>(std::distance(hist.begin(), iter));
 	}
 
 	return bin;

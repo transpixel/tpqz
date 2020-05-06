@@ -256,7 +256,9 @@ namespace color
 		, double const & lblu
 		, std::pair<double, double> const & outRange
 			= std::pair<double, double>
-			((double)u8pixMinValid, (double)u8pixMaxValid)
+			( static_cast<double>(u8pixMinValid)
+			, static_cast<double>(u8pixMaxValid)
+			)
 		, double const outMaxLimit = 256. // normalized XYZ scaled to this
 		);
 

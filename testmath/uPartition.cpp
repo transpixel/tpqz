@@ -76,7 +76,7 @@ math_Partition_test0a
 	double const valMin(5.);
 	double const delta(2.);
 	size_t const expSize(1u);
-	double const valMax(valMin + (double)expSize*delta);
+	double const valMax{ valMin + static_cast<double>(expSize)*delta };
 
 	// establish expectation
 	DataPair const expFullRange(valMin, valMax);
@@ -227,7 +227,7 @@ math_Partition_test2
 	double const expIndex( 16.);
 	DataPair const expFullRange{ valMin, valMax };
 	DataPair const expBinRange{ expValue, (expValue + delta) };
-	size_t const expBinIndex{(size_t)std::floor(expIndex)};
+	size_t const expBinIndex{ static_cast<size_t>(std::floor(expIndex)) };
 
 	// exercise the functions
 	math::Partition const part(valMin, delta, expSize);
@@ -280,7 +280,8 @@ math_Partition_test3
 	std::ostringstream oss;
 
 	math::Partition const part(2000., 100., 9u);
-	for (double expNdx(0.) ; expNdx < (double)part.size() ; expNdx += (1./8.))
+	double const maxNdx{ static_cast<double>(part.size()) };
+	for (double expNdx(0.) ; expNdx < maxNdx ; expNdx += (1./8.))
 	{
 		double const iValue(part.interpValueFor(expNdx));
 		double const gotNdx(part.interpIndexFor(iValue));

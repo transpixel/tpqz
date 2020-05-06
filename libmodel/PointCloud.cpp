@@ -181,7 +181,11 @@ namespace
 				, math::interp::linear(xyRange, locInModel[1], outRangeb)
 				);
 			img::UPix8 const rgb(img::color::toLRGB8fromLab(lab, nullptr));
-			color = {{ (float)rgb[0], (float)rgb[1], (float)rgb[2] }};
+			color =
+				{{ static_cast<float>(rgb[0])
+				 , static_cast<float>(rgb[1])
+				 , static_cast<float>(rgb[2])
+				}};
 		}
 		return color;
 	}

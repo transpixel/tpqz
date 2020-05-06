@@ -93,7 +93,7 @@ groups
 {
 	std::vector<std::pair<Iter, Iter> > pairs;
 
-	size_t const totalSize{ (size_t)(std::distance(beg, end)) };
+	size_t const totalSize{ static_cast<size_t>(std::distance(beg, end)) };
 	if (0u < totalSize)
 	{
 		if (0u < numGroups)

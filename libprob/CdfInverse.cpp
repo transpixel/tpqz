@@ -53,10 +53,10 @@ namespace
 	{
 		std::vector<double> probs;
 		probs.resize(lutSize);
-		double const fracPerNdx(1. / (double)lutSize);
+		double const fracPerNdx(1. / static_cast<double>(lutSize));
 		for (size_t nn(0u) ; nn < lutSize ; ++nn)
 		{
-			double const frac(fracPerNdx * (double)nn);
+			double const frac(fracPerNdx * static_cast<double>(nn));
 			double const prob = probFunc(frac);
 			probs[nn] = prob;
 		}
@@ -142,7 +142,7 @@ CdfInverse :: probDataPairs
 	assert(probDelta <= 1.);
 
 	// adjust to equal increments - and compute sizes
-	size_t const count((size_t)std::ceil(1. / probDelta));
+	size_t const count(static_cast<size_t>(std::ceil(1. / probDelta)));
 	size_t const nBetween(count - 1u);
 	fracValDataValPairs.reserve(nBetween + 2u);
 
@@ -153,10 +153,10 @@ CdfInverse :: probDataPairs
 	if (0u < nBetween)
 	{
 		// fill table
-		double const useDelta(1. / (double)nBetween);
+		double const useDelta(1. / static_cast<double>(nBetween));
 		for (size_t nn(1u) ; nn < nBetween ; ++nn)
 		{
-			double const fracVal((double)nn * useDelta);
+			double const fracVal(static_cast<double>(nn) * useDelta);
 			double const dataVal(operator()(fracVal));
 			fracValDataValPairs.push_back(std::make_pair(fracVal, dataVal));
 		}

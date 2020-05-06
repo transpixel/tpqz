@@ -143,10 +143,10 @@ compFlagsAll = \
  , '-fno-operator-names'
  , '-fstrict-enums'
 
-# , '-Weffc++'
-# , '-Wold-style-cast'
-# , '-Wzero-as-null-pointer-constant'
-# , '-Wuseless-cast'
+# , '-Weffc++' # complaints about default ctors (known gcc 'issues')
+# , '-Wold-style-cast' # complains: extstb, exthalf, Eigen3
+# , '-Wzero-as-null-pointer-constant'  # complains: extstb, Eigen3
+# , '-Wuseless-cast'  # complains: extstb, exthalf,
 
  ]
 

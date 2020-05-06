@@ -129,15 +129,25 @@ incPath = \
 # General compilation flags for all builds
 compFlagsAll = \
  [ '-std=c++11'
+ , '-Wc++11-compat'
  , '-pthread'
  , '-fomit-frame-pointer'
- , '-pedantic'
+ , '-pedantic-errors'
  , '-Wall'
  , '-Wextra'
  , '-Wuninitialized'
  , '-Winit-self'
  , '-Wuninitialized'
  , '-Winit-self'
+ , '-fno-nonansi-builtins'
+ , '-fno-operator-names'
+ , '-fstrict-enums'
+
+# , '-Weffc++'
+# , '-Wold-style-cast'
+# , '-Wzero-as-null-pointer-constant'
+# , '-Wuseless-cast'
+
  ]
 
 # Optimization specific flags

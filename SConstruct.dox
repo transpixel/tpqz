@@ -51,5 +51,13 @@ Each class of subdirectories is processed in the order of the list above
 and individual modules are processed lexicographically within a single
 class (e.g. libA, libB, ...).
 
+\subsection s0_0 Python
+\note To run a scons installation with python 3 on (a linux) system with
+multiple versions of python installed, consider something like:
+\arg $ alias scons3="/usr/bin/python3 $(which scons)"
+
+Then invoke scons with the alias as in:
+\arg $ scons3 --tp<flags> [...]
+
 */
 

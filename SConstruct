@@ -63,6 +63,15 @@ AddOption \
     , help = "Build with*OUT* software version string"
     )
 
+# Option: Build environment
+AddOption \
+    ( '--tpCompiler'
+    , dest = "tpCompiler"
+    , type = "string"
+    , nargs = 1
+    , default = "g++"
+    )
+
 # Option: Application optimization/debug
 AddOption \
     ( '--tpOptimize'
@@ -102,9 +111,15 @@ class TpBuild:
         self.tpBeSilent = GetOption('silent') 
         self.tpVerbose = GetOption('tpVerbose') 
         self.tpDryRun = GetOption('tpDryRun') 
+        self.tpCompiler = GetOption('tpCompiler')
         self.tpOptimize = GetOption('tpOptimize')
         self.tpSnapshot = GetOption('tpSnapshot')
         self.tpNoAssert = GetOption('tpNoAssert')
+
+    def compilerCommand(self):
+        """Command for compiler to run"""
+        cmdStr = self.tpCompiler
+        return cmdStr;
 
     # Compile option to en/dis-able assert()
     def optNoAssert(self):
@@ -171,8 +186,9 @@ class TpBuild:
         info += "\n tpBeSilent:   " + str(self.tpBeSilent)
         info += "\n tpVerbose:    " + str(self.tpVerbose)
         info += "\n tpDryRun:     " + str(self.tpDryRun)
-        info += "\n tpOptimize:   " + str(self.tpSnapshot)
-        info += "\n tpSnapshot:   " + str(self.tpOptimize)
+        info += "\n tpCompiler:   " + str(self.tpCompiler)
+        info += "\n tpSnapshot:   " + str(self.tpSnapshot)
+        info += "\n tpOptimize:   " + str(self.tpOptimize)
         info += "\n tpNoAssert:   " + str(self.tpNoAssert)
         info += "\n optNoAssert:  " + str(self.optNoAssert())
         info += "\n optSwVersion: " + str(self.optSwVersion())
@@ -277,6 +293,10 @@ else:
         ( CCFLAGS = compFlagsDebug
         , CPPFLAGS = optCppFlags
         )
+
+# Configure compiler to use
+env["CC"] = tpBuild.compilerCommand()
+env["CXX"] = tpBuild.compilerCommand()
 
 # Note: Import TERM for gcc color reporting
 #       If using colorgcc: apparently also need PATH and HOME per:

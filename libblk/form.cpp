@@ -139,7 +139,7 @@ namespace priv
 			VDes const vdesI = vDesForKey[keyI];
 			VDes const vdesJ = vDesForKey[keyJ];
 			constexpr TopoWgt weight{ 1. };
-			boost::add_edge(vdesI, vdesJ, weight, graph).first;
+			(void)boost::add_edge(vdesI, vdesJ, weight, graph).first;
 		}
 
 		return graph;

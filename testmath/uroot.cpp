@@ -91,7 +91,7 @@ math_root_test1
 			( double const & xx
 			) const
 		{
-			return { .001 * (xx - root()) * (xx + 3.) * (xx - 31.) };
+			return (.001 * (xx - root()) * (xx + 3.) * (xx - 31.));
 		}
 	};
 

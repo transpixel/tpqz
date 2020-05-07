@@ -123,11 +123,11 @@ radiusCircumscribed
 {
 	// return magnitude(centerOf(someSize));
 	return
-		{ .5 * std::hypot
+		(.5 * std::hypot
 			( static_cast<double>(someSize.high())
 			, static_cast<double>(someSize.wide())
 			)
-		};
+		);
 }
 
 inline

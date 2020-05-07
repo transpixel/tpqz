@@ -250,7 +250,7 @@ ro_PairBaseZ_test1
 			checkPair(oss, modParms.roPair());
 		}
 		{
-			constexpr double rp{ hp/std::sqrt(2.) };
+			static double const rp{ hp/std::sqrt(2.) };
 			ModelParms const modParms(halfBase, rp, rp, alpha3, rp, rp);
 			checkPair(oss, modParms.roPair());
 		}
@@ -296,9 +296,9 @@ ro_PairBaseZ_test2
 	std::array<double, 5u> const gotdfdpxs(nomPair.jacobianRow(uvNoms));
 
 	// perturbation for numerical differentation
-	constexpr double dp{ std::sqrt(math::eps) };
-	constexpr double perRun{ 1. / (2. * dp) };
-	constexpr double tol{ dp };
+	static double const dp{ std::sqrt(math::eps) };
+	static double const perRun{ 1. / (2. * dp) };
+	static double const tol{ dp };
 
 	// compute phi perturbations
 	std::array<double, 5u> expdfdqs;

@@ -79,7 +79,7 @@ tri_FaceVerts_test0
 			value_type const vtA{ static_cast<value_type>(wgtA) };
 			value_type const vtB{ static_cast<value_type>(wgtB) };
 			value_type const vtC{ static_cast<value_type>(wgtC) };
-			return { vtA*10.f + vtB*200.f + vtC*3000.f };
+			return (vtA*10.f + vtB*200.f + vtC*3000.f);
 		}
 
 		inline

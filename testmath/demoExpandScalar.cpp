@@ -635,10 +635,10 @@ io::out() << "sum: " << io::sprintf("%25.21f", sum) << std::endl;
 	io::out() << std::endl;
 
 	// decompose source value into series of exponents
-	constexpr double eVal{ std::exp(1.) };
-	constexpr double piVal{ 4.*std::atan(1.) };
-	constexpr double sqrt2{ std::sqrt(2) };
-	constexpr double sqrte{ std::sqrt(eVal) };
+	static double const eVal{ std::exp(1.) };
+	static double const piVal{ 4.*std::atan(1.) };
+	static double const sqrt2{ std::sqrt(2) };
+	static double const sqrte{ std::sqrt(eVal) };
 	std::vector<double> const xxs
 		{ 0., 1.
 		, eVal, piVal, sqrt2, sqrte

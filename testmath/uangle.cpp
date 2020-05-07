@@ -49,7 +49,7 @@ namespace
 	std::vector<double>
 	someAngles
 		( double const & da
-		, double const amin = { -2.5 * math::pi }
+		, double const amin = (-2.5 * math::pi)
 		)
 	{
 		std::vector<double> angles;

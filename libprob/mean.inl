@@ -149,13 +149,13 @@ namespace priv
 			( double const & arg
 			)
 		{
-			return { 1. / arg };
+			return (1. / arg);
 		}
 	}
 
 }
 
-template <typename FwdIter, typename DataType = double>
+template <typename FwdIter, typename DataType>
 inline
 DataType
 geometric
@@ -166,7 +166,7 @@ geometric
 	return priv::meanFor(beg, end, priv::geo::funcFwd, priv::geo::funcInv);
 }
 
-template <typename FwdIter, typename DataType = double>
+template <typename FwdIter, typename DataType>
 inline
 DataType
 harmonic

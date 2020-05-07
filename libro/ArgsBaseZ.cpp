@@ -53,7 +53,7 @@ namespace
 		)
 	{
 		// NOTE: include 0 in case one of the members itself is the root
-		return { (ab.first*ab.second) <= 0. };
+		return ((ab.first*ab.second) <= 0.);
 	}
 
 	//! True if start member of aPair is nearly the same as brackets
@@ -278,7 +278,7 @@ namespace
 			ga::BiVector const Jk{ angleJk(kappa) };
 			// assert(std::abs(Ik[2]) <= math::halfPi);
 			// assert(std::abs(Jk[2]) <= math::halfPi);
-			return { Ik[2] + Jk[2] };
+			return (Ik[2] + Jk[2]);
 		}
 	};
 
@@ -327,7 +327,7 @@ namespace
 				, double const kappa2
 				) const
 			{
-				return { theMet->rmsAzim(kappa1) < theMet->rmsAzim(kappa2) };
+				return (theMet->rmsAzim(kappa1) < theMet->rmsAzim(kappa2));
 			}
 		};
 

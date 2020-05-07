@@ -36,6 +36,12 @@
 
 #include "libdat/grid.h"
 
+// for whatever reason, clang(++-7) complains about the GCC pragmas
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#endif
+
+#if defined(__GNUC__)
 // Enum as int seems to be a error in eigen3 at least through v3.3.4
 // Apparently has been addressed in eigen development (at 3.3.90) but
 // to use older packages, easier to just disable warning here.
@@ -43,6 +49,7 @@
 #pragma GCC diagnostic ignored "-Wint-in-bool-context"
 #include "Eigen"
 #pragma GCC diagnostic pop
+#endif
 
 
 namespace la

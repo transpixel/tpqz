@@ -176,7 +176,7 @@ sumSqs
 
 template
 	< typename Type
-	, typename TmpType = double
+	, typename TmpType
 	, typename FwdIter
 	>
 inline

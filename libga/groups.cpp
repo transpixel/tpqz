@@ -76,7 +76,7 @@ std::vector<ga::Spinor>
 octaSpinors
 	()
 {
-	constexpr double const cc{ std::sqrt(.5) };
+	static double const cc{ std::sqrt(.5) };
 	static std::vector<ga::Spinor> const spins
 		{ ga::Spinor( 0., ga::BiVector( 0.,  cc,  cc))
 		, ga::Spinor( 0., ga::BiVector( 0.,  cc, -cc))

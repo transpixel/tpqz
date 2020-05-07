@@ -166,7 +166,7 @@ namespace raw10
 		isValid
 			() const
 		{
-			return { hwSizeQuads().isValid() };
+			return hwSizeQuads().isValid();
 		}
 
 		//! High/Wide in FourPix quad units (each quad spans 5 bytes)
@@ -182,7 +182,7 @@ namespace raw10
 		expRowQuadBytes
 			() const
 		{
-			return { theExpQuadWide * sizeof(FourPix) };
+			return (theExpQuadWide * sizeof(FourPix));
 		}
 
 		//! Number of unused-bytes of data at end of valid row (quad)data
@@ -190,7 +190,7 @@ namespace raw10
 		sizeRowJunk
 			() const
 		{
-			return { theExpRowJunk };
+			return theExpRowJunk;
 		}
 
 		//! Number of bytes of unused data at end of each line

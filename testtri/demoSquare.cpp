@@ -107,11 +107,11 @@ namespace example
 			long const & keyI = key.first;
 			long const & keyJ = key.second;
 			return
-				{  (theBegEndI.first <= keyI)
+				(  (theBegEndI.first <= keyI)
 				&& (keyI < theBegEndI.second)
 				&& (theBegEndJ.first <= keyJ)
 				&& (keyJ < theBegEndJ.second)
-				};
+				);
 		}
 
 		void
@@ -400,9 +400,9 @@ namespace tmp
 		)
 	{
 		return
-			{  dat::isValid(value.real())
+			(  dat::isValid(value.real())
 			&& dat::isValid(value.imag())
-			};
+			);
 	}
 }
 

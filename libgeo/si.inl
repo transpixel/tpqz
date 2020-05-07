@@ -50,7 +50,7 @@ Obs<GeoType> :: obsWeight
 	double const sigComposite
 		{ math::hypot((nomRange*theDirSigma), theStaSigma) };
 	assert(math::eps < sigComposite);
-	return { 1. / sigComposite };
+	return (1. / sigComposite);
 }
 
 template <typename GeoType>

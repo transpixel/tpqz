@@ -120,9 +120,9 @@ namespace
 			)
 		{
 			return
-				{ .50  * std::cos(azim)
+				( .50  * std::cos(azim)
 				+ .125 * std::cos(4.*(azim - .5*math::qtrPi))
-				};
+				);
 		}
 
 		static
@@ -143,7 +143,7 @@ namespace
 		fullDepth
 			()
 		{
-			return { 5. };
+			return 5.;
 		}
 
 		double

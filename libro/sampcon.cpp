@@ -337,7 +337,7 @@ namespace
 			)
 		{
 			size_t const & max = numElem;
-			return{ (max   ) * (max-1u) * (max-2u) * (max-3u) * (max-4u) };
+			return ((max) * (max-1u) * (max-2u) * (max-3u) * (max-4u));
 		}
 
 		//! Populate self with all combinations

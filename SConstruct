@@ -121,6 +121,62 @@ class TpBuild:
         cmdStr = self.tpCompiler
         return cmdStr;
 
+    def compilerFlags(self):
+        """Flags for use with currently active compiler"""
+        flags = []
+        if "g++" == self.tpCompiler:
+            flags = \
+                [ '-std=c++11'
+                , '-Wc++11-compat'
+                , '-pthread'
+                , '-fomit-frame-pointer'
+                , '-pedantic-errors'
+                , '-Wall'
+                , '-Wextra'
+                , '-Wuninitialized'
+                , '-Winit-self'
+                , '-Wuninitialized'
+                , '-Winit-self'
+                , '-fno-nonansi-builtins'
+                , '-fno-operator-names'
+                , '-fstrict-enums'
+                # , '-Weffc++' # bad on default ctors (known gcc 'issues')
+                # , '-Wold-style-cast' # bad on: extstb, exthalf, Eigen3
+                # , '-Wzero-as-null-pointer-constant'  # bad on: extstb, Eigen3
+                # , '-Wuseless-cast'  # bad on: extstb, exthalf,
+                ]
+        elif "clang++-7" == self.tpCompiler:
+            flags = \
+                [ '-std=c++11'
+                ]
+        return flags
+
+    def compilerFlagsOptimize(self):
+        """Flags specific to optimization"""
+        flags = []
+        if "g++" == self.tpCompiler:
+            flags = \
+                [ '-O3', '-s'
+                ]
+        elif "clang++-7" == self.tpCompiler:
+            flags = \
+                [ '-O3'
+                ]
+        return flags
+
+    def compilerFlagsDebug(self):
+        """Flags specific to debug build"""
+        flags = []
+        if "g++" == self.tpCompiler:
+            flags = \
+                [ '-g'
+                ]
+        elif "clang++-7" == self.tpCompiler:
+            flags = \
+                [ '-g'
+                ]
+        return flags
+
     # Compile option to en/dis-able assert()
     def optNoAssert(self):
         """Compiler '-D ...' option for disabling assert() statements"""
@@ -133,7 +189,7 @@ class TpBuild:
     def buildIdentifier(self):
         """Software source code identification string"""
         swId = ""
-        if not tpBuild.tpSnapshot :
+        if not self.tpSnapshot :
             spVer = subprocess.Popen \
                 (["git", "describe"], stdout=subprocess.PIPE)
             (spVerOut, spVerErr) = spVer.communicate()
@@ -195,6 +251,12 @@ class TpBuild:
         info += "\n"
         return info
 
+
+# Configure build process
+tpBuild = TpBuild()
+tpBuild.logProgress(str(tpBuild))
+
+
 #
 #===========================================================================
 # Compile/Link paths and options
@@ -209,40 +271,12 @@ incPath = \
     ]
 
 
-# General compilation flags for all builds
-compFlagsAll = \
-    [ '-std=c++11'
-    , '-Wc++11-compat'
-    , '-pthread'
-    , '-fomit-frame-pointer'
-    , '-pedantic-errors'
-    , '-Wall'
-    , '-Wextra'
-    , '-Wuninitialized'
-    , '-Winit-self'
-    , '-Wuninitialized'
-    , '-Winit-self'
-    , '-fno-nonansi-builtins'
-    , '-fno-operator-names'
-    , '-fstrict-enums'
-
-    # , '-Weffc++' # complaints about default ctors (known gcc 'issues')
-    # , '-Wold-style-cast' # complains: extstb, exthalf, Eigen3
-    # , '-Wzero-as-null-pointer-constant'  # complains: extstb, Eigen3
-    # , '-Wuseless-cast'  # complains: extstb, exthalf,
-
-    ]
 
 # Optimization specific flags
-compFlagsOptimize = compFlagsAll + \
-    [ '-O3'
-    , '-s' # strip
-    ]
+compFlagsOptimize = tpBuild.compilerFlags() + tpBuild.compilerFlagsOptimize()
 
 # Debug specific flags
-compFlagsDebug = compFlagsAll + \
-    [ '-g' # add ' -p' for profiling
-    ]
+compFlagsDebug = tpBuild.compilerFlags() + tpBuild.compilerFlagsDebug()
 
 
 libpaths = \
@@ -268,11 +302,6 @@ linkflags = \
 #  Configure Scons components considering custom options
 #===========================================================================
 #
-
-
-# Configure build process
-tpBuild = TpBuild()
-tpBuild.logProgress(str(tpBuild))
 
 # fetch current software build options
 optCppFlags = tpBuild.optCppFlags()

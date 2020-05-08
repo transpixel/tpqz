@@ -123,32 +123,40 @@ class TpBuild:
 
     def compilerFlags(self):
         """Flags for use with currently active compiler"""
-        flags = []
+        # Common across all supported compilers
+        flags = \
+            [ '-std=c++11'
+            , '-Wc++11-compat'
+            , '-pthread'
+            , '-fomit-frame-pointer'
+            , '-Wextra'
+            , '-Wuninitialized'
+            , '-Winit-self'
+            , '-fno-operator-names'
+            , '-fstrict-enums'
+            ]
+
+        # GCC
         if "g++" == self.tpCompiler:
-            flags = \
+            flags += \
                 [ '-std=c++11'
-                , '-Wc++11-compat'
-                , '-pthread'
-                , '-fomit-frame-pointer'
                 , '-pedantic-errors'
-                , '-Wall'
-                , '-Wextra'
-                , '-Wuninitialized'
-                , '-Winit-self'
-                , '-Wuninitialized'
-                , '-Winit-self'
                 , '-fno-nonansi-builtins'
-                , '-fno-operator-names'
-                , '-fstrict-enums'
+                , '-Wall'
                 # , '-Weffc++' # bad on default ctors (known gcc 'issues')
                 # , '-Wold-style-cast' # bad on: extstb, exthalf, Eigen3
                 # , '-Wzero-as-null-pointer-constant'  # bad on: extstb, Eigen3
                 # , '-Wuseless-cast'  # bad on: extstb, exthalf,
                 ]
+
+        # LLVM/Clang
         elif "clang++-7" == self.tpCompiler:
-            flags = \
+            flags += \
                 [ '-std=c++11'
+                        #                , '-Wall' # bad on exthalf
+#                , '-Weverything' # ? complains about c++98
                 ]
+
         return flags
 
     def compilerFlagsOptimize(self):

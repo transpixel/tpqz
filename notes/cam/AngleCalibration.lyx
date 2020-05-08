@@ -29,7 +29,7 @@
 \paperfontsize default
 \spacing single
 \use_hyperref false
-\papersize default
+\papersize letterpaper
 \use_geometry false
 \use_package amsmath 1
 \use_package amssymb 1
@@ -88,11 +88,13 @@ Stellacore Corporation
 \end_layout
 
 \begin_layout Abstract
-Camera calibration is a concept fundamental in photogrammetry and computer
- vision applications and it is often helpful to be able to estimate the
- most important calibration parameter values reliably and easily.
+Camera calibration is a fundamental concept in photogrammetry and computer
+ vision applications.
+ When working with new camera systems, it often desirable to estimate the
+ most important calibration parameter values reliably and easily without
+ the need for special calibration items or application software.
  This technical note describes a simple and practical technique for determining
- a camera's 
+ the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -100,17 +102,19 @@ principal
 \begin_inset Quotes erd
 \end_inset
 
- calibration values by using a single image exposure and three scene distance
- measurements.
- The overall calibration process can be completed in a few minutes time
- and requires only simple algebraic computations that can be performed easily
- with an arithmetic calculator or spreadsheet application.
- The simplicity and effectiveness of the technique are demonstrated by estimatin
-g the principal distance for a smart phone camera.
- Results of the calibration are validated by utilizing the computed calibration
- values in a three-dimensional (3D) scene reconstruction.
- Evaluation of the calibration result precision and assessment of the subsequent
- reconstruction test results both indicate that the proposed method is effective.
+ camera calibration values using a single image exposure and three scene
+ distance measurements.
+ The associated calibration process can be completed in a few minutes time
+ and requires only simple algebraic computations easily performed with a
+ common calculator or spreadsheet application.
+ The technique's simplicity and effectiveness are demonstrated by estimating
+ the principal distance for a smart phone camera.
+ The obtained calibration results are validated by using them in to perform
+ simple three-dimensional (3D) object reconstruction operations using an
+ independently acquired pair of from the same camera.
+ Evaluation of calibration data precision and independent assessment of
+ the subsequent reconstruction test results both indicate that the proposed
+ method is effective.
 \end_layout
 
 \begin_layout Keywords
@@ -121,24 +125,33 @@ Photogrammetry, Computer Vision, Camera Calibration
 Introduction
 \end_layout
 
-\begin_layout Standard
-Camera calibration is a concept fundamental to photogrammetry and computer
- vision applications.
- The calibration model may be expressed implicitly as part of a more general
- image formation model or the camera may be represented explicitly by its
- own model.
- In the later case, it is typically necessary to determine numeric values
- for the various parameters that represent the explicit camera model.
- Sometimes, this determination is part of a larger process as an initial
- step in a more sophisticated data refinement for high accuracy demanding
- applications.
- In other cases, a simple camera model may be completely sufficient for
- a particular application niche.
+\begin_layout Subsection
+Background
 \end_layout
 
 \begin_layout Standard
-The fundamental properties of most camera systems can be approximated by
- a simple camera obscura
+Camera calibration is a concept that is fundamental in the formulation of
+ photogrammetry and computer vision applications.
+ The calibration model may be expressed implicitly as part of a more general
+ image formation mathematical model or the camera may be represented explicitly
+ by its own math model.
+ In the later case, it is common to utilize a calibration process to determine
+ specific numeric values for the various parameters in the explicit camera
+ model.
+\end_layout
+
+\begin_layout Standard
+Camera models range from simple to sophisticated.
+ Sometimes, a simple model is completely sufficient for a particular application
+s.
+ At other times, a simple model is useful for exploratory design/simulation
+ work or as initial values for computational processes that compute more
+ sophisticated models using iterative refinement techniques.
+\end_layout
+
+\begin_layout Standard
+The vast majority of common camera systems, at their most fundamental level,
+ behave like a simple camera obscura
 \begin_inset Foot
 status open
 
@@ -155,34 +168,25 @@ Historically, a camera obscura is associated with a darkened room inside
 
 \end_inset
 
- model in which the camera comprises a small, 
-\begin_inset Quotes eld
-\end_inset
-
-pinhole
-\begin_inset Quotes erd
-\end_inset
-
-, aperture located some distance in front of a geometrically flat image
- plane.
- Even for advanced applications involving sophisticated mathematical camera
- models, it is frequently useful to be able to quickly estimate the characterist
-ics of an equivalent pinhole camera model.
+.
+ In this context, the camera construction includes a small aperture (e.g.
+ within the lens assembly) that is located some distance in front of a geometric
+ally flat image plane.
+ This simple geometry is only an approximation for real camera systems.
 \end_layout
 
 \begin_layout Standard
-It is often useful to have a quick and simple, yet reliable and accurate
- method for estimating the principal distance of a camera system.
- Such is the case, for example to obtain nominal camera calibration values
- after fitting a new lens to an image sensor or to obtain reasonably good
- initial values with which to bootstrap iterative numerical solution techniques.
-\end_layout
-
-\begin_layout Standard
-Also, it is often convenient if the computations can be done with simple
+Even for advanced applications employing sophisticated camera models, it
+ is frequently useful to quickly estimate the basic camera properties using
+ a simple pinhole model.
+ Also, it is often convenient if the computations can be done with simple
  algebra and arithmetic so that results can be computed with a simple calculator
  or spreadsheet application without having to resort to complex data fitting
  tools and processes.
+\end_layout
+
+\begin_layout Subsection
+Approach
 \end_layout
 
 \begin_layout Standard
@@ -196,7 +200,7 @@ The simple method, described herein, allows recovering the camera principal
 \end_layout
 
 \begin_layout Standard
-The method provides an algebraic expression for principal distance value
+The derivation provides an algebraic expression for principal distance value
  in terms of the roots of quadratic equations.
  When the geometric configuration is sufficient to determine a unique physical
  solution, the presented method provides a unique solution.
@@ -216,9 +220,11 @@ normal
 \end_inset
 
  optical system designs with relatively low distortion characteristics.
- The pinhole perspective model applies to the vast majority of consumer
- device, surveillance, and industrial use camera systems.
- Notable exceptions are ultra- wide angle and various fish-eye optics.
+ The pinhole perspective model often provide reasonable results for the
+ majority of typical consumer devices, surveillance cameras, and industrial
+ monitoring systems.
+ The simple pinhole model can be expected to breakdown for super- and ultra-wide
+ angle and fish-eye optics.
 \end_layout
 
 \begin_layout Standard
@@ -226,10 +232,9 @@ The simplicity and effectiveness of the technique are demonstrated by describing
  calibration of a smart phone camera by measuring two features on a single
  image and recording three object distances measured with a retractable
  steel tape.
- The validity of the computed calibration result is assessed by performing
- a subsequent test in which three-dimensional (3D) object coordinates are
- reconstructed from a pair of additional photographs taken with the same
- camera.
+ The validity of the obtained camera calibration is assessed by computing
+ a classic three-dimensional (3D) coordinate reconstruction from a pair
+ of additional photographs taken with the same camera.
 \end_layout
 
 \begin_layout Section
@@ -293,7 +298,7 @@ column
  isotropic with equal and uniform pixel spacing in both row and column direction
 s.
  In addition, the detector surface is generally very flat and may be considered
- planar for present purposes.
+ planar.
  Thus, the physical detector construction itself provides a natural two-dimensio
 nal (2D) Cartesian coordinate frame.
 \end_layout
@@ -304,7 +309,8 @@ nal (3D) Cartesian coordinate frame.
  This is done by defining a direction that is orthogonal to both the row
  and column directions on the detector and associated with the same units
  of measurement.
- 
+ By convention herein, this third axis is positive outward from the detector
+ surface.
 \end_layout
 
 \begin_layout Standard
@@ -774,6 +780,66 @@ Let vector,
 \begin_inset Formula $h$
 \end_inset
 
+, known as the 
+\begin_inset Quotes eld
+\end_inset
+
+principal vector
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+As the term is used herein, the principal vector, 
+\begin_inset Formula $h$
+\end_inset
+
+, may be decomposed as a sum of two vector constituents.
+ The first constituent lies in the plane of the detector and has two components
+ that represent the location of the 
+\begin_inset Quotes eld
+\end_inset
+
+principal point
+\begin_inset Quotes erd
+\end_inset
+
+ (of autocollimation).
+ The second constituent is the component of 
+\begin_inset Formula $h$
+\end_inset
+
+ perpendicular to the detector surface.
+ The magnitude of this orthogonal component is known as the 
+\begin_inset Quotes eld
+\end_inset
+
+principal distance
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For the special case in which a camera is focused at infinity, the principal
+ distance is approximately equal to the optical system focal length.
+ However, in general the principal distance has a somewhat abstract interpretati
+on.
+ Its numeric value is determined as a 
+\begin_inset Quotes eld
+\end_inset
+
+best fit
+\begin_inset Quotes erd
+\end_inset
+
+ to the pinhole central perspective model and therefore may be affected
+ by other considerations (various high order optical effects and aberrations).
+\end_layout
+
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
 , represent the location of the exit pupil as it is expressed in the Det
  frame.
  Also let vectors, 
@@ -943,12 +1009,13 @@ This is a limitation of the pinhole / central perspective projection model
  and not a limitation of actual optical systems.
  Physical lenses exist with larger than 180-deg full field of view.
  The fact that real optical systems exceed this limit, demonstrates that
- the simple perspective projection model is a simplifying approximation
- that is only valid over a restricted subset of actual optical systems.
- In general, validity of the approximation is improves with increasingly
- more telephoto optical systems, and degrades with increasingly wider angle
- ones while failing completely on non-rectilinear designs such as fish-eye
- and other extreme optical systems.
+ the simple perspective projection model, at best, is a simplifying approximatio
+n only valid for a restricted subset of actual optical systems.
+ In general, validity of the approximation improves for increasingly more
+ telephoto optical systems, and degrades with increasingly wider angle ones.
+ The central perspective model fails completely for substantially non-rectilinea
+r designs such as super-wide, ultra-wide angle, fish-eye and other extreme
+ optical systems.
 \end_layout
 
 \end_inset
@@ -1001,7 +1068,7 @@ Since the detector surface is assumed flat, the measurement vectors,
 
 , must lie in the plane of the detector which itself is orthogonal to the
  optical exit axis.
- Assuming the exit axis is aligned with the 
+ For exit axis aligned with the 
 \begin_inset Formula $e_{3}$
 \end_inset
 
@@ -1083,7 +1150,7 @@ Represent this measurement construct with scalar value,
 
 \end_inset
 
-which evaluates as,
+which may be expanded,
 \begin_inset Formula 
 \begin{equation}
 \rho_{j}^{2}=m_{jr}\eta_{r}+m_{jc}\eta_{c}\label{eq:MeaProjection}
@@ -1331,7 +1398,7 @@ Since both the
 \end_inset
 
  and 
-\begin_inset Formula $r$
+\begin_inset Formula $r^{2}$
 \end_inset
 
  are inherently positive, squaring these quantities does not significantly
@@ -1357,8 +1424,11 @@ I.e.
 \end_inset
 
 .
- Thus, any inversion process can be expected also to require a disambiguation
- step.
+ Thus, any inversion process to determine, 
+\begin_inset Formula $\eta$
+\end_inset
+
+, should be expected to require also a disambiguation consideration.
 \end_layout
 
 \begin_layout Standard
@@ -1534,6 +1604,10 @@ and scalar,
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 to express the product of squared interior distance values as,
 \begin_inset Formula 
 \begin{align}
@@ -1543,6 +1617,30 @@ to express the product of squared interior distance values as,
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Note that the exponents included in the expression of quantities, 
+\begin_inset Formula $\nu^{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\omega^{4}$
+\end_inset
+
+, are used primarily to track the algebraic order with which they are defined.
+ In this way, equations are expressed with notation in which terms have
+ homogeneous order.
+ The numeric values associated to the quantities, 
+\begin_inset Formula $\nu^{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\omega^{4}$
+\end_inset
+
+, may be negative.
+ However, this is not a concern since not roots of these values are required.
 \end_layout
 
 \begin_layout Standard
@@ -2572,9 +2670,19 @@ Use these to evaluate quadratic coefficients
 
 \end_deeper
 \begin_layout Itemize
-Solve the quadratic to obtain intermediate root candidates via an appropriate
- expression for (e.g.
- the appropriate, numerically stable variant of) the general quadratic formula,
+Solve the quadratic to obtain intermediate root candidates via the general
+ quadratic formula
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The quadratic formula may be expressed in various forms with different numeric
+ stability properties depending on specific data values.
+\end_layout
+
+\end_inset
+
+,
 \begin_inset Formula 
 \[
 \check{h}_{\pm}^{2}=\frac{-\kappa_{b}\pm\sqrt{\kappa_{b}^{2}-\kappa_{a}\kappa_{c}}}{\kappa_{a}}
@@ -2613,7 +2721,8 @@ Formula Verification
 \begin_layout Standard
 The recipe and formulae described in the previous section have been implemented
  in a computer program and verified with simulated numeric data.
- The simulation results verify that the various formulae are correct.
+ The simulation results (not presented here) verify that the various formulae
+ are correct.
 \end_layout
 
 \begin_layout Subsection
@@ -3400,7 +3509,7 @@ reference "subsec:Computational-Summary"
  produces a principal distance estimated value,
 \begin_inset Formula 
 \begin{align*}
-\eta & =3112\,\text{\left[pix\right]}
+\eta & =3112\,\left[\text{pix}\right]
 \end{align*}
 
 \end_inset
@@ -4094,7 +4203,14 @@ Stereo pair used for 3D object geometry reconstruction.
 \begin_inset space ~
 \end_inset
 
-TODO, were utilized to compute a 3D stereo module using a standard relative
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Real-Photo-Calibration"
+
+\end_inset
+
+, were utilized to compute a 3D stereo module using a standard relative
  orientation algorithm.
 \end_layout
 
@@ -4294,12 +4410,8 @@ The validation project consists of the following steps:
 \end_layout
 
 \begin_layout Enumerate
-Acquire and measure imagery
-\end_layout
-
-\begin_deeper
-\begin_layout Enumerate
-Collected here as a classic 
+Acquire and measure imagery.
+ Collected here as a classic 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4308,14 +4420,10 @@ convergent stereo pair
 \end_inset
 
  configuration.
-\end_layout
-
-\begin_layout Enumerate
-Measure row/column locations for various (arbitrary) corresponding image
+ Measure row/column locations for various (arbitrary) corresponding image
  feature locations in each image of the pair.
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
 Compute a 
 \begin_inset Quotes eld
@@ -4327,11 +4435,7 @@ relative orientation
 
  (RO) relationship between the two image exposures (using available custom
  software).
-\end_layout
-
-\begin_deeper
-\begin_layout Enumerate
-Treat camera as a 
+ Treat camera as a 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4351,11 +4455,8 @@ reference "subsec:Real-Photo-Calibration"
 \end_inset
 
  and estimate values for the five parameters representing general RO degrees
- of freedom
-\end_layout
-
-\begin_layout Enumerate
-Compute 3D point coordinates via space intersection using the RO solution.
+ of freedom.
+ Compute 3D point coordinates via space intersection using the RO solution.
  At this point all 3D model points are expressed in arbitrary 
 \begin_inset Quotes eld
 \end_inset
@@ -4376,53 +4477,31 @@ model units
  [mu]).
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
-Compute a model scale factor
-\end_layout
-
-\begin_deeper
-\begin_layout Enumerate
-Measure one of the table top diagonals (top103 to top104) using the steel
+Compute a model scale factor.
+ Measure one of the table top diagonals (top103 to top104) using the steel
  tape to obtain the diagonal in Ref units (of meters).
-\end_layout
-
-\begin_layout Enumerate
-Compute scale factor as ratio of the Ref distance (expressed in [m]) with
+ Compute scale factor as ratio of the Ref distance (expressed in [m]) with
  the corresponding model distance (expressed in [mu]).
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
-Field measure check distances
-\end_layout
-
-\begin_deeper
-\begin_layout Enumerate
-Use steel table and record values between pairs of points of interest that;
+Field measure check distances.
+ Use steel table and record values between pairs of points of interest that;
  can be measured with a steel tape (e.g.
  not having to pass through solid objects); and are representative of the
  full 3D shape of the table
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
-Compute and analyze check distance results
-\end_layout
-
-\begin_deeper
-\begin_layout Enumerate
-Evaluate distances between appropriate combinations of model points to obtain
- model distances in the model frame (in [mu]) for each of the field measured
- distances.
-\end_layout
-
-\begin_layout Enumerate
-Apply scale factor to express these the computed check distances in Ref
+Compute and analyze check distance results.
+ Evaluate distances between appropriate combinations of model points to
+ obtain model distances in the model frame (in [mu]) for each of the field
+ measured distances.
+ Apply scale factor to express these the computed check distances in Ref
  frame units (in [m]).
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
 Compare the computed check distance values with the corresponding field
  measured values to report differences and statistics.
@@ -4491,13 +4570,6 @@ reference "fig:Residual-erros-in"
 \end_inset
 
 .
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Residual-erros-in"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -4522,7 +4594,7 @@ Conclusions
 \end_layout
 
 \begin_layout Standard
-The physical trial case results demonstrate that the calibration process
+The described experiment results demonstrate that the calibration process
  is effective.
  It is capable of providing reasonable quality approximation of a camera's
  principal distance values using a single photo and a few easy-to-acquire
@@ -4530,71 +4602,53 @@ The physical trial case results demonstrate that the calibration process
 \end_layout
 
 \begin_layout Standard
-There is no need to align the single photo with any object features such
- as required when computing principal distance from a simple photo scale
- relationships (i.e.
- using the camera standoff distance and measuring an object distance on
- a surface oriented perpendicular the image plane and standoff measurement).
-\end_layout
-
-\begin_layout Standard
 The precision of the results may seem poor by engineering grade photogrammetry
  standards which often report results with precision expressed in fractions
  of a pixel.
- However, these results are obtained from only five observations (two image
- points and three object distances).
- Nonetheless, the quality of the results is good enough for initialization
- uses such as bootstrapping high precision iterative algorithms (e.g.
- fully rigorous bundle adjustment methods), and may be good enough for any
- number of applications which are satisfied by solution precision values
- better than a percent or so.
+ However, these results are obtained from only five simple observations
+ (two image points and three object distances) and with simple algebraic
+ computations.
 \end_layout
 
 \begin_layout Standard
-The demonstration case has a strong geometric configuration and produces
- a unique solution with relatively good precision.
- However, for weak imaging geometry, there can be a physically real ambiguity
- in computed solution values.
+The result quality should be more than sufficient for general initialization
+ type use such as bootstrapping high precision iterative algorithms (e.g.
+ fully rigorous bundle adjustment methods), and likely also good enough
+ for many applications which are satisfied with solution precision better
+ than a percent or so.
+\end_layout
+
+\begin_layout Standard
+The example calibration case involves a strong geometric configuration which
+ immediately produces a unique solution with relatively good numeric precision.
+ However, for weaker imaging geometries, there can be a physically real
+ ambiguity in the computed solution values.
  In the weak geometry cases, the ambiguity is associated with attempting
  calibration when not enough information is available from a single object
- space angle.
-\end_layout
-
-\begin_layout Standard
-The best way to deal with potential solution ambiguity is to avoid the weak
- imaging geometry when attempting calibration.
- Acquiring imagery with a strong geometry, provides a solution that is unique
- and also relatively precise.
+ space angle, and generally should be avoid when practical.
 \end_layout
 
 \begin_layout Standard
 For situations in which calibration must be attempted with weak imaging
  geometry, then additional information is necessary to obtain a unique solution.
  This information could come from various sources.
- One obvious remediation approach is to observe an additional angle relationship
-(s) within the same photo by measuring additional object distances.
+ One obvious on approach is to observe an additional angle relationship(s)
+ within the same photo by measuring additional object distances, then identify
+ which of the multiple solution values are in common to each case.
 \end_layout
 
 \begin_layout Standard
-However, if calibration is an initial goal, then in practice, some minimal
- care should be taken to observe an object angle in which the corresponding
- image features appear on approximately opposite sides relative to the center
- of the image detector.
+However, if practical camera calibration is the intended goal, then some
+ minimal care should be taken to acquire calibration images in which the
+ corresponding image features appear approximately on opposite sides of
+ the image relative to the center of the image.
 \end_layout
 
 \begin_layout Standard
-To guarantee a unique principal distance solution, the detector center location
- should project (perpendicularly) onto the line segment joining the two
- image features.
- The computed solution will be most precise and least sensitive to noise,
- the closer the projection point is to the center of the line segment between
- image features.
-\end_layout
-
-\begin_layout Standard
-Evaluation of the precision of the computed calibration and of the results
- of the 3D reconstruction validation process indicate that the proposed
- method is effective.
+Overall, the described process is relatively easy.
+ Evaluation of the precision of the computed calibration and analysis of
+ the 3D reconstruction validation results indicate that the proposed method
+ is effective.
 \end_layout
 
 \begin_layout Bibliography

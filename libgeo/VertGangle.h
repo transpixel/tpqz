@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,92 +26,95 @@
 //
 //
 
-#ifndef math_QuadEq_INCL_
-#define math_QuadEq_INCL_
+#ifndef geo_VertGangle_INCL_
+#define geo_VertGangle_INCL_
 
 /*! \file
-\brief Declarations for math::QuadEq
+\brief Declarations for geo::VertGangle
 */
 
+
 #include "libdat/validity.h"
-#include "libmath/math.h"
+#include "libga/ga.h"
+#include "libgeo/Wedge.h"
 
 #include <string>
 #include <utility>
-#include <vector>
 
 
-namespace math
+namespace geo
 {
 
-/*! \brief Classic quadratic equation.
+/*! \brief Generalization concept of angle as G2-element of geometric algebra.
 
 \par Example
-\dontinclude testmath/uQuadEq.cpp
+\dontinclude testgeo/uVertGangle.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
-class QuadEq
+
+struct VertGangle
 {
+	ga::Spinor theGangle{};
 
-	double const theA{ dat::nullValue<double>() }; // x^2 coefficent
-	double const theB{ dat::nullValue<double>() }; // x^1
-	double const theC{ dat::nullValue<double>() }; // x^0
-
-	// cached intermediary
-	double const theDescrim{ dat::nullValue<double>() }; // descrimant
-	double const theDelta{ dat::nullValue<double>() }; // root(descrim)
-
-public: // methods
-
-	QuadEq
-		() = default;
-
-	//! Value ctor
-	explicit
-	QuadEq
-		( double const coA
-		, double const coB
-		, double const coC
+	/*! Generalized (G2-subspace) angle second location w.r.t. first.
+	 *
+	 * Expresses angle relating two edges of Wedge, via:
+ 	 * \arg wedge.edge2() = (*this) * wedge.edge1()
+	 */
+	static
+	ga::Spinor
+	spinGangleFor
+		( Wedge const & wedge
 		);
 
-	//! Check if instance is valid
+	//! default null constructor
+	VertGangle
+		() = default;
+
+	//! Generalized angle at vertex from first toward second
+	explicit
+	VertGangle
+		( ga::Vector const & vert
+		, std::pair<ga::Vector, ga::Vector> const & locPair
+		);
+
+	//! Generalized angle associated with wedge vertex
+	explicit
+	VertGangle
+		( Wedge const & wedge
+		);
+
+	//! True if this instance is valid
+	inline
 	bool
 	isValid
 		() const;
 
-	//! The more negative of the two roots
+	//! Scalar magnitude of scalar part of vertGangle()
+	inline
 	double
-	realRootMin
+	ratioMag
 		() const;
 
-	//! The more positive of the two roots
+	//! Scalar magnitude of bivector part of vertGangle()
+	inline
 	double
-	realRootMax
+	angleMag
 		() const;
 
-	//! All roots: returns either: 0)empty, 1)averageMinMax, 2){min,max}
-	std::vector<double>
-	realUniqueRoots
-		( double const & tol = math::eps
-		) const;
-
-	//! The smallest non-negative root (or null)
-	double
-	realRootMinPos
-		() const;
-
-	//! Descriptive information about this instance.
+	//! Descriptive information about this instance
 	std::string
 	infoString
-		( std::string const & title = std::string()
+		( std::string const & title = {}
 		) const;
-};
 
-}
+}; // VertGangle
+
+} // geo
 
 // Inline definitions
-// #include "libmath/QuadEq.inl"
+#include "libgeo/VertGangle.inl"
 
-#endif // math_QuadEq_INCL_
+#endif // geo_VertGangle_INCL_
 

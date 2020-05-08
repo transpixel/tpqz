@@ -348,16 +348,16 @@ ga_functions_test2
 		// should be invalid w/o plane direction to resolve ambiguity
 		{
 			G2 const gotLog{ ga::logG2(popper) };
-			if (! gotLog.isValid())
+			if (gotLog.isValid())
 			{
 				oss << "Failure of singular pi-rotation test" << std::endl;
 				oss << gotLog.infoString("gotLog", false, true) << '\n';
 			}
 		}
 
-		// bivector part is zero in recovery under pi rotation
+		// bivector part is pi in recovery under pi rotation
 		{
-			G2 const expLog{ sArg, ga::bZero };
+			G2 const expLog{ sArg, math::pi*bDir };
 			G2 const gotLog{ ga::logG2(popper, bDir) };
 			if (! gotLog.nearlyEquals(expLog))
 			{
@@ -441,6 +441,27 @@ ga_functions_test3
 	return oss.str();
 }
 
+//! check angle extraction corner cases
+std::string
+ga_functions_test4
+	()
+{
+	std::ostringstream oss;
+
+	ga::Spinor const spin{ -ga::e1 * ga::e1 };
+	ga::BiVector const piPlane{ (ga::E12 + .3*ga::E23 - .5*ga::E31) };
+	ga::Spinor const gangle{ ga::logG2(spin, piPlane) };
+	ga::BiVector const & gotAngle = gangle.theB;
+	ga::BiVector const expAngle{ math::pi * ga::unit(piPlane) };
+	if (! gotAngle.nearlyEquals(expAngle))
+	{
+		oss << "Failure of pi-rotation special test" << std::endl;
+		oss << dat::infoString(expAngle, "expAngle") << std::endl;
+		oss << dat::infoString(gotAngle, "gotAngle") << std::endl;
+	}
+	return oss.str();
+}
+
 
 }
 
@@ -460,6 +481,7 @@ main
 	oss << ga_functions_test1a();
 	oss << ga_functions_test2();
 	oss << ga_functions_test3();
+	oss << ga_functions_test4();
 
 	// check/report results
 	std::string const errMessages(oss.str());

@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -28,62 +28,69 @@
 
 
 /*! \file
-\brief Definitions for cam::PinHole
+\brief Definitions for geo::VertGangle
 */
 
 
-#include "libcam/PinHole.h"
-
-#include "libio/sprintf.h"
+#include "libgeo/VertGangle.h"
 
 #include <sstream>
 
 
-namespace cam
+namespace geo
 {
-//======================================================================
 
-PinHole :: PinHole
-	()
-	: thePD(dat::nullValue<double>())
+// static
+ga::Spinor
+VertGangle :: spinGangleFor
+	( Wedge const & wedge
+	)
+{
+	ga::Vector const inv1{ ga::inverse(wedge.edge1()) };
+	return { ga::logG2(wedge.edge2() * inv1) };
+}
+
+// explicit
+VertGangle :: VertGangle
+	( ga::Vector const & vert
+	, std::pair<ga::Vector, ga::Vector> const & locPair
+	)
+	: theGangle{ spinGangleFor(geo::Wedge(vert, locPair)) }
 {
 }
 
 // explicit
-PinHole :: PinHole
-	( double const & pd
+VertGangle :: VertGangle
+	( Wedge const & wedge
 	)
-	: thePD(pd)
+	: theGangle{ spinGangleFor(wedge) }
 {
-}
-
-bool
-PinHole :: nearlyEquals
-	( PinHole const & other
-	, double const & tol
-	) const
-{
-	return
-		{  dat::nearlyEquals(thePD, other.thePD, tol)
-		};
 }
 
 std::string
-PinHole :: infoString
+VertGangle :: infoString
 	( std::string const & title
-	, std::string const & fmt
 	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << title << " ";
+		oss << title << std::endl;
 	}
-	oss << "PD: " << io::sprintf(fmt, thePD);
+	if (isValid())
+	{
+		oss
+			<< dat::infoString(theGangle, "theGangle")
+			<< " angleMag: " << dat::infoString(angleMag())
+			<< " ratioMag: " << dat::infoString(ratioMag())
+			;
+	}
+	else
+	{
+		oss << " <null>";
+	}
 	return oss.str();
 }
 
-//======================================================================
-}
-
+} // geo
 

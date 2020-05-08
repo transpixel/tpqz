@@ -101,6 +101,22 @@ Camera :: cornerDirections
 	return dirs;
 }
 
+bool
+Camera :: nearlyEquals
+	( Camera const & other
+	, double const & tol
+	) const
+{
+	return
+		{  isValid()
+		&& other.isValid()
+		&& theOptics.nearlyEquals(other.theOptics, tol)
+		&& theDetSize.nearlyEquals(other.theDetSize)
+		&& theAreaInImg.nearlyEquals(other.theAreaInImg, tol)
+		&& theAreaInDet.nearlyEquals(other.theAreaInDet, tol)
+		};
+}
+
 std::string
 Camera :: infoString
 	( std::string const & title

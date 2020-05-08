@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -28,62 +28,40 @@
 
 
 /*! \file
-\brief Definitions for cam::PinHole
+\brief Definitions for cam::InnerVertex
 */
 
 
-#include "libcam/PinHole.h"
+#include "libcam/InnerVertex.h"
 
-#include "libio/sprintf.h"
-
-#include <sstream>
+#include "libdat/ops.h"
 
 
 namespace cam
 {
-//======================================================================
-
-PinHole :: PinHole
-	()
-	: thePD(dat::nullValue<double>())
-{
-}
 
 // explicit
-PinHole :: PinHole
-	( double const & pd
+InnerVertex :: InnerVertex
+	( dat::Extents const & detSize
 	)
-	: thePD(pd)
-{
-}
+	: theDetSize{ detSize }
+	, theCenterRC{ dat::centerOf(theDetSize) }
+	, theCenterVec{ theCenterRC[0], theCenterRC[1], 0. }
+{ }
 
-bool
-PinHole :: nearlyEquals
-	( PinHole const & other
-	, double const & tol
+geo::Wedge
+InnerVertex :: wedgeFor
+	( double const & pd
+	, std::pair<dat::Spot, dat::Spot> const & meaPair
 	) const
 {
-	return
-		{  dat::nearlyEquals(thePD, other.thePD, tol)
-		};
+	dat::Spot const & meaRowCol1 = meaPair.first;
+	dat::Spot const & meaRowCol2 = meaPair.second;
+	ga::Vector const vecMea1{ meaRowCol1[0], meaRowCol1[1], 0. };
+	ga::Vector const vecMea2{ meaRowCol2[0], meaRowCol2[1], 0. };
+	ga::Vector const vecPD{ theCenterVec + pd * ga::e3 };
+	return geo::Wedge(vecPD, std::make_pair(vecMea1, vecMea2));
 }
 
-std::string
-PinHole :: infoString
-	( std::string const & title
-	, std::string const & fmt
-	) const
-{
-	std::ostringstream oss;
-	if (! title.empty())
-	{
-		oss << title << " ";
-	}
-	oss << "PD: " << io::sprintf(fmt, thePD);
-	return oss.str();
-}
-
-//======================================================================
-}
-
+} // cam
 

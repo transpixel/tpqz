@@ -54,7 +54,7 @@
 
 namespace
 {
-	constexpr bool const sSavePlotable{ false };
+	constexpr bool const sSavePlotable{ true };
 
 	void
 	saveModel
@@ -104,7 +104,7 @@ main
 		);
 	usage.addArg("mea1", "measurements for first(ref) image (*.meapoint)");
 	usage.addArg("mea2", "measurements for second image (*.meapoint)");
-	usage.addArg("outpath", "filename to report solutions");
+//	usage.addArg("outpath", "filename to report solutions");
 	// ...
 	if (usage.argStatus(argc, argv) != app::Usage::Valid)
 	{
@@ -119,16 +119,16 @@ main
 	int argnum(0);
 	std::string const meapath1(argv[++argnum]);
 	std::string const meapath2(argv[++argnum]);
-	std::string const outpath(argv[++argnum]);
+//	std::string const outpath(argv[++argnum]);
 
-	dat::Extents const detSize(2448u, 3264u);
+	dat::Extents const detSize(3120u, 4160u);
 	// double const estPd{ .5 * dat::diagonalMag(detSize) }; // 2040 or so
-	double const pd{ 2550. };
+	double const pd{ 3112. };
 	cam::Camera const camera(pd, detSize);
 
 	io::out() << dat::infoString(meapath1, "meapath1") << std::endl;
 	io::out() << dat::infoString(meapath2, "meapath2") << std::endl;
-	io::out() << dat::infoString(outpath, "outpath") << std::endl;
+//	io::out() << dat::infoString(outpath, "outpath") << std::endl;
 
 	std::vector<std::string> const meapaths{ meapath1, meapath2 };
 	cam::Loader const loader(meapaths);

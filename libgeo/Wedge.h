@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,92 +26,98 @@
 //
 //
 
-#ifndef math_QuadEq_INCL_
-#define math_QuadEq_INCL_
+#ifndef geo_Wedge_INCL_
+#define geo_Wedge_INCL_
 
 /*! \file
-\brief Declarations for math::QuadEq
+\brief Declarations for geo::Wedge
 */
 
-#include "libdat/validity.h"
-#include "libmath/math.h"
+
+#include "libgeo/Triangle.h"
 
 #include <string>
 #include <utility>
-#include <vector>
 
 
-namespace math
+namespace geo
 {
 
-/*! \brief Classic quadratic equation.
+/*! \brief A triangle vertex situated in space (like a pizza slice in 3D).
+
+Wedge is a vertex location and two edges - i.e. a triangle with special
+interpretation of one of the nodes as "the" vertex - and with the adjacent
+edges understood to be in order (from)1 and (into)2.
 
 \par Example
-\dontinclude testmath/uQuadEq.cpp
+\dontinclude testgeo/uWedge.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
-class QuadEq
+
+struct Wedge
 {
+	geo::Triangle theTriangle{};
 
-	double const theA{ dat::nullValue<double>() }; // x^2 coefficent
-	double const theB{ dat::nullValue<double>() }; // x^1
-	double const theC{ dat::nullValue<double>() }; // x^0
-
-	// cached intermediary
-	double const theDescrim{ dat::nullValue<double>() }; // descrimant
-	double const theDelta{ dat::nullValue<double>() }; // root(descrim)
-
-public: // methods
-
-	QuadEq
+	//! default null constructor
+	Wedge
 		() = default;
 
-	//! Value ctor
+	//! Value construction.
 	explicit
-	QuadEq
-		( double const coA
-		, double const coB
-		, double const coC
+	Wedge
+		( ga::Vector const & vert
+		, std::pair<ga::Vector, ga::Vector> const & locPair
 		);
 
-	//! Check if instance is valid
+	//! True if this instance is valid
+	inline
 	bool
 	isValid
 		() const;
 
-	//! The more negative of the two roots
-	double
-	realRootMin
+	//! Vertex location in space
+	inline
+	ga::Vector const &
+	vertex
 		() const;
 
-	//! The more positive of the two roots
-	double
-	realRootMax
+	//! End point location for the first (from) edge
+	inline
+	ga::Vector const &
+	point1
 		() const;
 
-	//! All roots: returns either: 0)empty, 1)averageMinMax, 2){min,max}
-	std::vector<double>
-	realUniqueRoots
-		( double const & tol = math::eps
-		) const;
-
-	//! The smallest non-negative root (or null)
-	double
-	realRootMinPos
+	//! End point location for the second (into) edge
+	inline
+	ga::Vector const &
+	point2
 		() const;
 
-	//! Descriptive information about this instance.
+	//! Vector edge from vert to first location
+	inline
+	ga::Vector
+	edge1
+		() const;
+
+	//! Vector edge from vert to second location
+	inline
+	ga::Vector
+	edge2
+		() const;
+
+	//! Descriptive information about this instance
 	std::string
 	infoString
-		( std::string const & title = std::string()
+		( std::string const & title = {}
 		) const;
-};
 
-}
+}; // Wedge
+
+} // geo
 
 // Inline definitions
-// #include "libmath/QuadEq.inl"
+#include "libgeo/Wedge.inl"
 
-#endif // math_QuadEq_INCL_
+#endif // geo_Wedge_INCL_
 

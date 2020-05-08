@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,64 +26,53 @@
 //
 //
 
+#ifndef cam_fit_INCL_
+#define cam_fit_INCL_
 
 /*! \file
-\brief Definitions for cam::PinHole
+\brief Declarations for cam::fit
 */
 
 
-#include "libcam/PinHole.h"
+#include "libdat/Extents.h"
+#include "libdat/Spot.h"
 
-#include "libio/sprintf.h"
-
-#include <sstream>
+#include <utility>
+#include <vector>
 
 
 namespace cam
 {
-//======================================================================
 
-PinHole :: PinHole
-	()
-	: thePD(dat::nullValue<double>())
+/*! \brief Utilities/functions for fitting camera models to measurement data.
+
+\par Example
+\dontinclude testcam/ufit.cpp
+\skip ExampleStart
+\until ExampleEnd
+*/
+
+namespace fit
 {
-}
+	/*! Estimate principal distance values for simple camera.
+	 *
+	 * Ref: tpqz/notes/cam/AngleCalibration document
+	 *
+	 */
+	std::vector<double>
+	principalDistanceFor
+		( std::pair<dat::Spot, dat::Spot> const & meaPair
+		, double const & angleMag
+		, dat::Extents const & detSize
+		);
 
-// explicit
-PinHole :: PinHole
-	( double const & pd
-	)
-	: thePD(pd)
-{
-}
 
-bool
-PinHole :: nearlyEquals
-	( PinHole const & other
-	, double const & tol
-	) const
-{
-	return
-		{  dat::nearlyEquals(thePD, other.thePD, tol)
-		};
-}
+} // fit
 
-std::string
-PinHole :: infoString
-	( std::string const & title
-	, std::string const & fmt
-	) const
-{
-	std::ostringstream oss;
-	if (! title.empty())
-	{
-		oss << title << " ";
-	}
-	oss << "PD: " << io::sprintf(fmt, thePD);
-	return oss.str();
-}
+} // cam
 
-//======================================================================
-}
+// Inline definitions
+// #include "libcam/fit.inl"
 
+#endif // cam_fit_INCL_
 

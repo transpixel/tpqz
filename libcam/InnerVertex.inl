@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -28,62 +28,40 @@
 
 
 /*! \file
-\brief Definitions for cam::PinHole
+\brief Inline definitions for cam::InnerVertex
 */
-
-
-#include "libcam/PinHole.h"
-
-#include "libio/sprintf.h"
-
-#include <sstream>
 
 
 namespace cam
 {
-//======================================================================
 
-PinHole :: PinHole
-	()
-	: thePD(dat::nullValue<double>())
-{
-}
-
-// explicit
-PinHole :: PinHole
-	( double const & pd
-	)
-	: thePD(pd)
-{
-}
-
+inline
 bool
-PinHole :: nearlyEquals
-	( PinHole const & other
-	, double const & tol
+InnerVertex :: isValid
+	() const
+{
+	return dat::isValid(theDetSize);
+}
+
+inline
+geo::VertGangle
+InnerVertex :: gangleFor
+	( double const & pd
+	, std::pair<dat::Spot, dat::Spot> const & meaPair
 	) const
 {
-	return
-		{  dat::nearlyEquals(thePD, other.thePD, tol)
-		};
+	return geo::VertGangle(wedgeFor(pd, meaPair));
 }
 
-std::string
-PinHole :: infoString
-	( std::string const & title
-	, std::string const & fmt
+inline
+double
+InnerVertex :: angleMag
+	( double const & pd
+	, std::pair<dat::Spot, dat::Spot> const & meaPair
 	) const
 {
-	std::ostringstream oss;
-	if (! title.empty())
-	{
-		oss << title << " ";
-	}
-	oss << "PD: " << io::sprintf(fmt, thePD);
-	return oss.str();
+	return gangleFor(pd, meaPair).angleMag();
 }
 
-//======================================================================
-}
-
+} // cam
 

@@ -148,17 +148,31 @@ argAngleFrom
 			}
 		}
 		else
-		if (0. < std::abs(caVal))
 		{
-			// input has significant scalar part & little/no bivector part
-			angle = bZero;
-		}
-		else
-		{
-			// input has little/no scalar part & little/no bivector part
-			BiVector const piDir{ ga::unit(planeForPi) };
-		//	assert(piDir.isValid());
-			angle = math::pi * piDir;
+			bool usePiPlane{ false };
+			if (0. < std::abs(caVal))
+			{
+				// input has significant scalar part & little/no bivector part
+				if (0. < caVal)
+				{
+					angle = bZero;
+				}
+				if (caVal < 0.)
+				{
+					usePiPlane = true;
+				}
+			}
+			else
+			{
+				// input has little/no scalar part & little/no bivector part
+				usePiPlane = true;
+			}
+			if (usePiPlane)
+			{
+				BiVector const piDir{ ga::unit(planeForPi) };
+			//	assert(piDir.isValid());
+				angle = math::pi * piDir;
+			}
 		}
 	}
 	return angle;

@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -28,62 +28,36 @@
 
 
 /*! \file
-\brief Definitions for cam::PinHole
+\brief Inline definitions for geo::VertGangle
 */
 
 
-#include "libcam/PinHole.h"
-
-#include "libio/sprintf.h"
-
-#include <sstream>
-
-
-namespace cam
+namespace geo
 {
-//======================================================================
 
-PinHole :: PinHole
-	()
-	: thePD(dat::nullValue<double>())
-{
-}
-
-// explicit
-PinHole :: PinHole
-	( double const & pd
-	)
-	: thePD(pd)
-{
-}
-
+inline
 bool
-PinHole :: nearlyEquals
-	( PinHole const & other
-	, double const & tol
-	) const
+VertGangle :: isValid
+	() const
 {
-	return
-		{  dat::nearlyEquals(thePD, other.thePD, tol)
-		};
+	return dat::isValid(theGangle);
 }
 
-std::string
-PinHole :: infoString
-	( std::string const & title
-	, std::string const & fmt
-	) const
+inline
+double
+VertGangle :: ratioMag
+	() const
 {
-	std::ostringstream oss;
-	if (! title.empty())
-	{
-		oss << title << " ";
-	}
-	oss << "PD: " << io::sprintf(fmt, thePD);
-	return oss.str();
+	return { theGangle.theS.theValue };
 }
 
-//======================================================================
+inline
+double
+VertGangle :: angleMag
+	() const
+{
+	return { ga::magnitude(theGangle.theB) };
 }
 
+} // geo
 

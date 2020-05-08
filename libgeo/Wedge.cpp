@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -28,62 +28,46 @@
 
 
 /*! \file
-\brief Definitions for cam::PinHole
+\brief Definitions for geo::Wedge
 */
 
 
-#include "libcam/PinHole.h"
-
-#include "libio/sprintf.h"
+#include "libgeo/Wedge.h"
 
 #include <sstream>
 
 
-namespace cam
+namespace geo
 {
-//======================================================================
-
-PinHole :: PinHole
-	()
-	: thePD(dat::nullValue<double>())
-{
-}
 
 // explicit
-PinHole :: PinHole
-	( double const & pd
+Wedge :: Wedge
+	( ga::Vector const & vert
+	, std::pair<ga::Vector, ga::Vector> const & locPair
 	)
-	: thePD(pd)
-{
-}
-
-bool
-PinHole :: nearlyEquals
-	( PinHole const & other
-	, double const & tol
-	) const
-{
-	return
-		{  dat::nearlyEquals(thePD, other.thePD, tol)
-		};
-}
+	: theTriangle(locPair.first, vert, locPair.second)
+{ }
 
 std::string
-PinHole :: infoString
+Wedge :: infoString
 	( std::string const & title
-	, std::string const & fmt
 	) const
 {
 	std::ostringstream oss;
 	if (! title.empty())
 	{
-		oss << title << " ";
+		oss << title << std::endl;
 	}
-	oss << "PD: " << io::sprintf(fmt, thePD);
+	if (isValid())
+	{
+		oss << dat::infoString(theTriangle, "theTriangle");
+	}
+	else
+	{
+		oss << " <null>";
+	}
 	return oss.str();
 }
 
-//======================================================================
-}
-
+} // geo
 

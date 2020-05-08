@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2017 Stellacore Corporation.
+// Copyright (c) 2020 Stellacore Corporation.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,101 +26,88 @@
 //
 //
 
-#ifndef cam_PinHole_INCL_
-#define cam_PinHole_INCL_
+#ifndef cam_InnerVertex_INCL_
+#define cam_InnerVertex_INCL_
 
 /*! \file
-\brief Declarations for cam::PinHole
+\brief Declarations for cam::InnerVertex
 */
 
-
-#include "libdat/dat.h"
+#include "libdat/Extents.h"
+#include "libdat/Spot.h"
 #include "libga/ga.h"
-#include "libmath/math.h"
+#include "libgeo/VertGangle.h"
+#include "libgeo/Wedge.h"
 
-#include <string>
+#include <utility>
 
 
 namespace cam
 {
 
-/*! \brief Ideal "pin-hole" perspective camera model
+/*! \brief Interior camera vertex geometry for particular detector size.
+
+A kind of general function object for computing angle properties associated
+with measurements on detector and scalar principal distance values.
 
 \par Example
-\dontinclude testcam/uPinHole.cpp
+\dontinclude testcam/uInnerVertex.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
 
-class PinHole
+struct InnerVertex
 {
-
-public: // data
-
-	double thePD;
+	dat::Extents const theDetSize{};
+	dat::Spot const theCenterRC{};
+	ga::Vector const theCenterVec{};
 
 public: // methods
 
 	//! default null constructor
-	PinHole
-		();
+	InnerVertex
+		() = default;
 
-	//! Construct with specific principal distance
+	// Attach angle computations to specific detector geometry
 	explicit
-	PinHole
-		( double const & pd
+	InnerVertex
+		( dat::Extents const & detSize
 		);
 
-	// copy constructor -- compiler provided
-	// assignment operator -- compiler provided
-	// destructor -- compiler provided
-
-	//! Check if instance is valid
-	inline
+	//! True if instance is valid
 	bool
 	isValid
 		() const;
 
-	//! (Unit) sensor direction associated with object point
+	//! Wedge associated with measurements subtended from exit pupil
+	geo::Wedge
+	wedgeFor
+		( double const & pd
+		, std::pair<dat::Spot, dat::Spot> const & meaPair
+		) const;
+
+	//! Full interior generalized vertex angle
 	inline
-	ga::Vector
-	directionTo
-		( ga::Vector const & objpnt
+	geo::VertGangle
+	gangleFor
+		( double const & pd
+		, std::pair<dat::Spot, dat::Spot> const & meaPair
 		) const;
 
-	//! Detector location assocated with object point (3rd component == PD)
+	//! Scalar magnitude of interior vertex angle
 	inline
-	dat::Spot
-	imageSpotFor
-		( ga::Vector const & objpnt
+	double
+	angleMag
+		( double const & pd
+		, std::pair<dat::Spot, dat::Spot> const & meaPair
 		) const;
 
-	//! Direction associated with image location
-	inline
-	ga::Vector
-	directionOf
-		( dat::Spot const & imgspot
-		) const;
+}; // InnerVertex
 
-	//! True if this instance and other are same within tolerance
-	bool
-	nearlyEquals
-		( PinHole const & other
-		, double const & tol = { math::eps }
-		) const;
-
-	//! Descriptive information about this instance.
-	std::string
-	infoString
-		( std::string const & title = std::string()
-		, std::string const & fmt = std::string("%12.6f")
-		) const;
-};
-
-}
+} // cam
 
 // Inline definitions
-#include "libcam/PinHole.inl"
+#include "libcam/InnerVertex.inl"
 
-#endif // cam_PinHole_INCL_
+#endif // cam_InnerVertex_INCL_
 

@@ -41,7 +41,10 @@ libpaths = \
 
  , '../libgeo/'
  , '../libga/'
+ , '../libprob/'
+ , '../libmath/'
  , '../libdat/'
+ , '../libapp/'
  , '../libio/'
  ]
 
@@ -50,14 +53,20 @@ linklibs = \
 
  , 'geo'
  , 'ga'
+ , 'prob'
+ , 'math'
  , 'dat'
+ , 'app'
  , 'io'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
+env.Program('demoAngleCal.cpp')
+
 env.Program('uCamera.cpp')
+env.Program('ufit.cpp')
 env.Program('uio.cpp')
 env.Program('uPinHole.cpp')
 env.Program('uXRefSpots.cpp')

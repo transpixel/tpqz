@@ -63,7 +63,6 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoAngleCal.cpp')
 
 env.Program('uCamera.cpp')
 env.Program('ufit.cpp')

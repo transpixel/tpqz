@@ -55,7 +55,6 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoExpandScalar.cpp')
 env.Program('uangle.cpp')
 env.Program('uCircleTab.cpp')
 env.Program('uCosTable.cpp')

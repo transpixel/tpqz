@@ -71,9 +71,6 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoCylinder.cpp')
-env.Program('demoSphere.cpp')
-env.Program('demoSquare.cpp')
 env.Program('uFaceVerts.cpp')
 env.Program('uIsoTille.cpp')
 env.Program('uNodeIndex.cpp')

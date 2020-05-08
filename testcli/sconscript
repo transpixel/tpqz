@@ -49,5 +49,4 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoArgs.cpp')
 

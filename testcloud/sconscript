@@ -76,9 +76,6 @@ env.Append(LIBPATH=libpaths)
 
 
 env.Program('ConvertToAscii.cpp')
-env.Program('demoAveragePnts.cpp')
-env.Program('demoDistBetween.cpp')
-env.Program('demoLoadBinary.cpp')
 env.Program('FillIndices.cpp')
 env.Program('ThinCloud.cpp')
 env.Program('uFixedPoint.cpp')

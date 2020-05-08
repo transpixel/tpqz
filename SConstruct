@@ -360,7 +360,7 @@ def moduleNameFrom(pathSubDir, tpBuild):
     """Extract module identity from subDir name"""
     modname = None
     # expect something like: ['.', '', 'mod', 'sconscript']
-    fields = re.split("lib|test|main|verify|sub|/", pathSubDir)
+    fields = re.split("lib|test|demo|main|verify|sub|/", pathSubDir)
     if 3 < len(fields) :
         modname = fields[2]
     tpBuild.logDetail("Inside Func: fields", fields)

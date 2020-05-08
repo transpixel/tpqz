@@ -68,10 +68,6 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoArcQuant.cpp')
-env.Program('demoRayGaps.cpp')
-env.Program('demoSimSI.cpp')
-env.Program('demoThales.cpp')
 env.Program('ucube.cpp')
 env.Program('uintersect.cpp')
 env.Program('uio.cpp')

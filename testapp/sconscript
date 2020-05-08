@@ -54,7 +54,6 @@ env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
 
-env.Program('demoVersionTag.cpp')
 env.Program('uProgress.cpp')
 
 # env.Program('foo.cpp')

@@ -36,7 +36,6 @@
 #include "libmath/CosTable.h"
 
 #include "libio/stream.h"
-#include "libga/ga.h"
 
 #include <complex>
 #include <fstream>

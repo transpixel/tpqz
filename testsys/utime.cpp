@@ -52,32 +52,58 @@ sys_time_test0
 {
 	std::ostringstream oss;
 
-	double const absT0(sys::time::now());
-	double const relT0(sys::time::relativeNow());
+	// expect executation of squential statement exectuation to *probably* be
+	// simultaneous withint at least this time interval
+	constexpr double tolSync{ .001 };
 
-	long const microSleep(123456l);
+	// get two times that should be *approximately* "simultaneous-ish
+	double const absT0{ sys::time::now() }; // since 1970.01.01-00:00:00.0
+	double const relT0{ sys::time::relativeNow() }; // should be ~= 0
+
+	// assume chorono::steady_clock should have been running at least this long
+	constexpr double sinceStart{ 1. };
+	if (! (sinceStart < absT0))
+	{
+		oss << "Failure of absolute time to return value larger than 1 sec"
+			<< std::endl;
+		oss << "absT0: " << absT0 << std::endl;
+	}
+	if (relT0 < 0.)
+	{
+		oss  << "Failure of positive relative time test" << std::endl;
+		oss << "relT0: " << relT0 << std::endl;
+	}
+	if (! (relT0 < tolSync)) // relative should initilize near zero
+	{
+		oss << "Faiure of first relative time test" << std::endl;
+		oss << "relT0: " << relT0 << std::endl;
+	}
+
+	// introduce significant delay (relative to tolSync)
+	constexpr double delay{ .125 };
+	constexpr long microSleep{ static_cast<long>(1.e6 * delay) };
 	std::this_thread::sleep_for(std::chrono::microseconds(microSleep));
 
-	double const absT1(sys::time::now());
-	double const relT1(sys::time::relativeNow());
+	// get another approximately "simultaneous"-ish times
+	double const absT1{ sys::time::now() };
+	double const relT1{ sys::time::relativeNow() }; //~= (absT1-absT0)
 
-	double const absDelta(absT1 - absT0);
-	double const relDelta(relT1 - relT0);
+	double const absDelta{ absT1 - absT0 };
+	double const & relDelta = relT1;  // since relT0 ~= 0
 
-	// check within a few micro seconds
-	double const microDif(std::abs(1.e6*(relDelta - absDelta)));
-	static double const microTol(4.);  // allow for run time of code
-	if (! (microDif < microTol))
+	double const dif{ std::abs(relDelta - absDelta) };
+	static double const tol(10.*tolSync);  // allow for run time of code
+	if (! (dif < tol))
 	{
 		oss << "Failure of relative time test" << std::endl;
-		oss << "absT0: " << absT0 << std::endl;
-		oss << "absT1: " << absT1 << std::endl;
+		oss << "   absT0: " << absT0 << std::endl;
+		oss << "   absT1: " << absT1 << std::endl;
 		oss << "absDelta: " << absDelta << std::endl;
-		oss << "relT0: " << relT0 << std::endl;
-		oss << "relT1: " << relT1 << std::endl;
+		oss << "   relT0: " << relT0 << std::endl;
+		oss << "   relT1: " << relT1 << std::endl;
 		oss << "relDelta: " << relDelta << std::endl;
-		oss << "microDif: " << microDif << std::endl;
-		oss << "microTol: " << microTol << std::endl;
+		oss << "     dif: " << dif << std::endl;
+		oss << "     tol: " << tol << std::endl;
 	}
 
 	return oss.str();

@@ -36,7 +36,6 @@
 #include "libdat/info.h"
 #include "libdat/validity.h"
 #include "libio/stream.h"
-#include "libmath/math.h"
 
 #include <iostream>
 #include <sstream>
@@ -81,7 +80,7 @@ dat_array_test1
 	Type const aMag{ dat::magnitude(aVec) };
 	Type const bMag{ dat::magnitude(bVec) };
 	Type const cMag{ dat::magnitude(cVec) };
-	Type const magErr{ math::sq(cMag) - math::sq(aMag) - math::sq(bMag) };
+	Type const magErr{ (cMag*cMag) - (aMag*aMag) - (bMag*bMag) };
 	// test not really important here, just to avoid compiler warnings
 	if (! (magErr < std::numeric_limits<Type>::epsilon()))
 	{

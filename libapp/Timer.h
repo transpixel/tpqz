@@ -34,7 +34,6 @@
 */
 
 
-#include "libdat/dat.h"
 #include "libsys/time.h"
 
 #include <string>

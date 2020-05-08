@@ -48,7 +48,7 @@ double
 VertGangle :: ratioMag
 	() const
 {
-	return { theGangle.theS.theValue };
+	return theGangle.theS.theValue;
 }
 
 inline
@@ -56,7 +56,7 @@ double
 VertGangle :: angleMag
 	() const
 {
-	return { ga::magnitude(theGangle.theB) };
+	return ga::magnitude(theGangle.theB);
 }
 
 } // geo

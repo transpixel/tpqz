@@ -63,9 +63,7 @@ PinHole :: nearlyEquals
 	, double const & tol
 	) const
 {
-	return
-		{  dat::nearlyEquals(thePD, other.thePD, tol)
-		};
+	return dat::nearlyEquals(thePD, other.thePD, tol);
 }
 
 std::string

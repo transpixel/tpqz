@@ -48,7 +48,7 @@
 #include "libprob/CdfForward.h"
 #include "libprob/Frac9.h"
 
-#include "libapp/Timer.h"
+#include "libsys/Timer.h"
 
 #include <bitset>
 
@@ -152,7 +152,7 @@ main
 	std::string const pathOutFlt{ "fGrid.pgm" };
 	std::string const pathOutGray{ "gGrid.pgm" };
 
-	app::Timer timer;
+	sys::Timer timer;
 
 	// load file (active) data into memory
 	timer.start("load.quads");

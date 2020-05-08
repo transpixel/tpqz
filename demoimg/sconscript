@@ -47,6 +47,7 @@ libpaths = \
  , '../libmath/'
  , '../libdat/'
  , '../libapp/'
+ , '../libsys/'
 
  , '../extstb/'
  ]
@@ -58,6 +59,7 @@ linklibs = \
  , 'math'
  , 'dat'
  , 'app'
+ , 'sys'
 
  , 'stb'
  ]

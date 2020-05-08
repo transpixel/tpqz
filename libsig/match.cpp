@@ -34,7 +34,6 @@
 
 #include "libsig/match.h"
 
-#include "libapp/Timer.h" // TODO ?
 #include "libdat/iter.h"
 #include "libdat/layout.h"
 #include "libdat/RowCol.h"
@@ -43,6 +42,7 @@
 #include "libimg/geo.h"
 #include "libsig/filter.h"
 #include "libsys/job.h"
+#include "libsys/Timer.h"
 
 #include <algorithm>
 #include <cassert>
@@ -293,7 +293,7 @@ spotPairAB
 	std::pair<dat::Spot, dat::Spot> spotPair
 		{ dat::nullValue<dat::Spot>(), dat::nullValue<dat::Spot>() };
 
-	app::Timer timer;
+	sys::Timer timer;
 	// create a metric response grid
 	timer.start("match..scoringGridFor");
 	dat::Extents const moveSize{ fcon.targetMoveSize() };

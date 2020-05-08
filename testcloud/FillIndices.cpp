@@ -37,9 +37,9 @@
 #include "libdat/info.h"
 #include "libio/stream.h"
 
-#include "libapp/Timer.h"
 #include "libcloud/cloud.h"
 #include "libimg/dilate.h"
+#include "libsys/Timer.h"
 
 #include "libdat/io.h"
 #include "libimg/io.h"
@@ -149,7 +149,7 @@ main
 	if (okayLoad)
 	{
 		// fill indices
-		app::Timer timer;
+		sys::Timer timer;
 		dat::grid<PixVal> const fullGrid{ img::dilate::floodFilled(origGrid) };
 		timer.stop();
 

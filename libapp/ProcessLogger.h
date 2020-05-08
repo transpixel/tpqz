@@ -35,7 +35,7 @@
 
 
 #include "libmem/query.h"
-#include "libapp/Timer.h"
+#include "libsys/Timer.h"
 
 #include <memory>
 #include <string>
@@ -49,7 +49,7 @@ namespace app
 class ProcessLogger
 {
 
-	app::Timer theTimer;
+	sys::Timer theTimer;
 	std::ostringstream theOssMem;
 	mem::query::Reporter theMemReporter;
 

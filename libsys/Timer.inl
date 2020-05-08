@@ -28,14 +28,14 @@
 
 
 /*! \file
-\brief Inline definitions for app::Timer
+\brief Inline definitions for sys::Timer
 */
 
 
 #include <cassert>
 
 
-namespace app
+namespace sys
 {
 //======================================================================
 

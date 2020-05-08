@@ -77,9 +77,6 @@ env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
 
-env.Program('ConvertToAscii.cpp')
-env.Program('FillIndices.cpp')
-env.Program('ThinCloud.cpp')
 env.Program('uFixedPoint.cpp')
 env.Program('uio.cpp')
 

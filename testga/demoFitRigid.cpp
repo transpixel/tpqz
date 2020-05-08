@@ -287,7 +287,7 @@ namespace
 			{
 				io::out() << "eval: " << eval;
 				io::out() << "   evec: ";
-				for (size_t jj{0u} ; jj < (size_t)eA.cols() ; ++jj)
+				for (size_t jj{0u} ; jj < static_cast<size_t>(eA.cols()) ; ++jj)
 				{
 					std::complex<double> const & foo
 						= solver.eigenvectors()(jj,kk);

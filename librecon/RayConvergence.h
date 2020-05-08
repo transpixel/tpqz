@@ -78,7 +78,7 @@ public: // methods
 	//! Robustly estimated intersection point
 	ga::Vector
 	robustPoint
-		( double const minAngle = { 1./8. }
+		( double const minAngle = 1./8.
 		, std::vector<double> * const & ptGapMags = nullptr
 		) const;
 

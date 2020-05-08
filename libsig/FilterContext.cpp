@@ -152,12 +152,12 @@ FilterContext :: commonCropIn1
 
 		// ensure positive values
 		dat::RowCol const bothUL
-			{{ (size_t)(std::max(0., ulBothInRef[0]))
-			 , (size_t)(std::max(0., ulBothInRef[1]))
+			{{ static_cast<size_t>(std::max(0., ulBothInRef[0]))
+			 , static_cast<size_t>(std::max(0., ulBothInRef[1]))
 			}};
 		dat::Extents const bothSize
-			( (size_t)(std::max(0., brBothInRef[0] - ulBothInRef[0]))
-			, (size_t)(std::max(0., brBothInRef[1] - ulBothInRef[1]))
+			( static_cast<size_t>(std::max(0., brBothInRef[0] - ulBothInRef[0]))
+			, static_cast<size_t>(std::max(0., brBothInRef[1] - ulBothInRef[1]))
 			);
 
 		bothInRef = dat::SubExtents(bothUL, bothSize);

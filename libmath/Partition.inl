@@ -131,8 +131,8 @@ Partition :: rangeForBin
 	if (ndx < theNumParts)
 	{
 		// here 'interp' is exact
-		double const valLo(interpValueFor((double)ndx));
-		double const valHi(valLo + theDelta);
+		double const valLo{ interpValueFor(static_cast<double>(ndx)) };
+		double const valHi{ valLo + theDelta };
 		rng = dat::Range<double>(valLo, valHi);
 	}
 	return rng;
@@ -149,9 +149,9 @@ Partition :: binIndexFor
 	{
 		if (theMin < value)
 		{
-			double const offset(value - theMin);
-			double const intervals(offset / theDelta);
-			size_t const binNdx((size_t)std::floor(intervals));
+			double const offset{ value - theMin };
+			double const intervals{ offset / theDelta };
+			size_t const binNdx{ static_cast<size_t>(std::floor(intervals)) };
 			if (binNdx < theNumParts)
 			{
 				ndx = binNdx;
@@ -188,7 +188,7 @@ Partition :: interpIndexFor
 		std::pair<double, double> const bMinMax(rangeForBin(ndx));
 		double const frac
 			(math::interp::fractionAtValid(value, bMinMax));
-		fndx = (double)ndx + frac;
+		fndx = static_cast<double>(ndx) + frac;
 	}
 	return fndx;
 }

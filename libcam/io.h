@@ -76,7 +76,7 @@ namespace io
 	MeaGroupOneAcq
 	loadFromAsciiTrifecta
 		( std::istream & istrm
-		, std::set<PntName> * const ptNames = { nullptr }
+		, std::set<PntName> * const ptNames = nullptr
 		);
 
 	//! Insert mea into table col(acqNdx), using map for pntNdx lookup

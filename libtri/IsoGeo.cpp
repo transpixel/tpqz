@@ -111,9 +111,9 @@ IsoGeo :: isValid
 	() const
 {
 	return
-		{  dat::isValid(theBarU)
+		(  dat::isValid(theBarU)
 		&& dat::isValid(theBarV)
-		};
+		);
 }
 
 dat::Area<double>

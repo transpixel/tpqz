@@ -108,23 +108,29 @@ namespace
 			img::FPix const gotXYZ(img::color::toXYZfromLRGB8(expLRGB));
 
 			// track minimum/max values
-			theMinXYZ[0] = std::min(theMinXYZ[0], (double)gotXYZ[0]);
-			theMinXYZ[1] = std::min(theMinXYZ[1], (double)gotXYZ[1]);
-			theMinXYZ[2] = std::min(theMinXYZ[2], (double)gotXYZ[2]);
+			theMinXYZ[0]
+				= std::min(theMinXYZ[0], static_cast<double>(gotXYZ[0]));
+			theMinXYZ[1]
+				= std::min(theMinXYZ[1], static_cast<double>(gotXYZ[1]));
+			theMinXYZ[2]
+				= std::min(theMinXYZ[2], static_cast<double>(gotXYZ[2]));
 
-			theMaxXYZ[0] = std::max(theMaxXYZ[0], (double)gotXYZ[0]);
-			theMaxXYZ[1] = std::max(theMaxXYZ[1], (double)gotXYZ[1]);
-			theMaxXYZ[2] = std::max(theMaxXYZ[2], (double)gotXYZ[2]);
+			theMaxXYZ[0]
+				= std::max(theMaxXYZ[0], static_cast<double>(gotXYZ[0]));
+			theMaxXYZ[1]
+				= std::max(theMaxXYZ[1], static_cast<double>(gotXYZ[1]));
+			theMaxXYZ[2]
+				= std::max(theMaxXYZ[2], static_cast<double>(gotXYZ[2]));
 
 			// enforce basic requirements
 			if (sEnforceLimits)
 			{
-				assert(0.f <= (float)gotXYZ[0]);
-				assert((float)gotXYZ[0] <= sFuzzyOne);
-				assert(0.f <= (float)gotXYZ[1]);
-				assert((float)gotXYZ[1] <= sFuzzyOne);
-				assert(0.f <= (float)gotXYZ[2]);
-				assert((float)gotXYZ[2] <= sFuzzyOne);
+				assert(0.f <= static_cast<float>(gotXYZ[0]));
+				assert(static_cast<float>(gotXYZ[0]) <= sFuzzyOne);
+				assert(0.f <= static_cast<float>(gotXYZ[1]));
+				assert(static_cast<float>(gotXYZ[1]) <= sFuzzyOne);
+				assert(0.f <= static_cast<float>(gotXYZ[2]));
+				assert(static_cast<float>(gotXYZ[2]) <= sFuzzyOne);
 			}
 
 			//
@@ -135,23 +141,29 @@ namespace
 				img::FPix const gotYxy(img::color::toYxyFromXYZ(gotXYZ));
 
 				// track minimum/max values
-				theMinYxy[0] = std::min(theMinYxy[0], (double)gotYxy[0]);
-				theMinYxy[1] = std::min(theMinYxy[1], (double)gotYxy[1]);
-				theMinYxy[2] = std::min(theMinYxy[2], (double)gotYxy[2]);
+				theMinYxy[0]
+					= std::min(theMinYxy[0], static_cast<double>(gotYxy[0]));
+				theMinYxy[1]
+					= std::min(theMinYxy[1], static_cast<double>(gotYxy[1]));
+				theMinYxy[2]
+					= std::min(theMinYxy[2], static_cast<double>(gotYxy[2]));
 
-				theMaxYxy[0] = std::max(theMaxYxy[0], (double)gotYxy[0]);
-				theMaxYxy[1] = std::max(theMaxYxy[1], (double)gotYxy[1]);
-				theMaxYxy[2] = std::max(theMaxYxy[2], (double)gotYxy[2]);
+				theMaxYxy[0]
+					= std::max(theMaxYxy[0], static_cast<double>(gotYxy[0]));
+				theMaxYxy[1]
+					= std::max(theMaxYxy[1], static_cast<double>(gotYxy[1]));
+				theMaxYxy[2]
+					= std::max(theMaxYxy[2], static_cast<double>(gotYxy[2]));
 
 				// enforce basic requirements
 				if (sEnforceLimits)
 				{
-					assert(0.f <= (float)gotYxy[0]);
-					assert((float)gotYxy[0] <= sFuzzyOne);
-					assert(0.f <= (float)gotYxy[1]);
-					assert((float)gotYxy[1] <= .74f);
-					assert(0.f <= (float)gotYxy[2]);
-					assert((float)gotYxy[2] <= .72f);
+					assert(0.f <= static_cast<float>(gotYxy[0]));
+					assert(static_cast<float>(gotYxy[0]) <= sFuzzyOne);
+					assert(0.f <= static_cast<float>(gotYxy[1]));
+					assert(static_cast<float>(gotYxy[1]) <= .74f);
+					assert(0.f <= static_cast<float>(gotYxy[2]));
+					assert(static_cast<float>(gotYxy[2]) <= .72f);
 				}
 
 				// inverse conversions
@@ -160,9 +172,18 @@ namespace
 					(img::color::toLRGB8fromYxy(gotYxy, & okay));
 
 				// check differences
-				double const dr((double)gotLRGB[0] - (double)expLRGB[0]);
-				double const dg((double)gotLRGB[1] - (double)expLRGB[1]);
-				double const db((double)gotLRGB[2] - (double)expLRGB[2]);
+				double const dr
+					{ static_cast<double>(gotLRGB[0])
+					- static_cast<double>(expLRGB[0])
+					};
+				double const dg
+					{ static_cast<double>(gotLRGB[1])
+					- static_cast<double>(expLRGB[1])
+					};
+				double const db
+					{ static_cast<double>(gotLRGB[2])
+					- static_cast<double>(expLRGB[2])
+					};
 
 				// track roundtrip differences
 				theMaxErrYxy[0] = std::max(theMaxErrYxy[0], std::abs(dr));
@@ -178,22 +199,28 @@ namespace
 				img::FPix const gotLab(img::color::toLabFromXYZ(gotXYZ));
 
 				// track minimum/max values
-				theMinLab[0] = std::min(theMinLab[0], (double)gotLab[0]);
-				theMinLab[1] = std::min(theMinLab[1], (double)gotLab[1]);
-				theMinLab[2] = std::min(theMinLab[2], (double)gotLab[2]);
+				theMinLab[0] = std::min
+					(theMinLab[0], static_cast<double>(gotLab[0]));
+				theMinLab[1] = std::min
+					(theMinLab[1], static_cast<double>(gotLab[1]));
+				theMinLab[2] = std::min
+					(theMinLab[2], static_cast<double>(gotLab[2]));
 
-				theMaxLab[0] = std::max(theMaxLab[0], (double)gotLab[0]);
-				theMaxLab[1] = std::max(theMaxLab[1], (double)gotLab[1]);
-				theMaxLab[2] = std::max(theMaxLab[2], (double)gotLab[2]);
+				theMaxLab[0] = std::max
+					(theMaxLab[0], static_cast<double>(gotLab[0]));
+				theMaxLab[1] = std::max
+					(theMaxLab[1], static_cast<double>(gotLab[1]));
+				theMaxLab[2] = std::max
+					(theMaxLab[2], static_cast<double>(gotLab[2]));
 
 				if (sEnforceLimits)
 				{
-					assert(0.f <= (float)gotLab[0]);
-					assert((float)gotLab[0] <= sFuzzyOne);
-					assert(-1.5f <= (float)gotLab[1]);
-					assert((float)gotLab[1] <= 2.0f);
-					assert(-1.5f <= (float)gotLab[2]);
-					assert((float)gotLab[2] <= 1.9f);
+					assert(0.f <= static_cast<float>(gotLab[0]));
+					assert(static_cast<float>(gotLab[0]) <= sFuzzyOne);
+					assert(-1.5f <= static_cast<float>(gotLab[1]));
+					assert(static_cast<float>(gotLab[1]) <= 2.0f);
+					assert(-1.5f <= static_cast<float>(gotLab[2]));
+					assert(static_cast<float>(gotLab[2]) <= 1.9f);
 				}
 
 				// inverse conversions
@@ -207,9 +234,18 @@ namespace
 					(img::color::toLRGB8fromXYZ(rtnXYZ, & ok2));
 
 				// check differences
-				double const dr((double)gotLRGB[0] - (double)expLRGB[0]);
-				double const dg((double)gotLRGB[1] - (double)expLRGB[1]);
-				double const db((double)gotLRGB[2] - (double)expLRGB[2]);
+				double const dr
+					{ static_cast<double>(gotLRGB[0])
+					- static_cast<double>(expLRGB[0])
+					};
+				double const dg
+					{ static_cast<double>(gotLRGB[1])
+					- static_cast<double>(expLRGB[1])
+					};
+				double const db
+					{ static_cast<double>(gotLRGB[2])
+					- static_cast<double>(expLRGB[2])
+					};
 
 				// track roundtrip differences
 				theMaxErrLab[0] = std::max(theMaxErrLab[0], std::abs(dr));
@@ -229,13 +265,19 @@ namespace
 				assert(okay);
 
 				// track minimum/max values
-				theMinSRGB[0] = std::min(theMinSRGB[0], (double)gotSRGB[0]);
-				theMinSRGB[1] = std::min(theMinSRGB[1], (double)gotSRGB[1]);
-				theMinSRGB[2] = std::min(theMinSRGB[2], (double)gotSRGB[2]);
+				theMinSRGB[0] = std::min
+					(theMinSRGB[0], static_cast<double>(gotSRGB[0]));
+				theMinSRGB[1] = std::min
+					(theMinSRGB[1], static_cast<double>(gotSRGB[1]));
+				theMinSRGB[2] = std::min
+					(theMinSRGB[2], static_cast<double>(gotSRGB[2]));
 
-				theMaxSRGB[0] = std::max(theMaxSRGB[0], (double)gotSRGB[0]);
-				theMaxSRGB[1] = std::max(theMaxSRGB[1], (double)gotSRGB[1]);
-				theMaxSRGB[2] = std::max(theMaxSRGB[2], (double)gotSRGB[2]);
+				theMaxSRGB[0] = std::max
+					(theMaxSRGB[0], static_cast<double>(gotSRGB[0]));
+				theMaxSRGB[1] = std::max
+					(theMaxSRGB[1], static_cast<double>(gotSRGB[1]));
+				theMaxSRGB[2] = std::max
+					(theMaxSRGB[2], static_cast<double>(gotSRGB[2]));
 
 				/* -- pointless since everything is in 8-bit range
 				if (sEnforceLimits)
@@ -400,12 +442,12 @@ namespace
 		for (size_t nn(0u) ; nn < 256u ; ++nn)
 		{
 			// create oscillating function
-			double const xx((double)nn);
+			double const xx(static_cast<double>(nn));
 			double const cxx(std::cos(xx*freq));
 			double const func(.5*(1. - cxx));
 			// convert to spacing increments
 			double const delta(std::abs(mag * func));
-			size_t const inc((size_t)std::floor(delta) + 1u);
+			size_t const inc(static_cast<size_t>(std::floor(delta)) + 1u);
 			// record increments for return
 			dvals.push_back(inc);
 		}
@@ -429,10 +471,10 @@ namespace
 		ivals.push_back(0u);
 		for (size_t nn(0u) ; nn < 255u ; ++nn)
 		{
-			size_t const ndx((size_t)ivals.back());
+			size_t const ndx{ static_cast<size_t>(ivals.back()) };
 			if (ndx < nn)
 			{
-				size_t const delta((size_t)(dvals[ndx]));
+				size_t const delta{ static_cast<size_t>(dvals[ndx]) };
 				ivals.push_back(ndx + delta);
 			}
 		}
@@ -474,7 +516,10 @@ namespace
 				for (uint8_t const & blu : ivals)
 				{
 					img::UPix8 const rgb
-						((uint8_t)red, (uint8_t)grn, (uint8_t)blu);
+						{ static_cast<uint8_t>(red)
+						, static_cast<uint8_t>(grn)
+						, static_cast<uint8_t>(blu)
+						};
 					rgbs.push_back(rgb);
 				}
 			}
@@ -602,7 +647,7 @@ img_color_test3
 	double const afterRgbTime(sys::time::relativeNow() - afterLabTime);
 
 	// report results
-	double const numPix((double)pRgbIns.size());
+	double const numPix(static_cast<double>(pRgbIns.size()));
 	io::out() << std::endl;
 	io::out()
 		<< std::fixed << std::setprecision(9)
@@ -632,10 +677,10 @@ img_color_test4
 	for (img::UPix8 const & pRgb : pRgbs)
 	{
 		img::FPix const pLab(img::color::toLabFromLRGB8(pRgb));
-		float const expL((float)pLab[0]);
+		float const expL{ static_cast<float>(pLab[0]) };
 		float const gotL(img::color::toLfromLRGB8(pRgb));
 		static float const tol
-			((float)std::numeric_limits<img::fpix_t>::epsilon());
+			{ static_cast<float>(std::numeric_limits<img::fpix_t>::epsilon()) };
 		float const absDiff(std::abs(gotL - expL));
 		if (tol < expL)
 		{
@@ -663,7 +708,7 @@ img_color_test4
 			sumL += img::color::toLfromLRGB8(*itRgb++);
 		}
 		double const xformTime(sys::time::relativeNow() - startTime);
-		double const numPix((double)pRgbs.size());
+		double const numPix(static_cast<double>(pRgbs.size()));
 		io::out() << "maxAbsFracDiff: " << maxAbsFracDiff << std::endl;
 		io::out() << " toLabXformTime: " << xformTime << std::endl;
 		io::out() << "toLabXformTime@: " << xformTime/numPix << std::endl;

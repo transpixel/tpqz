@@ -113,7 +113,8 @@ img_sample_test1
 	{
 		for (size_t col(0u) ; col < values.wide() ; ++col)
 		{
-			values(row, col) = {{ (double)row, (double)col }};
+			values(row, col)
+				= {{ static_cast<double>(row), static_cast<double>(col) }};
 		}
 	}
 	// note locations not included in test data

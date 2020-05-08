@@ -191,8 +191,10 @@ activeCrop
 		// adjusted the start area to allow for filter size
 		dat::RowCol const & overUL = overCrop.theUL;
 		dat::RowCol const rcUL
-			{{ (size_t)std::ceil(double(overUL[0]) + halfHigh)
-			 , (size_t)std::ceil(double(overUL[0]) + halfWide)
+			{{ static_cast<size_t>
+				 (std::ceil(static_cast<double>(overUL[0]) + halfHigh))
+			 , static_cast<size_t>
+				 (std::ceil(static_cast<double>(overUL[0]) + halfWide))
 			}};
 
 		// adjust the active size to allow for filter size
@@ -365,7 +367,8 @@ spotPairsFor
 		ItFCon const & fconEnd = fconGroup.second;
 
 		// allocate space for results - to match input size
-		size_t const sampSize{ (size_t)std::distance(fconBeg, fconEnd) };
+		size_t const sampSize
+			{ static_cast<size_t>(std::distance(fconBeg, fconEnd)) };
 		jobResults.emplace_back(std::make_shared<JobResult>(sampSize));
 
 		// setup match job

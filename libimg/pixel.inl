@@ -107,9 +107,9 @@ img::UPix8 :: infoString
 	}
 	using std::setw;
 	oss
-		<< " " << setw(4) << (int)theChans[0]
-		<< " " << setw(4) << (int)theChans[1]
-		<< " " << setw(4) << (int)theChans[2]
+		<< " " << setw(4) << static_cast<int>(theChans[0])
+		<< " " << setw(4) << static_cast<int>(theChans[1])
+		<< " " << setw(4) << static_cast<int>(theChans[2])
 		;
 	return oss.str();
 }
@@ -132,7 +132,11 @@ img::FPix :: FPix
 	, float const & chan1
 	, float const & chan2
 	)
-	: theChans{{ (fpix_t)chan0, (fpix_t)chan1, (fpix_t)chan2 }}
+	: theChans
+		{{ static_cast<fpix_t>(chan0)
+		 , static_cast<fpix_t>(chan1)
+		 , static_cast<fpix_t>(chan2)
+		}}
 { }
 
 inline
@@ -190,9 +194,12 @@ img::FPix :: infoString
 	using std::setprecision;
 	oss
 		<< std::showpoint
-		<< " " << setw(fpre+3u) << setprecision(fpre) << (float)theChans[0]
-		<< " " << setw(fpre+3u) << setprecision(fpre) << (float)theChans[1]
-		<< " " << setw(fpre+3u) << setprecision(fpre) << (float)theChans[2]
+		<< " " << setw(fpre+3u) << setprecision(fpre)
+			<< static_cast<float>(theChans[0])
+		<< " " << setw(fpre+3u) << setprecision(fpre)
+			<< static_cast<float>(theChans[1])
+		<< " " << setw(fpre+3u) << setprecision(fpre)
+			<< static_cast<float>(theChans[2])
 		;
 	return oss.str();
 }

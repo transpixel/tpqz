@@ -41,9 +41,9 @@ FaceVerts::Vertex :: isValid
 	() const
 {
 	return
-		{  dat::isValid(theNdxIJ)
+		(  dat::isValid(theNdxIJ)
 		&& dat::isValid(theW)
-		};
+		);
 }
 
 
@@ -58,10 +58,10 @@ FaceVerts :: isValid
 	() const
 {
 	return
-		{  theVerts[0].isValid()
+		(  theVerts[0].isValid()
 		&& theVerts[1].isValid()
 		&& theVerts[2].isValid()
-		};
+		);
 }
 
 template <typename PropSampFunc>

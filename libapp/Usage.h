@@ -78,7 +78,7 @@ public: // methods
 	addArg
 		( std::string const & name
 		, std::string const & desc
-		, ValidFunc const & func=0
+		, ValidFunc const & func = { nullptr }
 		);
 
 	//! Add an optional argument -- must be at end.
@@ -86,7 +86,7 @@ public: // methods
 	addArgOpt
 		( std::string const & name
 		, std::string const & desc
-		, ValidFunc const & func=0
+		, ValidFunc const & func = { nullptr }
 		);
 
 	//! Set summary
@@ -119,7 +119,7 @@ public: // methods
 	//! Descriptive information about this instance.
 	std::string
 	infoString
-		( std::string const & title="<program>"
+		( std::string const & title = { "<program>" }
 		) const;
 
 private: // data

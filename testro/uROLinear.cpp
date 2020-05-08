@@ -491,7 +491,7 @@ roPairPerturbations
 		double const magTheta{ ga::magnitude(thetaAt - thetaNom) };
 		double const xx{ math::hypot(magPhi, magTheta) };
 		constexpr double tol0{ 0. }; // perhaps eps?
-		return { tol0 + .35*math::sq(xx) };
+		return (tol0 + .35*math::sq(xx));
 	}
 
 	//! Estimate RO misclosure value using linear expansion

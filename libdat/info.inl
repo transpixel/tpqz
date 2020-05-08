@@ -112,7 +112,7 @@ infoString
 	priv::configStream(oss, fieldsPrecision);
 	putTitle(oss, title);
 
-	oss << std::setw(fieldsWide) << (long double)value;
+	oss << std::setw(fieldsWide) << static_cast<long double>(value);
 
 	return oss.str();
 }
@@ -129,7 +129,7 @@ infoString
 	std::ostringstream oss;
 	putTitle(oss, title);
 
-	oss << std::setw(fieldsWide) << (long long)arg;
+	oss << std::setw(fieldsWide) << static_cast<long long>(arg);
 
 	return oss.str();
 }
@@ -161,7 +161,7 @@ infoString
 	std::ostringstream oss;
 	putTitle(oss, title);
 
-	oss << std::setw(fieldsWide) << (void*)ptValue;
+	oss << std::setw(fieldsWide) << static_cast<void*>(ptValue);
 
 	return oss.str();
 }
@@ -217,7 +217,7 @@ infoString
 	)
 {
 	std::ostringstream oss;
-	size_t const twide(std::max((size_t)15u, title.size()));
+	size_t const twide(std::max(static_cast<size_t>(15u), title.size()));
 	putTitle(oss, title, twide);
 
 	size_t const fwide(1u + nbefore + 1u + nafter);

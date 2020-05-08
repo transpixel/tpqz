@@ -785,7 +785,7 @@ operator*
 	ImSpinor const i4(spin.theB * ispin.theV);
 	using dat::operator+;
 	ImSpinor const tmp(Vector{v1 + v2}, TriVector{t3});
-	return ImSpinor(tmp + i4);
+	return { tmp + i4 };
 }
 
 //
@@ -856,7 +856,7 @@ operator*
 	ImSpinor const i4(ispin.theV * spin.theB);
 	using dat::operator+;
 	ImSpinor const tmp(Vector{v1 + v2}, TriVector{t3});
-	return ImSpinor(tmp + i4);
+	return { tmp + i4 };
 }
 
 inline

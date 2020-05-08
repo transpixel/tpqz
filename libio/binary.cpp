@@ -63,7 +63,8 @@ prepareStream
 	if (ifs.good())
 	{
 		// determine number of records
-		std::streamsize const allBytes{ (std::streamsize)ifs.tellg() };
+		std::streamsize const allBytes
+			{ static_cast<std::streamsize>(ifs.tellg()) };
 		std::streamsize const numRecs{ allBytes / bytesPerRec };
 		std::streamsize const expBytes{ numRecs * bytesPerRec };
 		if (allBytes == expBytes)

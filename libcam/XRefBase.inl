@@ -93,7 +93,7 @@ inline
 XRefBase<DatType>::const_iterator :: operator bool
 	() const
 {
-	return (bool)theIterRC;
+	return static_cast<bool>(theIterRC);
 }
 
 template <typename DatType>

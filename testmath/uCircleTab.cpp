@@ -202,7 +202,7 @@ math_CircleTab_test2
 	math::CircleTab<CNum> const fan(avPairs, numNodes);
 
 	// evaluate interpolated angle values
-	double const da(twoPi / (double)numNodes);
+	double const da(twoPi / static_cast<double>(numNodes));
 	for (double aa(-pi) ; aa <= pi ; aa += da)
 	{
 		CNum const expValue(valueFor(aa));

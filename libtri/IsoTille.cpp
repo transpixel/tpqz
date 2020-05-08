@@ -74,9 +74,7 @@ bool
 IsoTille :: isValid
 	() const
 {
-	return
-		{  dat::isValid(theTileGeo)
-		};
+	return dat::isValid(theTileGeo);
 }
 
 NodeIterator

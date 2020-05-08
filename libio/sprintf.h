@@ -52,7 +52,8 @@ namespace io
 		, unsigned char const & val
 		)
 	{
-		return io::sprintf<unsigned short>(fmt, (unsigned short)val);
+		return io::sprintf<unsigned short>
+			(fmt, static_cast<unsigned short>(val));
 	}
 
 	//! repeat functionality

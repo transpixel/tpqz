@@ -66,7 +66,7 @@ dot
 		( std::inner_product
 			( v1.theValues.begin(), v1.theValues.end()
 			, v2.theValues.begin()
-			, double(0.)
+			, 0.
 			)
 		);
 }
@@ -82,7 +82,7 @@ dot
 		( -std::inner_product
 			( b1.theValues.begin(), b1.theValues.end()
 			, b2.theValues.begin()
-			, double(0.)
+			, 0.
 			)
 		);
 }
@@ -209,7 +209,7 @@ rejectionFrom
 		( std::inner_product
 			( vec.theValues.begin(), vec.theValues.end()
 			, somePlane.theValues.begin()
-			, double(0.)
+			, 0.
 			)
 		);
 }

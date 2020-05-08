@@ -180,7 +180,10 @@ loadFromPgm8
 
 				// read data
 				size_t const expBytes(image8.byteSize());
-				ifs.read((char * const)image8.begin(), expBytes);
+				ifs.read
+					( reinterpret_cast<char * const>(image8.begin())
+					, expBytes
+					);
 
 				// if not enough to complete the image...
 				size_t const gotBytes(ifs.gcount());
@@ -344,8 +347,8 @@ loadFromFloat
 		FloatHeader header;
 		// read header
 		size_t const expNumHdr(headerSize());
-		ifs.read(header.theHeader, (long)expNumHdr);
-		size_t const gotNumHdr((size_t)ifs.gcount());
+		ifs.read(header.theHeader, static_cast<long>(expNumHdr));
+		size_t const gotNumHdr(static_cast<size_t>(ifs.gcount()));
 		if (gotNumHdr == expNumHdr)
 		{
 			// allocate image storage
@@ -353,8 +356,11 @@ loadFromFloat
 				(header.theFormat.theHigh, header.theFormat.theWide);
 			// read image
 			size_t const expNumImg(imageSize(header));
-			ifs.read((char*)grid.begin(), (long)expNumImg);
-			size_t const gotNumImg((size_t)ifs.gcount());
+			ifs.read
+				( reinterpret_cast<char * const>(grid.begin())
+				, static_cast<long>(expNumImg)
+				);
+			size_t const gotNumImg(static_cast<size_t>(ifs.gcount()));
 			if (! (gotNumImg == expNumImg))
 			{
 				// else return null
@@ -385,7 +391,10 @@ loadFourPixGrid
 
 		// fetch and verify header
 		img::raw10::HeadBRCM hdr{};
-		ifs.read((char * const)hdr.theHdr.begin(), hdr.theSize);
+		ifs.read
+			( reinterpret_cast<char * const>(hdr.theHdr.begin())
+			, hdr.theSize
+			);
 		if (hdr.isValid())
 		{
 			// load line by line
@@ -394,16 +403,22 @@ loadFourPixGrid
 			{
 				// load active portion of file row
 				size_t const expBytes{ raspiSizes.expRowQuadBytes() };
-				ifs.read((char * const)grid.beginRow(row), expBytes);
-				size_t const gotBytes{ (size_t)ifs.gcount() };
+				ifs.read
+					( reinterpret_cast<char * const>(grid.beginRow(row))
+					, expBytes
+					);
+				size_t const gotBytes{ static_cast<size_t>(ifs.gcount()) };
 				bool const okayData{ (gotBytes == expBytes) };
 
 				// skip unused portion of row
 				bool okayJunk{ false };
 				if (! junkBuf.empty())
 				{
-					ifs.read((char * const)junkBuf.data(), junkBuf.size());
-					size_t const gotJunk{ (size_t)ifs.gcount() };
+					ifs.read
+						( reinterpret_cast<char * const>(junkBuf.data())
+						, junkBuf.size()
+						);
+					size_t const gotJunk{ static_cast<size_t>(ifs.gcount()) };
 					okayJunk = (gotJunk == junkBuf.size());
 				}
 
@@ -437,7 +452,10 @@ saveToFloat
 		// write header
 		ofs.write(header.theHeader, sizeof(FloatHeader));
 		// write image
-		ofs.write((char*)grid.begin(), imageSize(header));
+		ofs.write
+			( reinterpret_cast<char const * const>(grid.begin())
+			, imageSize(header)
+			);
 		// check status
 		okay = (! ofs.fail());
 	}
@@ -509,7 +527,7 @@ savePgm
 			oss << "P5" << '\n'
 				<< inSize.wide() << '\n' // col, row order for PGM
 				<< inSize.high() << '\n'
-				<< (int)std::numeric_limits<uint8_t>::max() << '\n'
+				<< static_cast<int>(std::numeric_limits<uint8_t>::max()) << '\n'
 				;
 			std::string const header(oss.str());
 			ofs.write(header.data(), header.size());
@@ -517,7 +535,10 @@ savePgm
 			// write data - for 8-bit, endian-ness doesn't matter
 			size_t const numBytes(grid.byteSize());
 			size_t const pos1(ofs.tellp());
-			ofs.write((char const * const)grid.begin(), numBytes);
+			ofs.write
+				( reinterpret_cast<char const * const>(grid.begin())
+				, numBytes
+				);
 			size_t const pos2(ofs.tellp());
 			size_t const gotBytes(pos2 - pos1);
 			okay = ((! ofs.fail()) && (gotBytes == numBytes));
@@ -546,7 +567,7 @@ savePpm
 	oss << "P6" << '\n'
 		<< inSize.wide() << '\n' // col, row order for PPM
 		<< inSize.high() << '\n'
-		<< (int)std::numeric_limits<uint8_t>::max() << '\n'
+		<< static_cast<int>(std::numeric_limits<uint8_t>::max()) << '\n'
 		;
 	std::string const header(oss.str());
 	ofs.write(header.data(), header.size());
@@ -558,7 +579,10 @@ savePpm
 	// write data - for 8-bit, endian-ness doesn't matter
 	size_t const numBytes(gridOfRgb.byteSize());
 	size_t const pos1(ofs.tellp());
-	ofs.write((char const * const)gridOfRgb.begin(), numBytes);
+	ofs.write
+		( reinterpret_cast<char const * const>(gridOfRgb.begin())
+		, numBytes
+		);
 	size_t const pos2(ofs.tellp());
 	size_t const gotBytes(pos2 - pos1);
 	okay = ((! ofs.fail()) && (gotBytes == numBytes));
@@ -598,9 +622,10 @@ saveJpg
 	if ((! fpath.empty()) && rgbGrid.isValid())
 	{
 		constexpr std::pair<size_t, size_t> const pctRange{ 0u, 100u };
-		int const useQual{ (int)dat::clamped(qualPercent, pctRange) };
-		int const high{ (int)rgbGrid.high() };
-		int const wide{ (int)rgbGrid.wide() };
+		int const useQual
+			{ static_cast<int>(dat::clamped(qualPercent, pctRange)) };
+		int const high{ static_cast<int>(rgbGrid.high()) };
+		int const wide{ static_cast<int>(rgbGrid.wide()) };
 		{ // guarded
 			std::lock_guard<std::mutex> lock(stb::gStbMutex);
 			constexpr int deep{ 3 };

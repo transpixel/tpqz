@@ -88,10 +88,14 @@ tri_NodeIterator_test1
 	std::set<tri::NodeKey> expMuNus;
 	{
 		dat::Area<double> const mnRange{ trigeo.tileAreaForDomain(xyDomain) };
-		long const muBeg{ (long)std::floor(mnRange[0].min() / da) };
-		long const muEnd{ (long)std::ceil(mnRange[0].max() / da) };
-		long const nuBeg{ (long)std::floor(mnRange[1].min() / db) };
-		long const nuEnd{ (long)std::ceil(mnRange[1].max() / db) };
+		long const muBeg
+			{ static_cast<long>(std::floor(mnRange[0].min() / da)) };
+		long const muEnd
+			{ static_cast<long>(std::ceil(mnRange[0].max() / da)) };
+		long const nuBeg
+			{ static_cast<long>(std::floor(mnRange[1].min() / db)) };
+		long const nuEnd
+			{ static_cast<long>(std::ceil(mnRange[1].max() / db)) };
 		for (long ndxJ{nuBeg} ; ndxJ <= nuEnd ; ++ndxJ)
 		{
 			for (long ndxI{muBeg} ; ndxI <= muEnd ; ++ndxI)

@@ -67,8 +67,8 @@ scaledCeil
 {
 	double const fhigh(scalar * double(hwSize.high()));
 	double const fwide(scalar * double(hwSize.wide()));
-	size_t const ohigh((size_t)std::ceil(fhigh));
-	size_t const owide((size_t)std::ceil(fwide));
+	size_t const ohigh{ static_cast<size_t>(std::ceil(fhigh)) };
+	size_t const owide{ static_cast<size_t>(std::ceil(fwide)) };
 	return dat::Extents(ohigh, owide);
 }
 
@@ -78,7 +78,10 @@ centerOf
 	( Extents const & someSize
 	)
 {
-	return Spot{{ .5*(double)someSize.high(), .5*(double)someSize.wide() }};
+	return Spot
+		{{ .5 * static_cast<double>(someSize.high())
+		 , .5 * static_cast<double>(someSize.wide())
+		}};
 }
 
 inline
@@ -119,7 +122,12 @@ radiusCircumscribed
 	)
 {
 	// return magnitude(centerOf(someSize));
-	return (.5 * std::hypot((double)someSize.high(), (double)someSize.wide()));
+	return
+		(.5 * std::hypot
+			( static_cast<double>(someSize.high())
+			, static_cast<double>(someSize.wide())
+			)
+		);
 }
 
 inline

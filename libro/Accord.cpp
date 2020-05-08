@@ -176,7 +176,7 @@ Accord :: rmsGapAll
 	double rms{ dat::nullValue<double>() };
 	if (isValid())
 	{
-		double const dof{ (double)numFreeUVs() };
+		double const dof{ static_cast<double>(numFreeUVs()) };
 		if (0. < dof)
 		{
 			rms = std::sqrt(sumSqGapAll() / dof);
@@ -207,7 +207,7 @@ Accord :: rmsGapExcluding
 	double rms{ dat::nullValue<double>() };
 	if (isValid())
 	{
-		double const dof{ (double)numFreeUVs() };
+		double const dof{ static_cast<double>(numFreeUVs()) };
 		if (0. < dof)
 		{
 			double const sumSq{ sumSqGapExcluding(omitNdxs) };

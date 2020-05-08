@@ -70,7 +70,7 @@ namespace
 	restAWhile
 		()
 	{
-		long const microSleep((long)std::floor(sWaitDelay));
+		long const microSleep{ static_cast<long>(std::floor(sWaitDelay)) };
 		std::this_thread::sleep_for(std::chrono::microseconds(microSleep));
 	}
 
@@ -129,9 +129,9 @@ arbitraryMicroDelay
 {
 	// compute some arbitrary wait interval
 	static double const microAmp(1.e6*sMaxCrunchTime);
-	double const updown(std::cos((double)seed));
-	double const delay(std::max(0., std::floor(microAmp*updown)));
-	long const nmicro((long)delay);
+	double const updown{ std::cos(static_cast<double>(seed)) };
+	double const delay{ std::max(0., std::floor(microAmp*updown)) };
+	long const nmicro{ static_cast<long>(delay) };
 	return nmicro;
 }
 
@@ -236,7 +236,7 @@ arbitraryAction
 
 	// select a subsystem arbitrarily
 	double const nanoSecs(1.e9 * sys::time::relativeNow());
-	size_t const ns((size_t)std::floor(nanoSecs));
+	size_t const ns{ static_cast<size_t>(std::floor(nanoSecs)) };
 	size_t const subCount(ns % 7u);
 	SubSysId subId(SubSysId::Unknown);
 	if (0u < subCount)

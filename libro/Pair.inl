@@ -60,7 +60,7 @@ ga::Vector
 Pair :: baseVectorIn0
 	() const
 {
-	return { rigid2w0().location() - rigid1w0().location() };
+	return (rigid2w0().location() - rigid1w0().location());
 }
 
 inline
@@ -68,7 +68,7 @@ ga::BiVector
 Pair :: basePlaneDirIn0
 	() const
 {
-	return { ga::unit(ga::E123 * baseVectorIn0()) };
+	return ga::unit(ga::E123 * baseVectorIn0());
 }
 
 inline
@@ -76,7 +76,7 @@ double
 Pair :: baseMag
 	() const
 {
-	return { ga::magnitude(baseVectorIn0()) };
+	return ga::magnitude(baseVectorIn0());
 }
 
 inline

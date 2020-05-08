@@ -86,7 +86,7 @@ trans_DataMap_test1
 	}
 
 	// check mapping for various test cases
-	double const delta(1. / (double)data.size());
+	double const delta{ 1. / static_cast<double>(data.size()) };
 	double const eps(dat::smallValue<double>());
 	std::vector<std::pair<double, double> > const tExpGots
 		{ std::make_pair( 0.00, func(0.  * delta))

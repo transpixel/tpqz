@@ -48,7 +48,8 @@
 namespace math
 {
 	//! Value of -i*ln(-1)
-	constexpr double pi(4.*std::atan(1.));
+	// constexpr double pi(4.*std::atan(1.)); // g++ extension
+	constexpr double pi{ M_PI };
 
 	//! Value of 2*pi
 	constexpr double twoPi(2.*pi);

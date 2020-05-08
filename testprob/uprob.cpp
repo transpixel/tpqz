@@ -69,14 +69,14 @@ prob_prob_test1
 	if (! (gotMin == expMin))
 	{
 		oss << "Failure of min test" << std::endl;
-		oss << "expMin: " << (int)expMin << std::endl;
-		oss << "gotMin: " << (int)gotMin << std::endl;
+		oss << "expMin: " << static_cast<int>(expMin) << std::endl;
+		oss << "gotMin: " << static_cast<int>(gotMin) << std::endl;
 	}
 	if (! (gotMax == expMax))
 	{
 		oss << "Failure of max test" << std::endl;
-		oss << "expMax: " << (int)expMax << std::endl;
-		oss << "gotMax: " << (int)gotMax << std::endl;
+		oss << "expMax: " << static_cast<int>(expMax) << std::endl;
+		oss << "gotMax: " << static_cast<int>(gotMax) << std::endl;
 	}
 
 	return oss.str();

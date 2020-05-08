@@ -48,7 +48,7 @@ Jump :: fromData
 {
 	std::vector<Jump> jumps;
 
-	size_t const numIn((size_t)std::distance(dataBeg, dataEnd));
+	size_t const numIn(static_cast<size_t>(std::distance(dataBeg, dataEnd)));
 	jumps.reserve(numIn);
 	if (dataEnd != dataBeg)
 	{

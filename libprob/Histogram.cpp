@@ -109,7 +109,7 @@ Histogram :: pdf
 				, probs.begin()
 				, [&sum]
 					( size_t const & count )
-					{ return ((double)count / sum); }
+					{ return (static_cast<double>(count) / sum); }
 				);
 		}
 	}

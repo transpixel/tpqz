@@ -68,7 +68,7 @@ CircleTab<Value> :: smoothed
 	assert(0. <= filterHalfAngle);
 
 	double const fdxHalf(orig.theIndexPerAngle * filterHalfAngle);
-	size_t const ndxHalf((size_t)(std::floor(fdxHalf)));
+	size_t const ndxHalf(static_cast<size_t>(std::floor(fdxHalf)));
 
 	// set return values
 	result.theTabValues
@@ -288,7 +288,7 @@ CircleTab<Value> :: CircleTab
 	, size_t const & numNodes
 	)
 	: theTabValues(numNodes)
-	, theIndexPerAngle((double)theTabValues.size() / math::twoPi)
+	, theIndexPerAngle{ static_cast<double>(theTabValues.size()) / math::twoPi }
 {
 	if (! theTabValues.empty())
 	{
@@ -302,12 +302,13 @@ CircleTab<Value> :: CircleTab
 		// fill table -- wastefull but easy to code // TODO optimize if needed
 
 		// fill table in angle ingrements
-		double const da(math::twoPi / (double)theTabValues.size());
+		double const da
+			{ math::twoPi / static_cast<double>(theTabValues.size()) };
 		std::pair<size_t, size_t> ndxLoHi(0u, 0u);
 		for (size_t ndx(0u) ; ndx < theTabValues.size() ; ++ndx)
 		{
 			// generate angle associated with lookup table
-			double const angleKey((double)ndx * da - math::pi);
+			double const angleKey(static_cast<double>(ndx) * da - math::pi);
 
 			// find bracketing indices
 			ndxLoHi = priv::bracketingIndicesFor(pavPairs, angleKey, &ndxLoHi);

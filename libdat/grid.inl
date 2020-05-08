@@ -43,9 +43,9 @@ dat::grid<Type> :: grid
 	( size_t const & high
 	, size_t const & wide
 	)
-	: theHigh(high)
-	, theWide(wide)
-	, theData(0)
+	: theHigh{ high }
+	, theWide{ wide }
+	, theData{ nullptr }
 {
 	if (0 < theHigh && 0 < theWide)
 	{
@@ -73,7 +73,7 @@ dat::grid<Type> :: grid
 	: grid(high, wide)
 {
 	size_t const size(theHigh * theWide);
-	std::fill(theData + 0, theData + size, fillValue);
+	std::fill(theData, theData + size, fillValue);
 }
 
 template < typename Type >
@@ -81,9 +81,9 @@ inline
 dat::grid<Type> :: grid
 	( grid<Type> const & orig
 	)
-	: theHigh(orig.theHigh)
-	, theWide(orig.theWide)
-	, theData(0)
+	: theHigh{ orig.theHigh }
+	, theWide{ orig.theWide }
+	, theData{ nullptr }
 {
 	if (0 < theHigh && 0 < theWide)
 	{
@@ -153,7 +153,7 @@ inline
 bool
 dat::grid<Type> :: isValid() const
 {
-	return theData != 0;
+	return theData != nullptr;
 }
 
 template < typename Type >
@@ -544,10 +544,10 @@ dat::grid<Type> :: resize
 	size_t const sizenew(high * wide);
 	if (sizeold != sizenew)
 	{
-		if (0 != theData) // deallocate old
+		if (nullptr != theData) // deallocate old
 		{
 			delete [] theData;
-			theData = 0;
+			theData = nullptr;
 		}
 
 		if (0 < sizenew) // allocate new

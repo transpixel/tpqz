@@ -56,6 +56,18 @@ RUN \
 	&& sed -i 's/^#*PermitRootLogin .*$/PermitRootLogin yes/' \
 		/etc/ssh/sshd_config
 
+#
+# -- Compilers
+#
+
+RUN \
+	apt-get -qq update \
+	&& \
+	apt-get install -y \
+		clang-7 \
+	&& \
+	apt-get clean
+
 # SSH login fix. Otherwise user is kicked off after login
 RUN \
 	sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd

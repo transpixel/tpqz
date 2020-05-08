@@ -152,7 +152,7 @@ CdfForward :: preCdfValues
 	 */
 	ptrdiff_t const dataSize(std::distance(freqBeg, freqEnd));
 
-	if (0u < dataSize)
+	if (static_cast<ptrdiff_t>(0) < dataSize)
 	{
 		// configure CDF data size
 		ptrdiff_t const cdfSize(dataSize + 1);

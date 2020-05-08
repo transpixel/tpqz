@@ -58,14 +58,14 @@ CdfInverse :: ndxLocsForUniformDelta
 
 	// establish size values
 	size_t const lastNdx(cdfSize - 1u);
-	double const delta(1. / (double)(lutSize - 1u));
+	double const delta(1. / static_cast<double>(lutSize - 1u));
 
 	// compute return values at uniform delta spacing
 	ndxLocs.reserve(lutSize);
 	for (size_t nn(0u) ; nn < lutSize ; ++nn)
 	{
 		// compute sample value
-		double const value((double)nn * delta);
+		double const value(static_cast<double>(nn) * delta);
 
 		// get bounding indices (specially adjusted for end effects)
 		std::pair<size_t, size_t> const ndxLoHi
@@ -84,7 +84,7 @@ CdfInverse :: ndxLocsForUniformDelta
 		}
 
 		// return absolute fractional index
-		double const index((double)ndxLo + fndx);
+		double const index(static_cast<double>(ndxLo) + fndx);
 		ndxLocs.push_back(index);
 	}
 

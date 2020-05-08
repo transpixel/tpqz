@@ -51,7 +51,7 @@ arithmetic
 		DataType const sum
 			(std::accumulate(beg, end, static_cast<DataType>(0)));
 		size_t const numSamps(std::distance(beg, end));
-		mean = (1./(double)numSamps) * sum;
+		mean = (1./static_cast<double>(numSamps)) * sum;
 	}
 	return mean;
 }
@@ -106,7 +106,8 @@ namespace priv
 				}
 				else // all samples were positive
 				{
-					double const aveFwd{ (1./(double)count) * sumFwd };
+					double const aveFwd
+						{ (1./static_cast<double>(count)) * sumFwd };
 					mean = invFunc(aveFwd);
 				}
 			}
@@ -148,13 +149,13 @@ namespace priv
 			( double const & arg
 			)
 		{
-			return { 1. / arg };
+			return (1. / arg);
 		}
 	}
 
 }
 
-template <typename FwdIter, typename DataType = double>
+template <typename FwdIter, typename DataType>
 inline
 DataType
 geometric
@@ -165,7 +166,7 @@ geometric
 	return priv::meanFor(beg, end, priv::geo::funcFwd, priv::geo::funcInv);
 }
 
-template <typename FwdIter, typename DataType = double>
+template <typename FwdIter, typename DataType>
 inline
 DataType
 harmonic

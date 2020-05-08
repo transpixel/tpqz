@@ -62,10 +62,10 @@ class Camera
 public: //data
 
 	// TODO - if need copy, probably should use shared_ptr (make into baseclass)
-	PinHole const theOptics;
-	dat::Extents const theDetSize;
-	dat::Area<double> const theAreaInImg; // symmetric about optical axis
-	dat::Area<double> const theAreaInDet; // matches dat::Extents
+	PinHole const theOptics{};
+	dat::Extents const theDetSize{};
+	dat::Area<double> const theAreaInImg{}; // symmetric about optical axis
+	dat::Area<double> const theAreaInDet{}; // matches dat::Extents
 
 public: // methods
 

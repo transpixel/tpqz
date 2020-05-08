@@ -70,7 +70,7 @@ points :: onEdge
 	std::vector<ga::Vector> pnts;
 	pnts.reserve(numBetween);
 	ga::Vector const dir(ga::e1);
-	double const delta(1./(double)(numBetween + 1u));
+	double const delta(1. / static_cast<double>(numBetween + 1u));
 	for (size_t nn(0u) ; nn < numBetween ; ++nn)
 	{
 		double const dist(double(nn+1u)*delta);

@@ -116,7 +116,7 @@ dat_array_test2
 
 	Elems const values{{ 3.f, 4.f, 5.f, -6.f, -7.f }};
 	Elems const recips(dat::reciprocals(values));
-	float const expDot{ (float)values.size() };
+	float const expDot{ static_cast<float>(values.size()) };
 	float const gotDot{ dat::dot(values, recips) };
 	if (! dat::nearlyEquals(gotDot, expDot))
 	{

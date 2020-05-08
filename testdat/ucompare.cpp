@@ -61,8 +61,8 @@ dat_compare_test0
 	if (dat::nearlyEquals(a1, b1))
 	{
 		oss << "Failure of a1,b1 test" << std::endl;
-		oss << "a1: " << (int)a1 << std::endl;
-		oss << "b1: " << (int)b1 << std::endl;
+		oss << "a1: " << static_cast<int>(a1) << std::endl;
+		oss << "b1: " << static_cast<int>(b1) << std::endl;
 		oss << "same: " << dat::nearlyEquals(a1,b1) << std::endl;
 	}
 	if (! dat::nearlyEquals(a1, a2))
@@ -76,8 +76,8 @@ dat_compare_test0
 	if (dat::nearlyEquals<uint8_t>(a1, b1, 1u)) // checks < vs. <= tol
 	{
 		oss << "Failure of a1,b1/same test" << std::endl;
-		oss << "a1: " << (int)a1 << std::endl;
-		oss << "b1: " << (int)b1 << std::endl;
+		oss << "a1: " << static_cast<int>(a1) << std::endl;
+		oss << "b1: " << static_cast<int>(b1) << std::endl;
 		oss << "same: " << dat::nearlyEquals<uint8_t>(a1,b1,(b1-a1))
 			<< std::endl;
 	}

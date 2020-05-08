@@ -179,7 +179,7 @@ math_interp_test2
 	// check degenerate case
 	{
 		double const datValue(-19.);
-		std::vector<double> const values{{ datValue }};
+		std::vector<double> const values{ datValue };
 		testArray(oss, 0., datValue, values, "at one value");
 		testArray(oss, .5, expNull, values, "one value .5");
 		testArray(oss, 1., expNull, values, "one value 1.");

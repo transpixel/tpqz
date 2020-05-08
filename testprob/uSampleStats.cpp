@@ -120,7 +120,8 @@ prob_SampleStats_test1
 	std::transform
 		( expHist.begin(), expHist.end()
 		, expPdf.begin()
-		, [&norm] (size_t const & hist) { return norm*(double)hist; }
+		, [&norm] (size_t const & hist)
+			{ return norm*static_cast<double>(hist); }
 		);
 	std::vector<double> const & gotPdf = stats.thePdf;
 	if (! dat::nearlyEquals<double>

@@ -55,11 +55,10 @@ namespace bitwork
 		)
 	{
 		return
-			{ static_cast<WorkType>
+			static_cast<WorkType>
 				( static_cast<WorkType>(loBits)
 				& static_cast<WorkType>(mask)
-				)
-			};
+				);
 	} 
 
 	//! Value associated with (masked and shifted) loBit pattern
@@ -71,7 +70,7 @@ namespace bitwork
 		, WorkType const & shift
 		)
 	{
-		return { static_cast<WorkType>(onLoBits(loBits, mask) >> shift) };
+		return static_cast<WorkType>(onLoBits(loBits, mask) >> shift);
 	}
 
 	//! Promote high values (bitshit left)

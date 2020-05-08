@@ -78,7 +78,7 @@ math_NumDeriv_test1
 			( InType const & arg
 			) const
 		{
-			return { 7.*arg*arg - 3.*arg + 11. };
+			return (7.*arg*arg - 3.*arg + 11.);
 		}
 
 		OutType
@@ -86,7 +86,7 @@ math_NumDeriv_test1
 			( InType const & arg
 			) const
 		{
-			return { 14.*arg - 3. };
+			return (14.*arg - 3.);
 		}
 	};
 

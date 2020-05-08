@@ -85,7 +85,7 @@ dat_ExtentsIterator_test0
 		{
 			for (size_t col(0u) ; col < extents.wide() ; ++col)
 			{
-				if (! ((bool)iter == iter.isActive()))
+				if (! (static_cast<bool>(iter) == iter.isActive()))
 				{
 					oss << "Failure of bool==isActive while active";
 				}
@@ -117,7 +117,7 @@ Bail:
 		// check end condition
 		if (iter.isValid())
 		{
-			if (! ((bool)iter == iter.isActive()))
+			if (! (static_cast<bool>(iter) == iter.isActive()))
 			{
 				oss << "Failure of bool==isActive at end";
 			}

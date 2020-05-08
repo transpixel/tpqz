@@ -93,7 +93,7 @@ prob_Frac9_test1
 		double const diffSq(math::sq(diff));
 		sumSq += diffSq;
 	}
-	double const gotRmse(std::sqrt(sumSq / (double)exp9.size()));
+	double const gotRmse{ std::sqrt(sumSq / static_cast<double>(exp9.size())) };
 
 	double const expRmse(0.);
 	double const tolRmse(5./8.); // e.g. allow for quantization effects

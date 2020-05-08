@@ -73,7 +73,7 @@ SampleEntropy :: inTotal
 	( double const & base
 	) const
 {
-	return ((double)theCount * perElement(base));
+	return (static_cast<double>(theCount) * perElement(base));
 }
 
 std::string

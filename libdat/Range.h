@@ -38,6 +38,7 @@
 #include "libdat/template.h"
 #include "libdat/validity.h"
 
+#include <algorithm>
 #include <string>
 #include <utility>
 

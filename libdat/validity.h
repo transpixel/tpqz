@@ -37,6 +37,9 @@
 #include "libdat/template.h"
 #include "libdat/types.h"
 
+#include <cmath>
+#include <functional>
+#include <limits>
 #include <string>
 #include <type_traits>
 #include <utility>

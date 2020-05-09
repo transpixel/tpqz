@@ -32,8 +32,6 @@
 */
 
 
-#include <limits>
-
 
 namespace dat
 {

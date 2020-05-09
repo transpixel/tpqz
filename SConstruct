@@ -365,6 +365,10 @@ def moduleNameFrom(pathSubDir, tpBuild):
         modname = fields[2]
     tpBuild.logDetail("Inside Func: fields", fields)
     tpBuild.logDetail("Inside Func: modname", modname)
+    # add basename to module libraries
+    if re.search("./lib", pathSubDir):
+        modroot = os.path.basename(os.getcwd())
+        modname = modroot + "_" + modname
     return modname
 
 # process all subDirs containing sconscript files
@@ -374,9 +378,9 @@ for scfile in scfiles:
     tpBuild.logDetail("... Module:", scfile)
     if not tpBuild.tpDryRun:
         modname = moduleNameFrom(scfile, tpBuild)
+        showSconsProgress = tpBuild.tpVerbose # or change name in other files
         Export('scfile')
         Export('modname')
-        showSconsProgress = tpBuild.tpVerbose # or change name in other files
         Export('showSconsProgress')
         SConscript(scfile, exports='env')
 

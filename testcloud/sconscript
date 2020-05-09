@@ -56,17 +56,17 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'cloud'
+ [ 'tpqz_cloud'
 
- , 'img'
- , 'geo'
- , 'ga'
- , 'math'
+ , 'tpqz_img'
+ , 'tpqz_geo'
+ , 'tpqz_ga'
+ , 'tpqz_math'
 
- , 'app'
- , 'io'
- , 'dat'
- , 'sys'
+ , 'tpqz_app'
+ , 'tpqz_io'
+ , 'tpqz_dat'
+ , 'tpqz_sys'
 
  , 'stb'
  ]

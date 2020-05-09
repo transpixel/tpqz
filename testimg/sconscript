@@ -52,12 +52,12 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'img'
- , 'prob'
- , 'io'
- , 'math'
- , 'dat'
- , 'app'
+ [ 'tpqz_img'
+ , 'tpqz_prob'
+ , 'tpqz_io'
+ , 'tpqz_math'
+ , 'tpqz_dat'
+ , 'tpqz_app'
 
  , 'stb'
  ]

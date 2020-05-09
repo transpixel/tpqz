@@ -45,9 +45,9 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'dat'
+ [ 'tpqz_dat'
 
- , 'io'
+ , 'tpqz_io'
  ]
 
 env.Append(LIBS=linklibs)

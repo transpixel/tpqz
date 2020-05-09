@@ -48,14 +48,14 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'map'
+ [ 'tpqz_map'
 
- , 'geo'
- , 'ga'
- , 'math'
- , 'dat'
+ , 'tpqz_geo'
+ , 'tpqz_ga'
+ , 'tpqz_math'
+ , 'tpqz_dat'
 
- , 'io'
+ , 'tpqz_io'
  ]
 
 env.Append(LIBS=linklibs)

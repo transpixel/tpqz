@@ -50,10 +50,10 @@ libpaths = \
 
 linklibs = \
  [ 'stb'
- , 'img'
- , 'io'
- , 'math'
- , 'dat'
+ , 'tpqz_img'
+ , 'tpqz_io'
+ , 'tpqz_math'
+ , 'tpqz_dat'
 
  ]
 

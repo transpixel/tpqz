@@ -47,9 +47,9 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'ga'
+ [ 'tpqz_ga'
 
- , 'io'
+ , 'tpqz_io'
  ]
 
 env.Append(CPPPATH=cpppaths)

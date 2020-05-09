@@ -55,21 +55,21 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'ro'
+ [ 'tpqz_ro'
 
- , 'cloud'
- , 'cam'
+ , 'tpqz_cloud'
+ , 'tpqz_cam'
 
- , 'geo'
- , 'ga'
+ , 'tpqz_geo'
+ , 'tpqz_ga'
 
- , 'prob'
- , 'math'
+ , 'tpqz_prob'
+ , 'tpqz_math'
 
- , 'app'
- , 'dat'
- , 'io'
- , 'file'
+ , 'tpqz_app'
+ , 'tpqz_dat'
+ , 'tpqz_io'
+ , 'tpqz_file'
 
  , 'libboost_filesystem'
  , 'libboost_system'

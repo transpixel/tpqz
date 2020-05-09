@@ -47,7 +47,7 @@
 // to use older packages, easier to just disable warning here.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wint-in-bool-context"
-#include "Eigen"
+#include "Eigen/Eigen"
 #pragma GCC diagnostic pop
 #endif
 

@@ -37,7 +37,7 @@ if showSconsProgress :
 env = env.Clone() # allow module to change anything it wants
 
 cpppaths = \
- [ '/usr/include/eigen3/Eigen/' # TODO move to libla wrapper
+ [ '/usr/include/eigen3/' # TODO move to libla wrapper
  ]
 
 env.Append(CPPPATH=cpppaths);

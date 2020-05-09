@@ -275,7 +275,7 @@ tpBuild.logProgress(str(tpBuild))
 # Paths to include files
 incPath = \
     [ '../'
-    , '/usr/include/eigen3/Eigen/'
+    , '/usr/include/eigen3/'
     ]
 
 

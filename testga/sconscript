@@ -47,16 +47,15 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'ga'
+ [ 'tpqz_ga'
 
- , 'io'
+ , 'tpqz_io'
  ]
 
 env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoFitRigid.cpp')
 env.Program('uAligner.cpp')
 env.Program('uConform.cpp')
 env.Program('uconstructs.cpp')

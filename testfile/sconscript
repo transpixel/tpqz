@@ -43,9 +43,9 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'file'
+ [ 'tpqz_file'
 
- , 'io'
+ , 'tpqz_io'
 
  , 'libboost_filesystem'
  , 'libboost_system'

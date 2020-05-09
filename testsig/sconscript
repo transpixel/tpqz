@@ -51,13 +51,13 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'sig'
- , 'img'
- , 'math'
- , 'io'
- , 'app'
- , 'dat'
- , 'sys'
+ [ 'tpqz_sig'
+ , 'tpqz_img'
+ , 'tpqz_math'
+ , 'tpqz_io'
+ , 'tpqz_app'
+ , 'tpqz_dat'
+ , 'tpqz_sys'
 
  ]
 

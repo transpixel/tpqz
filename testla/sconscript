@@ -47,16 +47,15 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'io'
- , 'math'
- , 'dat'
+ [ 'tpqz_io'
+ , 'tpqz_math'
+ , 'tpqz_dat'
  ]
 
 env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoInverseLS.cpp')
 env.Program('ueigen.cpp')
 
 

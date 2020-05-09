@@ -35,7 +35,6 @@
 
 #include "libtri/IsoTille.h"
 
-#include "libapp/Timer.h"
 #include "libdat/cast.h"
 #include "libdat/ExtentsIterator.h"
 #include "libdat/grid.h"
@@ -45,6 +44,7 @@
 #include "libio/string.h"
 #include "libmath/MapSizeArea.h"
 #include "libmath/math.h"
+#include "libsys/Timer.h"
 
 #include "libdat/MinMax.h"
 
@@ -548,8 +548,8 @@ main
 	size_t const gridHigh{ gridHW };
 	size_t const gridWide{ gridHW };
 
-	app::Timer timer;
-	app::Timer timeInterp;
+	sys::Timer timer;
+	sys::Timer timeInterp;
 
 	// define tessellation geometry
 	constexpr std::array<double, 2u> aDir{{ .125, 1. }};

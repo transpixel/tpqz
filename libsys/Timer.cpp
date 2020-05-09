@@ -28,17 +28,17 @@
 
 
 /*! \file
-\brief Definitions for app::Timer
+\brief Definitions for sys::Timer
 */
 
 
-#include "libapp/Timer.h"
+#include "libsys/Timer.h"
 
 #include <iomanip>
 #include <sstream>
 
 
-namespace app
+namespace sys
 {
 //======================================================================
 

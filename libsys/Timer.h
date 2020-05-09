@@ -26,15 +26,14 @@
 //
 //
 
-#ifndef app_Timer_INCL_
-#define app_Timer_INCL_
+#ifndef sys_Timer_INCL_
+#define sys_Timer_INCL_
 
 /*! \file
-\brief Declarations for app::Timer
+\brief Declarations for sys::Timer
 */
 
 
-#include "libdat/dat.h"
 #include "libsys/time.h"
 
 #include <string>
@@ -42,13 +41,13 @@
 #include <vector>
 
 
-namespace app
+namespace sys
 {
 
 /*! \brief Simple timing support.
 
 \par Example
-\dontinclude testapp/uTimer.cpp
+\dontinclude testsys/uTimer.cpp
 \skip ExampleStart
 \until ExampleEnd
 */
@@ -87,7 +86,6 @@ class Timer
 			() const;
 
 		//! Descriptive information about this instance
-		inline
 		std::string
 		infoString
 			( std::string const & title = std::string()
@@ -136,7 +134,7 @@ public: // methods
 }
 
 // Inline definitions
-#include "libapp/Timer.inl"
+#include "libsys/Timer.inl"
 
-#endif // app_Timer_INCL_
+#endif // sys_Timer_INCL_
 

@@ -51,20 +51,22 @@ libpaths = \
  , '../libapp/'
  , '../libio/'
  , '../libdat/'
+ , '../libsys/'
  , '../extstb/'
  ]
 
 linklibs = \
- [ 'cloud'
+ [ 'tpqz_cloud'
 
- , 'img'
- , 'geo'
- , 'ga'
- , 'math'
+ , 'tpqz_img'
+ , 'tpqz_geo'
+ , 'tpqz_ga'
+ , 'tpqz_math'
 
- , 'app'
- , 'io'
- , 'dat'
+ , 'tpqz_app'
+ , 'tpqz_io'
+ , 'tpqz_dat'
+ , 'tpqz_sys'
 
  , 'stb'
  ]
@@ -75,12 +77,6 @@ env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
 
-env.Program('ConvertToAscii.cpp')
-env.Program('demoAveragePnts.cpp')
-env.Program('demoDistBetween.cpp')
-env.Program('demoLoadBinary.cpp')
-env.Program('FillIndices.cpp')
-env.Program('ThinCloud.cpp')
 env.Program('uFixedPoint.cpp')
 env.Program('uio.cpp')
 

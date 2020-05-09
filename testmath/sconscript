@@ -45,17 +45,16 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'math'
+ [ 'tpqz_math'
 
- ,  'app'
- ,  'io'
- ,  'dat'
+ ,  'tpqz_app'
+ ,  'tpqz_io'
+ ,  'tpqz_dat'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoExpandScalar.cpp')
 env.Program('uangle.cpp')
 env.Program('uCircleTab.cpp')
 env.Program('uCosTable.cpp')

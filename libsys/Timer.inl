@@ -28,14 +28,14 @@
 
 
 /*! \file
-\brief Inline definitions for app::Timer
+\brief Inline definitions for sys::Timer
 */
 
 
 #include <cassert>
 
 
-namespace app
+namespace sys
 {
 //======================================================================
 
@@ -45,7 +45,7 @@ Timer::Interval :: Interval
 	( std::string const & info
 	)
 	: theStart(sys::time::relativeNow())
-	, theStop(dat::badDub)
+	, theStop{ -1. }
 	, theInfo(info)
 { }
 
@@ -70,7 +70,7 @@ bool
 Timer::Interval :: isDone
 	() const
 {
-	return dat::isValid(theStop);
+	return (0. < theStop);
 }
 
 //

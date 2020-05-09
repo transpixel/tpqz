@@ -43,11 +43,10 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'io'
+ [ 'tpqz_io'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoArgs.cpp')
 

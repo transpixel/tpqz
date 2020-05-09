@@ -72,7 +72,7 @@ namespace
 		)
 	{
 		std::normal_distribution<double> distro{ 0., distSigma };
-		return { distro(sRandGen) };
+		return distro(sRandGen);
 	}
 
 	struct Uncertainty

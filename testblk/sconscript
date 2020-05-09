@@ -56,21 +56,21 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'blk'
+ [ 'tpqz_blk'
 
- , 'ro'
+ , 'tpqz_ro'
 
- , 'geo'
- , 'cloud'
- , 'cam'
- , 'ga'
+ , 'tpqz_geo'
+ , 'tpqz_cloud'
+ , 'tpqz_cam'
+ , 'tpqz_ga'
 
- , 'prob'
- , 'math'
+ , 'tpqz_prob'
+ , 'tpqz_math'
 
- , 'app'
- , 'dat'
- , 'io'
+ , 'tpqz_app'
+ , 'tpqz_dat'
+ , 'tpqz_io'
 
  , 'libboost_graph'
  , 'libboost_serialization'
@@ -80,7 +80,6 @@ linklibs = \
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoGraph1.cpp')
 env.Program('ublk.cpp')
 env.Program('uform.cpp')
 

@@ -34,12 +34,12 @@
 #include "libapp/Usage.h"
 
 #include "build/version.h"
-#include "libapp/Timer.h"
 #include "libcloud/cast.h"
 #include "libcloud/FixedPoint.h"
 #include "libcloud/io.h"
 #include "libcloud/stats.h"
 #include "libio/stream.h"
+#include "libsys/Timer.h"
 
 #include <algorithm>
 #include <cassert>
@@ -90,8 +90,8 @@ main
 	int argnum(0);
 	std::string const inpath(argv[++argnum]);
 
-	app::Timer t1;
-	app::Timer t2;
+	sys::Timer t1;
+	sys::Timer t2;
 
 	// load data
 	t1.start("loadBinary");

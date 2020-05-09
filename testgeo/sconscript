@@ -52,26 +52,22 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'geo'
+ [ 'tpqz_geo'
 
- , 'cam'
- , 'ga'
+ , 'tpqz_cam'
+ , 'tpqz_ga'
 
- , 'prob'
- , 'math'
+ , 'tpqz_prob'
+ , 'tpqz_math'
 
- , 'dat'
- , 'io'
- , 'app'
+ , 'tpqz_dat'
+ , 'tpqz_io'
+ , 'tpqz_app'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoArcQuant.cpp')
-env.Program('demoRayGaps.cpp')
-env.Program('demoSimSI.cpp')
-env.Program('demoThales.cpp')
 env.Program('ucube.cpp')
 env.Program('uintersect.cpp')
 env.Program('uio.cpp')

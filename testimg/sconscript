@@ -52,12 +52,12 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'img'
- , 'prob'
- , 'io'
- , 'math'
- , 'dat'
- , 'app'
+ [ 'tpqz_img'
+ , 'tpqz_prob'
+ , 'tpqz_io'
+ , 'tpqz_math'
+ , 'tpqz_dat'
+ , 'tpqz_app'
 
  , 'stb'
  ]
@@ -66,7 +66,6 @@ env.Append(CPPPATH=cpppaths)
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoRaw10.cpp')
 env.Program('ubrand.cpp')
 env.Program('ucfa.cpp')
 env.Program('ucolor.cpp')

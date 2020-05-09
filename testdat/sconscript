@@ -45,15 +45,14 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'dat'
+ [ 'tpqz_dat'
 
- , 'io'
+ , 'tpqz_io'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoEnableIf.cpp')
 env.Program('ualgorithm.cpp')
 env.Program('uArea.cpp')
 env.Program('uarray.cpp')

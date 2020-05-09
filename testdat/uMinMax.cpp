@@ -33,7 +33,6 @@
 
 #include "libdat/MinMax.h"
 
-#include "libmath/math.h"
 #include "libio/stream.h"
 
 #include <cmath>
@@ -62,7 +61,7 @@ dat_MinMax_test0
 	{
 		oss << "Failure of null/null nearlyEquals test" << std::endl;
 	}
-	dat::MinMax<double> const goodA(.2, math::pi);
+	dat::MinMax<double> const goodA(.2, M_PI);
 	dat::MinMax<double> const goodB(1./5., std::atan2(0., -1.));
 	if (! goodA.nearlyEquals(goodB))
 	{

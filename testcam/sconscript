@@ -49,21 +49,20 @@ libpaths = \
  ]
 
 linklibs = \
- [ 'cam'
+ [ 'tpqz_cam'
 
- , 'geo'
- , 'ga'
- , 'prob'
- , 'math'
- , 'dat'
- , 'app'
- , 'io'
+ , 'tpqz_geo'
+ , 'tpqz_ga'
+ , 'tpqz_prob'
+ , 'tpqz_math'
+ , 'tpqz_dat'
+ , 'tpqz_app'
+ , 'tpqz_io'
  ]
 
 env.Append(LIBS=linklibs)
 env.Append(LIBPATH=libpaths)
 
-env.Program('demoAngleCal.cpp')
 
 env.Program('uCamera.cpp')
 env.Program('ufit.cpp')

@@ -34,7 +34,6 @@
 #include "libro/FitBaseZ.h"
 #include "libro/sampcon.h"
 
-#include "libapp/Timer.h"
 #include "libdat/info.h"
 #include "libdat/validity.h"
 #include "libio/sprintf.h"
@@ -42,6 +41,7 @@
 #include "libmath/math.h"
 #include "libro/Accord.h"
 #include "libro/QuadForm.h"
+#include "libsys/Timer.h"
 
 #include <iostream>
 #include <memory>
@@ -374,7 +374,7 @@ ro_FitBaseZ_test2
 	// create a "large" (relative to combinatorial) number of measurements
 	std::vector<PairUV> const uvs{ simUVs(roExp, 9u) };
 
-	app::Timer timer;
+	sys::Timer timer;
 
 	// get sample-consensus solution - by brute force combos
 	{
